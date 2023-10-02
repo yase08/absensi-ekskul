@@ -15,31 +15,48 @@ model User {
   mobileNumber         String?
   password             String
   image                String?
-  rayon                Rayon          @relation(fields: [rayonId], references: [id])
-  rombel               Rombel         @relation(fields: [rombelId], references: [id])
   role                 Role           @relation(fields: [roleId], references: [id])
-  ekskul               Ekskul         @relation(fields: [ekskulId], references: [id])
-  rayonId              Int            @unique
-  rombelId             Int            @unique
+  ekskuls              UserOnEkskul[]
   roleId               Int            @unique
-  ekskulId             Int
   announcements        Announcement[]
   passwordChangedAt    DateTime?      @db.Timestamptz(3)
   passwordResetToken   String?
   passwordResetExpires DateTime?      @db.Timestamptz(3)
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
-  Attendance           Attendance[]
-  UserOnEkskul         UserOnEkskul[]
+  Instructor           InstructorAttendance[]
+}
+
+model Student {
+  id           Int              @id @default(autoincrement())
+  name         String
+  nis          String
+  email        String
+  mobileNumber String
+  rombel       Rombel           @relation(fields: [rombelId], references: [id])
+  rayon        Rayon            @relation(fields: [rayonId], references: [id])
+  ekskuls      StudentOnEskul[]
+  rombelId     Int              @unique
+  rayonId      Int              @unique
+  Attendance   Attendance[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model StudentOnEskul {
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId Int
+  ekskul    Ekskul  @relation(fields: [ekskulId], references: [id])
+  ekskulId  Int
+
+  @@id([studentId, ekskulId])
 }
 
 model UserOnEkskul {
-  user     User       @relation(fields: [userId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
   userId   Int
-  ekskul   Permission @relation(fields: [ekskulId], references: [id])
+  ekskul   Ekskul @relation(fields: [ekskulId], references: [id])
   ekskulId Int
-  Role     Role?      @relation(fields: [roleId], references: [id])
-  roleId   Int?
 
   @@id([userId, ekskulId])
 }
@@ -54,7 +71,9 @@ model Gallery {
 }
 
 model Assessment {
-  id Int @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ActivityProgram {
@@ -89,7 +108,7 @@ model ScheduleOnEkskul {
 model Rayon {
   id        Int      @id @default(autoincrement())
   name      String
-  user      User?
+  Student   Student?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -97,7 +116,7 @@ model Rayon {
 model Rombel {
   id        Int      @id @default(autoincrement())
   name      String
-  user      User?
+  Student   Student?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -107,26 +126,27 @@ model Ekskul {
   name       String
   category   EkskulCategory     @relation(fields: [categoryId], references: [id])
   categoryId Int                @unique
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
-  User       User[]
+  User       UserOnEkskul[]
   Gallery    Gallery[]
   Schedules  ScheduleOnEkskul[]
+  Student    StudentOnEskul[]
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
 }
 
 model EkskulCategory {
   id        Int      @id @default(autoincrement())
   name      String
+  Ekskul    Ekskul?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Ekskul    Ekskul?
 }
 
 model Announcement {
   id          Int      @id @default(autoincrement())
   title       String
   description String
-  author      User?    @relation(fields: [authorId], references: [id])
+  author      User     @relation(fields: [authorId], references: [id])
   authorId    Int
   image       String?
   createdAt   DateTime @default(now())
@@ -134,22 +154,20 @@ model Announcement {
 }
 
 model Permission {
-  id           Int                @id @default(autoincrement())
-  name         String
-  roles        RoleOnPermission[]
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  UserOnEkskul UserOnEkskul[]
+  id        Int                @id @default(autoincrement())
+  name      String
+  roles     RoleOnPermission[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
 }
 
 model Role {
-  id           Int                @id @default(autoincrement())
-  name         String
-  permissions  RoleOnPermission[]
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  User         User?
-  UserOnEkskul UserOnEkskul[]
+  id          Int                @id @default(autoincrement())
+  name        String
+  permissions RoleOnPermission[]
+  User        User?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 }
 
 model RoleOnPermission {
@@ -164,10 +182,19 @@ model RoleOnPermission {
 model Attendance {
   id        Int                @id @default(autoincrement())
   category  CategoryAttendance
-  siswa     User               @relation(fields: [siswaId], references: [id])
+  siswa     Student            @relation(fields: [siswaId], references: [id])
   siswaId   Int
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
+}
+
+model InstructorAttendance {
+  id           Int                @id @default(autoincrement())
+  category     CategoryAttendance
+  instructor   User               @relation(fields: [instructorId], references: [id])
+  instructorId Int
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 }
 
 enum CategoryAttendance {
