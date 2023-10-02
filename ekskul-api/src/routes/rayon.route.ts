@@ -9,8 +9,7 @@ class RayonRoutes extends RayonController {
 
   constructor() {
     super();
-    this.router = Router() as Router;
-  }
+    this.router = Router() as Router;}
 
   routes(): Router {
     this.router.post("/", this.createRayon);

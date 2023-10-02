@@ -14,6 +14,13 @@ import hpp from "hpp";
 import session from "express-session";
 import { swaggerClient, swaggerServe } from "./libs/swagger.lib";
 import AuthRoutes from "./routes/auth.route";
+import AttendanceRoutes from "./routes/attendance.route";
+import RayonRoutes from "./routes/rayon.route";
+import RombelRoutes from "./routes/rombel.route";
+import RoleRoutes from "./routes/role.route";
+import EkskulCategoryRoutes from "./routes/ekskulCategory.route";
+import EkskulRoutes from "./routes/ekskul.route";
+import StudentRoutes from "./routes/student.route";
 
 // Membuat class App yang yang berfungsi sebagai server express
 export class App {
@@ -80,6 +87,13 @@ export class App {
   // Digunakan untuk memanggil route
   protected route(): void {
     this.app.use(`${this.version}/auth`, AuthRoutes);
+    this.app.use(`${this.version}/attendance`, AttendanceRoutes);
+    this.app.use(`${this.version}/rayon`, RayonRoutes);
+    this.app.use(`${this.version}/rombel`, RombelRoutes);
+    this.app.use(`${this.version}/ekskul`, EkskulRoutes);
+    this.app.use(`${this.version}/ekskulCategory`, EkskulCategoryRoutes);
+    this.app.use(`${this.version}/role`, RoleRoutes);
+    this.app.use(`${this.version}/student`, StudentRoutes);
   }
 
   // Digunakan untuk menjalankan server express

@@ -7,37 +7,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Attendance {
+  id        Int                @id @default(autoincrement())
+  date      String
+  category  CategoryAttendance
+  siswa     Student            @relation(fields: [siswaId], references: [id])
+  siswaId   Int
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
 model User {
-  id                   Int            @id @default(autoincrement())
-  email                String         @unique
-  name                 String         @unique
+  id                   Int                    @id @default(autoincrement())
+  email                String                 @unique
+  name                 String                 @unique
   nis                  String?
   mobileNumber         String?
   password             String
   image                String?
-  role                 Role           @relation(fields: [roleId], references: [id])
+  role                 Role                   @relation(fields: [roleId], references: [id])
   ekskuls              UserOnEkskul[]
-  roleId               Int            @unique
+  roleId               Int                    @unique
   announcements        Announcement[]
-  passwordChangedAt    DateTime?      @db.Timestamptz(3)
+  passwordChangedAt    DateTime?              @db.Timestamptz(3)
   passwordResetToken   String?
-  passwordResetExpires DateTime?      @db.Timestamptz(3)
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
+  passwordResetExpires DateTime?              @db.Timestamptz(3)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
   Instructor           InstructorAttendance[]
 }
 
 model Student {
   id           Int              @id @default(autoincrement())
   name         String
-  nis          String
+  nis          String           @unique
   email        String
   mobileNumber String
   rombel       Rombel           @relation(fields: [rombelId], references: [id])
   rayon        Rayon            @relation(fields: [rayonId], references: [id])
   ekskuls      StudentOnEskul[]
-  rombelId     Int              @unique
-  rayonId      Int              @unique
+  rombelId     Int
+  rayonId      Int
   Attendance   Attendance[]
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
@@ -106,26 +116,26 @@ model ScheduleOnEkskul {
 }
 
 model Rayon {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  Student   Student?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  Student   Student[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Rombel {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  Student   Student?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  Student   Student[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Ekskul {
   id         Int                @id @default(autoincrement())
   name       String
   category   EkskulCategory     @relation(fields: [categoryId], references: [id])
-  categoryId Int                @unique
+  categoryId Int
   User       UserOnEkskul[]
   Gallery    Gallery[]
   Schedules  ScheduleOnEkskul[]
@@ -137,7 +147,7 @@ model Ekskul {
 model EkskulCategory {
   id        Int      @id @default(autoincrement())
   name      String
-  Ekskul    Ekskul?
+  Ekskul    Ekskul[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -177,15 +187,6 @@ model RoleOnPermission {
   permissionId Int
 
   @@id([roleId, permissionId])
-}
-
-model Attendance {
-  id        Int                @id @default(autoincrement())
-  category  CategoryAttendance
-  siswa     Student            @relation(fields: [siswaId], references: [id])
-  siswaId   Int
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
 }
 
 model InstructorAttendance {
