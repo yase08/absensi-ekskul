@@ -21,6 +21,9 @@ import RoleRoutes from "./routes/role.route";
 import EkskulCategoryRoutes from "./routes/ekskulCategory.route";
 import EkskulRoutes from "./routes/ekskul.route";
 import StudentRoutes from "./routes/student.route";
+import ScheduleRoutes from "./routes/schedule.route";
+import GalleryRoutes from "./routes/gallery.route";
+import ActivityProgramRoutes from "./routes/activityProgram.route";
 
 // Membuat class App yang yang berfungsi sebagai server express
 export class App {
@@ -94,6 +97,9 @@ export class App {
     this.app.use(`${this.version}/ekskulCategory`, EkskulCategoryRoutes);
     this.app.use(`${this.version}/role`, RoleRoutes);
     this.app.use(`${this.version}/student`, StudentRoutes);
+    this.app.use(`${this.version}/activityProgram`, ActivityProgramRoutes);
+    this.app.use(`${this.version}/schedule`, ScheduleRoutes);
+    this.app.use(`${this.version}/gallery`, GalleryRoutes);
   }
 
   // Digunakan untuk menjalankan server express
