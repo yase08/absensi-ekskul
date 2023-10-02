@@ -18,9 +18,11 @@ model User {
   rayon                Rayon          @relation(fields: [rayonId], references: [id])
   rombel               Rombel         @relation(fields: [rombelId], references: [id])
   role                 Role           @relation(fields: [roleId], references: [id])
+  ekskul               Ekskul         @relation(fields: [ekskulId], references: [id])
   rayonId              Int            @unique
   rombelId             Int            @unique
   roleId               Int            @unique
+  ekskulId             Int
   announcements        Announcement[]
   passwordChangedAt    DateTime?      @db.Timestamptz(3)
   passwordResetToken   String?
@@ -28,6 +30,60 @@ model User {
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
   Attendance           Attendance[]
+  UserOnEkskul         UserOnEkskul[]
+}
+
+model UserOnEkskul {
+  user     User       @relation(fields: [userId], references: [id])
+  userId   Int
+  ekskul   Permission @relation(fields: [ekskulId], references: [id])
+  ekskulId Int
+  Role     Role?      @relation(fields: [roleId], references: [id])
+  roleId   Int?
+
+  @@id([userId, ekskulId])
+}
+
+model Gallery {
+  id        Int      @id @default(autoincrement())
+  url       String
+  ekskul    Ekskul   @relation(fields: [ekskulId], references: [id])
+  ekskulId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Assessment {
+  id Int @id @default(autoincrement())
+}
+
+model ActivityProgram {
+  id        Int      @id @default(autoincrement())
+  activity  String
+  task      String
+  startDate String
+  endDate   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Schedule {
+  id        Int                @id @default(autoincrement())
+  day       String
+  class     String
+  room      String
+  ekskuls   ScheduleOnEkskul[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+model ScheduleOnEkskul {
+  ekskul     Ekskul   @relation(fields: [ekskulId], references: [id])
+  ekskulId   Int
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId Int
+
+  @@id([ekskulId, scheduleId])
 }
 
 model Rayon {
@@ -47,12 +103,15 @@ model Rombel {
 }
 
 model Ekskul {
-  id         Int            @id @default(autoincrement())
+  id         Int                @id @default(autoincrement())
   name       String
-  category   EkskulCategory @relation(fields: [categoryId], references: [id])
-  categoryId Int            @unique
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  category   EkskulCategory     @relation(fields: [categoryId], references: [id])
+  categoryId Int                @unique
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  User       User[]
+  Gallery    Gallery[]
+  Schedules  ScheduleOnEkskul[]
 }
 
 model EkskulCategory {
@@ -75,20 +134,22 @@ model Announcement {
 }
 
 model Permission {
-  id        Int                @id @default(autoincrement())
-  name      String
-  roles     RoleOnPermission[]
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
+  id           Int                @id @default(autoincrement())
+  name         String
+  roles        RoleOnPermission[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  UserOnEkskul UserOnEkskul[]
 }
 
 model Role {
-  id          Int                @id @default(autoincrement())
-  name        String
-  permissions RoleOnPermission[]
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  User        User?
+  id           Int                @id @default(autoincrement())
+  name         String
+  permissions  RoleOnPermission[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  User         User?
+  UserOnEkskul UserOnEkskul[]
 }
 
 model RoleOnPermission {

@@ -55,6 +55,61 @@ export class AuthService {
     }
   }
 
+  async registerService(req: Request): Promise<any> {
+    try {
+      const emailArray: string[] = req.body.name.split(" ");
+      let password: string = "";
+      let email: string = "";
+
+      for (const namePart of emailArray) {
+        email = `${namePart}@smkwikrama.sch.id`; // Tentukan variabel email di sini
+      }
+
+      for (let i = 0; i < 4 && i < emailArray.length; i++) {
+        password += emailArray[i].slice(0, 1); // Mengambil satu karakter pertama dari setiap bagian nama
+      }
+
+      // Mengambil 4 angka terakhir dari NIS
+      const nisLast4: string = req.body.nis.slice(-4);
+
+      // Menggabungkan 4 angka terakhir dari NIS ke dalam password
+      password += nisLast4;
+
+      const user = await prisma.user.findUnique({ where: { email } }); // Tambahkan await di sini
+
+      if (user) throw apiResponse(status.BAD_REQUEST, "User already exists");
+
+      const hashedPassword = await hashPassword(password);
+
+      const userData = await prisma.user.create({
+        data: {
+          ...req.body,
+          password: hashedPassword,
+          email: email,
+          roleId: 1,
+        },
+      });
+
+      // await prisma.userOnEkskul.create({
+      //   data: {
+      //     ekskul: ekskul,
+      //   },
+      // });
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Register Success", undefined)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
   async forgotPasswordService(req: Request): Promise<any> {
     try {
       const user = await prisma.user.findUnique({
@@ -106,7 +161,7 @@ export class AuthService {
       const user = await prisma.user.findFirst({
         where: {
           passwordResetToken: hashedToken,
-          passwordResetExpires: { gt: Date.now() },
+          passwordResetExpires: { gt: new Date() },
         },
       });
 
