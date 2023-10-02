@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   Int            @id @default(autoincrement())
+  email                String         @unique
+  name                 String         @unique
+  nis                  String?
+  mobileNumber         String?
+  password             String
+  image                String?
+  rayon                Rayon          @relation(fields: [rayonId], references: [id])
+  rombel               Rombel         @relation(fields: [rombelId], references: [id])
+  role                 Role           @relation(fields: [roleId], references: [id])
+  rayonId              Int            @unique
+  rombelId             Int            @unique
+  roleId               Int            @unique
+  announcements        Announcement[]
+  passwordChangedAt    DateTime?      @db.Timestamptz(3)
+  passwordResetToken   String?
+  passwordResetExpires DateTime?      @db.Timestamptz(3)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  Attendance           Attendance[]
+}
+
+model Rayon {
+  id        Int      @id @default(autoincrement())
+  name      String
+  user      User?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Rombel {
+  id        Int      @id @default(autoincrement())
+  name      String
+  user      User?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ekskul {
+  id         Int            @id @default(autoincrement())
+  name       String
+  category   EkskulCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int            @unique
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+model EkskulCategory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Ekskul    Ekskul?
+}
+
+model Announcement {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  author      User?    @relation(fields: [authorId], references: [id])
+  authorId    Int
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Permission {
+  id        Int                @id @default(autoincrement())
+  name      String
+  roles     RoleOnPermission[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+model Role {
+  id          Int                @id @default(autoincrement())
+  name        String
+  permissions RoleOnPermission[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  User        User?
+}
+
+model RoleOnPermission {
+  role         Role       @relation(fields: [roleId], references: [id])
+  roleId       Int
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId Int
+
+  @@id([roleId, permissionId])
+}
+
+model Attendance {
+  id        Int                @id @default(autoincrement())
+  category  CategoryAttendance
+  siswa     User               @relation(fields: [siswaId], references: [id])
+  siswaId   Int
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+enum CategoryAttendance {
+  HADIR
+  SAKIT
+  IZIN
+  ALPA
+}
