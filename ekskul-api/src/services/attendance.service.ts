@@ -11,11 +11,12 @@ export class AttendanceService {
   async createAttendanceService(req: Request): Promise<any> {
     try {
       const attendanceData = req.body;
+      // const date = new Date();
 
       const createAttendancePromises = attendanceData.map(
         async (attendance: any) => {
           await prisma.attendance.create({
-            data: attendance,
+            data: { ...attendance },
           });
         }
       );

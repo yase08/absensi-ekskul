@@ -14,6 +14,8 @@ export class RayonService {
         where: { name: req.body.name },
       });
 
+      console.log(req.body);
+
       if (rayon)
         throw apiResponse(
           status.NOT_FOUND,
@@ -23,6 +25,9 @@ export class RayonService {
       const createRayon = await prisma.rayon.create({
         data: req.body,
       });
+
+      console.log(createRayon);
+
       if (!createRayon)
         throw apiResponse(status.FORBIDDEN, "Create new rayon failed");
 

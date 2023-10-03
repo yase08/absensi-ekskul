@@ -10,19 +10,20 @@ const prisma = new PrismaClient();
 export class EkskulService {
   async createEkskulService(req: Request): Promise<any> {
     try {
-      const ekskul = await prisma.ekskul.findFirst({
-        where: { name: req.body.name },
-      });
+      // const ekskul = await prisma.ekskul.findFirst({
+      //   where: { name: req.body.name },
+      // });
 
-      if (ekskul)
-        throw apiResponse(
-          status.NOT_FOUND,
-          `Ekskul ${req.body.name} already exist`
-        );
+      // if (ekskul)
+      //   throw apiResponse(
+      //     status.NOT_FOUND,
+      //     `Ekskul ${req.body.name} already exist`
+      //   );
 
       const createEkskul = await prisma.ekskul.create({
         data: req.body,
       });
+
       if (!createEkskul)
         throw apiResponse(status.FORBIDDEN, "Create new ekskul failed");
 
