@@ -1,23 +1,32 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { PrismaClient } from "@prisma/client";
 
 // Berfungsi untuk menghandle logic dari controler
 
-const prisma = new PrismaClient();
+const db = require("../db/models");
 
 export class RoomService {
   async createRoomService(req: Request): Promise<any> {
     try {
-      const createRoom = await prisma.room.create({
-        data: req.body,
+      const room = await db.room.findOne({
+        where: { name: req.body.name },
       });
+
+      if (room)
+        throw apiResponse(
+          status.CONFLICT,
+          `Room ${req.body.name} already exist`
+        );
+
+      const createRoom = await db.room.create(req.body);
 
       if (!createRoom)
         throw apiResponse(status.FORBIDDEN, "Create new room failed");
 
-      return Promise.resolve(apiResponse(status.OK, "Create new room success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Create new room success")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

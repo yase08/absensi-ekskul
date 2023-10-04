@@ -13,6 +13,7 @@ export class GalleryService {
       const createGallery = await prisma.gallery.create({
         data: req.body,
       });
+      
       if (!createGallery)
         throw apiResponse(status.FORBIDDEN, "Create new gallery failed");
 

@@ -1,23 +1,19 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { PrismaClient } from "@prisma/client";
 
 // Berfungsi untuk menghandle logic dari controler
 
-const prisma = new PrismaClient();
+const db = require("../db/models");
 
 export class AttendanceService {
   async createAttendanceService(req: Request): Promise<any> {
     try {
       const attendanceData = req.body;
-      // const date = new Date();
 
       const createAttendancePromises = attendanceData.map(
         async (attendance: any) => {
-          await prisma.attendance.create({
-            data: { ...attendance },
-          });
+          await db.attendance.create(attendance);
         }
       );
 

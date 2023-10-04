@@ -1,29 +1,27 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { PrismaClient } from "@prisma/client";
 
 // Berfungsi untuk menghandle logic dari controler
 
-const prisma = new PrismaClient();
+const db = require("../db/models");
 
 export class RombelService {
   async createRombelService(req: Request): Promise<any> {
     try {
-      const rombel = await prisma.rombel.findFirst({
+      const rombel = await db.rombel.findOne({
         where: { name: req.body.name },
       });
 
       if (rombel)
         throw apiResponse(
-          status.NOT_FOUND,
+          status.CONFLICT,
           `Rombel ${req.body.name} already exist`
         );
 
-      const createRayon = await prisma.rombel.create({
-        data: req.body,
-      });
-      if (!createRayon)
+      const createRombel = await db.rombel.create(req.body);
+
+      if (!createRombel)
         throw apiResponse(status.FORBIDDEN, "Create new rombel failed");
 
       return Promise.resolve(

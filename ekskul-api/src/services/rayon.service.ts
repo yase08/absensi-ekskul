@@ -1,32 +1,23 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { PrismaClient } from "@prisma/client";
 
 // Berfungsi untuk menghandle logic dari controler
 
-const prisma = new PrismaClient();
+const db = require("../db/models/index.js");
 
 export class RayonService {
   async createRayonService(req: Request): Promise<any> {
     try {
-      const rayon = await prisma.rayon.findFirst({
-        where: { name: req.body.name },
-      });
-
-      console.log(req.body);
+      const rayon = await db.rayon.findOne({ where: { name: req.body.name } });
 
       if (rayon)
         throw apiResponse(
-          status.NOT_FOUND,
+          status.CONFLICT,
           `Rayon ${req.body.name} already exist`
         );
 
-      const createRayon = await prisma.rayon.create({
-        data: req.body,
-      });
-
-      console.log(createRayon);
+      const createRayon = await db.rayon.create(req.body);
 
       if (!createRayon)
         throw apiResponse(status.FORBIDDEN, "Create new rayon failed");

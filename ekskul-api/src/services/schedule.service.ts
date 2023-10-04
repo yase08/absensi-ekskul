@@ -1,41 +1,15 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { PrismaClient } from "@prisma/client";
 
 // Berfungsi untuk menghandle logic dari controler
 
-const prisma = new PrismaClient();
+const db = require("../db/models");
 
 export class ScheduleService {
   async createScheduleService(req: Request): Promise<any> {
     try {
-      const schedule = await prisma.schedule.findFirst({
-        where: { day: req.body.day },
-      });
-
-      if (schedule)
-        throw apiResponse(
-          status.NOT_FOUND,
-          `Schedule ${req.body.name} already exist`
-        );
-
-      const createSchedule = await prisma.schedule.create({
-        data: {
-          ...req.body,
-          ekskuls: {
-            create: req.body.ekskuls.map((ekskulId) => {
-              return {
-                ekskul: {
-                  connect: {
-                    id: ekskulId,
-                  },
-                },
-              };
-            }),
-          },
-        },
-      });
+      const createSchedule = await db.schedule.create(req.body);
 
       if (!createSchedule)
         throw apiResponse(status.FORBIDDEN, "Create new schedule failed");

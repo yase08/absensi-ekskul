@@ -1,17 +1,15 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { PrismaClient } from "@prisma/client";
 
 // Berfungsi untuk menghandle logic dari controler
-
-const prisma = new PrismaClient();
+const db = require("../db/models/index.js");
 
 export class StudentService {
   async createStudentService(req: Request): Promise<any> {
     try {
-      const student = await prisma.student.findFirst({
-        where: { nis: req.body.nis },
+      const student = await db.student.findOne({
+        where: { name: req.body.name },
       });
 
       if (student)
@@ -20,22 +18,12 @@ export class StudentService {
           `Student ${req.body.name} already exist`
         );
 
-      const createStudent = await prisma.student.create({
-        data: {
-          ...req.body,
-          ekskuls: {
-            create: req.body.ekskuls.map((ekskulId) => {
-              return {
-                ekskul: {
-                  connect: {
-                    id: ekskulId,
-                  },
-                },
-              };
-            }),
-          },
-        },
+      const ekskuls = await db.ekskul.findAll({
+        where: { id: req.body.ekskuls },
       });
+
+      const createStudent = await db.student.create(req.body);
+      await createStudent.addEkskul(ekskuls);
 
       if (!createStudent)
         throw apiResponse(status.FORBIDDEN, "Create new student failed");
