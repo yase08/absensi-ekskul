@@ -9,7 +9,7 @@ import { extensionSupport } from "../helpers/extension.helper";
 export const upload = multer({
   storage: multer.diskStorage({
     destination(_: Request, file: Express.Multer.File, done: any) {
-      let disk: string = "/tmp";
+      let disk: string = "../public/uploads";
 
       if (!file) {
         done(new ExpressError("Uploading file failder"), null);

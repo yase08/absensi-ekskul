@@ -12,4 +12,31 @@ export class EkskulController extends EkskulService {
       return res.status(error.statusCode).json(error);
     }
   };
+
+  getAllEkskul = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getAllEkskulService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  updateEkskul = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.updateEkskulService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  deleteEkskul = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.deleteEkskulService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
 }

@@ -12,4 +12,31 @@ export class RayonController extends RayonService {
       return res.status(error.statusCode).json(error);
     }
   };
+
+  getAllRayon = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getAllRayonService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  updateRayon = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.updateRayonService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  deleteRayon = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.deleteRayonService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
 }

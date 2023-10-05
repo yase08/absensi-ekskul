@@ -14,4 +14,22 @@ export class AttendanceController extends AttendanceService {
       return res.status(error.statusCode).json(error);
     }
   };
+
+  getAllAttendance = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getAllAttendanceService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  updateAttendance = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.updateAttendanceService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
 }

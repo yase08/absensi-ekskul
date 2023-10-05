@@ -14,6 +14,9 @@ class RombelRoutes extends RombelController {
 
   routes(): Router {
     this.router.post("/", this.createRombel);
+    this.router.get("/", this.getAllRombel);
+    this.router.put("/:id", this.updateRombel);
+    this.router.delete("/:id", this.deleteRombel);
 
     return this.router;
   }
