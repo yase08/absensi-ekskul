@@ -1,21 +1,35 @@
 import {GiHamburgerMenu} from 'react-icons/gi'
 import {BiCodeAlt} from 'react-icons/bi'
 import {BsKeyboard} from 'react-icons/bs'
-import {MdKeyboardDoubleArrowRight} from 'react-icons/md'
+import {MdKeyboardDoubleArrowRight, MdColorLens} from 'react-icons/md'
 import {FiSettings, FiActivity} from 'react-icons/fi'
 import {CgProfile, CgLogOut} from 'react-icons/cg'
 import {AiOutlineMail, AiOutlineBell, AiOutlineClose} from 'react-icons/ai'
 import { useState } from 'react';
+import { useEffect } from 'react'
 // import AdminPicture from './AdminPicture';
 // import axios from 'axios';
 
 
 
 // eslint-disable-next-line react/prop-types
-const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavbar}) => {
+const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavbar, toggleOpenChangeBg}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenNotification, setIsOpenNotification] = useState(false);
     const [isOpenMassage, setIsOpenMassage] = useState(false);
+    const [isButtonVisible, setIsButtonVisible] = useState(false);
+    const [isButtonVisible1, setIsButtonVisible1] = useState(false);
+    const [isButtonVisible2, setIsButtonVisible2] = useState(false);
+    const [backgroundColor, setBackgroundColor] = useState('bg-primary');
+
+
+    useEffect(() => {
+      const savedColor = localStorage.getItem('backgroundColor');
+      if (savedColor) {
+        setBackgroundColor(savedColor);
+      }
+    }, []);
+
   
     const toggleDropdown = () => {
       setIsOpen(!isOpen);
@@ -48,46 +62,77 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
             return name.substring(0, maxLength) + '...';
         }
     }
+
+    const handleOpenForm = (event) => {
+        if (event.ctrlKey && event.shiftKey && event.key === '>') {
+          setIsButtonVisible(true);
+        }
     
+        if (event.ctrlKey && event.shiftKey && event.key === '<') {
+          setIsButtonVisible(false);
+        }
+      };
+    
+      useEffect(() => {
+        document.addEventListener('keydown', handleOpenForm);
+    
+        return () => {
+          document.removeEventListener('keydown', handleOpenForm);
+        };
+      }, []);
 
-    // useEffect(() => {
-    //     getUserSigninData();
-    // }, []);
-
-    // const [username, setUsername] = useState(false);
-
-  
-    // const getUserSigninData = async () => {
-    //     try {
-    //         const token = localStorage.getItem('token');
-    //         if (!token) {
-    //             return { success: false, message: "Token not found." };
-    //         }
-
-    //         const response = await axios.get('http://localhost:3000/auth/usersignin', {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //         });
-
-    //         setUsername(response.data.data.username);
-    //     } catch (error) {
-    //         console.error('An error occurred while fetching user signin data:', error);
-    //         return { success: false, message: "An error occurred while fetching user signin data." };
-    //     }
-    // };
+      const handleSecretKeywordInputChange = (event) => {
+        const inputKeyword = event.target.value.toLowerCase();
+        if (inputKeyword === 'perpindahan') {
+          setIsButtonVisible1(true);
+          setIsButtonVisible(false)
+        } if (inputKeyword === 'hapus perpindahan'){
+            setIsButtonVisible1(false)
+            setIsButtonVisible(false)
+        } if (inputKeyword === 'ganti bg') {
+            setIsButtonVisible2(true)
+            setIsButtonVisible(false)
+        } if (inputKeyword === 'hapus bg') {
+            setIsButtonVisible2(false)
+            setIsButtonVisible(false)
+        } if (inputKeyword === 'hapus semua') {
+            setIsButtonVisible1(false)
+            setIsButtonVisible2(false)
+            setIsButtonVisible(false)
+        }
+      };
+    
     return (
         <div className='w-full'>
-            <nav className={`bg-primary h-[115px] px-[29px] pt-[29px] flex justify-between items-start z-40 `}>
+            <nav className={`h-[115px] px-[29px] pt-[29px] flex justify-between items-start z-40`} style={{ backgroundColor: backgroundColor }}>
                 <div>
                     <button onClick={toggleExpansion} className={`${expanded ? 'max-lg:hidden':''}`}>
                         <GiHamburgerMenu className='text-white text-xl'/>
                     </button>
                 </div>
-                <div className='flex gap-[15px]'>
+                <div className='flex gap-[15px] items-center'>
+                {isButtonVisible && (
+                    <div>
+                        {/* Form untuk memasukkan kata kunci */}
+                        <input
+                        type="text"
+                        placeholder="Masukkan kata kunci"
+                        onChange={handleSecretKeywordInputChange}
+                        className='outline-none rounded-md px-2'
+
+                        />
+                    </div>
+                    )}
+                {isButtonVisible1 && (
                     <button onClick={toggleChangeNavbar}>
-                        <BsKeyboard className='text-white text-xl font-bold'/>
+                    <BsKeyboard className='text-white text-xl font-bold' />
                     </button>
+                 )}
+                {isButtonVisible2 && (
+                    <button onClick={toggleOpenChangeBg}>
+                    <MdColorLens className='text-white text-xl font-bold' />
+                    </button>
+                 )}
                     <button onClick={toggleDropdownMassage}>
                         <AiOutlineMail className='text-white text-xl font-bold'/>
                     </button>
