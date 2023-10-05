@@ -14,6 +14,7 @@ class AttendanceRoutes extends AttendanceController {
 
   routes(): Router {
     this.router.post("/", this.createAttendance);
+    this.router.get("/", this.exportToExcel);
 
     return this.router;
   }

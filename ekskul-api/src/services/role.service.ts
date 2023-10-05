@@ -1,11 +1,8 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { PrismaClient } from "@prisma/client";
 
 // Berfungsi untuk menghandle logic dari controler
-
-const prisma = new PrismaClient();
 
 export class RoleService {
   async createRoleService(req: Request): Promise<any> {
