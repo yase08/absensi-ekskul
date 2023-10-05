@@ -1,0 +1,32 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.bg-aesthetic {
+  background-image: url('https://tse2.mm.bing.net/th?id=OIP.xbCiqkLPzjTe005_wUAc8QHaEK&pid=Api&P=0&h=180'); /* Replace 'path/to/aesthetic-bg.jpg' with the actual path to your image */
+  background-size: cover;
+  background-position: center;
+}
+
+
+.hidden-scroll::-webkit-scrollbar{
+ display: none;
+}
+
+@keyframes border-rotate {
+  0%, 100% {
+    transform: scaleX(0);
+  }
+  50% {
+    transform: scaleX(1);
+  }
+}
+
+.group-hover\:border-rotate:hover {
+  animation: border-rotate 3s ease-in-out infinite;
+}
+
+
+

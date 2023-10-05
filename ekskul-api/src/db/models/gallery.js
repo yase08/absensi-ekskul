@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       name: DataTypes.STRING,
       date: DataTypes.STRING,
+      slug: DataTypes.STRING,
       ekskul_id: DataTypes.INTEGER,
     },
     {

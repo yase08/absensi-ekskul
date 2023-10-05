@@ -13,6 +13,9 @@ class RayonRoutes extends RayonController {
 
   routes(): Router {
     this.router.post("/", this.createRayon);
+    this.router.get("/", this.getAllRayon);
+    this.router.put("/:id", this.updateRayon);
+    this.router.delete("/:id", this.deleteRayon);
 
     return this.router;
   }

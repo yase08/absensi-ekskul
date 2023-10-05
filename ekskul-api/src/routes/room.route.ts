@@ -14,6 +14,9 @@ class RoomRoutes extends RoomController {
 
   routes(): Router {
     this.router.post("/", this.createRoom);
+    this.router.get("/", this.getAllRoom);
+    this.router.put("/:id", this.updateRoom);
+    this.router.delete("/:id", this.deleteRoom);
 
     return this.router;
   }

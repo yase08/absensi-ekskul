@@ -8,7 +8,7 @@ import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import http, { Server } from "http";
 import consola from "consola";
-// import nocache from "nocache";
+import nocache from "nocache";
 import SlowDown from "express-slow-down";
 import hpp from "hpp";
 import session from "express-session";
@@ -21,7 +21,8 @@ import RombelRoutes from "./routes/rombel.route";
 import EkskulRoutes from "./routes/ekskul.route";
 import StudentRoutes from "./routes/student.route";
 import ScheduleRoutes from "./routes/schedule.route";
-// import GalleryRoutes from "./routes/gallery.route";
+import GalleryRoutes from "./routes/gallery.route";
+import GalleryImageRoutes from "./routes/galleryImage.route";
 import RoomRoutes from "./routes/room.route";
 import ActivityProgramRoutes from "./routes/activityProgram.route";
 
@@ -48,8 +49,8 @@ export class App {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(compression());
-    // this.app.use(morgan("dev"));
-    // this.app.use(nocache());
+    this.app.use(morgan("dev"));
+    this.app.use(nocache());
     this.app.use(hpp({ checkBody: true, checkQuery: true }));
     this.app.use(helmet({ contentSecurityPolicy: false }));
     if (!["production", "test"].includes(this.env)) {
@@ -98,7 +99,7 @@ export class App {
     this.app.use(`${this.version}/student`, StudentRoutes);
     this.app.use(`${this.version}/activityProgram`, ActivityProgramRoutes);
     this.app.use(`${this.version}/schedule`, ScheduleRoutes);
-    // this.app.use(`${this.version}/gallery`, GalleryRoutes);
+    this.app.use(`${this.version}/gallery`, GalleryRoutes);
     this.app.use(`${this.version}/room`, RoomRoutes);
   }
 

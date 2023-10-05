@@ -14,6 +14,9 @@ class EkskulRoutes extends EkskulController {
 
   routes(): Router {
     this.router.post("/", this.createEkskul);
+    this.router.get("/", this.getAllEkskul);
+    this.router.put("/:id", this.updateEkskul);
+    this.router.delete("/:id", this.deleteEkskul);
 
     return this.router;
   }
