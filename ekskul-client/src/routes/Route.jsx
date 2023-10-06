@@ -4,6 +4,7 @@ import RombelDashboard from "../pages/Admin/Rombel/Rombel";
 import RayonDashboard from "../pages/Admin/Rayon/Rayon";
 import EkstrakulikulerDashboard from "../pages/Admin/Ekstrakulikuler/Ekstrakulikuler";
 import JadwalDashboard from "../pages/Admin/Jadwal/Jadwal";
+import { createBrowserRouter } from "react-router-dom/dist/umd/react-router-dom.development";
 
 const router = createBrowserRouter([
   {

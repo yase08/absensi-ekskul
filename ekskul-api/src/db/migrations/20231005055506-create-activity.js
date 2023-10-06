@@ -2,26 +2,46 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("galleryOnImages", {
+    await queryInterface.createTable("activities", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      gallery_id: {
+      schedule_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: "galleries",
+          model: "schedules",
           key: "id",
         },
       },
-      galleryImage_id: {
+      rombel_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: "galleryImages",
+          model: "rombels",
           key: "id",
         },
+      },
+      room_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "rooms",
+          key: "id",
+        },
+      },
+      ekskul_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "ekskuls",
+          key: "id",
+        },
+      },
+      startTime: {
+        type: Sequelize.STRING,
+      },
+      endTime: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
@@ -34,6 +54,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("galleryOnImages");
+    await queryInterface.dropTable("activities");
   },
 };

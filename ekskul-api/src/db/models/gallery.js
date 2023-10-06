@@ -11,8 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.ekskul, {
         foreignKey: "ekskul_id",
       });
-      this.belongsToMany(models.galleryImage, {
-        through: "galleryOnImages",
+      this.hasMany(models.galleryImage, {
         foreignKey: "gallery_id",
       });
     }

@@ -51,7 +51,28 @@ export class StudentService {
         typeof req.query.filter === "string" ? req.query.filter : "";
       const page: any = req.query.page;
 
-      const paramQuerySQL: any = {};
+      const paramQuerySQL: any = {
+        attributes: ["id", "name", "nis", "email", "mobileNumber"],
+        include: [
+          {
+            model: db.rombel,
+            attributes: ["name"],
+            as: "rombel",
+          },
+          {
+            model: db.rayon,
+            attributes: ["name"],
+            as: "rayon",
+          },
+          {
+            model: db.ekskul,
+            attributes: ["name"],
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      };
       let limit: number;
       let offset: number;
 
@@ -73,7 +94,7 @@ export class StudentService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -81,7 +102,8 @@ export class StudentService {
 
       const students = await db.student.findAll(paramQuerySQL);
 
-      if (!students) throw apiResponse(status.NOT_FOUND, "Students do not exist");
+      if (!students)
+        throw apiResponse(status.NOT_FOUND, "Students do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all students success", students)
@@ -138,7 +160,7 @@ export class StudentService {
           "Students do not exist for the given member_id"
         );
 
-      const deleteStudent = await db.student.delete({
+      const deleteStudent = await db.student.destroy({
         where: { id: studentExist.id },
       });
 

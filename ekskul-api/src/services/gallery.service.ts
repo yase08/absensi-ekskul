@@ -28,7 +28,7 @@ export class GalleryService {
       if (!createGallery)
         throw apiResponse(status.FORBIDDEN, "Create new gallery failed");
 
-      const folderName = path.join(__dirname, `../public/${req.body.slug}`);
+      const folderName = path.join(__dirname, `../public/gallery/${req.body.slug}`);
       console.log(folderName);
 
       // Mengecek apakah direktori parent sudah ada
@@ -100,7 +100,7 @@ export class GalleryService {
           "Gallerys do not exist for the given member_id"
         );
 
-      const deleteGallery = await db.gallery.delete({
+      const deleteGallery = await db.gallery.destroy({
         where: { id: galleryExist.id },
       });
 

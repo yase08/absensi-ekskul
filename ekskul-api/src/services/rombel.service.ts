@@ -69,7 +69,7 @@ export class RombelService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -134,7 +134,7 @@ export class RombelService {
           "Rombels do not exist for the given member_id"
         );
 
-      const deleteRombel = await db.rombel.delete({
+      const deleteRombel = await db.rombel.destroy({
         where: { id: rombelExist.id },
       });
 

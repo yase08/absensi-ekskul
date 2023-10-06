@@ -14,7 +14,9 @@ class ScheduleRoutes extends ScheduleController {
 
   routes(): Router {
     this.router.post("/", this.createSchedule);
+    this.router.post("/activity", this.createActivityOnSchedule);
     this.router.get("/", this.getAllSchedule);
+    this.router.get("/data", this.getSchedule);
     this.router.put("/:id", this.updateSchedule);
     this.router.delete("/:id", this.deleteSchedule);
 

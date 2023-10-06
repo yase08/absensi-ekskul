@@ -9,7 +9,7 @@ import { extensionSupport } from "../helpers/extension.helper";
 export const upload = multer({
   storage: multer.diskStorage({
     destination(_: Request, file: Express.Multer.File, done: any) {
-      let disk: string = "../public/uploads";
+      let disk: string = "../public/gallery";
 
       if (!file) {
         done(new ExpressError("Uploading file failder"), null);
@@ -31,9 +31,9 @@ export const upload = multer({
     file: Express.Multer.File,
     done: FileFilterCallback
   ) {
-    if (!extensionSupport(file.mimetype) || !file) {
-      throw Promise.reject(new ExpressError("File format not supported"));
-    }
+    // if (!extensionSupport(file.mimetype) || !file) {
+    //   throw Promise.reject(new ExpressError("File format not supported"));
+    // }
     done(null, true);
   },
   limits: { fileSize: 2000000 },

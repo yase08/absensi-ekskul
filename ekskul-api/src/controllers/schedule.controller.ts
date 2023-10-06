@@ -15,9 +15,33 @@ export class ScheduleController extends ScheduleService {
     }
   };
 
+  createActivityOnSchedule = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.createActivityOnScheduleService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
   getAllSchedule = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getAllScheduleService(req);
+      const serviceResponse: APIResponse = await this.getAllScheduleService(
+        req
+      );
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  getSchedule = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getScheduleService(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
@@ -26,7 +50,9 @@ export class ScheduleController extends ScheduleService {
 
   updateSchedule = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.updateScheduleService(req);
+      const serviceResponse: APIResponse = await this.updateScheduleService(
+        req
+      );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
@@ -35,7 +61,9 @@ export class ScheduleController extends ScheduleService {
 
   deleteSchedule = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.deleteScheduleService(req);
+      const serviceResponse: APIResponse = await this.deleteScheduleService(
+        req
+      );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);

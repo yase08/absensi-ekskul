@@ -67,7 +67,7 @@ export class RayonService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -132,7 +132,7 @@ export class RayonService {
           "Rayons do not exist for the given member_id"
         );
 
-      const deleteRayon = await db.rayon.delete({
+      const deleteRayon = await db.rayon.destroy({
         where: { id: rayonExist.id },
       });
 
