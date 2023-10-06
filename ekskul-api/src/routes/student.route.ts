@@ -14,6 +14,7 @@ class StudentRoutes extends StudentController {
 
   routes(): Router {
     this.router.post("/", this.createStudent);
+    this.router.get("/", this.getAllStudent);
 
     return this.router;
   }

@@ -19,33 +19,6 @@ module.exports = {
           "Sabtu"
         ),
       },
-      startDate: {
-        type: Sequelize.STRING,
-      },
-      endDate: {
-        type: Sequelize.STRING,
-      },
-      rombel_id: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "rombels",
-          key: "id",
-        },
-      },
-      room_id: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "rooms",
-          key: "id",
-        },
-      },
-      ekskul_id: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "ekskuls",
-          key: "id",
-        },
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -8,15 +8,15 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsToMany(models.gallery, {
-        through: "galleryOnImages",
-        foreignKey: "galleryImage_id",
+      this.belongsTo(models.gallery, {
+        foreignKey: "gallery_id",
       });
     }
   }
   galleryImage.init(
     {
       url: DataTypes.STRING,
+      gallery_id: DataTypes.INTEGER
     },
     {
       sequelize,

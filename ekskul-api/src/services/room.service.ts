@@ -69,7 +69,7 @@ export class RoomService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -134,7 +134,7 @@ export class RoomService {
           "Rooms do not exist for the given member_id"
         );
 
-      const deleteRoom = await db.room.delete({
+      const deleteRoom = await db.room.destroy({
         where: { id: roomExist.id },
       });
 

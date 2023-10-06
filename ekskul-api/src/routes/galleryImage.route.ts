@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { GalleryImageController } from "../controllers/galleryImage.controller";
 // import { DTOForgotPassword, DTOLogin, DTOResetToken } from "../dto/galleryImage.dto";
-import { validator } from "../middlewares/validator.middleware";
+import { upload } from "../libs/multer.lib";
 
 // class RouteUsers mengextends dari GalleryImageController agar bisa memakai semua property dan method dari galleryImage controller
 class GalleryImageRoutes extends GalleryImageController {
@@ -9,10 +9,11 @@ class GalleryImageRoutes extends GalleryImageController {
 
   constructor() {
     super();
-    this.router = Router() as Router;}
+    this.router = Router() as Router;
+  }
 
   routes(): Router {
-    this.router.post("/", this.createGalleryImage);
+    this.router.post("/", upload.array("images"), this.createGalleryImage);
 
     return this.router;
   }
