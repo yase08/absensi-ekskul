@@ -1,71 +1,42 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import { exportExcel } from "../libs/excel.lib";
 
 // Berfungsi untuk menghandle logic dari controler
 
 const db = require("../db/models");
 
-export class AttendanceService {
-  async createAttendanceService(req: Request): Promise<any> {
-    try {
-      const attendanceData = req.body;
+export class AttendanceInstructorService {
+    async createAttendanceService(req: Request): Promise<any> {
+        try {
+          // const attendance = await db.activityProgram.findOne({ where: { id: req.params.id } });
 
-      const createAttendancePromises = attendanceData.map(
-        async (attendance: any) => {
-          await db.attendance.create(attendance);
+          // if (attendance)
+          //   throw apiResponse(
+          //     status.CONFLICT,
+          //     `attendance ${req.body.name} already exist`
+          //   );
+    
+          const createAttendance = await db.instructorAttendance.create(req.body);
+    
+          if (!createAttendance)
+            throw apiResponse(status.FORBIDDEN, "Create new attendance failed");
+    
+          return Promise.resolve(
+            apiResponse(status.OK, "Create new attendance success")
+          );
+        } catch (error: any) {
+          return Promise.reject(
+            apiResponse(
+              error.statusCode || status.INTERNAL_SERVER_ERROR,
+              error.statusMessage,
+              error.message
+            )
+          );
         }
-      );
-
-      // const createAttendances = db.attendance.bulkCreate(attendanceData)
-
-      const createAttendances = await Promise.all(createAttendancePromises);
-
-      if (!createAttendances)
-        throw apiResponse(status.FORBIDDEN, "Create new attendances failed");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new attendance success")
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-  async fetchAttendanceService(req: Request): Promise<any> {
-    try {
-      // const attendanceData = await db.attendance.findAll();
-      const attendanceData = [{
-        "siswa_id":1,
-        "category":"hadir",
-        "date":"2021-10-01"
-      }]
-      console.log(attendanceData);
-      
-
-      if (!attendanceData)
-        throw apiResponse(status.FORBIDDEN, "attendance data not found");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new attendance success", attendanceData)
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
+      }
   async exportAttendance(req: Request): Promise<any> {
     try {
       // const attendanceData = await db.attendance.findAll();
@@ -139,7 +110,31 @@ export class AttendanceService {
         paramQuerySQL.offset = offset;
       }
 
-      const attendances = await db.attendance.findAll(paramQuerySQL);
+      paramQuerySQL.include = [
+        { model: db.user }
+      ];
+
+      const attendances = await db.instructorAttendance.findAll(paramQuerySQL);
+
+      if (!attendances) throw apiResponse(status.NOT_FOUND, "Attendances do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched all attendances success", attendances)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getOneAttendanceService(req: Request): Promise<any> {
+    try {
+      const attendances = await db.instructorAttendance.findOne({where: {id: req.params.id}});
 
       if (!attendances) throw apiResponse(status.NOT_FOUND, "Attendances do not exist");
 
@@ -159,7 +154,7 @@ export class AttendanceService {
 
   async updateAttendanceService(req: Request): Promise<any> {
     try {
-      const attendanceExist = await db.attendance.findOne({
+      const attendanceExist = await db.instructorAttendance.findOne({
         where: { id: req.params.id },
       });
 
@@ -169,7 +164,7 @@ export class AttendanceService {
           "Attendances do not exist for the given member_id"
         );
 
-      const updateAttendance = await db.attendance.update(req.body);
+      const updateAttendance = await db.instructorAttendance.update(req.body);
 
       if (!updateAttendance)
         throw apiResponse(status.FORBIDDEN, "Update attendance failed");

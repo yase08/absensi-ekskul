@@ -12,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
         through: "userOnEkskuls",
         foreignKey: "user_id",
       });
-      this.hasMany(models.role, {
-        foreignKey: "role_id",
-      });
+      // this.hasMany(models.role, {
+      //   foreignKey: "role_id",
+      // });
     }
   }
   user.init(

@@ -4,33 +4,29 @@ import { Request } from "express";
 import { Op } from "sequelize";
 
 // Berfungsi untuk menghandle logic dari controler
-const db = require("../db/models/index.js");
 
-export class UserService {
-  async createUserService(req: Request): Promise<any> {
+const db = require("../db/models");
+
+export class TaskService {
+  async createTaskService(req: Request): Promise<any> {
     try {
-      const user = await db.user.findOne({
+      const task = await db.task.findOne({
         where: { name: req.body.name },
       });
 
-      if (user)
+      if (task)
         throw apiResponse(
           status.CONFLICT,
-          `Student ${req.body.name} already exist`
+          `Task ${req.body.name} already exist`
         );
 
-      const ekskuls = await db.ekskul.findAll({
-        where: { id: req.body.ekskuls },
-      });
+      const createTask = await db.task.create(req.body);      
 
-      const createUser = await db.user.create(req.body);
-      await createUser.addEkskul(ekskuls);
-
-      if (!createUser)
-        throw apiResponse(status.FORBIDDEN, "Create new user failed");
+      if (!createTask)
+        throw apiResponse(status.FORBIDDEN, "Create new task failed");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new user success")
+        apiResponse(status.OK, "Create new task success")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -43,7 +39,7 @@ export class UserService {
     }
   }
 
-  async getAllUserService(req: Request): Promise<any> {
+  async getAllTaskService(req: Request): Promise<any> {
     try {
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
@@ -79,12 +75,17 @@ export class UserService {
         paramQuerySQL.offset = offset;
       }
 
-      const users = await db.user.findAll(paramQuerySQL);
+      paramQuerySQL.include = [
+        { model: db.ekskul },
+        { model: db.user },
+      ];
 
-      if (!users) throw apiResponse(status.NOT_FOUND, "Students do not exist");
+      const tasks = await db.task.findAll(paramQuerySQL);
+
+      if (!tasks) throw apiResponse(status.NOT_FOUND, "Tasks do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all users success", users)
+        apiResponse(status.OK, "Fetched all tasks success", tasks)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -97,24 +98,15 @@ export class UserService {
     }
   }
 
-  async updateUserService(req: Request): Promise<any> {
+  async getOneTaskService(req: Request): Promise<any> {
     try {
-      const userExist = await db.user.findOne({
-        where: { id: req.params.id },
-      });
+      const task = await db.task.findOne({where: {id: req.params.id}});
 
-      if (!userExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Students do not exist for the given member_id"
-        );
+      if (!task) throw apiResponse(status.NOT_FOUND, "Task do not exist");
 
-      const updateStudent = await db.user.update(req.body);
-
-      if (!updateStudent)
-        throw apiResponse(status.FORBIDDEN, "Update user failed");
-
-      return Promise.resolve(apiResponse(status.OK, "Update user success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched all task success", task)
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -126,26 +118,55 @@ export class UserService {
     }
   }
 
-  async deleteUserService(req: Request): Promise<any> {
+  async updateTaskService(req: Request): Promise<any> {
     try {
-      const userExist = await db.user.findOne({
+      const taskExist = await db.task.findOne({
         where: { id: req.params.id },
       });
 
-      if (!userExist)
+      if (!taskExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Students do not exist for the given member_id"
+          "Tasks do not exist for the given member_id"
         );
 
-      const deleteStudent = await db.user.delete({
-        where: { id: userExist.id },
+      const updateTask = await db.task.update(req.body);
+
+      if (!updateTask)
+        throw apiResponse(status.FORBIDDEN, "Update task failed");
+
+      return Promise.resolve(apiResponse(status.OK, "Update task success"));
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async deleteTaskService(req: Request): Promise<any> {
+    try {
+      const taskExist = await db.task.findOne({
+        where: { id: req.params.id },
       });
 
-      if (!deleteStudent)
-        throw apiResponse(status.FORBIDDEN, "Delete user failed");
+      if (!taskExist)
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Tasks do not exist for the given member_id"
+        );
 
-      return Promise.resolve(apiResponse(status.OK, "Delete user success"));
+      const deleteTask = await db.task.delete({
+        where: { id: taskExist.id },
+      });
+
+      if (!deleteTask)
+        throw apiResponse(status.FORBIDDEN, "Delete task failed");
+
+      return Promise.resolve(apiResponse(status.OK, "Delete task success"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

@@ -3,23 +3,22 @@ import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 
 // Berfungsi untuk menghandle logic dari controler
+const db = require("../db/models/index.js");
 
 export class RoleService {
   async createRoleService(req: Request): Promise<any> {
     try {
-      const role = await prisma.role.findFirst({
+      const role = await db.role.findOne({
         where: { name: req.body.name },
       });
 
       if (role)
         throw apiResponse(
-          status.NOT_FOUND,
+          status.CONFLICT,
           `Role ${req.body.name} already exist`
         );
 
-      const createRayon = await prisma.role.create({
-        data: req.body,
-      });
+      const createRayon = await db.role.create(req.body)
       if (!createRayon)
         throw apiResponse(status.FORBIDDEN, "Create new role failed");
 
