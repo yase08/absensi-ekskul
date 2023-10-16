@@ -68,7 +68,7 @@ export class GalleryService {
       if (!galleryExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Gallerys do not exist for the given member_id"
+          "Gallery do not exist for the given id"
         );
 
       const updateGallery = await db.gallery.update(req.body);
@@ -97,7 +97,7 @@ export class GalleryService {
       if (!galleryExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Gallerys do not exist for the given member_id"
+          "Gallery do not exist for the given id"
         );
 
       const deleteGallery = await db.gallery.destroy({

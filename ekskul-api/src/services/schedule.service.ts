@@ -68,7 +68,7 @@ export class ScheduleService {
       const schedules = await db.schedule.findAll(paramQuerySQL);
 
       if (!schedules)
-        throw apiResponse(status.NOT_FOUND, "Schedules do not exist");
+        throw apiResponse(status.NOT_FOUND, "do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all schedules success", schedules)
@@ -93,7 +93,7 @@ export class ScheduleService {
       if (!scheduleExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Schedules do not exist for the given member_id"
+          "Schedule do not exist for the given id"
         );
 
       const updateSchedule = await db.schedule.update(req.body);
@@ -122,7 +122,7 @@ export class ScheduleService {
       if (!scheduleExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Schedules do not exist for the given member_id"
+          "Schedule do not exist for the given id"
         );
 
       const deleteSchedule = await db.schedule.destroy({

@@ -128,7 +128,7 @@ export class StudentService {
       if (!studentExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Students do not exist for the given member_id"
+          "Student do not exist for the given id"
         );
 
       const updateStudent = await db.student.update(req.body);
@@ -157,7 +157,7 @@ export class StudentService {
       if (!studentExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Students do not exist for the given member_id"
+          "Student do not exist for the given id"
         );
 
       const deleteStudent = await db.student.destroy({

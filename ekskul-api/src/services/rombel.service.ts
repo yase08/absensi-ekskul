@@ -77,7 +77,7 @@ export class RombelService {
 
       const rombels = await db.rombel.findAll(paramQuerySQL);
 
-      if (!rombels) throw apiResponse(status.NOT_FOUND, "Rombels do not exist");
+      if (!rombels) throw apiResponse(status.NOT_FOUND, "Rombel do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all rombels success", rombels)
@@ -102,7 +102,7 @@ export class RombelService {
       if (!rombelExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rombels do not exist for the given member_id"
+          "Rombel do not exist for the given id"
         );
 
       const updateRombel = await db.rombel.update(req.body);
@@ -131,7 +131,7 @@ export class RombelService {
       if (!rombelExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rombels do not exist for the given member_id"
+          "Rombel do not exist for the given id"
         );
 
       const deleteRombel = await db.rombel.destroy({

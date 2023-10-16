@@ -14,7 +14,7 @@ export class ActivityProgramService {
       if (activityProgram)
         throw apiResponse(
           status.CONFLICT,
-          `activity program ${req.body.name} already exist`
+          `Activity program ${req.body.name} already exist`
         );
 
       const createActivityProgram = await db.activityProgram.create(req.body);

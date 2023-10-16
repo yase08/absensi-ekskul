@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { RombelController } from "../controllers/rombel.controller";
-// import { DTOForgotPassword, DTOLogin, DTOResetToken } from "../dto/rombel.dto";
-import { validator } from "../middlewares/validator.middleware";
+import { auth } from "../middlewares/authentication";
+import { permission } from "../middlewares/permission";
+import { authorization } from "../middlewares/authorization";
 
 // class RouteUsers mengextends dari RombelController agar bisa memakai semua property dan method dari rombel controller
 class RombelRoutes extends RombelController {
@@ -13,10 +14,26 @@ class RombelRoutes extends RombelController {
   }
 
   routes(): Router {
-    this.router.post("/", this.createRombel);
-    this.router.get("/", this.getAllRombel);
-    this.router.put("/:id", this.updateRombel);
-    this.router.delete("/:id", this.deleteRombel);
+    this.router.post(
+      "/",
+      [authorization(), auth(), permission(["instructor"])],
+      this.createRombel
+    );
+    this.router.get(
+      "/",
+      [authorization(), auth(), permission(["instructor"])],
+      this.getAllRombel
+    );
+    this.router.put(
+      "/:id",
+      [authorization(), auth(), permission(["instructor"])],
+      this.updateRombel
+    );
+    this.router.delete(
+      "/:id",
+      [authorization(), auth(), permission(["instructor"])],
+      this.deleteRombel
+    );
 
     return this.router;
   }

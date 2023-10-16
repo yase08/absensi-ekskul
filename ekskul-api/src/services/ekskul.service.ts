@@ -102,7 +102,7 @@ export class EkskulService {
       if (!ekskulExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Ekskuls do not exist for the given member_id"
+          "Ekskul do not exist for the given id"
         );
 
       const updateEkskul = await db.ekskul.update(req.body);
@@ -131,7 +131,7 @@ export class EkskulService {
       if (!ekskulExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Ekskuls do not exist for the given member_id"
+          "Ekskul do not exist for the given id"
         );
 
       const deleteEkskul = await db.ekskul.destroy({

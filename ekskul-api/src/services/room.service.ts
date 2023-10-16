@@ -77,7 +77,7 @@ export class RoomService {
 
       const rooms = await db.room.findAll(paramQuerySQL);
 
-      if (!rooms) throw apiResponse(status.NOT_FOUND, "Rooms do not exist");
+      if (!rooms) throw apiResponse(status.NOT_FOUND, "Room do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all rooms success", rooms)
@@ -102,7 +102,7 @@ export class RoomService {
       if (!roomExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rooms do not exist for the given member_id"
+          "Room do not exist for the given id"
         );
 
       const updateRoom = await db.room.update(req.body);
@@ -131,7 +131,7 @@ export class RoomService {
       if (!roomExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rooms do not exist for the given member_id"
+          "Room do not exist for the given id"
         );
 
       const deleteRoom = await db.room.destroy({

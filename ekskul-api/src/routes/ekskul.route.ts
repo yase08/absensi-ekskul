@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { EkskulController } from "../controllers/ekskul.controller";
-// import { DTOForgotPassword, DTOLogin, DTOResetToken } from "../dto/ekskul.dto";
-import { validator } from "../middlewares/validator.middleware";
+import { permission } from "../middlewares/permission";
+import { auth } from "../middlewares/authentication";
+import { authorization } from "../middlewares/authorization";
 
 // class RouteUsers mengextends dari EkskulController agar bisa memakai semua property dan method dari ekskul controller
 class EkskulRoutes extends EkskulController {
@@ -13,10 +14,26 @@ class EkskulRoutes extends EkskulController {
   }
 
   routes(): Router {
-    this.router.post("/", this.createEkskul);
-    this.router.get("/", this.getAllEkskul);
-    this.router.put("/:id", this.updateEkskul);
-    this.router.delete("/:id", this.deleteEkskul);
+    this.router.post(
+      "/",
+      [authorization(), auth(), permission(["admin"])],
+      this.createEkskul
+    );
+    this.router.get(
+      "/",
+      [authorization(), auth(), permission(["admin"])],
+      this.getAllEkskul
+    );
+    this.router.put(
+      "/:id",
+      [authorization(), auth(), permission(["admin"])],
+      this.updateEkskul
+    );
+    this.router.delete(
+      "/:id",
+      [authorization(), auth(), permission(["admin"])],
+      this.deleteEkskul
+    );
 
     return this.router;
   }
