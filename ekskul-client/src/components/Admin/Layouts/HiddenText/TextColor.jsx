@@ -48,7 +48,7 @@ const TextColor = ({ toggleOpenText }) => {
             <div className='w-[100%] p-3 '>
                 <div className='flex flex-col w-full h-full '>
                     <button className='text-center' onClick={toggleOpenText}>Text Color</button>
-                    <div>
+                    <div className=''>
                         <table className="min-w-full mt-7 flex flex-col">
                             <thead className='mb-2'>
                                 <tr className='flex justify-between px-6 mb-3 '>
