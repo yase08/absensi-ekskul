@@ -22,6 +22,7 @@ export default {
       },
       fontFamily:{
         'Gabarito': ['Gabarito', 'sans-serif'],
+        'Nunito': ['Nunito', 'sans-serif'],
       },
       boxShadow: {
         'top': '0 0 5px 5px rgba(0, 0, 0, 0.2)',

@@ -6,10 +6,10 @@ import Info from "../../../components/User/Dashboard/Info"
 const Dashboard = () => {
   return (
     <>
-    <div className="relative h-[100vh] ">
+    <div className="relative h-[100vh]">
       <TopNavbar/>
       <Navbar/>
-      <div className="bg-transparent w-full ">
+      <div className="bg-transparent w-full mt-[100px] relative">
        <Jumbotron/>
        <Info/>
       </div>
