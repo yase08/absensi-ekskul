@@ -100,7 +100,7 @@ export class AttendanceService {
       if (!attendanceExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Attendances do not exist for the given member_id"
+          "Attendance do not exist for the given id"
         );
 
       const updateAttendance = await db.attendance.update(req.body);

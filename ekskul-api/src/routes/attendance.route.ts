@@ -1,7 +1,8 @@
+import { auth } from "../middlewares/authentication";
+import { permission } from "../middlewares/permission";
 import { Router } from "express";
 import { AttendanceController } from "../controllers/attendance.controller";
-// import { DTOForgotPassword, DTOLogin, DTOResetToken } from "../dto/attendance.dto";
-import { validator } from "../middlewares/validator.middleware";
+import { authorization } from "../middlewares/authorization";
 
 // class RouteUsers mengextends dari AttendanceController agar bisa memakai semua property dan method dari attendance controller
 class AttendanceRoutes extends AttendanceController {
@@ -13,9 +14,21 @@ class AttendanceRoutes extends AttendanceController {
   }
 
   routes(): Router {
-    this.router.post("/", this.createAttendance);
-    this.router.get("/", this.getAllAttendance);
-    this.router.put("/:id", this.updateAttendance);
+    this.router.post(
+      "/",
+      [authorization(), auth(), permission(["instructor"])],
+      this.createAttendance
+    );
+    this.router.get(
+      "/",
+      [authorization(), auth(), permission(["instructor"])],
+      this.getAllAttendance
+    );
+    this.router.put(
+      "/:id",
+      [authorization(), auth(), permission(["instructor"])],
+      this.updateAttendance
+    );
 
     return this.router;
   }

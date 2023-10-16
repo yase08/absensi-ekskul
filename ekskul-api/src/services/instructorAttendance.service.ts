@@ -2,29 +2,31 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
+import { Session } from "express-session";
+
+interface ISession extends Session {
+  user: any;
+}
 
 // Berfungsi untuk menghandle logic dari controler
 
 const db = require("../db/models/index.js");
 
-export class RayonService {
-  async createRayonService(req: Request): Promise<any> {
+export class InstructorAttendanceService {
+  async createInstructorAttendanceService(req: Request): Promise<any> {
     try {
-      const rayon = await db.rayon.findOne({ where: { name: req.body.name } });
+      const instructor_Id = (req.session as ISession).user.id;
 
-      if (rayon)
-        throw apiResponse(
-          status.CONFLICT,
-          `Rayon ${req.body.name} already exist`
-        );
+      const createInstructorAttendance = await db.instructorAttendance.create({
+        ...req.body,
+        instructor_Id,
+      });
 
-      const createRayon = await db.rayon.create(req.body);
-
-      if (!createRayon)
-        throw apiResponse(status.FORBIDDEN, "Create new rayon failed");
+      if (!createInstructorAttendance)
+        throw apiResponse(status.FORBIDDEN, "Create new instructor failed");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new rayon success")
+        apiResponse(status.OK, "Create new instructor success")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -37,7 +39,7 @@ export class RayonService {
     }
   }
 
-  async getAllRayonService(req: Request): Promise<any> {
+  async getAllInstructorAttendanceService(req: Request): Promise<any> {
     try {
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
@@ -73,12 +75,13 @@ export class RayonService {
         paramQuerySQL.offset = offset;
       }
 
-      const rayons = await db.rayon.findAll(paramQuerySQL);
+      const instructors = await db.instructor.findAll(paramQuerySQL);
 
-      if (!rayons) throw apiResponse(status.NOT_FOUND, "Rayons do not exist");
+      if (!instructors)
+        throw apiResponse(status.NOT_FOUND, "Instructors do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all rayons success", rayons)
+        apiResponse(status.OK, "Fetched all instructors success", instructors)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -91,24 +94,26 @@ export class RayonService {
     }
   }
 
-  async updateRayonService(req: Request): Promise<any> {
+  async updateInstructorAttendanceService(req: Request): Promise<any> {
     try {
-      const rayonExist = await db.rayon.findOne({
+      const instructorExist = await db.instructor.findOne({
         where: { id: req.params.id },
       });
 
-      if (!rayonExist)
+      if (!instructorExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rayon do not exist for the given id"
+          "Instructors do not exist for the given member_id"
         );
 
-      const updateRayon = await db.rayon.update(req.body);
+      const updateInstructor = await db.instructor.update(req.body);
 
-      if (!updateRayon)
-        throw apiResponse(status.FORBIDDEN, "Update rayon failed");
+      if (!updateInstructor)
+        throw apiResponse(status.FORBIDDEN, "Update instructor failed");
 
-      return Promise.resolve(apiResponse(status.OK, "Update rayon success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Update instructor success")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -120,26 +125,28 @@ export class RayonService {
     }
   }
 
-  async deleteRayonService(req: Request): Promise<any> {
+  async deleteInstructorAttendanceService(req: Request): Promise<any> {
     try {
-      const rayonExist = await db.rayon.findOne({
+      const instructorExist = await db.instructor.findOne({
         where: { id: req.params.id },
       });
 
-      if (!rayonExist)
+      if (!instructorExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rayon do not exist for the given id"
+          "Instructors do not exist for the given member_id"
         );
 
-      const deleteRayon = await db.rayon.destroy({
-        where: { id: rayonExist.id },
+      const deleteInstructor = await db.instructor.destroy({
+        where: { id: instructorExist.id },
       });
 
-      if (!deleteRayon)
-        throw apiResponse(status.FORBIDDEN, "Delete rayon failed");
+      if (!deleteInstructor)
+        throw apiResponse(status.FORBIDDEN, "Delete instructor failed");
 
-      return Promise.resolve(apiResponse(status.OK, "Delete rayon success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Delete instructor success")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

@@ -34,14 +34,11 @@ export class AuthService {
           email: req.body.email,
           name: user.name,
           image: user.image,
+          role: user.role,
         },
         jwtSecret,
         { expiresIn: "1d" }
       );
-
-      // req.session. = {
-
-      // }
 
       return Promise.resolve(
         apiResponse(status.OK, "Login success", token, undefined)
