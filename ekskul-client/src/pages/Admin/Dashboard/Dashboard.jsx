@@ -10,7 +10,7 @@ import {AiOutlineTwitter} from 'react-icons/ai'
 import {BsInstagram, BsWhatsapp} from 'react-icons/bs'
 import Profile from "../../../components/Admin/Profile/Profile";
 import { useNavigate } from 'react-router-dom';
-import ColorSettingForm from "../../../components/Admin/Layouts/ColorSettingForm";
+import ColorSettingForm from "../../../components/Admin/Layouts/HiddenColor/Navbar";
 
 const Dashboard = () => {
     const [expanded, setExpanded] = useState(true);
