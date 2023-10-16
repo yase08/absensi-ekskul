@@ -4,18 +4,25 @@ import RombelDashboard from "../pages/Admin/Rombel/Rombel";
 import RayonDashboard from "../pages/Admin/Rayon/Rayon";
 import EkstrakulikulerDashboard from "../pages/Admin/Ekstrakulikuler/Ekstrakulikuler";
 import JadwalDashboard from "../pages/Admin/Jadwal/Jadwal";
+import ProfileDashboard from "../pages/Admin/Profile/Profile"
+import Login from "../pages/Admin/Login/Login"
+import { createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Dashboard />,
   },
-  {
-    path: "*",
-    element: <NotFoundPage />,
-  },
+  // {
+  //   path: "*",
+  //   element: <NotFoundPage />,
+  // },
   {
     path: "/admin",
+    element: <Login />,
+  },
+  {
+    path: "/admin/dashboard",
     element: <AdminDashboard />,
   },
   {
@@ -33,6 +40,10 @@ const router = createBrowserRouter([
   {
     path: "/admin/jadwal",
     element: <JadwalDashboard />,
+  },
+  {
+    path: "/admin/profile",
+    element: <ProfileDashboard/>,
   },
 ]);
 
