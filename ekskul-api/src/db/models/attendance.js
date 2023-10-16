@@ -11,11 +11,15 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.student, {
         foreignKey: "student_id",
       });
+      this.belongsTo(models.ekskul, {
+        foreignKey: "ekskul_id",
+      });
     }
   }
   attendance.init(
     {
       student_id: DataTypes.INTEGER,
+      ekskul_id: DataTypes.INTEGER,
       category: DataTypes.ENUM("hadir", "sakit", "izin", "alpa"),
       date: DataTypes.STRING,
     },

@@ -11,15 +11,13 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.ekskul, {
         foreignKey: "ekskul_id",
       });
-      this.hasMany(models.galleryImage, {
-        foreignKey: "gallery_id",
-      });
     }
   }
   gallery.init(
     {
       name: DataTypes.STRING,
       date: DataTypes.STRING,
+      images: DataTypes.JSONB,
       slug: DataTypes.STRING,
       ekskul_id: DataTypes.INTEGER,
     },
