@@ -65,33 +65,7 @@ export class AttendanceService {
       );
     }
   }
-  async fetchAttendanceService(req: Request): Promise<any> {
-    try {
-      // const attendanceData = await db.attendance.findAll();
-      const attendanceData = [{
-        "siswa_id":1,
-        "category":"hadir",
-        "date":"2021-10-01"
-      }]
-      console.log(attendanceData);
-      
 
-      if (!attendanceData)
-        throw apiResponse(status.FORBIDDEN, "attendance data not found");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new attendance success", attendanceData)
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
   async exportAttendance(req: Request): Promise<any> {
     try {
       // const attendanceData = await db.attendance.findAll();
