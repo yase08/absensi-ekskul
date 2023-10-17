@@ -202,13 +202,54 @@ export class ScheduleService {
 
   async updateActivityOnScheduleService(req: Request): Promise<any> {
     try {
-      const newActivity = await db.activity.update(req.body);
+      const activity = await db.activity.findOne({
+        where: {id: req.params.id }
+      });
+      console.log(activity);
+      
 
-      if (!newActivity)
-        throw apiResponse(status.FORBIDDEN, "Create new activity failed");
+      if (!activity)
+        throw apiResponse(status.NOT_FOUND, "Activity does not exist");
+
+      const updateActivity = await db.activity.update(req.body, {where: {id: activity.id }})
+
+      if (!updateActivity)
+      throw apiResponse(status.NOT_FOUND, "Cant update activity");
+
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new schedule success")
+        apiResponse(status.OK, "Update activity success")
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async deleteActivityOnScheduleService(req: Request): Promise<any> {
+    try {
+      const activity = await db.activity.findOne({
+        where: {id: req.params.id }
+      });
+      console.log(activity);
+      
+
+      if (!activity)
+        throw apiResponse(status.NOT_FOUND, "Activity does not exist");
+
+      const updateActivity = await db.activity.destroy({where: {id: activity.id }})
+
+      if (!updateActivity)
+      throw apiResponse(status.NOT_FOUND, "Cant delete activity");
+
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Delete activity success")
       );
     } catch (error: any) {
       return Promise.reject(

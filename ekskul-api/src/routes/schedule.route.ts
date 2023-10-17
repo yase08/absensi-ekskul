@@ -25,22 +25,30 @@ class ScheduleRoutes extends ScheduleController {
       permission(["admin"]),
       this.createActivityOnSchedule
     );
+    this.router.put(
+      "/activity/:id", [authorization(), auth(), permission(["admin"])],
+      this.updateActivityOnSchedule
+    );
+    this.router.delete(
+      "/activity/:id", [authorization(), auth(), permission(["admin"])],
+      this.deleteActivityOnSchedule
+    );
     this.router.get(
       "/",
       [authorization(), auth(), permission(["admin"])],
       this.getAllSchedule
     );
     this.router.get("/data", this.getSchedule);
-    this.router.put(
-      "/:id",
-      [authorization(), auth(), permission(["admin"])],
-      this.updateSchedule
-    );
-    this.router.delete(
-      "/:id",
-      [authorization(), auth(), permission(["admin"])],
-      this.deleteSchedule
-    );
+    // this.router.put(
+    //   "/:id",
+    //   [authorization(), auth(), permission(["admin"])],
+    //   this.updateSchedule
+    // );
+    // this.router.delete(
+    //   "/:id",
+    //   [authorization(), auth(), permission(["admin"])],
+    //   this.deleteSchedule
+    // );
 
     return this.router;
   }
