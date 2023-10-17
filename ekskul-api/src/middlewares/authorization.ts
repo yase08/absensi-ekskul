@@ -31,8 +31,8 @@ export const authorization = (): Handler => {
           "Access Token format is not valid"
         );
 
-      req.headers.authorization = `Bearer ${accessToken}`;
-
+        console.log("Authorization middleware passed.");
+        
       next();
     } catch (error) {
       return res.status(status.UNAUTHORIZED).json(error);

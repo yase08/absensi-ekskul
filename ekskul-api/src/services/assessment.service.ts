@@ -9,30 +9,34 @@ const db = require("../db/models");
 
 export class AssessmentService {
   async createAssessmentService(req: Request): Promise<any> {
-    try {
-
-      const existingAssessment = await db.assessment.findOne({
-        where: {
-          student_id: req.body.student_id,
-          task_id: req.body.task_id
-        }
-      });
-  
-      if (existingAssessment) {
-        throw apiResponse(
-          status.CONFLICT,
-          `Assessment for student ${req.body.student_id} and task ${req.body.task_id} already exists`
-        );
-      }
-  
-
+    try {      
+      
       const createAssessmentPromises = req.body.map(
-        async (assessment: any) => {
-          await db.assessment.create(assessment);
+        async (assessment: any) => {          
+          const existingAssessment = await db.assessment.findOne({
+            where: {
+              student_id: assessment.student_id,
+              task_id: assessment.task_id
+            }
+          });
+          if (existingAssessment) {
+            throw apiResponse(
+              status.CONFLICT,
+              `Assessment for student ${assessment.student_id} and task ${assessment.task_id} already exists`
+            );
+          }
+          await db.assessment.create({
+            student_id: assessment.student_id,
+            task_id: assessment.task_id,
+            grade: assessment.grade
+          });
         }
       );
-      // const createAssessment = await db.assessment.create(req.body);
       const createAttendances = await Promise.all(createAssessmentPromises);
+
+      if (!createAttendances)
+      throw apiResponse(status.FORBIDDEN, "Create new attendances failed");
+
 
       return Promise.resolve(
         apiResponse(status.OK, "Create new assessment success")

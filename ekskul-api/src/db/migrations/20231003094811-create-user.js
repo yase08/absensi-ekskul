@@ -30,6 +30,13 @@ module.exports = {
       role: {
         type: Sequelize.ENUM("admin", "instructor"),
       },
+      ekskul_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "ekskuls",
+          key: "id",
+        },
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

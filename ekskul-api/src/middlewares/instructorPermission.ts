@@ -12,6 +12,8 @@ export const checkInstructorPermission = (): Handler => {
     next: NextFunction
   ): Response<any, Record<string, any>> | void {
     const instructorIdFromParams = Number(req.params.instructor_id);
+    console.log(instructorIdFromParams);
+    
     const authenticatedTeacherId = (req.session as ISession).user?.id;
 
     if (instructorIdFromParams !== authenticatedTeacherId) {

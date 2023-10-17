@@ -1,9 +1,12 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import fs from "fs";
-import path from "path";
 import slugify from "slugify";
+import { ExpressError } from "../helpers/error.helper";
+import multer, { FileFilterCallback } from "multer";
+import path from "path";
+import fs from "fs";
+import { extensionSupport } from "../helpers/extension.helper";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -12,7 +15,9 @@ const db = require("../db/models");
 export class GalleryService {
   async createGalleryService(req: Request): Promise<any> {
     try {
-      const gallery = await db.gallery.findOne({ where: { name: req.body.name } });
+      const gallery = await db.gallery.findOne({
+        where: { name: req.body.name },
+      });
 
       if (gallery)
         throw apiResponse(
@@ -23,12 +28,11 @@ export class GalleryService {
       if (req.body.name) {
         req.body.slug = slugify(req.body.name.toLowerCase());
       }
-      const createGallery = await db.gallery.create(req.body);
 
-      if (!createGallery)
-        throw apiResponse(status.FORBIDDEN, "Create new gallery failed");
-
-      const folderName = path.join(__dirname, `../public/gallery/${req.body.slug}`);
+      const folderName = path.join(
+        __dirname,
+        `../public/gallery/${req.body.slug}`
+      );
       console.log(folderName);
 
       // Mengecek apakah direktori parent sudah ada
@@ -44,6 +48,64 @@ export class GalleryService {
         fs.mkdirSync(folderName);
         console.log("Folder created");
       }
+
+      const storage = multer.diskStorage({
+        destination: (_: Request, file: Express.Multer.File, done: any) => {
+          const folder = path.join(
+            __dirname,
+            `../public/gallery/${req.body.slug}`
+          );
+
+          if (!file) {
+            done(new ExpressError("Uploading file failed"), null);
+          } else {
+            if (fs.existsSync(folder)) {
+              done(null, folder);
+            } else {
+              done(new ExpressError("No such file directory").message, null);
+            }
+          }
+        },
+        filename: (_req: Request, file: Express.Multer.File, done: any) => {
+          if (!file) done(new ExpressError("Get file upload failed"), null);
+          done(null, `${Date.now()}_${file.originalname}`);
+        },
+      });
+
+      const fileFilter = (
+        _req: Request,
+        file: Express.Multer.File,
+        done: FileFilterCallback
+      ) => {
+        if (!extensionSupport(file.mimetype) || !file) {
+          throw Promise.reject(new ExpressError("File format not supported"));
+        }
+        done(null, true);
+      };
+
+      const uploadPhoto = multer({
+        storage: storage,
+        limits: { fileSize: 2000000 },
+        fileFilter,
+      }).array("images");
+
+      let files: Express.Multer.File[] = req.files as Express.Multer.File[];
+      let bookImages: string[] = [];
+
+      for (let i in files) {
+        const file = files[i];
+        const fileName = file.filename;
+        bookImages.push(fileName);
+      }
+
+      const createGallery = await db.gallery.create({
+        ...req.body,
+        ekskul_id: 1,
+        images: bookImages,
+      });
+
+      if (!createGallery)
+        throw apiResponse(status.FORBIDDEN, "Create new gallery failed");
 
       return Promise.resolve(
         apiResponse(status.OK, "Create new gallery success")

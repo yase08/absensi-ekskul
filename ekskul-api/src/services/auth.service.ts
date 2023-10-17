@@ -35,6 +35,7 @@ export class AuthService {
           name: user.name,
           image: user.image,
           role: user.role,
+          ekskul: user.ekskul_id,
         },
         jwtSecret,
         { expiresIn: "1d" }

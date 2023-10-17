@@ -16,10 +16,12 @@ export class InstructorAttendanceService {
   async createInstructorAttendanceService(req: Request): Promise<any> {
     try {
       const instructor_Id = (req.session as ISession).user.id;
-
+      const ekskul_id = (req.session as ISession).user.ekskul_id;
+      
       const createInstructorAttendance = await db.instructorAttendance.create({
-        ...req.body,
-        instructor_Id,
+        category: req.body.category,
+        instructor_id: instructor_Id,
+        ekskul_id: ekskul_id,
       });
 
       if (!createInstructorAttendance)
@@ -73,9 +75,14 @@ export class InstructorAttendanceService {
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
+        paramQuerySQL.where = {
+          ekskul_id: (req.session as ISession).user.ekskul_id,
+        };
       }
 
-      const instructors = await db.instructor.findAll(paramQuerySQL);
+      console.log((req.session as ISession).user.ekskul);
+
+      const instructors = await db.instructorAttendance.findAll(paramQuerySQL);
 
       if (!instructors)
         throw apiResponse(status.NOT_FOUND, "Instructors do not exist");
@@ -96,17 +103,17 @@ export class InstructorAttendanceService {
 
   async updateInstructorAttendanceService(req: Request): Promise<any> {
     try {
-      const instructorExist = await db.instructor.findOne({
+      const instructorExist = await db.instructorAttendance.findOne({
         where: { id: req.params.id },
       });
 
       if (!instructorExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Instructors do not exist for the given member_id"
+          "Instructors do not exist for the given id"
         );
 
-      const updateInstructor = await db.instructor.update(req.body);
+      const updateInstructor = await db.instructorAttendance.update(req.body);
 
       if (!updateInstructor)
         throw apiResponse(status.FORBIDDEN, "Update instructor failed");
@@ -127,7 +134,7 @@ export class InstructorAttendanceService {
 
   async deleteInstructorAttendanceService(req: Request): Promise<any> {
     try {
-      const instructorExist = await db.instructor.findOne({
+      const instructorExist = await db.instructorAttendance.findOne({
         where: { id: req.params.id },
       });
 
@@ -137,7 +144,7 @@ export class InstructorAttendanceService {
           "Instructors do not exist for the given member_id"
         );
 
-      const deleteInstructor = await db.instructor.destroy({
+      const deleteInstructor = await db.instructorAttendance.destroy({
         where: { id: instructorExist.id },
       });
 

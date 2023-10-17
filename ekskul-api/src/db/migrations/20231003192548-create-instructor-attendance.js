@@ -16,6 +16,13 @@ module.exports = {
           key: "id",
         },
       },
+      ekskul_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "ekskuls",
+          key: "id",
+        },
+      },
       category: {
         type: Sequelize.ENUM("hadir", "sakit", "izin", "alpa"),
       },
