@@ -1,8 +1,8 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { JwtPayload } from "jsonwebtoken";
 import { verifyToken } from "../libs/jwt.lib";
+import { ISession } from "../interfaces/user.interface";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -11,19 +11,14 @@ const db = require("../db/models");
 export class AttendanceService {
   async createAttendanceService(req: Request): Promise<any> {
     try {
-      const accessToken: string = (req.headers.authorization as string).split(
-        "Bearer "
-      )[1];
-      const decodedToken: any = await verifyToken(accessToken);
-
-      const ekskulIds = decodedToken.ekskul;
+      const ekskuls = (req.session as ISession).user.ekskul;
       const selectedEkskulId = Number(req.query.ekskul_id);
+      console.log(ekskuls);
 
-      if (ekskulIds.includes(selectedEkskulId)) {
+      if (ekskuls.includes(selectedEkskulId)) {
         const createAttendancePromises = [];
 
         for (const attendance of req.body) {
-          // Memeriksa apakah student_id terkait dengan ekskul_id tertentu
           const studentId = attendance.student_id;
 
           const studentOnEkskul = await db.studentOnEkskul.findOne({
@@ -31,14 +26,12 @@ export class AttendanceService {
           });
 
           if (studentOnEkskul) {
-            // Jika terkait, buat data kehadiran
             const createAttendance = db.attendance.create({
               ...attendance,
               ekskul_id: selectedEkskulId,
             });
             createAttendancePromises.push(createAttendance);
           } else {
-            // Jika tidak terkait, lewati data kehadiran ini dan beri respons error
             throw apiResponse(
               status.FORBIDDEN,
               `Student with ID ${studentId} is not associated with the selected ekskul`
@@ -74,19 +67,14 @@ export class AttendanceService {
 
   async getAllAttendanceService(req: Request): Promise<any> {
     try {
-      const accessToken: string = (req.headers.authorization as string).split(
-        "Bearer "
-      )[1];
-      const decodedToken: any = await verifyToken(accessToken);
-
-      const ekskulIds = decodedToken.ekskul;
+      const ekskuls = (req.session as ISession).user.ekskul;
       const selectedEkskulId = req.query.ekskul_id;
 
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
       const page: any = req.query.page;
 
-      if (ekskulIds.includes(Number(selectedEkskulId))) {
+      if (ekskuls.includes(Number(selectedEkskulId))) {
         const paramQuerySQL: any = {
           where: { ekskul_id: selectedEkskulId },
         };
