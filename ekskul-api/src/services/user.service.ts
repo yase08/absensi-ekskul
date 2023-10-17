@@ -2,36 +2,42 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
+import { hashPassword } from "../libs/bcrypt.lib";
 
 // Berfungsi untuk menghandle logic dari controler
+
 const db = require("../db/models/index.js");
 
 export class UserService {
   async createUserService(req: Request): Promise<any> {
     try {
       const user = await db.user.findOne({
-        where: { name: req.body.name },
+        where: { email: req.body.email, mobileNumber: req.body.mobileNumber },
       });
 
       if (user)
         throw apiResponse(
           status.CONFLICT,
-          `Student ${req.body.name} already exist`
+          `User with email ${req.body.email} and mobile number ${req.body.mobileNumber} already exist`
         );
+
+      const hashedPassword = await hashPassword(req.body.password);
 
       const ekskuls = await db.ekskul.findAll({
         where: { id: req.body.ekskuls },
       });
 
-      const createUser = await db.user.create(req.body);
+      const createUser = await db.user.create({
+        ...req.body,
+        role: "instructor",
+        password: hashedPassword,
+      });
       await createUser.addEkskul(ekskuls);
 
       if (!createUser)
         throw apiResponse(status.FORBIDDEN, "Create new user failed");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new user success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Create new user success"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -73,7 +79,7 @@ export class UserService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -81,7 +87,7 @@ export class UserService {
 
       const users = await db.user.findAll(paramQuerySQL);
 
-      if (!users) throw apiResponse(status.NOT_FOUND, "Students do not exist");
+      if (!users) throw apiResponse(status.NOT_FOUND, "Users do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all users success", users)
@@ -106,12 +112,16 @@ export class UserService {
       if (!userExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Students do not exist for the given member_id"
+          "User do not exist for the given id"
         );
 
-      const updateStudent = await db.user.update(req.body);
+      const updateUser = await db.user.update(req.body, {
+        where: {
+          id: userExist.id,
+        },
+      });
 
-      if (!updateStudent)
+      if (!updateUser)
         throw apiResponse(status.FORBIDDEN, "Update user failed");
 
       return Promise.resolve(apiResponse(status.OK, "Update user success"));
@@ -135,14 +145,14 @@ export class UserService {
       if (!userExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Students do not exist for the given member_id"
+          "User do not exist for the given id"
         );
 
-      const deleteStudent = await db.user.delete({
+      const deleteUser = await db.user.destroy({
         where: { id: userExist.id },
       });
 
-      if (!deleteStudent)
+      if (!deleteUser)
         throw apiResponse(status.FORBIDDEN, "Delete user failed");
 
       return Promise.resolve(apiResponse(status.OK, "Delete user success"));

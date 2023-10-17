@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
 import { APIResponse } from "../helpers/apiResponse.helper";
 
-// Berfungsi untuk controller yang extends service, jadi bisa memakai semua property dan method dari student service
+// Berfungsi untuk controller yang extends service, jadi bisa memakai semua property dan method dari user service
 export class UserController extends UserService {
   createUser = async (req: Request, res: Response): Promise<Response> => {
     try {
