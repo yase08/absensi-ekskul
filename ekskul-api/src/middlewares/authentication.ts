@@ -22,7 +22,18 @@ export const auth = (): Handler => {
         accesstoken
       )) as JwtPayload;
       const user = await db.user.findOne({ where: { id: Number(decoded.id) } });
-      req.session["user"] = user;
+      const userOnEkskul = await db.userOnEkskul.findAll({
+        where: { user_id: user.id },
+      });
+      const ekskulIds = userOnEkskul.map((userEkskul) => userEkskul.ekskul_id);
+      req.session["user"] = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        role: user.role,
+        ekskul: ekskulIds,
+      };
       next();
     } catch (error: any) {
       return res.status(error.statusCode || status.UNAUTHORIZED).json({

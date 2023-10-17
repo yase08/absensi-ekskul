@@ -3,6 +3,7 @@ import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
 import { Session } from "express-session";
+import { verifyToken } from "../libs/jwt.lib";
 
 interface ISession extends Session {
   user: any;
@@ -16,20 +17,43 @@ export class InstructorAttendanceService {
   async createInstructorAttendanceService(req: Request): Promise<any> {
     try {
       const instructor_Id = (req.session as ISession).user.id;
-      const ekskul_id = (req.session as ISession).user.ekskul_id;
-      
-      const createInstructorAttendance = await db.instructorAttendance.create({
-        category: req.body.category,
-        instructor_id: instructor_Id,
-        ekskul_id: ekskul_id,
+      const ekskulIds = (req.session as ISession).user.ekskul;
+          
+
+      const selectedEkskulId = Number(req.query.ekskul_id);
+
+      if (ekskulIds.includes(selectedEkskulId)) {
+      const userOnEkskul = await db.userOnEkskul.findOne({
+        where: { user_id: instructor_Id, ekskul_id: selectedEkskulId },
       });
 
-      if (!createInstructorAttendance)
-        throw apiResponse(status.FORBIDDEN, "Create new instructor failed");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new instructor success")
+      if (userOnEkskul) {
+        // Jika terkait, buat data kehadiran
+        const createInstructorAttendance = db.instructorAttendance.create({
+          ...req.body,
+          ekskul_id: selectedEkskulId,
+          instructor_id: instructor_Id 
+        });
+        if (!createInstructorAttendance)
+          throw apiResponse(status.FORBIDDEN, "Create new instructor failed");
+    
+        return Promise.resolve(
+          apiResponse(status.OK, "Create new instructor success")
+        );
+      } else {
+        // Jika tidak terkait, lewati data kehadiran ini dan beri respons error
+        throw apiResponse(
+          status.FORBIDDEN,
+          `Instructor with ID ${instructor_Id} is not associated with the selected ekskul`
+        );
+      }
+    } else {
+      throw apiResponse(
+        status.NOT_FOUND,
+        "Ekskul does not exist for the given id"
       );
+    }
+
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -42,6 +66,7 @@ export class InstructorAttendanceService {
   }
 
   async getAllInstructorAttendanceService(req: Request): Promise<any> {
+    const ekskulIds = (req.session as ISession).user.ekskul
     try {
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
@@ -75,9 +100,15 @@ export class InstructorAttendanceService {
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
-        paramQuerySQL.where = {
-          ekskul_id: (req.session as ISession).user.ekskul_id,
-        };
+        if (ekskulIds.length > 1) {
+          paramQuerySQL.where = {
+            ekskul_id: ekskulIds, // Filter by multiple ekskul IDs
+          };
+        } else if (ekskulIds.length === 1) {
+          paramQuerySQL.where = {
+            ekskul_id: ekskulIds[0], // Filter by a single ekskul ID
+          };
+        }
       }
 
       console.log((req.session as ISession).user.ekskul);

@@ -202,7 +202,7 @@ export class ScheduleService {
 
   async updateActivityOnScheduleService(req: Request): Promise<any> {
     try {
-      const newActivity = await db.activity.create(req.body);
+      const newActivity = await db.activity.update(req.body);
 
       if (!newActivity)
         throw apiResponse(status.FORBIDDEN, "Create new activity failed");
