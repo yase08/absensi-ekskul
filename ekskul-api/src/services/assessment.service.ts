@@ -9,34 +9,30 @@ const db = require("../db/models");
 
 export class AssessmentService {
   async createAssessmentService(req: Request): Promise<any> {
-    try {      
-      
-      const createAssessmentPromises = req.body.map(
-        async (assessment: any) => {          
-          const existingAssessment = await db.assessment.findOne({
-            where: {
-              student_id: assessment.student_id,
-              task_id: assessment.task_id
-            }
-          });
-          if (existingAssessment) {
-            throw apiResponse(
-              status.CONFLICT,
-              `Assessment for student ${assessment.student_id} and task ${assessment.task_id} already exists`
-            );
-          }
-          await db.assessment.create({
+    try {
+      const createAssessmentPromises = req.body.map(async (assessment: any) => {
+        const existingAssessment = await db.assessment.findOne({
+          where: {
             student_id: assessment.student_id,
             task_id: assessment.task_id,
-            grade: assessment.grade
-          });
+          },
+        });
+        if (existingAssessment) {
+          throw apiResponse(
+            status.CONFLICT,
+            `Assessment for student ${assessment.student_id} and task ${assessment.task_id} already exists`
+          );
         }
-      );
+        await db.assessment.create({
+          student_id: assessment.student_id,
+          task_id: assessment.task_id,
+          grade: assessment.grade,
+        });
+      });
       const createAttendances = await Promise.all(createAssessmentPromises);
 
       if (!createAttendances)
-      throw apiResponse(status.FORBIDDEN, "Create new attendances failed");
-
+        throw apiResponse(status.FORBIDDEN, "Create new attendances failed");
 
       return Promise.resolve(
         apiResponse(status.OK, "Create new assessment success")
@@ -93,14 +89,12 @@ export class AssessmentService {
         task_id: req.params.id, // Add the task_id filter
       };
 
-      paramQuerySQL.include = [
-        { model: db.task },
-        { model: db.student },
-      ];
+      paramQuerySQL.include = [{ model: db.task }, { model: db.student }];
 
       const assessments = await db.assessment.findAll(paramQuerySQL);
 
-      if (!assessments) throw apiResponse(status.NOT_FOUND, "Assessments do not exist");
+      if (!assessments)
+        throw apiResponse(status.NOT_FOUND, "Assessments do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all assessments success", assessments)
@@ -116,14 +110,17 @@ export class AssessmentService {
     }
   }
 
-  async getOneAssessmentService(req: Request): Promise<any> {
+  async getAssessmentService(req: Request): Promise<any> {
     try {
-      const assessment = await db.assessment.findOne({where: {id: req.params.id}});
+      const assessment = await db.assessment.findOne({
+        where: { id: req.params.id },
+      });
 
-      if (!assessment) throw apiResponse(status.NOT_FOUND, "Assessment do not exist");
+      if (!assessment)
+        throw apiResponse(status.NOT_FOUND, "Assessment do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all asesssment success", assessment)
+        apiResponse(status.OK, "Fetched asesssment success", assessment)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -153,7 +150,9 @@ export class AssessmentService {
       if (!updateAssessment)
         throw apiResponse(status.FORBIDDEN, "Update assessment failed");
 
-      return Promise.resolve(apiResponse(status.OK, "Update assessment success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Update assessment success")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -184,7 +183,9 @@ export class AssessmentService {
       if (!deleteAssessment)
         throw apiResponse(status.FORBIDDEN, "Delete assessment failed");
 
-      return Promise.resolve(apiResponse(status.OK, "Delete assessment success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Delete assessment success")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

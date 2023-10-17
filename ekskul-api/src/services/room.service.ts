@@ -91,6 +91,26 @@ export class RoomService {
     }
   }
 
+  async getRoomService(req: Request): Promise<any> {
+    try {
+      const room = await db.room.findOne({ where: { id: req.params.id } });
+
+      if (!room) throw apiResponse(status.NOT_FOUND, "Room do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched room success", room)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
   async updateRoomService(req: Request): Promise<any> {
     try {
       const roomExist = await db.room.findOne({

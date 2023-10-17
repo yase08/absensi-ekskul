@@ -21,9 +21,14 @@ class InstructorAttendanceRoutes extends InstructorAttendanceController {
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["instructor", "admin"])],
 
       this.getAllInstructorAttendance
+    );
+    this.router.get(
+      "/:id",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getInstructorAttendance
     );
     this.router.put(
       "/:id",

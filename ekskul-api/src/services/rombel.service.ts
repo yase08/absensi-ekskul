@@ -93,40 +93,60 @@ export class RombelService {
     }
   }
 
+  async getRombelService(req: Request): Promise<any> {
+    try {
+      const rombel = await db.rombel.findOne({ where: { id: req.params.id } });
+
+      if (!rombel) throw apiResponse(status.NOT_FOUND, "Rombel do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched rombel success", rombel)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
   async updateRombelService(req: Request): Promise<any> {
     try {
       const rombelExist = await db.rombel.findOne({
         where: { id: req.params.id },
       });
-  
+
       if (!rombelExist) {
         throw apiResponse(
           status.NOT_FOUND,
           "Rombel does not exist for the given id"
         );
       }
-  
+
       const rombelSame = await db.rombel.findOne({
         where: { name: req.body.name },
       });
-  
+
       if (rombelSame && rombelSame.id !== rombelExist.id) {
         throw apiResponse(
           status.CONFLICT,
           `Rombel with the name ${req.body.name} already exists`
         );
       }
-  
+
       const updateRombel = await db.rombel.update(req.body, {
         where: {
           id: rombelExist.id,
         },
       });
-  
+
       if (!updateRombel) {
         throw apiResponse(status.FORBIDDEN, "Update rombel failed");
       }
-  
+
       return Promise.resolve(apiResponse(status.OK, "Update rombel success"));
     } catch (error: any) {
       return Promise.reject(

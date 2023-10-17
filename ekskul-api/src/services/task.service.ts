@@ -20,14 +20,12 @@ export class TaskService {
           `Task ${req.body.name} already exist`
         );
 
-      const createTask = await db.task.create(req.body);      
+      const createTask = await db.task.create(req.body);
 
       if (!createTask)
         throw apiResponse(status.FORBIDDEN, "Create new task failed");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new task success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Create new task success"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -75,10 +73,7 @@ export class TaskService {
         paramQuerySQL.offset = offset;
       }
 
-      paramQuerySQL.include = [
-        { model: db.ekskul },
-        { model: db.user },
-      ];
+      paramQuerySQL.include = [{ model: db.ekskul }, { model: db.user }];
 
       const tasks = await db.task.findAll(paramQuerySQL);
 
@@ -98,14 +93,14 @@ export class TaskService {
     }
   }
 
-  async getOneTaskService(req: Request): Promise<any> {
+  async getTaskService(req: Request): Promise<any> {
     try {
-      const task = await db.task.findOne({where: {id: req.params.id}});
+      const task = await db.task.findOne({ where: { id: req.params.id } });
 
       if (!task) throw apiResponse(status.NOT_FOUND, "Task do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all task success", task)
+        apiResponse(status.OK, "Fetched task success", task)
       );
     } catch (error: any) {
       return Promise.reject(

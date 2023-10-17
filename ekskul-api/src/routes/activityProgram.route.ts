@@ -1,8 +1,8 @@
 import { permission } from "../middlewares/permission";
 import { auth } from "../middlewares/authentication";
+import { authorization } from "../middlewares/authorization";
 import { Router } from "express";
 import { ActivityProgramController } from "../controllers/activityProgram.controller";
-import { authorization } from "../middlewares/authorization";
 
 // class RouteUsers mengextends dari ActivityProgramController agar bisa memakai semua property dan method dari activityProgram controller
 class ActivityProgramRoutes extends ActivityProgramController {
@@ -22,17 +22,22 @@ class ActivityProgramRoutes extends ActivityProgramController {
     this.router.get(
       "/",
       [authorization(), auth(), permission(["instructor", "admin"])],
-      this.getAllActivityProgramService
+      this.getAllActivityProgram
+    );
+    this.router.get(
+      "/:id",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getActivityProgram
     );
     this.router.put(
       "/:id",
       [authorization(), auth(), permission(["instructor", "admin"])],
-      this.updateActivityProgramService
+      this.updateActivityProgram
     );
     this.router.delete(
       "/:id",
       [authorization(), auth(), permission(["instructor", "admin"])],
-      this.deleteActivityProgramService
+      this.deleteActivityProgram
     );
 
     return this.router;

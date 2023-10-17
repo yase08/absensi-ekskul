@@ -22,9 +22,9 @@ export class TaskController extends TaskService {
     }
   };
 
-  getOneTask = async (req: Request, res: Response): Promise<Response> => {
+  getTask = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getOneTaskService(req);
+      const serviceResponse: APIResponse = await this.getTaskService(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);

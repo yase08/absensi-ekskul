@@ -20,9 +20,24 @@ class StudentRoutes extends StudentController {
       this.createStudent
     );
     this.router.get(
+      "/:id",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getStudent
+    );
+    this.router.get(
       "/",
       [authorization(), auth(), permission(["admin"])],
       this.getAllStudent
+    );
+    this.router.put(
+      "/:id",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.updateStudent
+    );
+    this.router.delete(
+      "/:id",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.deleteStudent
     );
 
     return this.router;

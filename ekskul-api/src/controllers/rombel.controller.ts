@@ -22,6 +22,15 @@ export class RombelController extends RombelService {
     }
   };
 
+  getRombel = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getRombelService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
   updateRombel = async (req: Request, res: Response): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.updateRombelService(req);

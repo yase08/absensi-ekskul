@@ -47,26 +47,4 @@ export class ScheduleController extends ScheduleService {
       return res.status(error.statusCode).json(error);
     }
   };
-
-  updateSchedule = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const serviceResponse: APIResponse = await this.updateScheduleService(
-        req
-      );
-      return res.status(serviceResponse.statusCode).json(serviceResponse);
-    } catch (error: any) {
-      return res.status(error.statusCode).json(error);
-    }
-  };
-
-  deleteSchedule = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const serviceResponse: APIResponse = await this.deleteScheduleService(
-        req
-      );
-      return res.status(serviceResponse.statusCode).json(serviceResponse);
-    } catch (error: any) {
-      return res.status(error.statusCode).json(error);
-    }
-  };
 }
