@@ -16,12 +16,12 @@ class StudentRoutes extends StudentController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.createStudent
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.getAllStudent
     );
 

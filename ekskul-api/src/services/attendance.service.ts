@@ -160,7 +160,11 @@ export class AttendanceService {
           "Attendance do not exist for the given id"
         );
 
-      const updateAttendance = await db.attendance.update(req.body);
+      const updateAttendance = await db.attendance.update(req.body, {
+        where: {
+          id: attendanceExist.id,
+        },
+      });
 
       if (!updateAttendance)
         throw apiResponse(status.FORBIDDEN, "Update attendance failed");

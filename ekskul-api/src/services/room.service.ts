@@ -25,9 +25,7 @@ export class RoomService {
       if (!createRoom)
         throw apiResponse(status.FORBIDDEN, "Create new room failed");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new room success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Create new room success"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -105,7 +103,9 @@ export class RoomService {
           "Room do not exist for the given id"
         );
 
-      const updateRoom = await db.room.update(req.body);
+      const updateRoom = await db.room.update(req.body, {
+        id: roomExist.id,
+      });
 
       if (!updateRoom)
         throw apiResponse(status.FORBIDDEN, "Update room failed");

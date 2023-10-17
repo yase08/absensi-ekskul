@@ -105,7 +105,11 @@ export class RombelService {
           "Rombel do not exist for the given id"
         );
 
-      const updateRombel = await db.rombel.update(req.body);
+      const updateRombel = await db.rombel.update(req.body, {
+        where: {
+          id: rombelExist.id,
+        },
+      });
 
       if (!updateRombel)
         throw apiResponse(status.FORBIDDEN, "Update rombel failed");

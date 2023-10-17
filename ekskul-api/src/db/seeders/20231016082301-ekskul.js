@@ -36,6 +36,30 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          name: "javascript",
+          category: "produktif",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "python",
+          category: "produktif",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "iot",
+          category: "produktif",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "java",
+          category: "produktif",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );

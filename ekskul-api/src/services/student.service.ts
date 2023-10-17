@@ -131,7 +131,11 @@ export class StudentService {
           "Student do not exist for the given id"
         );
 
-      const updateStudent = await db.student.update(req.body);
+      const updateStudent = await db.student.update(req.body, {
+        where: {
+          id: studentExist.id,
+        },
+      });
 
       if (!updateStudent)
         throw apiResponse(status.FORBIDDEN, "Update student failed");

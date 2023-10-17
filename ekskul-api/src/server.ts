@@ -21,7 +21,6 @@ import EkskulRoutes from "./routes/ekskul.route";
 import StudentRoutes from "./routes/student.route";
 import ScheduleRoutes from "./routes/schedule.route";
 import GalleryRoutes from "./routes/gallery.route";
-import GalleryImageRoutes from "./routes/galleryImage.route";
 import RoomRoutes from "./routes/room.route";
 import ActivityProgramRoutes from "./routes/activityProgram.route";
 
@@ -98,7 +97,6 @@ export class App {
     this.app.use(`${this.version}/activityProgram`, ActivityProgramRoutes);
     this.app.use(`${this.version}/schedule`, ScheduleRoutes);
     this.app.use(`${this.version}/gallery`, GalleryRoutes);
-    this.app.use(`${this.version}/galleryImage`, GalleryImageRoutes);
     this.app.use(`${this.version}/room`, RoomRoutes);
   }
 

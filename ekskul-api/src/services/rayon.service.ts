@@ -103,7 +103,11 @@ export class RayonService {
           "Rayon do not exist for the given id"
         );
 
-      const updateRayon = await db.rayon.update(req.body);
+      const updateRayon = await db.rayon.update(req.body, {
+        where: {
+          id: rayonExist.id,
+        },
+      });
 
       if (!updateRayon)
         throw apiResponse(status.FORBIDDEN, "Update rayon failed");

@@ -96,7 +96,11 @@ export class ScheduleService {
           "Schedule do not exist for the given id"
         );
 
-      const updateSchedule = await db.schedule.update(req.body);
+      const updateSchedule = await db.schedule.update(req.body, {
+        where: {
+          id: scheduleExist.id
+        }
+      });
 
       if (!updateSchedule)
         throw apiResponse(status.FORBIDDEN, "Update schedule failed");
