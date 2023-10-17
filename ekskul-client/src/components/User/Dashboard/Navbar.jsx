@@ -12,7 +12,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="backdrop-blur-md z-50 max-lg:justify-center max-lg:fixed max-lg:bottom-0 w-full text-black flex justify-between items-center h-[100px] px-6 transition-all bg-white dark:bg-bad lg:shadow-lg dark:shadow-slate-600 max-lg:shadow-top">
+      <nav className="backdrop-blur-md z-50 max-lg:justify-center top-0 fixed max-lg:bottom-0 w-full text-black flex justify-between items-center h-[100px] px-6 transition-all bg-white dark:bg-bad lg:shadow-lg dark:shadow-slate-600 max-lg:shadow-top">
         <ul className="flex gap-x-5 max-lg:gap-x-10 items-center relative font-Gabarito font-medium text-black dark:text-white">
             <li className='max-lg:hidden lg:mr-5'>
             <a href="#" >
