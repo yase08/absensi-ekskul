@@ -32,6 +32,36 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          name: "cicurug 2",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "cicurug 3",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "cicurug 4",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "cicurug 5",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "cicurug 6",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "cicurug 7",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );

@@ -16,8 +16,23 @@ class ActivityProgramRoutes extends ActivityProgramController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["instructor", "admin"])],
       this.createActivityProgram
+    );
+    this.router.get(
+      "/",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getAllActivityProgramService
+    );
+    this.router.put(
+      "/:id",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.updateActivityProgramService
+    );
+    this.router.delete(
+      "/:id",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.deleteActivityProgramService
     );
 
     return this.router;

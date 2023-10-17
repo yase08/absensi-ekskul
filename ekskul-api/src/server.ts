@@ -21,7 +21,6 @@ import EkskulRoutes from "./routes/ekskul.route";
 import StudentRoutes from "./routes/student.route";
 import ScheduleRoutes from "./routes/schedule.route";
 import GalleryRoutes from "./routes/gallery.route";
-import GalleryImageRoutes from "./routes/galleryImage.route";
 import RoomRoutes from "./routes/room.route";
 import ActivityProgramRoutes from "./routes/activityProgram.route";
 import AssessmentRoutes from "./routes/assessment.route";

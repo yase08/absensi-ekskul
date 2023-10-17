@@ -31,6 +31,26 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          name: "PPLG XI-2",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "PPLG XI-3",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "PPLG XI-4",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "PPLG XI-5",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );

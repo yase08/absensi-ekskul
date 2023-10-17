@@ -28,6 +28,11 @@ export class AuthService {
       if (!hashedPassword)
         throw apiResponse(status.BAD_REQUEST, "Incorect email or password");
 
+      const userOnEkskul = await db.userOnEkskul.findAll({
+        where: { user_id: user.id },
+      });
+      const ekskulIds = userOnEkskul.map((userEkskul) => userEkskul.ekskul_id);
+
       const token = jwt.sign(
         {
           id: user.id,
@@ -35,7 +40,7 @@ export class AuthService {
           name: user.name,
           image: user.image,
           role: user.role,
-          ekskul: user.ekskul_id,
+          ekskul: ekskulIds,
         },
         jwtSecret,
         { expiresIn: "1d" }

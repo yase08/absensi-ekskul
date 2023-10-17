@@ -105,7 +105,11 @@ export class EkskulService {
           "Ekskul do not exist for the given id"
         );
 
-      const updateEkskul = await db.ekskul.update(req.body);
+      const updateEkskul = await db.ekskul.update(req.body, {
+        where: {
+          id: ekskulExist.id,
+        },
+      });
 
       if (!updateEkskul)
         throw apiResponse(status.FORBIDDEN, "Update ekskul failed");

@@ -84,65 +84,69 @@ export class ScheduleService {
     }
   }
 
-  async updateScheduleService(req: Request): Promise<any> {
-    try {
-      const scheduleExist = await db.schedule.findOne({
-        where: { id: req.params.id },
-      });
+  // async updateScheduleService(req: Request): Promise<any> {
+  //   try {
+  //     const scheduleExist = await db.schedule.findOne({
+  //       where: { id: req.params.id },
+  //     });
 
-      if (!scheduleExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Schedule do not exist for the given id"
-        );
+  //     if (!scheduleExist)
+  //       throw apiResponse(
+  //         status.NOT_FOUND,
+  //         "Schedule do not exist for the given id"
+  //       );
 
-      const updateSchedule = await db.schedule.update(req.body);
+  //     const updateSchedule = await db.schedule.update(req.body, {
+  //       where: {
+  //         id: scheduleExist.id
+  //       }
+  //     });
 
-      if (!updateSchedule)
-        throw apiResponse(status.FORBIDDEN, "Update schedule failed");
+  //     if (!updateSchedule)
+  //       throw apiResponse(status.FORBIDDEN, "Update schedule failed");
 
-      return Promise.resolve(apiResponse(status.OK, "Update schedule success"));
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
+  //     return Promise.resolve(apiResponse(status.OK, "Update schedule success"));
+  //   } catch (error: any) {
+  //     return Promise.reject(
+  //       apiResponse(
+  //         error.statusCode || status.INTERNAL_SERVER_ERROR,
+  //         error.statusMessage,
+  //         error.message
+  //       )
+  //     );
+  //   }
+  // }
 
-  async deleteScheduleService(req: Request): Promise<any> {
-    try {
-      const scheduleExist = await db.schedule.findOne({
-        where: { id: req.params.id },
-      });
+  // async deleteScheduleService(req: Request): Promise<any> {
+  //   try {
+  //     const scheduleExist = await db.schedule.findOne({
+  //       where: { id: req.params.id },
+  //     });
 
-      if (!scheduleExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Schedule do not exist for the given id"
-        );
+  //     if (!scheduleExist)
+  //       throw apiResponse(
+  //         status.NOT_FOUND,
+  //         "Schedule do not exist for the given id"
+  //       );
 
-      const deleteSchedule = await db.schedule.destroy({
-        where: { id: scheduleExist.id },
-      });
+  //     const deleteSchedule = await db.schedule.destroy({
+  //       where: { id: scheduleExist.id },
+  //     });
 
-      if (!deleteSchedule)
-        throw apiResponse(status.FORBIDDEN, "Delete schedule failed");
+  //     if (!deleteSchedule)
+  //       throw apiResponse(status.FORBIDDEN, "Delete schedule failed");
 
-      return Promise.resolve(apiResponse(status.OK, "Delete schedule success"));
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
+  //     return Promise.resolve(apiResponse(status.OK, "Delete schedule success"));
+  //   } catch (error: any) {
+  //     return Promise.reject(
+  //       apiResponse(
+  //         error.statusCode || status.INTERNAL_SERVER_ERROR,
+  //         error.statusMessage,
+  //         error.message
+  //       )
+  //     );
+  //   }
+  // }
 
   async getScheduleService(req: Request): Promise<any> {
     try {
@@ -176,6 +180,27 @@ export class ScheduleService {
   }
 
   async createActivityOnScheduleService(req: Request): Promise<any> {
+    try {
+      const newActivity = await db.activity.create(req.body);
+
+      if (!newActivity)
+        throw apiResponse(status.FORBIDDEN, "Create new activity failed");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Create new schedule success")
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async updateActivityOnScheduleService(req: Request): Promise<any> {
     try {
       const newActivity = await db.activity.create(req.body);
 

@@ -27,6 +27,7 @@ module.exports = {
           model: "ekskuls",
           key: "id",
         },
+        unique: true,
       },
       createdAt: {
         allowNull: false,

@@ -12,9 +12,6 @@ module.exports = (sequelize, DataTypes) => {
         through: "userOnEkskuls",
         foreignKey: "user_id",
       });
-      this.belongsTo(models.ekskul, {
-        foreignKey: "ekskul_id",
-      });
     }
   }
   user.init(
@@ -23,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       mobileNumber: DataTypes.STRING,
       image: DataTypes.STRING,
-      ekskul_id: DataTypes.STRING,
       password: DataTypes.STRING,
       role: DataTypes.ENUM("admin", "instructor"),
     },

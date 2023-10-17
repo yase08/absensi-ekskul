@@ -16,17 +16,17 @@ class AttendanceRoutes extends AttendanceController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["instructor", "admin"])],
       this.createAttendance
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["instructor", "admin"])],
       this.getAllAttendance
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["instructor", "admin"])],
       this.updateAttendance
     );
 

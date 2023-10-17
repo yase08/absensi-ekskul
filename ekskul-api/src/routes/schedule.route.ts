@@ -38,7 +38,7 @@ class ScheduleRoutes extends ScheduleController {
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.deleteSchedule
     );
 

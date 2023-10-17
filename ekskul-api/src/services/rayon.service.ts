@@ -103,7 +103,22 @@ export class RayonService {
           "Rayon do not exist for the given id"
         );
 
-      const updateRayon = await db.rayon.update(req.body);
+        const rayonSame = await db.rayon.findOne({
+          where: { name: req.body.name },
+        });
+    
+        if (rayonSame && rayonSame.id !== rayonExist.id) {
+          throw apiResponse(
+            status.CONFLICT,
+            `Rayon with the name ${req.body.name} already exists`
+          );
+        }
+
+      const updateRayon = await db.rayon.update(req.body, {
+        where: {
+          id: rayonExist.id,
+        },
+      });
 
       if (!updateRayon)
         throw apiResponse(status.FORBIDDEN, "Update rayon failed");

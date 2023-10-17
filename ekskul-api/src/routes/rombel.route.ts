@@ -16,22 +16,22 @@ class RombelRoutes extends RombelController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.createRombel
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.getAllRombel
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.updateRombel
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.deleteRombel
     );
 

@@ -16,22 +16,22 @@ class RayonRoutes extends RayonController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.createRayon
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.getAllRayon
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.updateRayon
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["instructor"])],
+      [authorization(), auth(), permission(["admin"])],
       this.deleteRayon
     );
 
