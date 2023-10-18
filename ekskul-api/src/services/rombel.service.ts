@@ -69,7 +69,7 @@ export class RombelService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -77,10 +77,30 @@ export class RombelService {
 
       const rombels = await db.rombel.findAll(paramQuerySQL);
 
-      if (!rombels) throw apiResponse(status.NOT_FOUND, "Rombels do not exist");
+      if (!rombels) throw apiResponse(status.NOT_FOUND, "Rombel do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all rombels success", rombels)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getRombelService(req: Request): Promise<any> {
+    try {
+      const rombel = await db.rombel.findOne({ where: { id: req.params.id } });
+
+      if (!rombel) throw apiResponse(status.NOT_FOUND, "Rombel do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched rombel success", rombel)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -99,16 +119,33 @@ export class RombelService {
         where: { id: req.params.id },
       });
 
-      if (!rombelExist)
+      if (!rombelExist) {
         throw apiResponse(
           status.NOT_FOUND,
-          "Rombels do not exist for the given member_id"
+          "Rombel does not exist for the given id"
         );
+      }
 
-      const updateRombel = await db.rombel.update(req.body);
+      const rombelSame = await db.rombel.findOne({
+        where: { name: req.body.name },
+      });
 
-      if (!updateRombel)
+      if (rombelSame && rombelSame.id !== rombelExist.id) {
+        throw apiResponse(
+          status.CONFLICT,
+          `Rombel with the name ${req.body.name} already exists`
+        );
+      }
+
+      const updateRombel = await db.rombel.update(req.body, {
+        where: {
+          id: rombelExist.id,
+        },
+      });
+
+      if (!updateRombel) {
         throw apiResponse(status.FORBIDDEN, "Update rombel failed");
+      }
 
       return Promise.resolve(apiResponse(status.OK, "Update rombel success"));
     } catch (error: any) {
@@ -131,10 +168,10 @@ export class RombelService {
       if (!rombelExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rombels do not exist for the given member_id"
+          "Rombel do not exist for the given id"
         );
 
-      const deleteRombel = await db.rombel.delete({
+      const deleteRombel = await db.rombel.destroy({
         where: { id: rombelExist.id },
       });
 

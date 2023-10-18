@@ -8,13 +8,14 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      this.hasMany(models.activity, {
+        foreignKey: "schedule_id",
+      });
     }
   }
   schedule.init(
     {
       day: DataTypes.STRING,
-      startDate: DataTypes.STRING,
-      endDate: DataTypes.STRING,
     },
     {
       sequelize,

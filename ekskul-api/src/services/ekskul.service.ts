@@ -69,7 +69,7 @@ export class EkskulService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -93,6 +93,26 @@ export class EkskulService {
     }
   }
 
+  async getEkskulService(req: Request): Promise<any> {
+    try {
+      const ekskul = await db.ekskul.findOne({ where: { id: req.params.id } });
+
+      if (!ekskul) throw apiResponse(status.NOT_FOUND, "Ekskul do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched ekskul success", ekskul)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
   async updateEkskulService(req: Request): Promise<any> {
     try {
       const ekskulExist = await db.ekskul.findOne({
@@ -102,10 +122,14 @@ export class EkskulService {
       if (!ekskulExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Ekskuls do not exist for the given member_id"
+          "Ekskul do not exist for the given id"
         );
 
-      const updateEkskul = await db.ekskul.update(req.body);
+      const updateEkskul = await db.ekskul.update(req.body, {
+        where: {
+          id: ekskulExist.id,
+        },
+      });
 
       if (!updateEkskul)
         throw apiResponse(status.FORBIDDEN, "Update ekskul failed");
@@ -131,10 +155,10 @@ export class EkskulService {
       if (!ekskulExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Ekskuls do not exist for the given member_id"
+          "Ekskul do not exist for the given id"
         );
 
-      const deleteEkskul = await db.ekskul.delete({
+      const deleteEkskul = await db.ekskul.destroy({
         where: { id: ekskulExist.id },
       });
 

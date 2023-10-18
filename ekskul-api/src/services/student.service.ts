@@ -51,7 +51,28 @@ export class StudentService {
         typeof req.query.filter === "string" ? req.query.filter : "";
       const page: any = req.query.page;
 
-      const paramQuerySQL: any = {};
+      const paramQuerySQL: any = {
+        attributes: ["id", "name", "nis", "email", "mobileNumber"],
+        include: [
+          {
+            model: db.rombel,
+            attributes: ["name"],
+            as: "rombel",
+          },
+          {
+            model: db.rayon,
+            attributes: ["name"],
+            as: "rayon",
+          },
+          {
+            model: db.ekskul,
+            attributes: ["name"],
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      };
       let limit: number;
       let offset: number;
 
@@ -73,7 +94,7 @@ export class StudentService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -81,7 +102,8 @@ export class StudentService {
 
       const students = await db.student.findAll(paramQuerySQL);
 
-      if (!students) throw apiResponse(status.NOT_FOUND, "Students do not exist");
+      if (!students)
+        throw apiResponse(status.NOT_FOUND, "Students do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all students success", students)
@@ -106,10 +128,14 @@ export class StudentService {
       if (!studentExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Students do not exist for the given member_id"
+          "Student do not exist for the given id"
         );
 
-      const updateStudent = await db.student.update(req.body);
+      const updateStudent = await db.student.update(req.body, {
+        where: {
+          id: studentExist.id,
+        },
+      });
 
       if (!updateStudent)
         throw apiResponse(status.FORBIDDEN, "Update student failed");
@@ -135,10 +161,10 @@ export class StudentService {
       if (!studentExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Students do not exist for the given member_id"
+          "Student do not exist for the given id"
         );
 
-      const deleteStudent = await db.student.delete({
+      const deleteStudent = await db.student.destroy({
         where: { id: studentExist.id },
       });
 
@@ -146,6 +172,26 @@ export class StudentService {
         throw apiResponse(status.FORBIDDEN, "Delete student failed");
 
       return Promise.resolve(apiResponse(status.OK, "Delete student success"));
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getStudentService(req: Request): Promise<any> {
+    try {
+      const student = await db.student.findOne({ where: { id: req.params.id } });
+
+      if (!student) throw apiResponse(status.NOT_FOUND, "Student do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched student success", student)
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

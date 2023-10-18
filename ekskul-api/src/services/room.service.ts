@@ -25,9 +25,7 @@ export class RoomService {
       if (!createRoom)
         throw apiResponse(status.FORBIDDEN, "Create new room failed");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new room success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Create new room success"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -69,7 +67,7 @@ export class RoomService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -77,10 +75,30 @@ export class RoomService {
 
       const rooms = await db.room.findAll(paramQuerySQL);
 
-      if (!rooms) throw apiResponse(status.NOT_FOUND, "Rooms do not exist");
+      if (!rooms) throw apiResponse(status.NOT_FOUND, "Room do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all rooms success", rooms)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getRoomService(req: Request): Promise<any> {
+    try {
+      const room = await db.room.findOne({ where: { id: req.params.id } });
+
+      if (!room) throw apiResponse(status.NOT_FOUND, "Room do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched room success", room)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -102,10 +120,12 @@ export class RoomService {
       if (!roomExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rooms do not exist for the given member_id"
+          "Room do not exist for the given id"
         );
 
-      const updateRoom = await db.room.update(req.body);
+      const updateRoom = await db.room.update(req.body, {
+        id: roomExist.id,
+      });
 
       if (!updateRoom)
         throw apiResponse(status.FORBIDDEN, "Update room failed");
@@ -131,10 +151,10 @@ export class RoomService {
       if (!roomExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rooms do not exist for the given member_id"
+          "Room do not exist for the given id"
         );
 
-      const deleteRoom = await db.room.delete({
+      const deleteRoom = await db.room.destroy({
         where: { id: roomExist.id },
       });
 

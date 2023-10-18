@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { RayonController } from "../controllers/rayon.controller";
-// import { DTOForgotPassword, DTOLogin, DTOResetToken } from "../dto/rayon.dto";
-import { validator } from "../middlewares/validator.middleware";
+import { auth } from "../middlewares/authentication";
+import { permission } from "../middlewares/permission";
+import { authorization } from "../middlewares/authorization";
 
 // class RouteUsers mengextends dari RayonController agar bisa memakai semua property dan method dari rayon controller
 class RayonRoutes extends RayonController {
@@ -9,13 +10,35 @@ class RayonRoutes extends RayonController {
 
   constructor() {
     super();
-    this.router = Router() as Router;}
+    this.router = Router() as Router;
+  }
 
   routes(): Router {
-    this.router.post("/", this.createRayon);
-    this.router.get("/", this.getAllRayon);
-    this.router.put("/:id", this.updateRayon);
-    this.router.delete("/:id", this.deleteRayon);
+    this.router.post(
+      "/",
+      [authorization(), auth(), permission(["admin"])],
+      this.createRayon
+    );
+    this.router.get(
+      "/",
+      [authorization(), auth(), permission(["admin"])],
+      this.getAllRayon
+    );
+    this.router.get(
+      "/:id",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getRayon
+    );
+    this.router.put(
+      "/:id",
+      [authorization(), auth(), permission(["admin"])],
+      this.updateRayon
+    );
+    this.router.delete(
+      "/:id",
+      [authorization(), auth(), permission(["admin"])],
+      this.deleteRayon
+    );
 
     return this.router;
   }

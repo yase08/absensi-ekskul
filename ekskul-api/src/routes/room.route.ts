@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { RoomController } from "../controllers/room.controller";
-// import { DTOForgotPassword, DTOLogin, DTOResetToken } from "../dto/room.dto";
-import { validator } from "../middlewares/validator.middleware";
+import { auth } from "../middlewares/authentication";
+import { permission } from "../middlewares/permission";
+import { authorization } from "../middlewares/authorization";
 
 // class RouteUsers mengextends dari RoomController agar bisa memakai semua property dan method dari room controller
 class RoomRoutes extends RoomController {
@@ -13,10 +14,31 @@ class RoomRoutes extends RoomController {
   }
 
   routes(): Router {
-    this.router.post("/", this.createRoom);
-    this.router.get("/", this.getAllRoom);
-    this.router.put("/:id", this.updateRoom);
-    this.router.delete("/:id", this.deleteRoom);
+    this.router.post(
+      "/",
+      [authorization(), auth(), permission(["admin"])],
+      this.createRoom
+    );
+    this.router.get(
+      "/",
+      [authorization(), auth(), permission(["admin"])],
+      this.getAllRoom
+    );
+    this.router.get(
+      "/:id",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getRoom
+    );
+    this.router.put(
+      "/:id",
+      [authorization(), auth(), permission(["admin"])],
+      this.updateRoom
+    );
+    this.router.delete(
+      "/:id",
+      [authorization(), auth(), permission(["admin"])],
+      this.deleteRoom
+    );
 
     return this.router;
   }

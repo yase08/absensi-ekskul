@@ -67,7 +67,7 @@ export class RayonService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -91,6 +91,26 @@ export class RayonService {
     }
   }
 
+  async getRayonService(req: Request): Promise<any> {
+    try {
+      const rayon = await db.rayon.findOne({ where: { id: req.params.id } });
+
+      if (!rayon) throw apiResponse(status.NOT_FOUND, "Rayon do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched rayon success", rayon)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
   async updateRayonService(req: Request): Promise<any> {
     try {
       const rayonExist = await db.rayon.findOne({
@@ -100,10 +120,25 @@ export class RayonService {
       if (!rayonExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rayons do not exist for the given member_id"
+          "Rayon do not exist for the given id"
         );
 
-      const updateRayon = await db.rayon.update(req.body);
+      const rayonSame = await db.rayon.findOne({
+        where: { name: req.body.name },
+      });
+
+      if (rayonSame && rayonSame.id !== rayonExist.id) {
+        throw apiResponse(
+          status.CONFLICT,
+          `Rayon with the name ${req.body.name} already exists`
+        );
+      }
+
+      const updateRayon = await db.rayon.update(req.body, {
+        where: {
+          id: rayonExist.id,
+        },
+      });
 
       if (!updateRayon)
         throw apiResponse(status.FORBIDDEN, "Update rayon failed");
@@ -129,10 +164,10 @@ export class RayonService {
       if (!rayonExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rayons do not exist for the given member_id"
+          "Rayon do not exist for the given id"
         );
 
-      const deleteRayon = await db.rayon.delete({
+      const deleteRayon = await db.rayon.destroy({
         where: { id: rayonExist.id },
       });
 

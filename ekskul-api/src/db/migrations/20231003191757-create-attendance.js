@@ -9,6 +9,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      ekskul_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "ekskuls",
+          key: "id",
+        },
+      },
       student_id: {
         type: Sequelize.INTEGER,
         references: {

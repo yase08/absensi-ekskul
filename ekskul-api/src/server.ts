@@ -17,14 +17,16 @@ import AuthRoutes from "./routes/auth.route";
 import AttendanceRoutes from "./routes/attendance.route";
 import RayonRoutes from "./routes/rayon.route";
 import RombelRoutes from "./routes/rombel.route";
-import RoleRoutes from "./routes/role.route";
 import EkskulRoutes from "./routes/ekskul.route";
 import StudentRoutes from "./routes/student.route";
 import ScheduleRoutes from "./routes/schedule.route";
 import GalleryRoutes from "./routes/gallery.route";
-import GalleryImageRoutes from "./routes/galleryImage.route";
 import RoomRoutes from "./routes/room.route";
 import ActivityProgramRoutes from "./routes/activityProgram.route";
+import AssessmentRoutes from "./routes/assessment.route";
+import UserRoutes from "./routes/user.route";
+import TaskRoute from "./routes/task.route";
+import instructorAttendanceRoute from "./routes/instructorAttendance.route";
 
 // Membuat class App yang yang berfungsi sebagai server express
 export class App {
@@ -95,13 +97,16 @@ export class App {
     this.app.use(`${this.version}/rayon`, RayonRoutes);
     this.app.use(`${this.version}/rombel`, RombelRoutes);
     this.app.use(`${this.version}/ekskul`, EkskulRoutes);
-    this.app.use(`${this.version}/role`, RoleRoutes);
     this.app.use(`${this.version}/student`, StudentRoutes);
+    this.app.use(`${this.version}/user`, UserRoutes);
     this.app.use(`${this.version}/activityProgram`, ActivityProgramRoutes);
     this.app.use(`${this.version}/schedule`, ScheduleRoutes);
     this.app.use(`${this.version}/gallery`, GalleryRoutes);
-    this.app.use(`${this.version}/galleryImage`, GalleryImageRoutes);
     this.app.use(`${this.version}/room`, RoomRoutes);
+    this.app.use(`${this.version}/assessment`, AssessmentRoutes);
+    this.app.use(`${this.version}/task`, TaskRoute);
+    this.app.use(`${this.version}/instructorAttendance`, instructorAttendanceRoute);
+
   }
 
   // Digunakan untuk menjalankan server express

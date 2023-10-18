@@ -59,7 +59,7 @@ export class ScheduleService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
@@ -67,7 +67,8 @@ export class ScheduleService {
 
       const schedules = await db.schedule.findAll(paramQuerySQL);
 
-      if (!schedules) throw apiResponse(status.NOT_FOUND, "Schedules do not exist");
+      if (!schedules)
+        throw apiResponse(status.NOT_FOUND, "do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all schedules success", schedules)
@@ -83,69 +84,68 @@ export class ScheduleService {
     }
   }
 
-  async updateScheduleService(req: Request): Promise<any> {
-    try {
-      const scheduleExist = await db.schedule.findOne({
-        where: { id: req.params.id },
-      });
-
-      if (!scheduleExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Schedules do not exist for the given member_id"
-        );
-
-      const updateSchedule = await db.schedule.update(req.body);
-
-      if (!updateSchedule)
-        throw apiResponse(status.FORBIDDEN, "Update schedule failed");
-
-      return Promise.resolve(apiResponse(status.OK, "Update schedule success"));
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async deleteScheduleService(req: Request): Promise<any> {
-    try {
-      const scheduleExist = await db.schedule.findOne({
-        where: { id: req.params.id },
-      });
-
-      if (!scheduleExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Schedules do not exist for the given member_id"
-        );
-
-      const deleteSchedule = await db.schedule.delete({
-        where: { id: scheduleExist.id },
-      });
-
-      if (!deleteSchedule)
-        throw apiResponse(status.FORBIDDEN, "Delete schedule failed");
-
-      return Promise.resolve(apiResponse(status.OK, "Delete schedule success"));
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
   async getScheduleService(req: Request): Promise<any> {
     try {
-      
+      const schedules = await db.schedule.findAll({
+        include: {
+          model: db.activity,
+          include: [
+            { model: db.rombel, as: "rombel", attributes: ["name"] },
+            { model: db.room, as: "room", attributes: ["name"] },
+            { model: db.ekskul, as: "ekskul", attributes: ["name"] },
+          ],
+          attributes: { exclude: ["rombel_id", "room_id", "ekskul_id"] },
+        },
+      });
+
+      if (!schedules)
+        throw apiResponse(status.NOT_FOUND, "Schedule do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched schedule data", schedules)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async createActivityOnScheduleService(req: Request): Promise<any> {
+    try {
+      const newActivity = await db.activity.create(req.body);
+
+      if (!newActivity)
+        throw apiResponse(status.FORBIDDEN, "Create new activity failed");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Create new schedule success")
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async updateActivityOnScheduleService(req: Request): Promise<any> {
+    try {
+      const newActivity = await db.activity.update(req.body);
+
+      if (!newActivity)
+        throw apiResponse(status.FORBIDDEN, "Create new activity failed");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Create new schedule success")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

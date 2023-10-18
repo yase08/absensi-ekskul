@@ -12,9 +12,6 @@ module.exports = (sequelize, DataTypes) => {
         through: "userOnEkskuls",
         foreignKey: "user_id",
       });
-      this.hasMany(models.role, {
-        foreignKey: "role_id",
-      });
     }
   }
   user.init(
@@ -22,8 +19,9 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       email: DataTypes.STRING,
       mobileNumber: DataTypes.STRING,
+      image: DataTypes.STRING,
       password: DataTypes.STRING,
-      role_id: DataTypes.INTEGER,
+      role: DataTypes.ENUM("admin", "instructor"),
     },
     {
       sequelize,

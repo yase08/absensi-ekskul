@@ -1,9 +1,8 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import fs from "fs";
-import path from "path";
 import slugify from "slugify";
+import { Op } from "sequelize";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -12,41 +11,117 @@ const db = require("../db/models");
 export class GalleryService {
   async createGalleryService(req: Request): Promise<any> {
     try {
-      const gallery = await db.gallery.findOne({ where: { name: req.body.name } });
+      const ekskulOnGallery = await db.gallery.findOne({
+        where: { ekskul_id: req.body.ekskul_id },
+      });
 
-      if (gallery)
+      if (ekskulOnGallery)
         throw apiResponse(
           status.CONFLICT,
-          `Gallery ${req.body.name} already exist`
+          `Ekskul id ${req.body.ekskul_id} on gallery images already exist`
         );
 
       if (req.body.name) {
         req.body.slug = slugify(req.body.name.toLowerCase());
       }
-      const createGallery = await db.gallery.create(req.body);
+
+      let files: Express.Multer.File[] = req.files as Express.Multer.File[];
+      let galleryImages: string[] = [];
+
+      for (let i in files) {
+        const file = files[i];
+        const fileName = file.filename;
+        galleryImages.push(fileName);
+      }
+
+      const createGallery = await db.gallery.create({
+        ...req.body,
+        images: galleryImages,
+      });
 
       if (!createGallery)
         throw apiResponse(status.FORBIDDEN, "Create new gallery failed");
 
-      const folderName = path.join(__dirname, `../public/${req.body.slug}`);
-      console.log(folderName);
-
-      // Mengecek apakah direktori parent sudah ada
-      const parentFolderName = path.dirname(folderName);
-      if (!fs.existsSync(parentFolderName)) {
-        fs.mkdirSync(parentFolderName, { recursive: true });
-      }
-
-      // Membuat folder yang diinginkan
-      if (fs.existsSync(folderName)) {
-        console.log("Folder already exists", folderName);
-      } else {
-        fs.mkdirSync(folderName);
-        console.log("Folder created");
-      }
-
       return Promise.resolve(
         apiResponse(status.OK, "Create new gallery success")
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getAllGalleryService(req: Request): Promise<any> {
+    try {
+      const sort: string =
+        typeof req.query.sort === "string" ? req.query.sort : "";
+      const filter: string =
+        typeof req.query.filter === "string" ? req.query.filter : "";
+      const page: any = req.query.page;
+
+      const paramQuerySQL: any = {};
+      let limit: number;
+      let offset: number;
+
+      if (filter) {
+        paramQuerySQL.where = {
+          name: { [Op.iLike]: `%${filter}%` },
+        };
+      }
+
+      if (sort) {
+        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
+        const fieldName = sort.replace(/^-/, "");
+        paramQuerySQL.order = [[fieldName, sortOrder]];
+      }
+
+      if (page && page.size && page.number) {
+        limit = parseInt(page.size, 10);
+        offset = (parseInt(page.number, 10) - 1) * limit;
+        paramQuerySQL.limit = limit;
+        paramQuerySQL.offset = offset;
+      } else {
+        limit = 10;
+        offset = 0;
+        paramQuerySQL.limit = limit;
+        paramQuerySQL.offset = offset;
+      }
+
+      const galleries = await db.gallery.findAll(paramQuerySQL);
+
+      if (!galleries)
+        throw apiResponse(status.NOT_FOUND, "Galleries do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched all galleries success", galleries)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getGalleryService(req: Request): Promise<any> {
+    try {
+      const galleries = await db.gallery.findAll({
+        where: { slug: req.params.slug },
+      });
+
+      if (!galleries)
+        throw apiResponse(status.NOT_FOUND, "Galleries do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched all galleries success", galleries)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -68,10 +143,29 @@ export class GalleryService {
       if (!galleryExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Gallerys do not exist for the given member_id"
+          "Gallery do not exist for the given id"
         );
 
-      const updateGallery = await db.gallery.update(req.body);
+      let galleryImages: string[] = [];
+      let files: Express.Multer.File[] = req.files as Express.Multer.File[];
+
+      for (let i in files) {
+        const file = files[i];
+        const fileName = file.filename;
+        galleryImages.push(fileName);
+      }
+
+      const updateGallery = await db.gallery.update(
+        {
+          ...req.body,
+          images: galleryImages,
+        },
+        {
+          where: {
+            id: galleryExist.id,
+          },
+        }
+      );
 
       if (!updateGallery)
         throw apiResponse(status.FORBIDDEN, "Update gallery failed");
@@ -97,10 +191,10 @@ export class GalleryService {
       if (!galleryExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Gallerys do not exist for the given member_id"
+          "Gallery do not exist for the given id"
         );
 
-      const deleteGallery = await db.gallery.delete({
+      const deleteGallery = await db.gallery.destroy({
         where: { id: galleryExist.id },
       });
 

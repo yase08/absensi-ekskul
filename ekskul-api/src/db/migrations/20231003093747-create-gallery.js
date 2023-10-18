@@ -18,12 +18,16 @@ module.exports = {
       date: {
         type: Sequelize.STRING,
       },
+      images: {
+        type: Sequelize.JSONB,
+      },
       ekskul_id: {
         type: Sequelize.INTEGER,
         references: {
           model: "ekskuls",
           key: "id",
         },
+        unique: true,
       },
       createdAt: {
         allowNull: false,
