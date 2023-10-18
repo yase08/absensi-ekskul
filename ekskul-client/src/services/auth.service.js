@@ -1,11 +1,11 @@
 import axios from "axios";
-import jwtDecode from "jwt-decode";
+// import jwtDecode from "jwt-decode";
 import { API, VERSION } from "../utils/baseUrl";
 
 export const login = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/auth/login`,
+      `https://cxw30mfb-8000.asse.devtunnels.ms/api/v1/auth/login`,
       requestData
     );
     return response.data;
@@ -45,7 +45,7 @@ export const resetToken = async (token, requestData) => {
   }
 };
 
-export const getUserData = (token) => {
-  const decode = jwtDecode(token);
-  return decode;
-};
+// export const getUserData = (token) => {
+//   const decode = jwtDecode(token);
+//   return decode;
+// };
