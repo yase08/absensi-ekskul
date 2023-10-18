@@ -1,3 +1,4 @@
+import React from 'react'
 
 const TableEskul = () => {
   return (
@@ -60,10 +61,7 @@ const TableEskul = () => {
           <thead>
             <tr>
               <th className="w-1/6 px-6 py-3 white text-left text-xs leading-4 font-medium text-gray-600 uppercase tracking-wider">
-                Ektrakulikuler
-              </th>
-              <th className="w-1/6 px-6 py-3 white text-left text-xs leading-4 font-medium text-gray-600 uppercase tracking-wider">
-                Category
+                Rombel
               </th>
               <th className="w-1/6 px-6 py-3 whitespace-no-wrap"></th>
             </tr>
@@ -74,13 +72,7 @@ const TableEskul = () => {
                   {/* <img
                       className="h-10 w-10 rounded-full" 
                   /> */}
-                  Basket
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase"> 
-                  {/* <img
-                      className="h-10 w-10 rounded-full" 
-                  /> */}
-                  Umum
+                  ppxg xii-2
                   </td>
                 <td className="px-6 py-4 whitespace-no-wrap"></td>
                 <td className="px-6 py-4 whitespace-no-wrap">

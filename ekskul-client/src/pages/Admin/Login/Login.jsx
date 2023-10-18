@@ -1,9 +1,8 @@
-import { BsInstagram } from 'react-icons/bs';
-import { AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineUser, AiOutlineLock, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import { AiOutlineUser, AiOutlineLock, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { useState } from 'react';
-import {FcGoogle} from 'react-icons/fc'
 import './Login.css';
 import logo from '../../../assets/Logo-Absensi.png'
+import { login } from '../../../services/auth.service';
 
 const Login = () => {
   const [changeMethod, setChangeMethod] = useState(false);
@@ -21,6 +20,11 @@ const Login = () => {
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   };
+
+  const HandleLoginPage = async () => {
+    const response = await login()
+    
+  }
 
   return (
     <div className='w-full h-[100vh] bg-primary flex relative transition-all '>

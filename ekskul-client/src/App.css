@@ -45,6 +45,6 @@
   100% { transform: rotate(360deg); }
 }
 
-.custom-cursor {
+/* .custom-cursor {
   cursor: url('./assets/react.svg'),auto;
-}
+} */
