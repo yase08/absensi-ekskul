@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
+import { validator } from "../middlewares/validator.middleware";
+import { DTOForgotPassword, DTOLogin, DTOResetToken } from "../dto/auth.dto";
 
 // class RouteUsers mengextends dari AuthController agar bisa memakai semua property dan method dari auth controller
 class AuthRoutes extends AuthController {
@@ -11,13 +13,15 @@ class AuthRoutes extends AuthController {
   }
 
   routes(): Router {
-    this.router.post("/login", this.login);
+    this.router.post("/login", [validator(DTOLogin)], this.login);
     this.router.post(
       "/forgot-password",
+      [validator(DTOForgotPassword)],
       this.forgotPassword
     );
     this.router.put(
       "/reset-token/:token",
+      [validator(DTOResetToken)],
       this.resetToken
     );
 
