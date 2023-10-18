@@ -101,6 +101,33 @@ export class ActivityProgramService {
     }
   }
 
+  async getActivityProgramService(req: Request): Promise<any> {
+    try {
+      const activityProgram = await db.activityProgram.findOne({
+        where: { id: req.params.id },
+      });
+
+      if (!activityProgram)
+        throw apiResponse(status.NOT_FOUND, "Activity program do not exist");
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Fetched activity program success",
+          activityProgram
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
   async updateActivityProgramService(req: Request): Promise<any> {
     try {
       const activityProgramExist = await db.activityProgram.findOne({

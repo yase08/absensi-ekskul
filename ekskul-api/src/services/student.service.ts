@@ -182,4 +182,24 @@ export class StudentService {
       );
     }
   }
+
+  async getStudentService(req: Request): Promise<any> {
+    try {
+      const student = await db.student.findOne({ where: { id: req.params.id } });
+
+      if (!student) throw apiResponse(status.NOT_FOUND, "Student do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched student success", student)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
 }

@@ -28,7 +28,7 @@ class GalleryRoutes extends GalleryController {
     this.router.get("/:slug", this.getGalleryService);
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin"]), upload.array("images")],
       this.updateGallery
     );
     this.router.delete(

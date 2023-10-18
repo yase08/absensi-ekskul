@@ -93,6 +93,26 @@ export class EkskulService {
     }
   }
 
+  async getEkskulService(req: Request): Promise<any> {
+    try {
+      const ekskul = await db.ekskul.findOne({ where: { id: req.params.id } });
+
+      if (!ekskul) throw apiResponse(status.NOT_FOUND, "Ekskul do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched ekskul success", ekskul)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
   async updateEkskulService(req: Request): Promise<any> {
     try {
       const ekskulExist = await db.ekskul.findOne({

@@ -18,42 +18,40 @@ export class InstructorAttendanceService {
     try {
       const instructor_Id = (req.session as ISession).user.id;
       const ekskulIds = (req.session as ISession).user.ekskul;
-          
 
       const selectedEkskulId = Number(req.query.ekskul_id);
 
       if (ekskulIds.includes(selectedEkskulId)) {
-      const userOnEkskul = await db.userOnEkskul.findOne({
-        where: { user_id: instructor_Id, ekskul_id: selectedEkskulId },
-      });
-
-      if (userOnEkskul) {
-        // Jika terkait, buat data kehadiran
-        const createInstructorAttendance = db.instructorAttendance.create({
-          ...req.body,
-          ekskul_id: selectedEkskulId,
-          instructor_id: instructor_Id 
+        const userOnEkskul = await db.userOnEkskul.findOne({
+          where: { user_id: instructor_Id, ekskul_id: selectedEkskulId },
         });
-        if (!createInstructorAttendance)
-          throw apiResponse(status.FORBIDDEN, "Create new instructor failed");
-    
-        return Promise.resolve(
-          apiResponse(status.OK, "Create new instructor success")
-        );
+
+        if (userOnEkskul) {
+          // Jika terkait, buat data kehadiran
+          const createInstructorAttendance = db.instructorAttendance.create({
+            ...req.body,
+            ekskul_id: selectedEkskulId,
+            instructor_id: instructor_Id,
+          });
+          if (!createInstructorAttendance)
+            throw apiResponse(status.FORBIDDEN, "Create new instructor failed");
+
+          return Promise.resolve(
+            apiResponse(status.OK, "Create new instructor success")
+          );
+        } else {
+          // Jika tidak terkait, lewati data kehadiran ini dan beri respons error
+          throw apiResponse(
+            status.FORBIDDEN,
+            `Instructor with ID ${instructor_Id} is not associated with the selected ekskul`
+          );
+        }
       } else {
-        // Jika tidak terkait, lewati data kehadiran ini dan beri respons error
         throw apiResponse(
-          status.FORBIDDEN,
-          `Instructor with ID ${instructor_Id} is not associated with the selected ekskul`
+          status.NOT_FOUND,
+          "Ekskul does not exist for the given id"
         );
       }
-    } else {
-      throw apiResponse(
-        status.NOT_FOUND,
-        "Ekskul does not exist for the given id"
-      );
-    }
-
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -66,7 +64,7 @@ export class InstructorAttendanceService {
   }
 
   async getAllInstructorAttendanceService(req: Request): Promise<any> {
-    const ekskulIds = (req.session as ISession).user.ekskul
+    const ekskulIds = (req.session as ISession).user.ekskul;
     try {
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
@@ -120,6 +118,36 @@ export class InstructorAttendanceService {
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all instructors success", instructors)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getInstructorAttendanceService(req: Request): Promise<any> {
+    try {
+      const instructorAttendance = await db.instructorAttendance.findOne({
+        where: { id: req.params.id },
+      });
+
+      if (!instructorAttendance)
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Instructor attendance do not exist"
+        );
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Fetched instructor attendance success",
+          instructorAttendance
+        )
       );
     } catch (error: any) {
       return Promise.reject(

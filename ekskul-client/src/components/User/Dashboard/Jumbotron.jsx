@@ -1,22 +1,24 @@
-import WhiteLogo from '../../../assets/Logo-white.png'
-import BlackLogo from '../../../assets/Logo-black.png'
+import React from 'react'
+import wk2 from '../../../assets/Rectangle 39.png'
+
 const Jumbotron = () => {
   return (
-<div className="w-full h-[500px] flex max-md:flex-col max-md:flex-no-wrap justify-center relative items-center text-black dark:text-white">
-  <ul className='w-full h-full shadow-lg max-md:order-2 max-md:py-[100px]'>
-    <div className='w-full h-full flex flex-col items-center justify-center '>
-      <h1 className='font-Gabarito font-bold xl:text-5xl max-xl:text-[40px]'>Esktrakulikuler</h1>
-      <h1 className='opacity-70 xl:text-xl max-xl:text-[15px] uppercase'>Smk wikrama bogor</h1>
-      <button className='border border-black dark:border-white rounded-full px-3 py-2 mt-5 hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black'>Get Ekstrakulikuler</button>
+    <div className='bg-transparent w-full h-auto px-[165px] py-[165px] font-Nunito relative'>
+      <div className='bg-transparent w-full '>
+        <h1 className='text-[#004aad] text-[45px] leading-[normal] capitalize'>selamat datang di website</h1>
+        <p className="font-bold text-transparent text-[48px] leading-[normal]">
+           <span className="text-[#ffde59]">Eks</span>
+           <span className="text-[#ffbd59]">trakuri</span>
+           <span className="text-[#ff914d]">kuler</span>
+        </p>
+        <h1 className="font-bold text-[48px] leading-[normal] text-[#004aad]">WIKRAMA</h1>
+        <p className='capitalize my-2'>segala informasi tentang ekstrakulikuler di <span className='uppercase'>smk wikrama bogor</span> ada di sini</p>
+        <button className='bg-[#004AAD] p-[22px] text-white rounded-xl capitalize mt-5 text-[20px] font-bold'>get ekstrakurikuler</button>
+      </div>
+      <div className='w-[38%] absolute top-0 right-0'>
+        <img src={wk2}/>
+      </div>
     </div>
-  </ul>
-  <ul className='w-full h-full flex flex-col justify-center items-center gap-5 bg-transparent shadow-lg max-md:order-1'>
-    <img src={BlackLogo} alt="" className='w-[200px] max-md:w-[150px] dark:hidden block'/>
-    <img src={WhiteLogo} alt="" className='w-[200px] max-md:w-[150px] dark:block hidden'/>
-  </ul>
-</div>
-
-
   )
 }
 

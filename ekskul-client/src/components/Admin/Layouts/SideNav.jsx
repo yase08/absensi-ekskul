@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { BsJoystick } from 'react-icons/bs'
 import { IoDiamondSharp } from 'react-icons/io5'
 import Button from "../../../components/Admin/Layouts/Button";
+import ColorSettingForm from './ColorSettingForm'
 
 
 

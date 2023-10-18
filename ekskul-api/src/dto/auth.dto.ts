@@ -1,4 +1,4 @@
-// // Berfungsi untuk memvalidasi req.body / req.params / req.query
+// Berfungsi untuk memvalidasi req.body / req.params / req.query
 
 import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
 

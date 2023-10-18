@@ -24,6 +24,11 @@ class RayonRoutes extends RayonController {
       [authorization(), auth(), permission(["admin"])],
       this.getAllRayon
     );
+    this.router.get(
+      "/:id",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getRayon
+    );
     this.router.put(
       "/:id",
       [authorization(), auth(), permission(["admin"])],

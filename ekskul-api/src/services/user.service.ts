@@ -103,6 +103,26 @@ export class UserService {
     }
   }
 
+  async getUserService(req: Request): Promise<any> {
+    try {
+      const user = await db.user.findOne({ where: { id: req.params.id } });
+
+      if (!user) throw apiResponse(status.NOT_FOUND, "User do not exist");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched user success", user)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
   async updateUserService(req: Request): Promise<any> {
     try {
       const userExist = await db.user.findOne({

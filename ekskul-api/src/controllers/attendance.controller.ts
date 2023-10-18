@@ -14,6 +14,7 @@ export class AttendanceController extends AttendanceService {
       return res.status(error.statusCode).json(error);
     }
   };
+
   getAttendance = async (req: Request, res: Response): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.fetchAttendanceService(
@@ -24,11 +25,10 @@ export class AttendanceController extends AttendanceService {
       return res.status(error.statusCode).json(error);
     }
   };
+  
   exportToExcel = async (req: Request, res: Response): Promise<any> => {
     try {
-      const serviceResponse: APIResponse = await this.exportAttendance(
-        req
-      );
+      const serviceResponse: APIResponse = await this.exportAttendance(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
@@ -37,7 +37,9 @@ export class AttendanceController extends AttendanceService {
 
   getAllAttendance = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getAllAttendanceService(req);
+      const serviceResponse: APIResponse = await this.getAllAttendanceService(
+        req
+      );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
@@ -46,7 +48,9 @@ export class AttendanceController extends AttendanceService {
 
   updateAttendance = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.updateAttendanceService(req);
+      const serviceResponse: APIResponse = await this.updateAttendanceService(
+        req
+      );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);

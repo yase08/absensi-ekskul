@@ -30,6 +30,19 @@ export class InstructorAttendanceController extends InstructorAttendanceService 
     }
   };
 
+  getInstructorAttendance = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.getInstructorAttendanceService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
   updateInstructorAttendance = async (
     req: Request,
     res: Response

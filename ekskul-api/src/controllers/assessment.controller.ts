@@ -6,7 +6,9 @@ import { APIResponse } from "../helpers/apiResponse.helper";
 export class AssessmentController extends AssessmentService {
   createAssessment = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.createAssessmentService(req);
+      const serviceResponse: APIResponse = await this.createAssessmentService(
+        req
+      );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
@@ -15,16 +17,18 @@ export class AssessmentController extends AssessmentService {
 
   getAllAssessment = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getAllAssessmentService(req);
+      const serviceResponse: APIResponse = await this.getAllAssessmentService(
+        req
+      );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
     }
   };
 
-  getOneAssessment = async (req: Request, res: Response): Promise<Response> => {
+  getAssessment = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getOneAssessmentService(req);
+      const serviceResponse: APIResponse = await this.getAssessmentService(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
@@ -33,7 +37,9 @@ export class AssessmentController extends AssessmentService {
 
   updateAssessment = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.updateAssessmentService(req);
+      const serviceResponse: APIResponse = await this.updateAssessmentService(
+        req
+      );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
@@ -42,7 +48,9 @@ export class AssessmentController extends AssessmentService {
 
   deleteAssessment = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.deleteAssessmentService(req);
+      const serviceResponse: APIResponse = await this.deleteAssessmentService(
+        req
+      );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
