@@ -38,7 +38,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Lakukan permintaan API untuk login
     try {
       const response = await login({ email, password });
       if (response.statusCode === 200) {
