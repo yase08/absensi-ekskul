@@ -146,13 +146,15 @@ export class GalleryService {
           "Gallery do not exist for the given id"
         );
 
-      let galleryImages: string[] = [];
-      let files: Express.Multer.File[] = req.files as Express.Multer.File[];
+      const previousImages = galleryExist.images;
 
-      for (let i in files) {
-        const file = files[i];
-        const fileName = file.filename;
-        galleryImages.push(fileName);
+      let galleryImages: string[] = previousImages.slice();
+
+      if (Array.isArray(req.files) && req.files.length > 0) {
+        const newImages = req.files.map(
+          (file: Express.Multer.File) => file.filename
+        );
+        galleryImages = galleryImages.concat(newImages);
       }
 
       const updateGallery = await db.gallery.update(

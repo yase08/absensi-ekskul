@@ -3,6 +3,7 @@ import axios from 'axios';
 import TableEskul from './Table';
 import Swal from 'sweetalert2';
 import './Rayon.css'; // Use a consistent file naming convention for CSS (e.g., Rayon.css)
+import { getAllRayon } from '../../../services/rayon.service';
 
 const Rayon = () => {
   const [formData, setFormData] = useState({
@@ -23,15 +24,15 @@ const Rayon = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('https://cxw30mfb-8000.asse.devtunnels.ms/api/v1/rayon', formData);
-      const successMessage = response.data.statusMessage;
+      const response = await getAllRayon()
+      const successMessage = response.statusMessage;
 
       Swal.fire({
         icon: 'success',
         title: 'Success!',
         text: successMessage,
       });
-      console.log('Response:', response.data);
+      console.log('Response:', response);
     } catch (error) {
       console.error('Error:', error);
 
