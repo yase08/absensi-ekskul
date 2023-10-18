@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-import { AiOutlineUser, AiOutlineLock, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
-import { useState } from 'react';
-import './Login.css';
-import logo from '../../../assets/Logo-Absensi.png'
-import { login } from '../../../services/auth.service';
-=======
 import { BsInstagram } from "react-icons/bs";
 import {
   AiOutlineArrowLeft,
@@ -14,18 +7,19 @@ import {
   AiOutlineEye,
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
+import {useNavigate} from 'react-router-dom'
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import "./Login.css";
 import logo from "../../../assets/Logo-Absensi.png";
 import { login } from "../../../services/auth.service";
->>>>>>> 8a1d3442caa84294014eb43c6fe6416d8281a097
 
 const Login = () => {
   const [changeMethod, setChangeMethod] = useState(false);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate()
 
   const toggleChangeMethod = () => {
     setChangeMethod(!changeMethod);
@@ -39,13 +33,6 @@ const Login = () => {
     setPassword(e.target.value);
   };
 
-<<<<<<< HEAD
-  const HandleLoginPage = async () => {
-    const response = await login()
-    
-  }
-
-=======
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
@@ -58,6 +45,7 @@ const Login = () => {
       if (response.statusCode === 200) {
         const data = response.data;
         sessionStorage.setItem("token", data);
+        navigate('/admin/dashboard')
       } else {
         console.error("Login failed:", response.data.message);
       }
@@ -65,7 +53,6 @@ const Login = () => {
       console.error("An error occurred:", error.message);
     }
   };
->>>>>>> 8a1d3442caa84294014eb43c6fe6416d8281a097
   return (
     <div className="w-full h-[100vh] bg-primary flex relative transition-all ">
       <div
