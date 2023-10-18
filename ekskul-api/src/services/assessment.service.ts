@@ -11,8 +11,9 @@ export class AssessmentService {
   async createAssessmentService(req: Request): Promise<any> {
     try {      
       
-      const createAssessmentPromises = req.body.map(
-        async (assessment: any) => {          
+      const createAssessmentPromises =[];
+
+      for (const assessment of req.body) {     
           const existingAssessment = await db.assessment.findOne({
             where: {
               student_id: assessment.student_id,
@@ -31,7 +32,6 @@ export class AssessmentService {
             grade: assessment.grade
           });
         }
-      );
       const createAttendances = await Promise.all(createAssessmentPromises);
 
       if (!createAttendances)
