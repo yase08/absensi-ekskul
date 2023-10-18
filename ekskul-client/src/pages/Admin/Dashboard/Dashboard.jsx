@@ -5,12 +5,12 @@ import Table from "../../../components/Admin/Table/Table";
 import TopNav from "../../../components/Admin/Layouts/TopNav"
 import {useState} from "react";
 import {RiFacebookFill} from 'react-icons/ri'
-import {AiOutlineClose} from 'react-icons/ai'
 import {AiOutlineTwitter} from 'react-icons/ai'
 import {BsInstagram, BsWhatsapp} from 'react-icons/bs'
 import Profile from "../../../components/Admin/Profile/Profile";
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import ColorSettingForm from "../../../components/Admin/Layouts/HiddenColor/Navbar";
+import Tein from "../../../components/Admin/magic/Tein";
 
 const Dashboard = () => {
     const [expanded, setExpanded] = useState(true);
@@ -44,42 +44,6 @@ const [loading, setLoading] = useState(false);
     };
 
 
-    const [searchQuery, setSearchQuery] = useState('');
-    const [suggestions, setSuggestions] = useState([]);
-    const navigate = useNavigate();
-  
-
-    const getMachineLearningSuggestions = async (query) => {
-        const suggestions = ['rombel', 'rayon', 'ekstrakulikuler', 'jadwal','program','siswa','gallery', 'ruangan','instruktur'];
-        return suggestions.filter((suggestion) =>
-          suggestion.toLowerCase().includes(query.toLowerCase())
-        );
-      };
-    
-      const handleInputChange = async (event) => {
-        const query = event.target.value;
-        setSearchQuery(query);
-    
-        const suggestions = await getMachineLearningSuggestions(query);
-        setSuggestions(suggestions);
-      };
-    
-      const handleSuggestionClick = (suggestion) => {
-        setSearchQuery(suggestion);
-        setSuggestions([]);
-      };
-    
-      const handleButtonClick = async () => {
-        setLoading(true);
-        try {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          navigate(`/admin/${searchQuery}`);
-        } catch (error) {
-          console.error('Error:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
 
     return (
         <> 
@@ -135,47 +99,14 @@ const [loading, setLoading] = useState(false);
             </div>
         </div>
         {openHelpNav && (
-            <div className="bg-transparent w-full h-full justify-center items-center flex z-50 fixed" style={{ backdropFilter: 'blur(5px)' }}>
-                <div className="text-black bg-white border p-3 border-gray-400 w-[400px] h-auto ">
-                    <div className=" relative">
-                        <div className="text-white">-</div>
-                        <button onClick={toggleOpenHelpNav} className="absolute right-0 top-0 "><AiOutlineClose/></button>
-                    </div>
-                    <div className="flex flex-col gap-[1px]">
-                    <input
-                  type="text"
-                  className="outline-none border p-1 rounded-sm border-gray-400 w-full"
-                  placeholder="Where Do You Want To Go"
-                  value={searchQuery}
-                  onChange={handleInputChange}
-                />
-                {suggestions.length > 0 && (
-                  <div className="bg-white border w-full border-gray-400  h-auto">
-                    {suggestions.map((suggestion, index) => (
-                      <div
-                        key={index}
-                        className="cursor-pointer hover:bg-gray-200 p-1 rounded"
-                        onClick={() => handleSuggestionClick(suggestion)}
-                      >
-                        {suggestion}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                    <button className="bg-blue-500 p-1 w-full text-white rounded-sm" onClick={handleButtonClick}>
-                    {loading ? <div className="loader"></div> : 'Tein'}
-                    </button>
-
-                    </div>
-                </div>
-            </div>
+        <Tein toggleOpenHelpNav={toggleOpenHelpNav} setLoading={setLoading} loading={loading}/>
         )}
         {openChangeBg && (
          <div className="bg-transparent w-full h-full justify-center items-center flex z-50 fixed" style={{ backdropFilter: 'blur(5px)' }}>
             <div className="text-black bg-white border border-gray-400 w-[400px] h-auto ">
             <ColorSettingForm toggleOpenChangeBg={toggleOpenChangeBg}/>
             </div>
-            </div>
+          </div>
         )}
     </div>
 </>

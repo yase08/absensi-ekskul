@@ -1,4 +1,5 @@
 
+
 const TableEskul = () => {
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

@@ -1,7 +1,7 @@
 import {AiFillFire} from 'react-icons/ai'
 // import {FiInfo} from 'react-icons/fi'
-import {SiPhpmyadmin, SiPrivateinternetaccess, SiGoogleclassroom} from 'react-icons/si'
-import {BiUserCheck, BiPhotoAlbum} from 'react-icons/bi'
+import { SiGoogleclassroom} from 'react-icons/si'
+import { BiPhotoAlbum} from 'react-icons/bi'
 import {HiOutlineChevronDown} from 'react-icons/hi'
 // import { PiCardsLight} from 'react-icons/pi'
 import { GiBasketballBall,GiTeacher} from 'react-icons/gi'
@@ -14,7 +14,7 @@ import { useState } from 'react';
 import { BsJoystick } from 'react-icons/bs'
 import { IoDiamondSharp } from 'react-icons/io5'
 import Button from "../../../components/Admin/Layouts/Button";
-import ColorSettingForm from './ColorSettingForm'
+// import ColorSettingForm from './ColorSettingForm'
 
 
 
@@ -227,7 +227,7 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                             <p className={`uppercase font-normal text-xs antialiased tracking-[1.5px] font-poppins opacity-40  ${expanded ? 'lg:hidden':''}`}>dashboard</p>
                             <div className='my-[15px]'>
                                 <div className={`flex flex-col gap-y-[13px] relative  ${expanded?'px-1 max-lg:px-4':'w-full h-[55px] flex justify-center px-4'}`}>
-                                    <a href='/admin' onMouseEnter={handleNavbarHomeMouseEnter} onMouseLeave={handleNavbarHomeMouseLeave} className={`flex gap-x-[24.5px] items-center before:absolute  ${currentPath === '/admin' || currentPath ==='/admin/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 before:bg-primary before:-left-[20px]' : 'before:w-[4px] before:h-5 before:bg-primary before:-left-[20px]  ') : 'w-full h-[50px]'} ${expanded ? 'items-center lg:justify-center animate-fade-in-out' : ''}`}>
+                                    <a href='/admin/dashboard' onMouseEnter={handleNavbarHomeMouseEnter} onMouseLeave={handleNavbarHomeMouseLeave} className={`flex gap-x-[24.5px] items-center before:absolute  ${currentPath === '/admin/dashboard' || currentPath ==='/admin/dashboard/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 before:bg-primary before:-left-[20px]' : 'before:w-[4px] before:h-5 before:bg-primary before:-left-[20px]  ') : 'w-full h-[50px]'} ${expanded ? 'items-center lg:justify-center animate-fade-in-out' : ''}`}>
                                         <AiFillFire className={`opacity-100 ${expanded ? (currentPath === '/' ? 'text-2xl opacity-100 text-white' : 'text-2xl opacity-60 text-black') : 'opacity-60'}`}/>
                                         <p href="" className={`opacity-60 text-sm ${expanded ? 'lg:hidden' : ''} transition-opacity`}>Home</p>
                                     </a>
@@ -251,7 +251,7 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                     className={`bg-transparent w-full ${expanded ? 'lg:px-1':''}`}>
                         <button
                             onClick={toggleDataDropdown}
-                            className={`relative flex items-center justify-between   ${currentPath === '/admin/rayon' || currentPath === '/admin/rayon/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute ') : 'w-full h-[50px] '} ${currentPath === '/admin/rombel' || currentPath === '/admin/rombel/' ? (expanded ? 'w-full h-[50px] bg-primary rounded-md' : 'before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute ') : 'w-full h-[60px] '} ${expanded ? 'items-center lg:justify-center animate-fade-in-out max-lg:px-8' : 'justify-between lg:px-9'}`}
+                            className={`relative flex items-center justify-between   ${currentPath === '/admin/rayon' || currentPath === '/admin/rayon/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute ') : 'w-full h-[50px] '} ${currentPath === '/admin/rombel' || currentPath === '/admin/rombel/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute ') : 'w-full h-[50px] '} ${expanded ? 'items-center lg:justify-center animate-fade-in-out max-lg:px-8' : 'justify-between lg:px-9'}`}
                             >
                                 <div className='flex gap-x-[24.5px] items-center '>
                                <SiGoogleclassroom className={`opacity-100 ${expanded ? (currentPath === '/data' ? 'text-2xl opacity-100 text-white' : 'text-2xl opacity-60 text-black') : 'opacity-60'}`}/>

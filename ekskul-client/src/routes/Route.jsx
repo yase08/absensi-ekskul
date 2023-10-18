@@ -4,6 +4,9 @@ import RombelDashboard from "../pages/Admin/Rombel/Rombel";
 import RayonDashboard from "../pages/Admin/Rayon/Rayon";
 import EkstrakulikulerDashboard from "../pages/Admin/Ekstrakulikuler/Ekstrakulikuler";
 import JadwalDashboard from "../pages/Admin/Jadwal/Jadwal";
+import RuanganDashboard from "../pages/Admin/Ruangan/Ruangan";
+import ProgramDashboard from "../pages/Admin/Program/Program";
+import SiswaDashboard from "../pages/Admin/Siswa/Siswa";
 import ProfileDashboard from "../pages/Admin/Profile/Profile"
 import GalleryDashboard from "../pages/Admin/Gallery/Gallery"
 import Login from "../pages/Admin/Login/Login"
@@ -41,6 +44,18 @@ const router = createBrowserRouter([
   {
     path: "/admin/jadwal",
     element: <JadwalDashboard />,
+  },
+  {
+    path: "/admin/program",
+    element: <ProgramDashboard />,
+  },
+  {
+    path: "/admin/siswa",
+    element: <SiswaDashboard />,
+  },
+  {
+    path: "/admin/ruangan",
+    element: <RuanganDashboard />,
   },
   {
     path: "/admin/profile",

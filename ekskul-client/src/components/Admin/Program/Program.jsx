@@ -13,7 +13,7 @@ const Ekstrakulikuler = () => {
     <div className="w-full h-full bg-transparent p-[20px]">
     <div className="w-full flex flex-col gap-2">
       <div className='flex justify-between'>
-      <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">Ekstrakulikuler</h1>
+      <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">Program</h1>
       <button onClick={toggleExpansion} className='bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500'>Add Data</button>
       </div>
       <div className="w-full bg-white mt-3 mb-5">
@@ -24,21 +24,21 @@ const Ekstrakulikuler = () => {
    <div className='bg-transparent flex items-center justify-center w-full absolute top-0 left-0 h-full z-50' style={{ backdropFilter: 'blur(5px)' }}>
    <div className='bg-light w-[600px] h-auto border shadow-md'>
      <div className='flex justify-between p-5 border-b border-gray-300  relative group'>
-       <p className='font-semibold opacity-70'>Add Data Ekstrakulikuler</p>
+       <p className='font-semibold opacity-70'>Add Data Program</p>
        <button onClick={toggleExpansion}>
          <AiOutlineClose className='text-2xl'/>
        </button>
      </div>
      <div className='w-full h-full'>
       <form action="" className='flex flex-col p-5 gap-2'>
-        <label htmlFor="" className='text-xl'>Ekstrakulikuler</label>
-        <input type="text" name="" id="" placeholder="Input Your Ekstrakulikuler" className='bg-transparent outline-none border p-3 rounded-md border-gray-400'/>
-        <label htmlFor="" className='text-xl'>Category</label>
-        <select className='bg-transparent outline-none border p-3 rounded-md border-gray-400 text-opacity-40'>
-          <option value="">Umum</option>
-          <option value="">Produktif</option>
-          <option value="">Seni Budaya</option>
-        </select>
+        <label htmlFor="" className='text-xl'>Aktivitas</label>
+        <input type="text" name="" id="" placeholder="Input Your Aktivitas" className='bg-transparent outline-none border p-3 rounded-md border-gray-400'/>
+        <label htmlFor="" className='text-xl'>Tugas</label>
+        <input type="text" name="" id="" placeholder="Input Your Tugas" className='bg-transparent outline-none border p-3 rounded-md border-gray-400'/>
+        <label htmlFor="" className='text-xl'>Start</label>
+        <input type="date" name="" id="" placeholder="Input Your Ekstrakulikuler" className='bg-transparent outline-none border p-3 rounded-md border-gray-400'/>
+        <label htmlFor="" className='text-xl'>End</label>
+        <input type="date" name="" id="" placeholder="Input Your Ekstrakulikuler" className='bg-transparent outline-none border p-3 rounded-md border-gray-400'/>
         <button className='bg-blue-500 p-2 mt-4 rounded-md text-white'>Submit</button>
       </form>
      </div>
