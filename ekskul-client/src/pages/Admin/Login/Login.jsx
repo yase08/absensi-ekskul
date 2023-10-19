@@ -7,6 +7,7 @@ import {
   AiOutlineEye,
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
+import {useNavigate} from 'react-router-dom'
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import "./Login.css";
@@ -18,6 +19,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate()
 
   const toggleChangeMethod = () => {
     setChangeMethod(!changeMethod);
@@ -43,6 +45,7 @@ const Login = () => {
       if (response.statusCode === 200) {
         const data = response.data;
         sessionStorage.setItem("token", data);
+        navigate('/admin/dashboard')
       } else {
         console.error("Login failed:", response.data.message);
       }
@@ -153,7 +156,7 @@ const Login = () => {
                 <button className="capitalize">forgot password?</button>
               </div>
               <button
-                className="w-full h-20 bg-[#FFDE59] text-white font-bold rounded-md"
+                className="w-full h-20 bg-[#FFDE59] text-white font-bold rounded-md polygon"
                 type="submit"
               >
                 Submit

@@ -3,6 +3,9 @@ import { StudentController } from "../controllers/student.controller";
 import { auth } from "../middlewares/authentication";
 import { permission } from "../middlewares/permission";
 import { authorization } from "../middlewares/authorization";
+import { validator } from "../middlewares/validator.middleware";
+import { DTOStudent, DTOStudentById } from "../dto/student.dto";
+
 
 // class RouteUsers mengextends dari StudentController agar bisa memakai semua property dan method dari student controller
 class StudentRoutes extends StudentController {
@@ -16,7 +19,7 @@ class StudentRoutes extends StudentController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin"]), validator(DTOStudent)],
       this.createStudent
     );
     this.router.get(
@@ -31,7 +34,7 @@ class StudentRoutes extends StudentController {
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
+      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOStudentById)],
       this.updateStudent
     );
     this.router.delete(

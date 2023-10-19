@@ -1,7 +1,7 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -123,9 +123,9 @@ export class RoomService {
           "Room do not exist for the given id"
         );
 
-      const updateRoom = await db.room.update(req.body, {
+      const updateRoom = await db.room.update(req.body, {where: {
         id: roomExist.id,
-      });
+      }});
 
       if (!updateRoom)
         throw apiResponse(status.FORBIDDEN, "Update room failed");
