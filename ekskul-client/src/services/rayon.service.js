@@ -36,7 +36,7 @@ export const updateRayon = async (id) => {
     return response.data;
   } catch (error) {
     if (error.response) {
-      throw error.response.data.message;
+      throw error.response.data;
     }
   }
 };
@@ -44,14 +44,14 @@ export const updateRayon = async (id) => {
 export const createRayon = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/rayon`,
+      `${API}/${VERSION}/rayon`,
       requestData,
       config
     );
-    return response.data;
+    return response.data.statusMessage;
   } catch (error) {
     if (error.response) {
-      throw error.response.data.message;
+      throw error.response.data;
     }
   }
 };

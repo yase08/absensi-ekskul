@@ -1,14 +1,13 @@
 const getTokenFromSessionStorage = sessionStorage.getItem("token")
-  ? JSON.parse(sessionStorage.getItem("token"))
+  ? sessionStorage.getItem("token")
   : null;
 
-export const config = {
-  headers: {
-    Authorization: `Bearer ${
-      getTokenFromSessionStorage !== null
-        ? getTokenFromSessionStorage.token
-        : ""
-    }`,
-    Accept: "application/json",
-  },
-};
+  export const config = {
+    headers: {
+      Authorization:
+        getTokenFromSessionStorage !== null
+          ? `Bearer ${getTokenFromSessionStorage}`
+          : "",
+      Accept: "application/json",
+    },
+  };

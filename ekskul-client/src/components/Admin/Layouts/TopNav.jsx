@@ -5,11 +5,9 @@ import {MdKeyboardDoubleArrowRight, MdColorLens} from 'react-icons/md'
 import {FiSettings, FiActivity} from 'react-icons/fi'
 import {CgProfile, CgLogOut} from 'react-icons/cg'
 import {AiOutlineMail, AiOutlineBell, AiOutlineClose} from 'react-icons/ai'
-import { useState } from 'react';
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react';
 // import AdminPicture from './AdminPicture';
 // import axios from 'axios';
-
 import { useNavigate } from 'react-router-dom'
 
 
@@ -23,8 +21,7 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
     const [isButtonVisible2, setIsButtonVisible2] = useState(false);
     const [backgroundColor, setBackgroundColor] = useState('bg-primary');
     const navigate = useNavigate();
-
-
+    
     useEffect(() => {
       const savedColor = localStorage.getItem('backgroundColor');
       if (savedColor) {
@@ -35,6 +32,7 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
     const handleLogout = () => {
         sessionStorage.removeItem("token")
         navigate("/admin")
+    
       }
 
   

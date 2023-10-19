@@ -9,7 +9,7 @@ import ColorSettingForm from "../../../components/Admin/Layouts/HiddenColor/Navb
 
 
 const Rayon = () => {
-    const [expanded, setExpanded] = useState(true);
+    const [expanded, setExpanded] = useState(false);
     // Inside your component's state declarations
 const [loading, setLoading] = useState(false);
 
