@@ -1,14 +1,21 @@
-import { AiOutlineUser, AiOutlineLock, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
-import { useState } from 'react';
-import './Login.css';
-import logo from '../../../assets/Logo-Absensi.png'
-import { login } from '../../../services/auth.service';
+import {
+  AiOutlineUser,
+  AiOutlineLock,
+  AiOutlineEye,
+  AiOutlineEyeInvisible,
+} from "react-icons/ai";
+import { useState } from "react";
+import "./Login.css";
+import logo from "../../../assets/Logo-Absensi.png";
+import { login } from "../../../services/auth.service";
+import {useNavigate} from 'react-router-dom'
 
 const Login = () => {
   const [changeMethod, setChangeMethod] = useState(false);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate()
 
   const toggleChangeMethod = () => {
     setChangeMethod(!changeMethod);
@@ -20,6 +27,28 @@ const Login = () => {
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Lakukan permintaan API untuk login
+    try {
+      const response = await login({ email, password });
+      if (response.statusCode === 200) {
+        const data = response.data;
+        sessionStorage.setItem("token", data);
+        navigate("/admin/dashboard")
+      } else {
+        console.error("Login failed:", response.data.message);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error.message);
+    }
   };
 
 
