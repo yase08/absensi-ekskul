@@ -231,4 +231,36 @@ export class AttendanceService {
       );
     }
   }
+
+  async getTotalAttendanceService(req: Request): Promise<any> {
+    try {
+        const attendances = await db.attendance.findAll({where: {createdAt: new Date()}}).length;
+  
+        if (!attendances || attendances.length === 0) {
+          return Promise.resolve(
+            apiResponse(
+              status.NOT_FOUND,
+              "No attendances found with the specified filter"
+            )
+          );
+        }
+  
+        return Promise.resolve(
+          apiResponse(
+            status.OK,
+            "Fetched all attendances success",
+            attendances
+          )
+        );
+      } 
+     catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
 }

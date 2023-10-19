@@ -27,6 +27,11 @@ class AttendanceRoutes extends AttendanceController {
       [authorization(), auth(), permission(["instructor", "admin"])],
       this.getAllAttendance
     );
+    this.router.get(
+      "/total",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getTotalAttendance
+    );
     this.router.put(
       "/:id",
       [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOAttendanceById)],

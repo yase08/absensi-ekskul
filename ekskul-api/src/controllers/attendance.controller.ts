@@ -15,9 +15,9 @@ export class AttendanceController extends AttendanceService {
     }
   };
 
-  getAttendance = async (req: Request, res: Response): Promise<Response> => {
+  getTotalAttendance = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.fetchAttendanceService(
+      const serviceResponse: APIResponse = await this.getTotalAttendanceService(
         req
       );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
