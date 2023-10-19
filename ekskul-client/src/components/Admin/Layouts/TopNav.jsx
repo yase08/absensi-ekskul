@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 // import AdminPicture from './AdminPicture';
 // import axios from 'axios';
 
+import { useNavigate } from 'react-router-dom'
 
 
 // eslint-disable-next-line react/prop-types
@@ -21,6 +22,7 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
     const [isButtonVisible1, setIsButtonVisible1] = useState(false);
     const [isButtonVisible2, setIsButtonVisible2] = useState(false);
     const [backgroundColor, setBackgroundColor] = useState('bg-primary');
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -29,6 +31,11 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
         setBackgroundColor(savedColor);
       }
     }, []);
+
+    const handleLogout = () => {
+        sessionStorage.removeItem("token")
+        navigate("/admin")
+      }
 
   
     const toggleDropdown = () => {
@@ -49,11 +56,6 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
       setIsOpenMassage(!isOpenMassage); 
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userRole');
-        window.location.href = '/';
-    };
 
     const truncateName = (name, maxLength = 10) => {
         if (name.length <= maxLength) {

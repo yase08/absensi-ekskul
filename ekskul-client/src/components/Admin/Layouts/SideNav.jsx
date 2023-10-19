@@ -15,6 +15,7 @@ import { BsJoystick } from 'react-icons/bs'
 import { IoDiamondSharp } from 'react-icons/io5'
 import Button from "../../../components/Admin/Layouts/Button";
 // import ColorSettingForm from './ColorSettingForm'
+import { useNavigate } from 'react-router-dom'
 
 
 
@@ -22,6 +23,7 @@ import Button from "../../../components/Admin/Layouts/Button";
 const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) => {
     const location = useLocation();
     const currentPath = location.pathname;
+    const navigate = useNavigate;
 
     const [dataDropdownVisible, setDataDropdownVisible] = useState(false);
     const [hoverdataDropdownVisible, setHoverDataDropdownVisible] = useState(false);
@@ -202,6 +204,8 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
         setInfoHome8Navbar(false);
         }
       };
+
+  
 
 
   return (

@@ -16,6 +16,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false);
+
 
   const toggleChangeMethod = () => {
     setChangeMethod(!changeMethod);
@@ -35,8 +37,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Lakukan permintaan API untuk login
+    setLoading(true);
     try {
       const response = await login({ email, password });
       if (response.statusCode === 200) {
@@ -48,8 +49,11 @@ const Login = () => {
       }
     } catch (error) {
       console.error("An error occurred:", error.message);
+    } finally {
+      setLoading(false);
     }
   };
+
 
 
   return (
@@ -158,7 +162,7 @@ const Login = () => {
                 className="w-full h-20 bg-[#FFDE59] text-white font-bold rounded-md"
                 type="submit"
               >
-                Submit
+                {loading ? <div className="loader"></div> : 'Submit'}
               </button>
             </form>
           </div>
