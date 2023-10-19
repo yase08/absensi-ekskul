@@ -1,6 +1,7 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { IsNotEmpty, IsString } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
 export class DTORoom {
   @IsNotEmpty()
@@ -10,10 +11,7 @@ export class DTORoom {
 
 export class DTORoomById {
   @IsNotEmpty()
-  @IsString()
-  name: string;
-
-  @IsNotEmpty()
-  @IsString()
-  id: string;
+  @Transform(({ value }) => Number(value), { toClassOnly: true })
+  @IsInt()
+  id: number;
 }

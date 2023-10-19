@@ -1,68 +1,97 @@
-
 import SideNav from "../../../components/Admin/Layouts/SideNav";
-import TopNav from "../../../components/Admin/Layouts/TopNav"
-import {useState} from "react";
-import RayonComponent from "../../../components/Admin/Rayon/Rayon"
+import TopNav from "../../../components/Admin/Layouts/TopNav";
+import { useEffect, useState } from "react";
+import RayonComponent from "../../../components/Admin/Rayon/Rayon";
 import Tein from "../../../components/Admin/magic/Tein";
 import ColorSettingForm from "../../../components/Admin/Layouts/HiddenColor/Navbar";
+import { getAllRayon } from "../../../services/rayon.service";
 // import Jumbotron from "../../../components/Admin/Jumbotron/Jumbotron";
 
-
 const Rayon = () => {
-    const [expanded, setExpanded] = useState(true);
-    // Inside your component's state declarations
-const [loading, setLoading] = useState(false);
+  const [expanded, setExpanded] = useState(true);
+  const [filter, setFilter] = useState("");
+  const [sort, setSort] = useState("");
+  const [size, setSize] = useState("");
+  const [number, setNumber] = useState("");
+  // Inside your component's state declarations
+  const [loading, setLoading] = useState(false);
 
-    const toggleExpansion = () => {
-            setExpanded(!expanded);
-    };
-    const [openProfile, setOpenProfile] = useState(false);
+  const toggleExpansion = () => {
+    setExpanded(!expanded);
+  };
+  const [openProfile, setOpenProfile] = useState(false);
 
-    const toggleOpenProfile = () => {
-        setOpenProfile(!openProfile);
-    };
-    const [changeNavbar, setChangeNavbar] = useState(false);
+  const toggleOpenProfile = () => {
+    setOpenProfile(!openProfile);
+  };
+  const [changeNavbar, setChangeNavbar] = useState(false);
 
-    const toggleChangeNavbar = () => {
-        setChangeNavbar(!changeNavbar);
-    };
+  const toggleChangeNavbar = () => {
+    setChangeNavbar(!changeNavbar);
+  };
 
-    const [openHelpNav, setHelpNav] = useState(false);
+  const [openHelpNav, setHelpNav] = useState(false);
 
-    const toggleOpenHelpNav = () => {
-        setHelpNav(!openHelpNav);
-    };
-    
-    const [openChangeBg, setOpenChangeBg] = useState(false);
+  const toggleOpenHelpNav = () => {
+    setHelpNav(!openHelpNav);
+  };
 
-    const toggleOpenChangeBg = () => {
-        setOpenChangeBg(!openChangeBg);
-    };
+  const [openChangeBg, setOpenChangeBg] = useState(false);
 
-    return (
-        <> < div className = "flex overflow-hidden " > 
-        <SideNav expanded={expanded} toggleExpansion={toggleExpansion} changeNavbar={changeNavbar} toggleOpenHelpNav={toggleOpenHelpNav}/>
-        
+  const toggleOpenChangeBg = () => {
+    setOpenChangeBg(!openChangeBg);
+  };
+
+  useEffect(async () => {
+    const response = await getAllRayon({ filter, sort, size, number });
+    console.log(response);
+  }, []);
+
+  return (
+    <>
+      {" "}
+      <div className="flex overflow-hidden ">
+        <SideNav
+          expanded={expanded}
+          toggleExpansion={toggleExpansion}
+          changeNavbar={changeNavbar}
+          toggleOpenHelpNav={toggleOpenHelpNav}
+        />
+
         <div
-            className={`w-full transition-all overflow-hidden duration-[700ms] ${expanded
-                ? 'lg:ml-[65.5px]'
-                : 'lg:ml-[320px]'}`}>
-            <TopNav toggleOpenChangeBg={toggleOpenChangeBg} toggleExpansion={toggleExpansion} toggleChangeNavbar={toggleChangeNavbar} expanded={expanded} toggleOpenProfile={toggleOpenProfile}/>
-            <RayonComponent/>
+          className={`w-full transition-all overflow-hidden duration-[700ms] ${
+            expanded ? "lg:ml-[65.5px]" : "lg:ml-[320px]"
+          }`}
+        >
+          <TopNav
+            toggleOpenChangeBg={toggleOpenChangeBg}
+            toggleExpansion={toggleExpansion}
+            toggleChangeNavbar={toggleChangeNavbar}
+            expanded={expanded}
+            toggleOpenProfile={toggleOpenProfile}
+          />
+          <RayonComponent />
         </div>
         {openHelpNav && (
-        <Tein toggleOpenHelpNav={toggleOpenHelpNav} setLoading={setLoading} loading={loading}/>
+          <Tein
+            toggleOpenHelpNav={toggleOpenHelpNav}
+            setLoading={setLoading}
+            loading={loading}
+          />
         )}
         {openChangeBg && (
-         <div className="bg-transparent w-full h-full justify-center items-center flex z-50 fixed" style={{ backdropFilter: 'blur(5px)' }}>
+          <div
+            className="bg-transparent w-full h-full justify-center items-center flex z-50 fixed"
+            style={{ backdropFilter: "blur(5px)" }}
+          >
             <div className="text-black bg-white border border-gray-400 w-[400px] h-auto ">
-            <ColorSettingForm toggleOpenChangeBg={toggleOpenChangeBg}/>
+              <ColorSettingForm toggleOpenChangeBg={toggleOpenChangeBg} />
             </div>
           </div>
         )}
-    </div>
-</>
-    )
-}
+      </div>
+    </>
+  );
+};
 
-export default Rayon
+export default Rayon;

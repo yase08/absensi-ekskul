@@ -6,7 +6,6 @@ import { authorization } from "../middlewares/authorization";
 import { validator } from "../middlewares/validator.middleware";
 import { DTOUser, DTOUserById } from "../dto/user.dto";
 
-
 // class RouteUsers mengextends dari UserController agar bisa memakai semua property dan method dari user controller
 class UserRoutes extends UserController {
   private router: Router;
@@ -29,17 +28,22 @@ class UserRoutes extends UserController {
     );
     this.router.get(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        validator(DTOUserById),
+      ],
       this.getUser
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"]), validator(DTOUserById)],
+      [authorization(), auth(), permission(["admin"]), validator(DTOUser)],
       this.updateUser
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin"]), validator(DTOUserById)],
       this.deleteUser
     );
 

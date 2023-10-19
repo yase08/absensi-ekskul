@@ -6,7 +6,6 @@ import { authorization } from "../middlewares/authorization";
 import { validator } from "../middlewares/validator.middleware";
 import { DTOTask, DTOTaskById } from "../dto/task.dto";
 
-
 // class RouteUsers mengextends dari TaskController agar bisa memakai semua property dan method dari rayon controller
 class TaskRoutes extends TaskController {
   private router: Router;
@@ -29,17 +28,32 @@ class TaskRoutes extends TaskController {
     );
     this.router.get(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        validator(DTOTaskById),
+      ],
       this.getTask
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOTaskById)],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        validator(DTOTask),
+      ],
       this.updateTask
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        validator(DTOTaskById),
+      ],
       this.deleteTask
     );
 

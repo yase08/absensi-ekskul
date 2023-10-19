@@ -1,6 +1,11 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { IsNotEmpty, IsString, IsInt, IsEmail, MaxLength, MinLength } from "class-validator";
+import { Transform } from "class-transformer";
+import {
+  IsNotEmpty,
+  IsString,
+  IsInt,
+} from "class-validator";
 
 export class DTOInstructorAttendance {
   @IsNotEmpty()
@@ -14,23 +19,11 @@ export class DTOInstructorAttendance {
   @IsNotEmpty()
   @IsInt()
   ekskul_id: number;
-
 }
 
 export class DTOInstructorAttendanceById {
   @IsNotEmpty()
-  @IsString()
-  category: string;
-
-  @IsNotEmpty()
+  @Transform(({ value }) => Number(value), { toClassOnly: true })
   @IsInt()
-  instructor_id: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  ekskul_id: number;
-
-  @IsNotEmpty()
-  @IsString()
-  id: string;
+  id: number;
 }
