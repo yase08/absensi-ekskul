@@ -15,7 +15,6 @@ import { BsJoystick } from 'react-icons/bs'
 import { IoDiamondSharp } from 'react-icons/io5'
 import Button from "../../../components/Admin/Layouts/Button";
 // import ColorSettingForm from './ColorSettingForm'
-import { useNavigate } from 'react-router-dom'
 
 
 
@@ -23,7 +22,6 @@ import { useNavigate } from 'react-router-dom'
 const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) => {
     const location = useLocation();
     const currentPath = location.pathname;
-    const navigate = useNavigate;
 
     const [dataDropdownVisible, setDataDropdownVisible] = useState(false);
     const [hoverdataDropdownVisible, setHoverDataDropdownVisible] = useState(false);
@@ -205,8 +203,6 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
         }
       };
 
-  
-
 
   return (
                 <div>
@@ -218,9 +214,9 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                         </div>
                 </div>
                     )}
-                    <nav className={`bg-white max-lg:border-r h-[100vh] z-50 transition-all duration-[700ms] fixed ${expanded ? 'max-lg:w-[320px] lg:w-[65px] ':'max-lg:w-0 overflow-y-scroll hidden-scroll lg:w-[320px]'}`}>
+                    <nav className={`bg-white max-lg:border-r h-[100vh] z-50 transition-all duration-[700ms] fixed  ${expanded ? 'max-lg:w-[320px] lg:w-[65px] ':'max-lg:w-0 overflow-y-scroll hidden-scroll lg:w-[320px]'}`}>
                <Button toggleExpansion={toggleExpansion} expanded={expanded}/>
-               <div>
+               <div className='max-lg:overflow-hidden'>
 
                         <ul className="w-full bg-transparent flex justify-center items-center h-[72px]">
                             <button onClick={toggleExpansion} className={`cursor-pointer uppercase font-semibold opacity-75 font antialiased tracking-[2px] font-poppins ${expanded ? 'lg:hidden':'max-lg:hidden'}`}>Eksul</button>

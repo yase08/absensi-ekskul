@@ -1,6 +1,30 @@
-import React from 'react'
+import  { useState } from 'react'
+import { getAllRayon } from '../../../services/rayon.service';
+import { useEffect } from 'react';
 
 const TableEskul = () => {
+  const [filter, setFilter] = useState('');
+  const [sort, setSort] = useState('');
+  const [size, setSize] = useState('');
+  const [number, setNumber] = useState('');
+  const [data, setData] = useState('')
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await getAllRayon({
+        filter,sort,size,number
+      })
+      
+      console.log(setData)
+    } catch (error) {
+      console.error('Error:', error);
+      }
+ 
+    };
+
+    useEffect(() => {
+      handleGetRequest();
+    });
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
     <div className="overflow-x-auto hidden-scroll w-full">

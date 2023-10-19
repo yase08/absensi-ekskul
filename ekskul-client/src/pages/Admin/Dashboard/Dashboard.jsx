@@ -13,7 +13,7 @@ import ColorSettingForm from "../../../components/Admin/Layouts/HiddenColor/Navb
 import Tein from "../../../components/Admin/magic/Tein";
 
 const Dashboard = () => {
-    const [expanded, setExpanded] = useState(true);
+    const [expanded, setExpanded] = useState(false);
     // Inside your component's state declarations
 const [loading, setLoading] = useState(false);
 
