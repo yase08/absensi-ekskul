@@ -43,7 +43,9 @@ export class ScheduleService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -65,13 +67,19 @@ export class ScheduleService {
         paramQuerySQL.offset = offset;
       }
 
-      const schedules = await db.schedule.findAll(paramQuerySQL);
+      const scheduleFilter = await db.schedule.findAll(paramQuerySQL);
+      const schedules = await db.schedule.findAll({
+        attributes: ["id", "name"],
+      });
 
-      if (!schedules)
-        throw apiResponse(status.NOT_FOUND, "do not exist");
+      if (!scheduleFilter)
+        throw apiResponse(status.NOT_FOUND, "Schedules do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all schedules success", schedules)
+        apiResponse(status.OK, "Fetched all schedules success", {
+          scheduleFilter,
+          schedules,
+        })
       );
     } catch (error: any) {
       return Promise.reject(
@@ -139,22 +147,21 @@ export class ScheduleService {
   async updateActivityOnScheduleService(req: Request): Promise<any> {
     try {
       const activity = await db.activity.findOne({
-        where: {id: req.params.id }
+        where: { id: req.params.id },
       });
       console.log(activity);
-      
 
       if (!activity)
         throw apiResponse(status.NOT_FOUND, "Activity does not exist");
 
-      const updateActivity = await db.activity.update(req.body, {where: {id: activity.id }})
+      const updateActivity = await db.activity.update(req.body, {
+        where: { id: activity.id },
+      });
 
       if (!updateActivity)
-      throw apiResponse(status.NOT_FOUND, "Cant update activity");
+        throw apiResponse(status.NOT_FOUND, "Cant update activity");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Update activity success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Update activity success"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -169,23 +176,21 @@ export class ScheduleService {
   async deleteActivityOnScheduleService(req: Request): Promise<any> {
     try {
       const activity = await db.activity.findOne({
-        where: {id: req.params.id }
+        where: { id: req.params.id },
       });
       console.log(activity);
-      
 
       if (!activity)
         throw apiResponse(status.NOT_FOUND, "Activity does not exist");
 
-      const updateActivity = await db.activity.destroy({where: {id: activity.id }})
+      const updateActivity = await db.activity.destroy({
+        where: { id: activity.id },
+      });
 
       if (!updateActivity)
-      throw apiResponse(status.NOT_FOUND, "Cant delete activity");
+        throw apiResponse(status.NOT_FOUND, "Cant delete activity");
 
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Delete activity success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Delete activity success"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

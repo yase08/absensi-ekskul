@@ -69,28 +69,26 @@ export class AttendanceService {
   async exportAttendance(req: Request): Promise<any> {
     try {
       // const attendanceData = await db.attendance.findAll();
-      const attendanceData = [{
-        "siswa_id":1,
-        "category":"hadir",
-        "date":"2021-10-01"
-      }]
+      const attendanceData = [
+        {
+          siswa_id: 1,
+          category: "hadir",
+          date: "2021-10-01",
+        },
+      ];
 
       const columns = [
-        { header: 'Student', key: 'siswa_id', width: 15 },
-        { header: 'Category', key: 'category', width: 15 },
-        { header: 'Date', key: 'date', width: 15 },
+        { header: "Student", key: "siswa_id", width: 15 },
+        { header: "Category", key: "category", width: 15 },
+        { header: "Date", key: "date", width: 15 },
       ];
-      const file = 'ajdoad.xlsx'; // Use 'filename' here
+      const file = "ajdoad.xlsx"; // Use 'filename' here
 
-      const exportSuccess = await exportExcel(columns, attendanceData, file);      
+      const exportSuccess = await exportExcel(columns, attendanceData, file);
 
+      if (!exportSuccess) throw apiResponse(status.FORBIDDEN, "Export failed");
 
-      if (!exportSuccess)
-        throw apiResponse(status.FORBIDDEN, "Export failed");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Export Success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Export Success"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -101,7 +99,6 @@ export class AttendanceService {
       );
     }
   }
-
 
   async getAllAttendanceService(req: Request): Promise<any> {
     try {
@@ -150,9 +147,12 @@ export class AttendanceService {
           },
         ];
 
-        const attendances = await db.attendance.findAll(paramQuerySQL);
+        const attendanceFilter = await db.attendance.findAll(paramQuerySQL);
+        const attendances = await db.attendance.findAll({
+          attributes: ["id", "name"],
+        });
 
-        if (!attendances || attendances.length === 0) {
+        if (!attendanceFilter || attendanceFilter.length === 0) {
           return Promise.resolve(
             apiResponse(
               status.NOT_FOUND,
@@ -161,7 +161,7 @@ export class AttendanceService {
           );
         }
 
-        const modifiedAttendances = attendances.map((attendance) => {
+        const modifiedAttendances = attendanceFilter.map((attendance) => {
           return {
             id: attendance.id,
             ekskul_id: attendance.ekskul.name,
@@ -174,11 +174,10 @@ export class AttendanceService {
         });
 
         return Promise.resolve(
-          apiResponse(
-            status.OK,
-            "Fetched all attendances success",
-            modifiedAttendances
-          )
+          apiResponse(status.OK, "Fetched all attendances success", {
+            modifiedAttendances,
+            attendances,
+          })
         );
       } else {
         throw apiResponse(

@@ -56,7 +56,9 @@ export class ActivityProgramService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -78,17 +80,21 @@ export class ActivityProgramService {
         paramQuerySQL.offset = offset;
       }
 
-      const activityPrograms = await db.activityProgram.findAll(paramQuerySQL);
+      const activityProgramFilter = await db.activityProgram.findAll(
+        paramQuerySQL
+      );
+      const activityPrograms = await db.activityProgram.findAll({
+        attributes: ["id", "name"],
+      });
 
-      if (!activityPrograms)
-        throw apiResponse(status.NOT_FOUND, "Activity programs do not exist");
+      if (!activityProgramFilter)
+        throw apiResponse(status.NOT_FOUND, "ActivityPrograms do not exist");
 
       return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Fetched all activity programs success",
-          activityPrograms
-        )
+        apiResponse(status.OK, "Fetched all activityPrograms success", {
+          activityProgramFilter,
+          activityPrograms,
+        })
       );
     } catch (error: any) {
       return Promise.reject(

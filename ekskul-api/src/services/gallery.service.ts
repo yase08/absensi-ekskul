@@ -72,7 +72,9 @@ export class GalleryService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -94,13 +96,19 @@ export class GalleryService {
         paramQuerySQL.offset = offset;
       }
 
-      const galleries = await db.gallery.findAll(paramQuerySQL);
+      const galleryFilter = await db.gallery.findAll(paramQuerySQL);
+      const galleries = await db.gallery.findAll({
+        attributes: ["id", "name"],
+      });
 
-      if (!galleries)
+      if (!galleryFilter)
         throw apiResponse(status.NOT_FOUND, "Galleries do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all galleries success", galleries)
+        apiResponse(status.OK, "Fetched all galleries success", {
+          galleryFilter,
+          galleries,
+        })
       );
     } catch (error: any) {
       return Promise.reject(

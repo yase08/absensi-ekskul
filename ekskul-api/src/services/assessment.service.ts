@@ -66,7 +66,9 @@ export class AssessmentService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -82,28 +84,25 @@ export class AssessmentService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       }
 
-      paramQuerySQL.where = {
-        ...(paramQuerySQL.where || {}), // Preserve existing filters
-        task_id: req.params.id, // Add the task_id filter
-      };
+      const assessmentFilter = await db.assessment.findAll(paramQuerySQL);
+      const assessments = await db.assessment.findAll({
+        attributes: ["id", "name"],
+      });
 
-      paramQuerySQL.include = [
-        { model: db.task },
-        { model: db.student },
-      ];
-
-      const assessments = await db.assessment.findAll(paramQuerySQL);
-
-      if (!assessments) throw apiResponse(status.NOT_FOUND, "Assessments do not exist");
+      if (!assessmentFilter)
+        throw apiResponse(status.NOT_FOUND, "Assessments do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all assessments success", assessments)
+        apiResponse(status.OK, "Fetched all assessments success", {
+          assessmentFilter,
+          assessments,
+        })
       );
     } catch (error: any) {
       return Promise.reject(

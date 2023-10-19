@@ -78,7 +78,7 @@ export class InstructorAttendanceService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: { [Op.like]: `%${filter}%` },
         };
       }
 
@@ -100,24 +100,30 @@ export class InstructorAttendanceService {
         paramQuerySQL.offset = offset;
         if (ekskulIds.length > 1) {
           paramQuerySQL.where = {
-            ekskul_id: ekskulIds, // Filter by multiple ekskul IDs
+            ekskul_id: ekskulIds,
           };
         } else if (ekskulIds.length === 1) {
           paramQuerySQL.where = {
-            ekskul_id: ekskulIds[0], // Filter by a single ekskul ID
+            ekskul_id: ekskulIds[0],
           };
         }
       }
 
-      console.log((req.session as ISession).user.ekskul);
+      const instructorAttendanceFilter = await db.instructorAttendance.findAll(
+        paramQuerySQL
+      );
+      const instructors = await db.instructorAttendance.findAll({
+        attributes: ["id", "name"],
+      });
 
-      const instructors = await db.instructorAttendance.findAll(paramQuerySQL);
-
-      if (!instructors)
+      if (!instructorAttendanceFilter)
         throw apiResponse(status.NOT_FOUND, "Instructors do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all instructors success", instructors)
+        apiResponse(status.OK, "Fetched all instructor success", {
+          instructorAttendanceFilter,
+          instructors,
+        })
       );
     } catch (error: any) {
       return Promise.reject(

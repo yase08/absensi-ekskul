@@ -78,7 +78,9 @@ export class StudentService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -100,13 +102,19 @@ export class StudentService {
         paramQuerySQL.offset = offset;
       }
 
-      const students = await db.student.findAll(paramQuerySQL);
+      const studentFilter = await db.student.findAll(paramQuerySQL);
+      const students = await db.student.findAll({
+        attributes: ["id", "name"],
+      });
 
-      if (!students)
+      if (!studentFilter)
         throw apiResponse(status.NOT_FOUND, "Students do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all students success", students)
+        apiResponse(status.OK, "Fetched all students success", {
+          studentFilter,
+          students,
+        })
       );
     } catch (error: any) {
       return Promise.reject(
@@ -185,7 +193,9 @@ export class StudentService {
 
   async getStudentService(req: Request): Promise<any> {
     try {
-      const student = await db.student.findOne({ where: { id: req.params.id } });
+      const student = await db.student.findOne({
+        where: { id: req.params.id },
+      });
 
       if (!student) throw apiResponse(status.NOT_FOUND, "Student do not exist");
 

@@ -53,7 +53,9 @@ export class EkskulService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -75,12 +77,19 @@ export class EkskulService {
         paramQuerySQL.offset = offset;
       }
 
-      const ekskuls = await db.ekskul.findAll(paramQuerySQL);
+      const ekskulFilter = await db.ekskul.findAll(paramQuerySQL);
+      const ekskuls = await db.ekskul.findAll({
+        attributes: ["id", "name"],
+      });
 
-      if (!ekskuls) throw apiResponse(status.NOT_FOUND, "Ekskuls do not exist");
+      if (!ekskulFilter)
+        throw apiResponse(status.NOT_FOUND, "Ekskuls do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all ekskuls success", ekskuls)
+        apiResponse(status.OK, "Fetched all ekskuls success", {
+          ekskulFilter,
+          ekskuls,
+        })
       );
     } catch (error: any) {
       return Promise.reject(
