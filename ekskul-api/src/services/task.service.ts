@@ -51,7 +51,9 @@ export class TaskService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -67,20 +69,25 @@ export class TaskService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       }
 
-      paramQuerySQL.include = [{ model: db.ekskul }, { model: db.user }];
+      const taskFilter = await db.task.findAll(paramQuerySQL);
+      const tasks = await db.task.findAll({
+        attributes: ["id", "name"],
+      });
 
-      const tasks = await db.task.findAll(paramQuerySQL);
-
-      if (!tasks) throw apiResponse(status.NOT_FOUND, "Tasks do not exist");
+      if (!taskFilter)
+        throw apiResponse(status.NOT_FOUND, "Tasks do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all tasks success", tasks)
+        apiResponse(status.OK, "Fetched all tasks success", {
+          taskFilter,
+          tasks,
+        })
       );
     } catch (error: any) {
       return Promise.reject(

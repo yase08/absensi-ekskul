@@ -51,7 +51,9 @@ export class RayonService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -73,12 +75,19 @@ export class RayonService {
         paramQuerySQL.offset = offset;
       }
 
-      const rayons = await db.rayon.findAll(paramQuerySQL);
+      const rayonFilter = await db.rayon.findAll(paramQuerySQL);
+      const rayons = await db.rayon.findAll({
+        attributes: ["id", "name"],
+      });
 
-      if (!rayons) throw apiResponse(status.NOT_FOUND, "Rayons do not exist");
+      if (!rayonFilter)
+        throw apiResponse(status.NOT_FOUND, "Rayons do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all rayons success", rayons)
+        apiResponse(status.OK, "Fetched all rayons success", {
+          rayonFilter,
+          rayons,
+        })
       );
     } catch (error: any) {
       return Promise.reject(

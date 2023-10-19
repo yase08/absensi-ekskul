@@ -19,7 +19,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       images: {
-        type: Sequelize.JSONB,
+        type: Sequelize.JSON,
       },
       ekskul_id: {
         type: Sequelize.INTEGER,

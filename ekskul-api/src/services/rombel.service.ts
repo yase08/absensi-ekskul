@@ -53,7 +53,9 @@ export class RombelService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -75,12 +77,19 @@ export class RombelService {
         paramQuerySQL.offset = offset;
       }
 
-      const rombels = await db.rombel.findAll(paramQuerySQL);
+      const rombelFilter = await db.rombel.findAll(paramQuerySQL);
+      const rombels = await db.rombel.findAll({
+        attributes: ["id", "name"],
+      });
 
-      if (!rombels) throw apiResponse(status.NOT_FOUND, "Rombel do not exist");
+      if (!rombelFilter)
+        throw apiResponse(status.NOT_FOUND, "Rombels do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all rombels success", rombels)
+        apiResponse(status.OK, "Fetched all rombels success", {
+          rombelFilter,
+          rombels,
+        })
       );
     } catch (error: any) {
       return Promise.reject(

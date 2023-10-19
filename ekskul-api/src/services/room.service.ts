@@ -51,7 +51,9 @@ export class RoomService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -73,12 +75,19 @@ export class RoomService {
         paramQuerySQL.offset = offset;
       }
 
-      const rooms = await db.room.findAll(paramQuerySQL);
+      const roomFilter = await db.room.findAll(paramQuerySQL);
+      const rooms = await db.room.findAll({
+        attributes: ["id", "name"],
+      });
 
-      if (!rooms) throw apiResponse(status.NOT_FOUND, "Room do not exist");
+      if (!roomFilter)
+        throw apiResponse(status.NOT_FOUND, "Rooms do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all rooms success", rooms)
+        apiResponse(status.OK, "Fetched all rooms success", {
+          roomFilter,
+          rooms,
+        })
       );
     } catch (error: any) {
       return Promise.reject(

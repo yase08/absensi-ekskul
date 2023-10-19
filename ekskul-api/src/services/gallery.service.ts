@@ -3,6 +3,7 @@ import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import slugify from "slugify";
 import { Op } from "sequelize";
+import path from "path";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -14,6 +15,7 @@ export class GalleryService {
       const ekskulOnGallery = await db.gallery.findOne({
         where: { ekskul_id: req.body.ekskul_id },
       });
+      const directory = path.join(__dirname, `../public/gallery`);
 
       if (ekskulOnGallery)
         throw apiResponse(
@@ -31,7 +33,7 @@ export class GalleryService {
       for (let i in files) {
         const file = files[i];
         const fileName = file.filename;
-        galleryImages.push(fileName);
+        galleryImages.push(`${directory}/${fileName}`);
       }
 
       const createGallery = await db.gallery.create({
@@ -140,6 +142,8 @@ export class GalleryService {
         where: { id: req.params.id },
       });
 
+      const directory = path.join(__dirname, `../public/gallery`);
+
       if (req.body.name) {
         req.body.slug = slugify(req.body.name.toLowerCase());
       }
@@ -151,14 +155,15 @@ export class GalleryService {
         );
 
       const previousImages = galleryExist.images;
-
-      let galleryImages: string[] = previousImages.slice();
+      const stringifyPreviousImages = JSON.parse(previousImages);
+      let galleryImages: string[] = [];
 
       if (Array.isArray(req.files) && req.files.length > 0) {
         const newImages = req.files.map(
-          (file: Express.Multer.File) => file.filename
+          (file: Express.Multer.File) => `${directory}/${file.filename}`
         );
-        galleryImages = galleryImages.concat(newImages);
+
+        galleryImages = [...stringifyPreviousImages, ...newImages];
       }
 
       const updateGallery = await db.gallery.update(

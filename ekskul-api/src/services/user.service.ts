@@ -63,7 +63,9 @@ export class UserService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -85,12 +87,19 @@ export class UserService {
         paramQuerySQL.offset = offset;
       }
 
-      const users = await db.user.findAll(paramQuerySQL);
+      const userFilter = await db.user.findAll(paramQuerySQL);
+      const users = await db.user.findAll({
+        attributes: ["id", "name"],
+      });
 
-      if (!users) throw apiResponse(status.NOT_FOUND, "Users do not exist");
+      if (!userFilter)
+        throw apiResponse(status.NOT_FOUND, "Users do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all users success", users)
+        apiResponse(status.OK, "Fetched all users success", {
+          userFilter,
+          users,
+        })
       );
     } catch (error: any) {
       return Promise.reject(
