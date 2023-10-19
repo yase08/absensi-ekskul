@@ -3,6 +3,9 @@ import { RayonController } from "../controllers/rayon.controller";
 import { auth } from "../middlewares/authentication";
 import { permission } from "../middlewares/permission";
 import { authorization } from "../middlewares/authorization";
+import { validator } from "../middlewares/validator.middleware";
+import { DTORayon, DTORayonById } from "../dto/rayon.dto";
+
 
 // class RouteUsers mengextends dari RayonController agar bisa memakai semua property dan method dari rayon controller
 class RayonRoutes extends RayonController {
@@ -16,7 +19,7 @@ class RayonRoutes extends RayonController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin"]), validator(DTORayon)],
       this.createRayon
     );
     this.router.get(
@@ -31,7 +34,7 @@ class RayonRoutes extends RayonController {
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin"]), validator(DTORayonById)],
       this.updateRayon
     );
     this.router.delete(

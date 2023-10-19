@@ -2,13 +2,13 @@
 
 import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
-export class DTORombel {
+export class DTORayon {
   @IsNotEmpty()
   @IsString()
   name: string;
 }
 
-export class DTORombelById {
+export class DTORayonById {
   @IsNotEmpty()
   @IsString()
   name: string;

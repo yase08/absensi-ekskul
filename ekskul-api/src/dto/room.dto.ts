@@ -1,14 +1,14 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
-export class DTORombel {
+export class DTORoom {
   @IsNotEmpty()
   @IsString()
   name: string;
 }
 
-export class DTORombelById {
+export class DTORoomById {
   @IsNotEmpty()
   @IsString()
   name: string;

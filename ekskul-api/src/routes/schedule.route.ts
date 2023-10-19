@@ -3,6 +3,9 @@ import { ScheduleController } from "../controllers/schedule.controller";
 import { auth } from "../middlewares/authentication";
 import { permission } from "../middlewares/permission";
 import { authorization } from "../middlewares/authorization";
+import { validator } from "../middlewares/validator.middleware";
+import { DTOActivity, DTOActivityById, DTOSchedule } from "../dto/schedule.dto";
+
 
 // class RouteUsers mengextends dari ScheduleController agar bisa memakai semua property dan method dari schedule controller
 class ScheduleRoutes extends ScheduleController {
@@ -16,18 +19,17 @@ class ScheduleRoutes extends ScheduleController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin"]), validator(DTOSchedule)],
       this.createSchedule
     );
     this.router.post(
       "/activity",
-      auth,
-      permission(["admin"]),
+      [authorization(), auth(), permission(["admin"]), validator(DTOActivity)],
       this.createActivityOnSchedule
     );
     this.router.put(
       "/activity/:id",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin"]), validator(DTOActivityById)],
       this.updateActivityOnSchedule
     );
     this.router.delete(
