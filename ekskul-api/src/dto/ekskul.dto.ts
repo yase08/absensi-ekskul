@@ -2,16 +2,24 @@
 
 import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
-export class DTORombel {
+export class DTOEkskul {
   @IsNotEmpty()
   @IsString()
   name: string;
+
+  @IsNotEmpty()
+  @IsString()
+  category: string;
 }
 
-export class DTORombelById {
+export class DTOEkskulById {
   @IsNotEmpty()
   @IsString()
   name: string;
+
+  @IsNotEmpty()
+  @IsString()
+  category: string;
 
   @IsNotEmpty()
   @IsString()

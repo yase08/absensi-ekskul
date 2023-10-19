@@ -159,7 +159,7 @@ const Login = () => {
                 <button className="capitalize">forgot password?</button>
               </div>
               <button
-                className="w-full h-20 bg-[#FFDE59] text-white font-bold rounded-md"
+                className="w-full h-20 bg-[#FFDE59] text-white font-bold rounded-md polygon"
                 type="submit"
               >
                 {loading ? <div className="loader"></div> : 'Submit'}

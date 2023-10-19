@@ -49,6 +49,7 @@
   cursor: url('./assets/react.svg'),auto;
 } */
 
+<<<<<<< HEAD
 
 
 .dots-container {
@@ -120,4 +121,16 @@
     color: rgba(0, 0, 0, 0.759);
 
   }
+=======
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+>>>>>>> c1cea3366c35d58fc126e02bd5da2f4719fa6888
 }

@@ -3,6 +3,9 @@ import { RoomController } from "../controllers/room.controller";
 import { auth } from "../middlewares/authentication";
 import { permission } from "../middlewares/permission";
 import { authorization } from "../middlewares/authorization";
+import { validator } from "../middlewares/validator.middleware";
+import { DTORoom, DTORoomById } from "../dto/room.dto";
+
 
 // class RouteUsers mengextends dari RoomController agar bisa memakai semua property dan method dari room controller
 class RoomRoutes extends RoomController {
@@ -16,7 +19,7 @@ class RoomRoutes extends RoomController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin"]), validator(DTORoom)],
       this.createRoom
     );
     this.router.get(
@@ -31,7 +34,7 @@ class RoomRoutes extends RoomController {
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin"]), validator(DTORoomById)],
       this.updateRoom
     );
     this.router.delete(
