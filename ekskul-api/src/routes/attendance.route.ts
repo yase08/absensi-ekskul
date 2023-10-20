@@ -34,7 +34,7 @@ class AttendanceRoutes extends AttendanceController {
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOAttendanceById)],
+      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOAttendance)],
       this.updateAttendance
     );
 

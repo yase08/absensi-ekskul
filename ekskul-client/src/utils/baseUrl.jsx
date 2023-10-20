@@ -1,2 +1,2 @@
-export const API = "http://localhost:7000/api";
+export const API = "https://cxw30mfb-8000.asse.devtunnels.ms/api";
 export const VERSION = "v1";

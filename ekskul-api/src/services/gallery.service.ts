@@ -140,6 +140,10 @@ export class GalleryService {
         where: { id: req.params.id },
       });
 
+      if (req.body.name) {
+        req.body.slug = slugify(req.body.name.toLowerCase());
+      }
+
       if (!galleryExist)
         throw apiResponse(
           status.NOT_FOUND,

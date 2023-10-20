@@ -1,5 +1,6 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
+import { Transform } from "class-transformer";
 import { IsNotEmpty, IsString, IsInt } from "class-validator";
 
 export class DTOTask {
@@ -14,23 +15,11 @@ export class DTOTask {
   @IsNotEmpty()
   @IsInt()
   author_id: number;
-
 }
 
 export class DTOTaskById {
   @IsNotEmpty()
-  @IsString()
-  name: string;
-
-  @IsNotEmpty()
+  @Transform(({ value }) => Number(value), { toClassOnly: true })
   @IsInt()
-  ekskul_id: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  author_id: number;
-
-  @IsNotEmpty()
-  @IsString()
-  id: string;
+  id: number;
 }
