@@ -104,13 +104,13 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
     
     return (
         <div className='w-full'>
-            <nav className={`h-[115px] px-[29px] pt-[29px] flex justify-between items-start z-40`} style={{ backgroundColor: backgroundColor }}>
+            <nav className={`h-[115px] px-[29px] py-[29px] flex justify-between items-start z-40`} style={{ backgroundColor: backgroundColor }}>
                 <div>
                     <button onClick={toggleExpansion} className={`${expanded ? 'max-lg:hidden':''}`}>
                         <GiHamburgerMenu className='text-white text-xl'/>
                     </button>
                 </div>
-                <div className='flex gap-[15px] items-center'>
+                <div className='flex gap-[15px] items-center '>
                 {isButtonVisible && (
                     <div>
                         {/* Form untuk memasukkan kata kunci */}
