@@ -5,7 +5,7 @@ import { API, VERSION } from "../utils/baseUrl";
 export const login = async (requestData) => {
   try {
     const response = await axios.post(
-      `http://localhost:7000/api/v1/auth/login`,
+      `${API}/${VERSION}/auth/login`,
       requestData
     );
     return response.data;

@@ -8,11 +8,12 @@ const TableEskul = () => {
   const [filter, setFilter] = useState('');
   const [sort, setSort] = useState('');
   const [size, setSize] = useState('10');
-  const [number, setNumber] = useState(1);
+  const [number, setNumber] = useState('1');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rayonOptions, setRayonOptions] = useState([]);
   const [getAllData, setGetAllData] = useState(0);
+  const [loadingOption, setLoadingOption] = useState(false);
 
   const totalPages = Math.ceil(getAllData / size); // Calculate total pages
 
@@ -64,29 +65,68 @@ const TableEskul = () => {
   const handleGetRequest = async () => {
     try {
       const response = await getAllRayon({ filter, sort, size, number });
-      if (Array.isArray(response.data)) {
-        setData(response.data);
-          setGetAllData(17); // Update with the total count from the API
-        const rayonNames = [
-          ...new Set(
-            response.data.map((item) => item.name.replace(/\d+/g, '').trim())
-          ),
-        ];
-        setRayonOptions(['', ...rayonNames]);
+  
+      if (response && response.data) {
+        console.log('API Response:', response.data);
+  
+        if (Array.isArray(response.data.rayonFilter)) {
+          const rayonData = response.data.rayonFilter;
+          const rayons = response.data.rayons;
+          setData(rayonData);
+  
+          // Filter the rayon options based on your criteria
+          const uniqueOptions = {};
+          rayons.forEach((item) => {
+            const name = item.name.replace(/\d+/g, '').trim(); // Remove numbers and trim
+            if (name.length > 2 && !/\d/.test(name)) {
+              uniqueOptions[name] = true;
+            }
+          });
+  
+          const filteredOptions = Object.keys(uniqueOptions);
+          setRayonOptions(['', ...filteredOptions]);
+  
+          // Set the total data count
+          if (data.length === 0) {
+            setGetAllData(response.data.rayons.length);
+          } else {
+            setGetAllData(response.data.rayonFilter.length);
+          }
+        } else {
+          setError(new Error('Data is not an array'));
+        }
       } else {
-        setError(new Error('Data is not an array'));
+        setError(new Error('Data retrieval failed'));
       }
     } catch (error) {
-      console.error('Error:', error);
       setError(error);
     } finally {
       setLoading(false);
     }
   };
+  
+  
+  
+  
 
-  const handleFilterChange = (selectedOption) => {
+  const handleFilterChange = async (selectedOption) => {
+    setLoadingOption(true); // Set loading state to true
     setFilter(selectedOption);
+    // setGetAllData(data.length)
+    // setNumber(1); // Reset the current page to the first page when the filter changes
+  
+    try {
+      // Perform data fetching here
+      // Once the data is ready, set loadingOption to false
+      setLoadingOption(false);
+    } catch (error) {
+      // Handle errors if data fetching fails
+      setLoadingOption(false); // Ensure that loading is set to false in case of an error
+      console.error('Error fetching data:', error);
+    }
   };
+  
+  
 
   useEffect(() => {
     handleGetRequest();
@@ -126,20 +166,19 @@ const TableEskul = () => {
               <th></th>
               <th></th>
               <th className="text-right pr-6">
-                <select
-                  name=""
-                  id=""
-                  className="border border-black py-1 rounded-md w-[85px]"
-                  value={filter}
-                  onChange={(e) => handleFilterChange(e.target.value)}
-                >
-                  <option value="">Select Filter</option>
-                  {rayonOptions.map((option, index) => (
-                    <option key={index} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+              <select
+  name=""
+  id=""
+  className="border border-black py-1 rounded-md w-[85px]"
+  value={filter}
+  onChange={(e) => handleFilterChange(e.target.value)}
+>
+  {rayonOptions.map((option, index) => (
+    <option key={index} value={option}>
+      {loadingOption ? 'Loading...' : option}
+    </option>
+  ))}
+</select>
               </th>
             </tr>
           </thead>
