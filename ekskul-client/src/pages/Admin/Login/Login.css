@@ -14,7 +14,3 @@ input:-webkit-autofill:active {
   background-image: url("https://hariannusantara.com/wp-content/uploads/2019/06/gambar-pemandangan-pegunungan9.jpg");
   /* Properti background lainnya */
 }
-
-.polygon {
-  clip-path: polygon(25% 0%, 75% 0%, 80% 50%, 75% 100%, 25% 100%, 20% 50%);
-}
