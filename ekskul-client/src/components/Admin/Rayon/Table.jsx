@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { getAllRayon } from '../../../services/rayon.service';
-import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch, AiOutlineFileSearch } from 'react-icons/ai';
 import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { IoIosOptions } from 'react-icons/io';
 
 const TableEskul = () => {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState('');
   const [sort, setSort] = useState('');
+  const [search, setSearch] = useState('');
+  const [changeFitur, setChangeFitur] = useState('');
   const [size, setSize] = useState('10');
   const [number, setNumber] = useState('1');
   const [loading, setLoading] = useState(true);
@@ -16,6 +19,19 @@ const TableEskul = () => {
   const [loadingOption, setLoadingOption] = useState(false);
 
 
+  const ToggleHandleSearch = () => {
+    setSearch(!search)
+  }
+  const ToggleHandleChange = () => {
+    setChangeFitur(!changeFitur)
+    setSearch(false)
+  }
+
+  const handleInputChange = (event) => {
+    // Menggunakan event.target.value untuk mendapatkan nilai input yang baru
+    const newFilterValue = event.target.value;
+    setFilter(newFilterValue);
+  };
 
 
   const totalPages = Math.ceil(getAllData / size); // Calculate total pages
@@ -154,7 +170,7 @@ const TableEskul = () => {
         <table className="min-w-full border-collapse w-full bg-transparent">
           <thead>
             <tr>
-              <th className="w-1/6 flex items-center gap-1 px-6 py-3 white text-left text-base leading-4 font-medium text-gray-600 uppercase tracking-wider">
+              <th className="w-1/6 flex items-center gap-1 px-6 py-3 white text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
                 Rayon
                 <button onClick={DescAndAsc}>
                   {sort ? <AiOutlineArrowUp /> : <AiOutlineArrowDown />}
@@ -162,23 +178,29 @@ const TableEskul = () => {
               </th>
               <th></th>
               <th></th>
-              <th className="text-right pr-6">
-              <select
-  name=""
-  id=""
-  className="border border-black py-1 rounded-md w-[85px]"
-  value={filter}
-  onChange={(e) => handleFilterChange(e.target.value)}
->
-  {rayonOptions.map((option, index) => (
-    <option key={index} value={option}>
-      {loadingOption ? 'Loading...' : option}
-    </option>
-  ))}
-</select>
-
-
-
+              <th className="text-right pr-6 flex bg-transparent justify-end ">
+                <input type="text" placeholder='Search Here...' className={`bg-transparent border-b border-black outline-none transition-all duration-500 ${search ? 'w-[150px]':'w-0'}`} value={filter} onChange={handleInputChange} />
+                <button className={`mx-3 p-2 border  rounded-full border-black hover:bg-black hover:text-white ${changeFitur ? '':'hidden'}`} onClick={ToggleHandleSearch}>
+                  <AiOutlineSearch/>
+                </button>
+                <div className='flex'>
+                <button onClick={ToggleHandleChange} className={`p-2 flex justify-center items-center  border-black ${changeFitur ? 'border rounded-md':'border-y border-l rounded-l-md'}`}>
+              <AiOutlineFileSearch className={` ${changeFitur ? '':'mr-2'}`}/>
+            </button>
+             <select
+              name=""
+              id=""
+              className={` border-black outline-none py-1 rounded-r-md w-[85px] ${changeFitur ? 'hidden ':'border-r border-y'}`}
+              value={filter}
+              onChange={(e) => handleFilterChange(e.target.value)}
+            >
+              {rayonOptions.map((option, index) => (
+                <option key={index} value={option}>
+                  {loadingOption ? 'Loading...' : option}
+                </option>
+              ))}
+            </select>
+                </div>
 
               </th>
             </tr>
