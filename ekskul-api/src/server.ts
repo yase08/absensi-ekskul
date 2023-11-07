@@ -26,7 +26,8 @@ import ActivityProgramRoutes from "./routes/activityProgram.route";
 import AssessmentRoutes from "./routes/assessment.route";
 import UserRoutes from "./routes/user.route";
 import TaskRoute from "./routes/task.route";
-import instructorAttendanceRoute from "./routes/instructorAttendance.route";
+import ActivityRoute from "./routes/activity.route";
+import InstructorAttendanceRoute from "./routes/instructorAttendance.route";
 
 // Membuat class App yang yang berfungsi sebagai server express
 export class App {
@@ -105,8 +106,11 @@ export class App {
     this.app.use(`${this.version}/room`, RoomRoutes);
     this.app.use(`${this.version}/assessment`, AssessmentRoutes);
     this.app.use(`${this.version}/task`, TaskRoute);
-    this.app.use(`${this.version}/instructorAttendance`, instructorAttendanceRoute);
-
+    this.app.use(`${this.version}/activity`, ActivityRoute);
+    this.app.use(
+      `${this.version}/instructorAttendance`,
+      InstructorAttendanceRoute
+    );
   }
 
   // Digunakan untuk menjalankan server express

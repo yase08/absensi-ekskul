@@ -41,9 +41,19 @@ export class ScheduleService {
       let limit: number;
       let offset: number;
 
+      paramQuerySQL.include = {
+        model: db.activity,
+        include: [
+          { model: db.rombel, as: "rombel", attributes: ["name"] },
+          { model: db.room, as: "room", attributes: ["name"] },
+          { model: db.ekskul, as: "ekskul", attributes: ["name"] },
+        ],
+        attributes: { exclude: ["rombel_id", "room_id", "ekskul_id"] },
+      };
+
       if (filter) {
         paramQuerySQL.where = {
-          name: {
+          day: {
             [Op.like]: `%${filter}%`,
           },
         };
@@ -69,7 +79,7 @@ export class ScheduleService {
 
       const scheduleFilter = await db.schedule.findAll(paramQuerySQL);
       const schedules = await db.schedule.findAll({
-        attributes: ["id", "name"],
+        attributes: ["id", "day"],
       });
 
       if (!scheduleFilter)

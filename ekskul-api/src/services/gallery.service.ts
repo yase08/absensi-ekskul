@@ -15,7 +15,6 @@ export class GalleryService {
       const ekskulOnGallery = await db.gallery.findOne({
         where: { ekskul_id: req.body.ekskul_id },
       });
-      const directory = path.join(__dirname, `../public/gallery`);
 
       if (ekskulOnGallery)
         throw apiResponse(
@@ -32,8 +31,8 @@ export class GalleryService {
 
       for (let i in files) {
         const file = files[i];
-        const fileName = file.filename;
-        galleryImages.push(`${directory}/${fileName}`);
+        const pathName = file.path;
+        galleryImages.push(pathName);
       }
 
       const createGallery = await db.gallery.create({
