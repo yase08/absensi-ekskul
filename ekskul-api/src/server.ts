@@ -54,8 +54,9 @@ export class App {
     this.app.use(compression());
     this.app.use(morgan("dev"));
     this.app.use(nocache());
+    this.app.enable("trust proxy")
     this.app.use(hpp({ checkBody: true, checkQuery: true }));
-    this.app.use(helmet({ contentSecurityPolicy: false }));
+    this.app.use(helmet({ contentSecurityPolicy: true }));
     if (!["production", "test"].includes(this.env)) {
       this.app.use(`${this.version}/docs`, swaggerServe, swaggerClient());
     }
