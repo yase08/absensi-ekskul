@@ -14,17 +14,6 @@ export class AttendanceController extends AttendanceService {
       return res.status(error.statusCode).json(error);
     }
   };
-
-  getAttendance = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const serviceResponse: APIResponse = await this.fetchAttendanceService(
-        req
-      );
-      return res.status(serviceResponse.statusCode).json(serviceResponse);
-    } catch (error: any) {
-      return res.status(error.statusCode).json(error);
-    }
-  };
   
   exportToExcel = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -45,6 +34,18 @@ export class AttendanceController extends AttendanceService {
       return res.status(error.statusCode).json(error);
     }
   };
+
+  getChartAttendance = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getChartAttendanceService(
+        req
+      );
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+  
 
   updateAttendance = async (req: Request, res: Response): Promise<Response> => {
     try {

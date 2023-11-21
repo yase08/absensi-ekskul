@@ -17,10 +17,7 @@ export class DTOAttendance {
   date: string;
 
   @IsNotEmpty()
-  @IsInt()
-  instructor_id: number;
-
-  @IsNotEmpty()
+  @Transform(({ value }) => Number(value), { toClassOnly: true })
   @IsInt()
   ekskul_id: number;
 }

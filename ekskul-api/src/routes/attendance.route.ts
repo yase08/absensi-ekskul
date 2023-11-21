@@ -19,7 +19,9 @@ class AttendanceRoutes extends AttendanceController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOAttendance)],
+      [authorization(), auth(), permission(["instructor", "admin"]), 
+      // validator(DTOAttendance)
+    ],
       this.createAttendance
     );
     this.router.get(
@@ -27,9 +29,16 @@ class AttendanceRoutes extends AttendanceController {
       [authorization(), auth(), permission(["instructor", "admin"])],
       this.getAllAttendance
     );
+    this.router.get(
+      "/chart",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getChartAttendance
+    );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOAttendance)],
+      [authorization(), auth(), permission(["instructor", "admin"]), 
+      // validator(DTOAttendance)
+    ],
       this.updateAttendance
     );
 
