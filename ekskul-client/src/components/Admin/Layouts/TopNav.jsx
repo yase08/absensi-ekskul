@@ -5,11 +5,10 @@ import {MdKeyboardDoubleArrowRight, MdColorLens} from 'react-icons/md'
 import {FiSettings, FiActivity} from 'react-icons/fi'
 import {CgProfile, CgLogOut} from 'react-icons/cg'
 import {AiOutlineMail, AiOutlineBell, AiOutlineClose} from 'react-icons/ai'
-import { useState } from 'react';
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react';
 // import AdminPicture from './AdminPicture';
 // import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom'
 
 
 // eslint-disable-next-line react/prop-types
@@ -21,14 +20,20 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
     const [isButtonVisible1, setIsButtonVisible1] = useState(false);
     const [isButtonVisible2, setIsButtonVisible2] = useState(false);
     const [backgroundColor, setBackgroundColor] = useState('bg-primary');
-
-
+    const navigate = useNavigate();
+    
     useEffect(() => {
       const savedColor = localStorage.getItem('backgroundColor');
       if (savedColor) {
         setBackgroundColor(savedColor);
       }
     }, []);
+
+    const handleLogout = () => {
+        sessionStorage.removeItem("token")
+        navigate("/admin")
+    
+      }
 
   
     const toggleDropdown = () => {
@@ -49,11 +54,6 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
       setIsOpenMassage(!isOpenMassage); 
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userRole');
-        window.location.href = '/';
-    };
 
     const truncateName = (name, maxLength = 10) => {
         if (name.length <= maxLength) {
@@ -104,13 +104,13 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
     
     return (
         <div className='w-full'>
-            <nav className={`h-[115px] px-[29px] pt-[29px] flex justify-between items-start z-40`} style={{ backgroundColor: backgroundColor }}>
+            <nav className={`h-[115px] px-[29px] py-[29px] flex justify-between items-start z-40`} style={{ backgroundColor: backgroundColor }}>
                 <div>
                     <button onClick={toggleExpansion} className={`${expanded ? 'max-lg:hidden':''}`}>
                         <GiHamburgerMenu className='text-white text-xl'/>
                     </button>
                 </div>
-                <div className='flex gap-[15px] items-center'>
+                <div className='flex gap-[15px] items-center '>
                 {isButtonVisible && (
                     <div>
                         {/* Form untuk memasukkan kata kunci */}

@@ -214,9 +214,9 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                         </div>
                 </div>
                     )}
-                    <nav className={`bg-white max-lg:border-r h-[100vh] z-50 transition-all duration-[700ms] fixed ${expanded ? 'max-lg:w-[320px] lg:w-[65px] ':'max-lg:w-0 overflow-y-scroll hidden-scroll lg:w-[320px]'}`}>
+                    <nav className={`bg-white max-lg:border-r h-[100vh] z-50 transition-all duration-[700ms] fixed  ${expanded ? 'max-lg:w-[320px] lg:w-[65px] ':'max-lg:w-0 overflow-y-scroll hidden-scroll lg:w-[320px]'}`}>
                <Button toggleExpansion={toggleExpansion} expanded={expanded}/>
-               <div>
+               <div className='max-lg:overflow-hidden'>
 
                         <ul className="w-full bg-transparent flex justify-center items-center h-[72px]">
                             <button onClick={toggleExpansion} className={`cursor-pointer uppercase font-semibold opacity-75 font antialiased tracking-[2px] font-poppins ${expanded ? 'lg:hidden':'max-lg:hidden'}`}>Eksul</button>

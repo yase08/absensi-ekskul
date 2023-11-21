@@ -1,18 +1,14 @@
-import { BsInstagram } from "react-icons/bs";
 import {
-  AiOutlineArrowLeft,
-  AiOutlineArrowRight,
   AiOutlineUser,
   AiOutlineLock,
   AiOutlineEye,
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
-import {useNavigate} from 'react-router-dom'
 import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import "./Login.css";
 import logo from "../../../assets/Logo-Absensi.png";
 import { login } from "../../../services/auth.service";
+import {useNavigate} from 'react-router-dom'
 
 const Login = () => {
   const [changeMethod, setChangeMethod] = useState(false);
@@ -20,6 +16,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false);
+
 
   const toggleChangeMethod = () => {
     setChangeMethod(!changeMethod);
@@ -39,20 +37,25 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       const response = await login({ email, password });
       if (response.statusCode === 200) {
         const data = response.data;
         sessionStorage.setItem("token", data);
-        navigate('/admin/dashboard')
+        navigate("/admin/dashboard")
       } else {
         console.error("Login failed:", response.data.message);
       }
     } catch (error) {
       console.error("An error occurred:", error.message);
+    } finally {
+      setLoading(false);
     }
   };
+
+
+
   return (
     <div className="w-full h-[100vh] bg-primary flex relative transition-all ">
       <div
@@ -159,7 +162,7 @@ const Login = () => {
                 className="w-full h-20 bg-[#FFDE59] text-white font-bold rounded-md polygon"
                 type="submit"
               >
-                Submit
+                {loading ? <div className="loader"></div> : 'Submit'}
               </button>
             </form>
           </div>
