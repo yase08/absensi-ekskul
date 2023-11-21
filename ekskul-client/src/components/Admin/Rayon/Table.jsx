@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { getAllRayon } from '../../../services/rayon.service';
+import { deleteRayon, getAllRayon } from '../../../services/rayon.service';
 import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch, AiOutlineFileSearch } from 'react-icons/ai';
 import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 import { IoIosOptions } from 'react-icons/io';
 import { useDebouncedCallback } from 'use-debounce';
+import Swal from 'sweetalert2';
 
-const TableEskul = () => {
+const TableEskul = ({ setFormOld }) => {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState('');
   const [sort, setSort] = useState('');
@@ -15,8 +16,8 @@ const TableEskul = () => {
   const [number, setNumber] = useState('1');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [rayonOptions, setRayonOptions] = useState([]);
   const [getAllData, setGetAllData] = useState(0);
+  // const [rayonOptions, setRayonOptions] = useState([]);
   const [loadingOption, setLoadingOption] = useState(false);
 
   const ToggleHandleSearch = () => {
@@ -32,16 +33,17 @@ const TableEskul = () => {
     // function
     (value) => {
       setFilter(value);
+      console.log(value);
     },
     // delay in ms
-    3000
+    1500
   );
 
   // const handleInputChange = (e) => {
   //   setFilter(e.target.value);
   // };
 
-  const totalPages = Math.ceil(getAllData / size); // Calculate total pages
+  const totalPages = Math.ceil(data.length / size); // Calculate total pages
 
   const handlePrevPage = () => {
     if (number > 1) {
@@ -94,29 +96,16 @@ const TableEskul = () => {
 
       if (response && response.data) {
         console.log('API Response:', response.data);
+        console.log(response);
 
-        if (Array.isArray(response.data.rayonFilter)) {
-          const rayonData = response.data.rayonFilter;
-          const rayons = response.data.rayons;
+        if (Array.isArray(response.data)) {
+          const rayonData = response.data;
           setData(rayonData);
 
           // Filter the rayon options based on your criteria
-          const uniqueOptions = {};
-          rayons.forEach((item) => {
-            const name = item.name.replace(/\d+/g, '').trim(); // Remove numbers and trim
-            if (name.length > 2 && !/\d/.test(name)) {
-              uniqueOptions[name] = true;
-            }
-          });
-
-          const filteredOptions = Object.keys(uniqueOptions);
-          setRayonOptions(['', ...filteredOptions]);
-
           // Set the total data count
           if (data.length === 0) {
-            setGetAllData(response.data.rayons.length);
-          } else {
-            setGetAllData(response.data.rayonFilter.length);
+            setGetAllData(response.data.length);
           }
         } else {
           setError(new Error('Data is not an array'));
@@ -130,6 +119,52 @@ const TableEskul = () => {
       setLoading(false);
     }
   };
+
+  const handleDeleteRequest = async (id) => {
+    // event.preventDefault();
+    setLoading(true);
+
+     try {
+      const response = await deleteRayon(id);
+      const successMessage = response.statusMessage;
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: successMessage,
+      });
+
+      handleGetRequest()
+      console.log('Response:', response.data);
+    } catch (error) {
+      console.error('Error:', error);
+
+      if (error.response) {
+        const errorMessage = error.response.statusMessage;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'No response received from the server.',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'An unexpected error occurred.',
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // setRayonOptions(['', ...data.map((item) => item.name)]);
 
   const handleFilterChange = async (selectedOption) => {
     setLoadingOption(true); // Set loading state to true
@@ -221,11 +256,11 @@ const TableEskul = () => {
                     value={filter}
                     onChange={(e) => handleFilterChange(e.target.value)}
                   >
-                    {rayonOptions.map((option, index) => (
+                    {/* {rayonOptions.map((option, index) => (
                       <option key={index} value={option}>
                         {loadingOption ? 'Loading...' : option}
                       </option>
-                    ))}
+                    ))} */}
                   </select>
                 </div>
               </th>
@@ -245,11 +280,11 @@ const TableEskul = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                    <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                    <button className="text-indigo-600 hover:text-indigo-900" onClick={() => setFormOld(item)}>
                       Edit
-                    </a>
+                    </button>
                     <span className="px-2">|</span>
-                    <button className="text-red-600 hover:text-red-900 cursor-pointer">
+                    <button className="text-red-600 hover:text-red-900 cursor-pointer" onClick={() => handleDeleteRequest(item.id)}>
                       Delete
                     </button>
                   </td>

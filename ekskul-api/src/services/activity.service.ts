@@ -1,7 +1,6 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { Op } from "sequelize";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -41,14 +40,6 @@ export class ActivityService {
       let limit: number;
       let offset: number;
 
-      paramQuerySQL.attributes = [
-        "id",
-        "startTime",
-        "endTime",
-        "createdAt",
-        "updatedAt",
-      ];
-
       paramQuerySQL.include = [
         { model: db.rombel, as: "rombel", attributes: ["name"] },
         { model: db.room, as: "room", attributes: ["name"] },
@@ -82,14 +73,30 @@ export class ActivityService {
 
       const activityFilter = await db.activity.findAll(paramQuerySQL);
 
+      const manipulatedActivity = activityFilter.map((activity) => {
+        return {
+          id: activity.id,
+          startTime: activity.startTime,
+          endTime: activity.endTime,
+          rombel: activity.rombel ? activity.rombel.name : null,
+          room: activity.room ? activity.room.name : null,
+          ekskul: activity.ekskul ? activity.ekskul.name : null,
+          schedule: activity.schedule ? activity.schedule.name : null,
+          createdAt: activity.createdAt,
+          updatedAt: activity.updatedAt,
+        };
+      });
+
       if (!activityFilter || activityFilter.length === 0) {
         throw apiResponse(status.NOT_FOUND, "Activities do not exist");
       }
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all activities success", {
-          activityFilter,
-        })
+        apiResponse(
+          status.OK,
+          "Fetched all activities success",
+          manipulatedActivity
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -137,17 +144,6 @@ export class ActivityService {
           "Activity do not exist for the given id"
         );
 
-      const activitySame = await db.activity.findOne({
-        where: { name: req.body.name },
-      });
-
-      if (activitySame && activitySame.id !== activityExist.id) {
-        throw apiResponse(
-          status.CONFLICT,
-          `Activity with the name ${req.body.name} already exists`
-        );
-      }
-
       const updateActivity = await db.activity.update(req.body, {
         where: {
           id: activityExist.id,
@@ -184,9 +180,6 @@ export class ActivityService {
       const deleteActivity = await db.activity.destroy({
         where: { id: activityExist.id },
       });
-
-      if (!deleteActivity)
-        throw apiResponse(status.FORBIDDEN, "Delete activity failed");
 
       return Promise.resolve(apiResponse(status.OK, "Delete activity success"));
     } catch (error: any) {

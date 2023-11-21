@@ -8,13 +8,8 @@ export class DTOTask {
   @IsString()
   name: string;
 
-  @IsNotEmpty()
   @IsInt()
   ekskul_id: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  author_id: number;
 }
 
 export class DTOTaskById {

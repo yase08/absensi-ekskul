@@ -23,7 +23,7 @@ const router = createBrowserRouter([
   //   element: <NotFoundPage />,
   // },
   {
-    path: "/admin",
+    path: "/login",
     element: <Login />,
   },
   {

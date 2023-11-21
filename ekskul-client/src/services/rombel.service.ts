@@ -5,7 +5,7 @@ import { config } from "../utils/config";
 export const getAllRombel = async ({ filter, sort, size, number }) => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/rombel?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/rombel?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
       config
     );
     return response.data;
@@ -18,7 +18,7 @@ export const getAllRombel = async ({ filter, sort, size, number }) => {
 
 export const deleteRombel = async (id) => {
   try {
-    const response = await axios.delete(`${API}${VERSION}/rombel/${id}`, config);
+    const response = await axios.delete(`${API}/${VERSION}/rombel/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -27,10 +27,11 @@ export const deleteRombel = async (id) => {
   }
 };
 
-export const updateRombel = async (id) => {
+export const updateRombel = async (id, requestData) => {
   try {
-    const response = await axios.delete(
-      `${API}${VERSION}/rombel/${id}`,
+    const response = await axios.put(
+      `${API}/${VERSION}/rombel/${id}`,
+      requestData,
       config
     );
     return response.data;
@@ -44,7 +45,7 @@ export const updateRombel = async (id) => {
 export const createRombel = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/rombel`,
+      `${API}/${VERSION}/rombel`,
       requestData,
       config
     );

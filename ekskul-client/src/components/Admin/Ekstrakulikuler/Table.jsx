@@ -1,9 +1,325 @@
+import { useEffect, useState } from 'react'
+import Swal from 'sweetalert2';
+import { useDebouncedCallback } from 'use-debounce';
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiOutlineSearch } from 'react-icons/ai';
+import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
+import { deleteEkskul, getAllEkskul } from '../../../services/ekskul.service';
 
-const TableEskul = () => {
+const TableEskul = ({ setFormOld, setOpen }) => {
+  const [data, setData] = useState([]);
+  const [filter, setFilter] = useState('');
+  const [sort, setSort] = useState('');
+  const [search, setSearch] = useState('');
+  const [changeFitur, setChangeFitur] = useState('');
+  const [size, setSize] = useState('10');
+  const [number, setNumber] = useState('1');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [getAllData, setGetAllData] = useState(0);
+  // const [rayonOptions, setRayonOptions] = useState([]);
+  const [loadingOption, setLoadingOption] = useState(false);
+
+  const ToggleHandleSearch = () => {
+    setSearch(!search);
+  };
+
+  const ToggleHandleChange = () => {
+    setChangeFitur(!changeFitur);
+    setSearch(false);
+  };
+
+  const debounced = useDebouncedCallback(
+    // function
+    (value) => {
+      setFilter(value);
+    },
+    // delay in ms
+    1500
+  );
+
+  const handleInputChange = (e) => {
+    setFilter(e.target.value);
+  };
+
+  const totalPages = Math.ceil(data.length / size); // Calculate total pages
+
+  const handlePrevPage = () => {
+    if (number > 1) {
+      setNumber(number - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (number < totalPages) {
+      setNumber(number + 1);
+    }
+  };
+
+  const generatePaginationButtons = () => {
+    const paginationButtons = [];
+
+    for (let i = 1; i <= totalPages; i++) {
+      paginationButtons.push(
+        <button
+          key={i}
+          className={`w-[40px] h-[40px] bg-primary rounded-md ${
+            i === number ? 'bg-blue-600' : 'hover:bg-blue-400'
+          }`}
+          onClick={() => setNumber(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return paginationButtons;
+  };
+
+  const DescAndAsc = () => {
+    setSort(sort === '-id' ? '' : '-id');
+  };
+
+  const pageSizeOptions = [10, 25, 50];
+
+  const handlePageSize = (e) => {
+    const newSize = e.target.value;
+    setSize(newSize);
+    // Reset the current page to the first page when changing page size
+    setNumber(1);
+  };
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await getAllEkskul({ filter, sort, size, number});
+
+      if (response && response.data) {
+        console.log('API Response:', response.data);
+        console.log(response);
+
+        if (Array.isArray(response.data)) {
+          const rombelData = response.data;
+          setData(rombelData);
+
+          // Filter the rayon options based on your criteria
+          // Set the total data count
+          if (data.length === 0) {
+            setGetAllData(response.data.length);
+          }
+        } else {
+          setError(new Error('Data is not an array'));
+        }
+      } else {
+        setError(new Error('Data retrieval failed'));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteRequest = async (id) => {
+    // event.preventDefault();
+    setLoading(true);
+
+     try {
+      const response = await deleteEkskul(id);
+      const successMessage = response.statusMessage;
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: successMessage,
+      });
+
+      handleGetRequest()
+      console.log('Response:', response.data);
+    } catch (error) {
+      console.error('Error:', error);
+
+      if (error.response) {
+        const errorMessage = error.response.statusMessage;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'No response received from the server.',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'An unexpected error occurred.',
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleFilterChange = async (selectedOption) => {
+    setLoadingOption(true); // Set loading state to true
+    setFilter(selectedOption);
+    // setGetAllData(data.length)
+    // setNumber(1); // Reset the current page to the first page when the filter changes
+
+    try {
+      // Perform data fetching here
+      // Once the data is ready, set loadingOption to false
+      setLoadingOption(false);
+    } catch (error) {
+      // Handle errors if data fetching fails
+      setLoadingOption(false); // Ensure that loading is set to false in case of an error
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const handleEdit = async (item) => {
+    setFormOld(item)
+    setOpen(true)
+  }
+
+  useEffect(() => {
+    handleGetRequest();
+  }, [filter, sort, size, number]);
+
+  if (loading) {
+    return (
+      <div className="p-3">
+        <div className="relative bg-transparent flex gap-1 justify-center items-end">
+          <p className="text-animation font-Gabarito text-xl">Loading</p>
+          <section className="dots-container">
+            <div className="dot"></div>
+            <div className="dot"></div>
+            <div className="dot"></div>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p>{error.message}</p>;
+  }
+
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
     <div className="overflow-x-auto hidden-scroll w-full">
-        {/* <div>
+        
+        <table className="min-w-full border-collapse w-full">
+          <thead>
+            <tr>
+            <th className="w-1/6 flex items-center gap-1 px-6 py-3 white text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
+                Rombel
+              <button onClick={DescAndAsc}>
+                  {sort ? <AiOutlineArrowUp /> : <AiOutlineArrowDown />}
+              </button>
+              </th>
+              <th></th>
+              <th></th>
+              <th className="text-right pr-6 flex bg-transparent justify-end">
+                <input
+                  type="text"
+                  placeholder="Search Here..."
+                  className={`bg-transparent border-b border-black outline-none transition-all duration-500 ${
+                    search ? 'w-[150px]' : 'w-0'
+                  }`}
+                  // value={}
+                  onChange={(e) => debounced(e.target.value)}
+                />
+                <button
+                  className={`mx-3 p-2 border rounded-full border-black hover:bg-black hover:text-white ${
+                    changeFitur ? '' : 'hidden'
+                  }`}
+                  onClick={ToggleHandleSearch}
+                >
+                  <AiOutlineSearch />
+                </button>
+                <div className="flex">
+                  <button
+                    onClick={ToggleHandleChange}
+                    className={`p-2 flex justify-center items-center  border-black ${
+                      changeFitur ? 'border rounded-md' : 'border-y border-l rounded-l-md'
+                    }`}
+                  >
+                    <AiOutlineFileSearch className={` ${changeFitur ? '' : 'mr-2'}`} />
+                  </button>
+                  <select
+                    name=""
+                    id=""
+                    className={`border-black outline-none py-1 rounded-r-md w-[85px] ${
+                      changeFitur ? 'hidden ' : 'border-r border-y'
+                    }`}
+                    value={filter}
+                    onChange={(e) => handleFilterChange(e.target.value)}
+                  >
+                    {/* {rayonOptions.map((option, index) => (
+                      <option key={index} value={option}>
+                        {loadingOption ? 'Loading...' : option}
+                      </option>
+                    ))} */}
+                  </select>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody className='w-full'>
+              {/* <tr className="border-b hover:bg-gray-200">
+                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase"> 
+                  <img
+                      className="h-10 w-10 rounded-full" 
+                  />
+                  </td>
+                <td className="px-6 py-4 whitespace-no-wrap"></td>
+                <td className="px-6 py-4 whitespace-no-wrap">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
+                  <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                    Edit
+                  </a>
+                  <span className="px-2">|</span>
+                  <button
+                    className="text-red-600 hover:text-red-900 cursor-pointer"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr> */}
+               {data.length > 0 ? (
+              data.map((item, index) => (
+                <tr key={index} className="border-b hover:bg-gray-200">
+                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
+                    {item.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
+                    {item.category}
+                  </td>
+                  <td className="px-6 py-4 whitespace-no-wrap">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      {/* Customize content here */}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
+                    <button className="text-indigo-600 hover:text-indigo-900" onClick={() => handleEdit(item)}>
+                      Edit
+                    </button>
+                    <span className="px-2">|</span>
+                    <button className="text-red-600 hover:text-red-900 cursor-pointer" onClick={() => handleDeleteRequest(item.id)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="px-6 py-4 text-center">
+                <div>
           <span className='w-full flex items-center justify-center'>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -55,69 +371,41 @@ const TableEskul = () => {
 
           </span>
               <p className="text-center text-gray-500 text-xl">No data available</p>
-        </div> */}
-        <table className="min-w-full border-collapse w-full">
-          <thead>
-            <tr>
-              <th className="w-1/6 px-6 py-3 white text-left text-xs leading-4 font-medium text-gray-600 uppercase tracking-wider">
-                Ektrakulikuler
-              </th>
-              <th className="w-1/6 px-6 py-3 white text-left text-xs leading-4 font-medium text-gray-600 uppercase tracking-wider">
-                Category
-              </th>
-              <th className="w-1/6 px-6 py-3 whitespace-no-wrap"></th>
-            </tr>
-          </thead>
-          <tbody>
-              <tr className="border-b hover:bg-gray-200">
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase"> 
-                  {/* <img
-                      className="h-10 w-10 rounded-full" 
-                  /> */}
-                  Basket
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase"> 
-                  {/* <img
-                      className="h-10 w-10 rounded-full" 
-                  /> */}
-                  Umum
-                  </td>
-                <td className="px-6 py-4 whitespace-no-wrap"></td>
-                <td className="px-6 py-4 whitespace-no-wrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                  <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                    Edit
-                  </a>
-                  <span className="px-2">|</span>
-                  <button
-                    className="text-red-600 hover:text-red-900 cursor-pointer"
-                  >
-                    Delete
-                  </button>
+        </div>
                 </td>
               </tr>
+            )}
           </tbody>
         </table>
-      {/* {totalPages > 1 && (
-        <div className="mt-4 flex justify-start">
-          <ul className="flex mt-4">
-            {Array.from({ length: totalPages }, (_, index) => (
-              <li
-                key={index + 1}
-                className={`mx-1 cursor-pointer flex items-center justify-center w-[40px] h-[40px] ${
-                  currentPage === index + 1 ? 'font-semibold bg-blue-500 rounded-md text-white' : 'font-normal'
-                }`}
-                onClick={() => onPageChange(index + 1)}
+        <div className="bg-transparent w-full h-full mt-5 px-5">
+          <div className="bg-transparent flex justify-end items-center gap-4">
+            <div className="flex gap-2 text-white">
+              <button className="text-black" onClick={handlePrevPage}>
+                <BiLeftArrow />
+              </button>
+              {totalPages > 1 && generatePaginationButtons()}
+              <button className="text-black" onClick={handleNextPage}>
+                <BiRightArrow />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <select
+                className="border border-black py-1 rounded-md w-[55px]"
+                value={size}
+                onChange={handlePageSize}
               >
-                {index + 1}
-              </li>
-            ))}
-          </ul>
+                {pageSizeOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <p className="text-gray-500 text-xs">
+                Page {number} of {totalPages} | Total data: {getAllData}
+              </p>
+            </div>
+          </div>
         </div>
-      )} */}
     </div>
   </div>
   )

@@ -9,34 +9,32 @@ const db = require("../db/models");
 
 export class AssessmentService {
   async createAssessmentService(req: Request): Promise<any> {
-    try {      
-      
-      const createAssessmentPromises =[];
+    try {
+      const createAssessmentPromises = [];
 
-      for (const assessment of req.body) {     
-          const existingAssessment = await db.assessment.findOne({
-            where: {
-              student_id: assessment.student_id,
-              task_id: assessment.task_id
-            }
-          });
-          if (existingAssessment) {
-            throw apiResponse(
-              status.CONFLICT,
-              `Assessment for student ${assessment.student_id} and task ${assessment.task_id} already exists`
-            );
-          }
-          await db.assessment.create({
+      for (const assessment of req.body) {
+        const existingAssessment = await db.assessment.findOne({
+          where: {
             student_id: assessment.student_id,
             task_id: assessment.task_id,
-            grade: assessment.grade
-          });
+          },
+        });
+        if (existingAssessment) {
+          throw apiResponse(
+            status.CONFLICT,
+            `Assessment for student ${assessment.student_id} and task ${assessment.task_id} already exists`
+          );
         }
+        await db.assessment.create({
+          student_id: assessment.student_id,
+          task_id: assessment.task_id,
+          grade: assessment.grade,
+        });
+      }
       const createAttendances = await Promise.all(createAssessmentPromises);
 
       if (!createAttendances)
-      throw apiResponse(status.FORBIDDEN, "Create new attendances failed");
-
+        throw apiResponse(status.FORBIDDEN, "Create new attendances failed");
 
       return Promise.resolve(
         apiResponse(status.OK, "Create new assessment success")
@@ -66,11 +64,18 @@ export class AssessmentService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: {
+          student_id: {
             [Op.like]: `%${filter}%`,
           },
         };
       }
+
+      paramQuerySQL.attributes = ["id", "grade", "createdAt", "updatedAt"];
+
+      paramQuerySQL.include = [
+        { model: db.student, as: "student", attributes: ["name"] },
+        { model: db.task, as: "task", attributes: ["name"] },
+      ];
 
       if (sort) {
         const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
@@ -91,18 +96,31 @@ export class AssessmentService {
       }
 
       const assessmentFilter = await db.assessment.findAll(paramQuerySQL);
-      const assessments = await db.assessment.findAll({
-        attributes: ["id", "name"],
-      });
+
+      // const assessments = await db.assessment.findAll({
+      //   attributes: ["id"],
+      //   include: [{ model: db.student, as: "student", attributes: ["name"] }],
+      // });
 
       if (!assessmentFilter)
         throw apiResponse(status.NOT_FOUND, "Assessments do not exist");
 
+      const manipulatedResponse = assessmentFilter.map((item) => ({
+        id: item.id,
+        grade: item.grade,
+        student: item.student ? item.student.name : null,
+        task: item.task ? item.task.name : null,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      }));
+
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all assessments success", {
-          assessmentFilter,
-          assessments,
-        })
+        apiResponse(
+          status.OK,
+          "Fetched all assessments success",
+          manipulatedResponse
+          // assessments,
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -117,9 +135,12 @@ export class AssessmentService {
 
   async getOneAssessmentService(req: Request): Promise<any> {
     try {
-      const assessment = await db.assessment.findOne({where: {id: req.params.id}});
+      const assessment = await db.assessment.findOne({
+        where: { id: req.params.id },
+      });
 
-      if (!assessment) throw apiResponse(status.NOT_FOUND, "Assessment do not exist");
+      if (!assessment)
+        throw apiResponse(status.NOT_FOUND, "Assessment do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all asesssment success", assessment)
@@ -147,12 +168,18 @@ export class AssessmentService {
           "Assessments do not exist for the given member_id"
         );
 
-      const updateAssessment = await db.assessment.update(req.body);
+      const updateAssessment = await db.assessment.update(req.body, {
+        where: {
+          id: assessmentExist.id,
+        },
+      });
 
       if (!updateAssessment)
         throw apiResponse(status.FORBIDDEN, "Update assessment failed");
 
-      return Promise.resolve(apiResponse(status.OK, "Update assessment success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Update assessment success")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -176,14 +203,13 @@ export class AssessmentService {
           "Assessments do not exist for the given member_id"
         );
 
-      const deleteAssessment = await db.assessment.delete({
+      await db.assessment.destroy({
         where: { id: assessmentExist.id },
       });
 
-      if (!deleteAssessment)
-        throw apiResponse(status.FORBIDDEN, "Delete assessment failed");
-
-      return Promise.resolve(apiResponse(status.OK, "Delete assessment success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Delete assessment success")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

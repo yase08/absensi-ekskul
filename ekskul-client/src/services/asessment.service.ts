@@ -5,7 +5,7 @@ import { config } from "../utils/config";
 export const getAllAssessment = async ({ filter, sort, size, number }) => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/assessment?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/assessment?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
       config
     );
     return response.data;
@@ -19,7 +19,7 @@ export const getAllAssessment = async ({ filter, sort, size, number }) => {
 export const deleteAssessment = async (id) => {
   try {
     const response = await axios.delete(
-      `${API}${VERSION}/assessment/${id}`,
+      `${API}/${VERSION}/assessment/${id}`,
       config
     );
     return response.data;
@@ -33,7 +33,7 @@ export const deleteAssessment = async (id) => {
 export const updateAssessment = async (id) => {
   try {
     const response = await axios.delete(
-      `${API}${VERSION}/assessment/${id}`,
+      `${API}/${VERSION}/assessment/${id}`,
       config
     );
     return response.data;
@@ -47,7 +47,7 @@ export const updateAssessment = async (id) => {
 export const createAssessment = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/assessment`,
+      `${API}/${VERSION}/assessment`,
       requestData,
       config
     );

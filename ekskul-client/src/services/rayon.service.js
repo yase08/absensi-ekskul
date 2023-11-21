@@ -18,7 +18,7 @@ export const getAllRayon = async ({ filter, sort, size, number }) => {
 
 export const deleteRayon = async (id) => {
   try {
-    const response = await axios.delete(`${API}${VERSION}/rayon/${id}`, config);
+    const response = await axios.delete(`${API}/${VERSION}/rayon/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -27,10 +27,11 @@ export const deleteRayon = async (id) => {
   }
 };
 
-export const updateRayon = async (id) => {
+export const updateRayon = async (id, requestData) => {
   try {
-    const response = await axios.delete(
-      `${API}${VERSION}/rayon/${id}`,
+    const response = await axios.put(
+      `${API}/${VERSION}/rayon/${id}`,
+      requestData,
       config
     );
     return response.data;

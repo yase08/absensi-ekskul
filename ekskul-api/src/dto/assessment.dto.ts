@@ -8,21 +8,17 @@ import {
 } from "class-validator";
 
 export class DTOAssessment {
-  @IsNotEmpty()
-  @IsString()
-  category: string;
+  // @IsNotEmpty()
+  // @IsInt()
+  // grade: number;
 
-  @IsNotEmpty()
-  @IsInt()
-  grade: number;
+  // @IsNotEmpty()
+  // @IsInt()
+  // task_id: number;
 
-  @IsNotEmpty()
-  @IsInt()
-  task_id: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  student_id: number;
+  // @IsNotEmpty()
+  // @IsInt()
+  // student_id: number;
 }
 
 export class DTOAsessmentById {

@@ -5,7 +5,7 @@ import { config } from "../utils/config";
 export const getAllTask = async ({ filter, sort, size, number }) => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/task?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/task?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
       config
     );
     return response.data;
@@ -18,7 +18,7 @@ export const getAllTask = async ({ filter, sort, size, number }) => {
 
 export const deleteTask = async (id) => {
   try {
-    const response = await axios.delete(`${API}${VERSION}/task/${id}`, config);
+    const response = await axios.delete(`${API}/${VERSION}/task/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -29,7 +29,7 @@ export const deleteTask = async (id) => {
 
 export const updateTask = async (id) => {
   try {
-    const response = await axios.delete(`${API}${VERSION}/task/${id}`, config);
+    const response = await axios.delete(`${API}/${VERSION}/task/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -41,7 +41,7 @@ export const updateTask = async (id) => {
 export const createTask = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/task`,
+      `${API}/${VERSION}/task`,
       requestData,
       config
     );

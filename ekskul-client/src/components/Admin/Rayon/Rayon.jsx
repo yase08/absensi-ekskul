@@ -2,20 +2,30 @@ import { useState } from 'react';
 import TableEskul from './Table';
 import Swal from 'sweetalert2';
 import './Rayon.css'; 
-import { createRayon } from '../../../services/rayon.service';
+import { createRayon, updateRayon } from '../../../services/rayon.service';
 
 const Rayon = () => {
   const [formData, setFormData] = useState({
     name: '',
   });
+  const [formOld, setFormOld] = useState('');
 
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    if (formOld) {
+      setFormOld({
+        id: formOld.id,
+        name: e.target.value,
+        createdAt: formOld.createdAt,
+        updatedAt: formOld.updatedAt,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value,
+      });
+    }
   };
 
   const handlePostRequest = async (event) => {
@@ -53,6 +63,50 @@ const Rayon = () => {
     }
   };
 
+  const handleUpdateRequest  = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    console.log(formOld);
+
+    try {
+      const response = await updateRayon(formOld.id, formOld);
+      const successMessage = response.statusMessage;
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: successMessage,
+      });
+      setFormOld('')
+      console.log('Response:', response.data);
+    } catch (error) {
+      console.error('Error:', error);
+
+      if (error.response) {
+        const errorMessage = error.response.data.statusMessage;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'No response received from the server.',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'An unexpected error occurred.',
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
       <div className="w-full flex flex-col gap-2">
@@ -66,19 +120,19 @@ const Rayon = () => {
                   placeholder='Input Rayon Here!!'
                   type="text"
                   name='name'
-                  value={formData.name}
+                  value={formOld ? formOld.name : formData.name}
                   onChange={handleInputChange}
-                  className={`border text-black text-opacity-60 outline-none rounded-md h-[50px] px-5`}
+                  className={`border ${formOld ? 'border-blue-500': ''} text-black text-opacity-60 outline-none rounded-md h-[50px] px-5`}
                 />
               </div>
-              <button className="bg-primary text-white h-[50px] rounded-md" onClick={handlePostRequest}>
+              <button className="bg-primary text-white h-[50px] rounded-md" onClick={formOld ? handleUpdateRequest : handlePostRequest}>
                 {loading ? <div className="loader"></div> : 'Submit'}
               </button>
             </form>
           </div>
         </div>
         <div className="w-full bg-white mt-5 mb-5">
-          <TableEskul />
+          <TableEskul setFormOld={setFormOld} />
         </div>
       </div>
     </div>

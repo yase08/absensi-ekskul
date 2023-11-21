@@ -20,7 +20,7 @@ export const login = async (requestData) => {
 export const forgotPassword = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/auth/forgot-password`,
+      `${API}/${VERSION}/auth/forgot-password`,
       requestData
     );
     return response.data;
@@ -34,7 +34,7 @@ export const forgotPassword = async (requestData) => {
 export const resetToken = async (token, requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/auth/reset-token/${token}`,
+      `${API}/${VERSION}/auth/reset-token/${token}`,
       requestData
     );
     return response.data;

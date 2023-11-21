@@ -5,7 +5,7 @@ import { config } from "../utils/config";
 export const getAllInstructorAttendance = async ({ filter, sort, size, number }) => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/instructorAttendance?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/instructorAttendance?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
       config
     );
     return response.data;
@@ -18,7 +18,7 @@ export const getAllInstructorAttendance = async ({ filter, sort, size, number })
 
 export const deleteInstructorAttendance = async (id) => {
   try {
-    const response = await axios.delete(`${API}${VERSION}/instructorAttendance/${id}`, config);
+    const response = await axios.delete(`${API}/${VERSION}/instructorAttendance/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -30,7 +30,7 @@ export const deleteInstructorAttendance = async (id) => {
 export const updateInstructorAttendance = async (id) => {
   try {
     const response = await axios.delete(
-      `${API}${VERSION}/instructorAttendance/${id}`,
+      `${API}/${VERSION}/instructorAttendance/${id}`,
       config
     );
     return response.data;
@@ -44,7 +44,7 @@ export const updateInstructorAttendance = async (id) => {
 export const createInstructorAttendance = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/instructorAttendance`,
+      `${API}/${VERSION}/instructorAttendance`,
       requestData,
       config
     );

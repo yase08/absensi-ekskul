@@ -78,18 +78,20 @@ export class EkskulService {
       }
 
       const ekskulFilter = await db.ekskul.findAll(paramQuerySQL);
-      const ekskuls = await db.ekskul.findAll({
-        attributes: ["id", "name"],
-      });
+      // const ekskuls = await db.ekskul.findAll({
+      //   attributes: ["id", "name"],
+      // });
 
       if (!ekskulFilter)
         throw apiResponse(status.NOT_FOUND, "Ekskuls do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all ekskuls success", {
-          ekskulFilter,
-          ekskuls,
-        })
+        apiResponse(
+          status.OK,
+          "Fetched all ekskuls success",
+          ekskulFilter
+          // ekskuls,
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -167,12 +169,9 @@ export class EkskulService {
           "Ekskul do not exist for the given id"
         );
 
-      const deleteEkskul = await db.ekskul.destroy({
+      await db.ekskul.destroy({
         where: { id: ekskulExist.id },
       });
-
-      if (!deleteEkskul)
-        throw apiResponse(status.FORBIDDEN, "Delete ekskul failed");
 
       return Promise.resolve(apiResponse(status.OK, "Delete ekskul success"));
     } catch (error: any) {

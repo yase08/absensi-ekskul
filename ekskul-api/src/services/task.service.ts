@@ -2,6 +2,7 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
+import { ISession } from "../interfaces/user.interface";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -10,6 +11,7 @@ const db = require("../db/models");
 export class TaskService {
   async createTaskService(req: Request): Promise<any> {
     try {
+      const instructor_Id = (req.session as ISession).user.id;
       const task = await db.task.findOne({
         where: { name: req.body.name },
       });
@@ -20,7 +22,10 @@ export class TaskService {
           `Task ${req.body.name} already exist`
         );
 
-      const createTask = await db.task.create(req.body);
+      const createTask = await db.task.create({
+        author_id: Number(instructor_Id),
+        ...req.body,
+      });
 
       if (!createTask)
         throw apiResponse(status.FORBIDDEN, "Create new task failed");
@@ -129,10 +134,12 @@ export class TaskService {
       if (!taskExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Tasks do not exist for the given member_id"
+          "Tasks do not exist for the given id"
         );
 
-      const updateTask = await db.task.update(req.body);
+      const updateTask = await db.task.update(req.body, {
+        where: { id: taskExist.id },
+      });
 
       if (!updateTask)
         throw apiResponse(status.FORBIDDEN, "Update task failed");
@@ -161,7 +168,7 @@ export class TaskService {
           "Tasks do not exist for the given member_id"
         );
 
-      const deleteTask = await db.task.delete({
+      const deleteTask = await db.task.destroy({
         where: { id: taskExist.id },
       });
 

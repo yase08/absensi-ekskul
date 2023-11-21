@@ -103,18 +103,35 @@ export class StudentService {
       }
 
       const studentFilter = await db.student.findAll(paramQuerySQL);
-      const students = await db.student.findAll({
-        attributes: ["id", "name"],
-      });
+      // const students = await db.student.findAll({
+      //   attributes: ["id", "name"],
+      // });
 
       if (!studentFilter)
         throw apiResponse(status.NOT_FOUND, "Students do not exist");
 
+      const manipulatedStudent = studentFilter.map((student: any) => {
+        return {
+          id: student.id,
+          name: student.name,
+          nis: student.nis,
+          email: student.email,
+          mobileNumber: student.mobileNumber,
+          rombel: student.rombel ? student.rombel.name : null,
+          rayon: student.rayon ? student.rayon.name : null,
+          ekskuls: student.ekskuls
+            ? student.ekskuls.map((ekskul: any) => ekskul.name)
+            : null,
+        };
+      });
+
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all students success", {
-          studentFilter,
-          students,
-        })
+        apiResponse(
+          status.OK,
+          "Fetched all students success",
+          manipulatedStudent
+          // students,
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -171,6 +188,10 @@ export class StudentService {
           status.NOT_FOUND,
           "Student do not exist for the given id"
         );
+
+      await db.studentOnEkskul.destroy({
+        where: { student_id: studentExist.id },
+      });
 
       const deleteStudent = await db.student.destroy({
         where: { id: studentExist.id },

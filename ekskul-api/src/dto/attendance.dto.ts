@@ -15,11 +15,14 @@ export class DTOAttendance {
   @IsNotEmpty()
   @IsString()
   date: string;
+<<<<<<< HEAD
 
   @IsNotEmpty()
   @Transform(({ value }) => Number(value), { toClassOnly: true })
   @IsInt()
   ekskul_id: number;
+=======
+>>>>>>> 9a5c4d384f579de1f1e1f60f9cebf6ba2a975b74
 }
 
 export class DTOAttendanceById {

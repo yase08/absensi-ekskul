@@ -77,6 +77,14 @@ export class GalleryService {
         };
       }
 
+      paramQuerySQL.include = [
+        {
+          model: db.ekskul,
+          as: "ekskul",
+          attributes: ["name"],
+        },
+      ];
+
       if (sort) {
         const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
         const fieldName = sort.replace(/^-/, "");
@@ -96,18 +104,32 @@ export class GalleryService {
       }
 
       const galleryFilter = await db.gallery.findAll(paramQuerySQL);
-      const galleries = await db.gallery.findAll({
-        attributes: ["id", "name"],
-      });
+      // const galleries = await db.gallery.findAll({
+      //   attributes: ["id", "name"],
+      // });
 
       if (!galleryFilter)
-        throw apiResponse(status.NOT_FOUND, "Galleries do not exist");
+        throw apiResponse(status.NOT_FOUND, "Gallery do not exist");
+
+      const manipulatedGallery = galleryFilter.map((item) => {
+        return {
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          ekskul: item.ekskul ? item.ekskul.name : null,
+          images: JSON.parse(item.images),
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+        };
+      });
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all galleries success", {
-          galleryFilter,
-          galleries,
-        })
+        apiResponse(
+          status.OK,
+          "Fetched all gallery success",
+          manipulatedGallery
+          // galleries,
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -124,13 +146,36 @@ export class GalleryService {
     try {
       const galleries = await db.gallery.findAll({
         where: { slug: req.params.slug },
+        include: [
+          {
+            model: db.ekskul,
+            as: "ekskul",
+            attributes: ["name"],
+          },
+        ],
+      });
+
+      const manipulatedGallery = galleries.map((item) => {
+        return {
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          ekskul: item.ekskul ? item.ekskul.name : null,
+          images: JSON.parse(item.images),
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+        };
       });
 
       if (!galleries)
-        throw apiResponse(status.NOT_FOUND, "Galleries do not exist");
+        throw apiResponse(status.NOT_FOUND, "Gallery do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all galleries success", galleries)
+        apiResponse(
+          status.OK,
+          "Fetched all gallery success",
+          manipulatedGallery
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -161,8 +206,6 @@ export class GalleryService {
           "Gallery do not exist for the given id"
         );
 
-      const previousImages = galleryExist.images;
-      const stringifyPreviousImages = JSON.parse(previousImages);
       let galleryImages: string[] = [];
 
       if (Array.isArray(req.files) && req.files.length > 0) {
@@ -170,7 +213,7 @@ export class GalleryService {
           (file: Express.Multer.File) => `${directory}/${file.filename}`
         );
 
-        galleryImages = [...stringifyPreviousImages, ...newImages];
+        galleryImages = [...newImages];
       }
 
       const updateGallery = await db.gallery.update(
@@ -212,12 +255,9 @@ export class GalleryService {
           "Gallery do not exist for the given id"
         );
 
-      const deleteGallery = await db.gallery.destroy({
+      await db.gallery.destroy({
         where: { id: galleryExist.id },
       });
-
-      if (!deleteGallery)
-        throw apiResponse(status.FORBIDDEN, "Delete gallery failed");
 
       return Promise.resolve(apiResponse(status.OK, "Delete gallery success"));
     } catch (error: any) {

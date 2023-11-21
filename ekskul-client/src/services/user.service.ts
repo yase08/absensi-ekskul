@@ -5,7 +5,7 @@ import { config } from "../utils/config";
 export const getAllUser = async ({ filter, sort, size, number }) => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/user?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/user?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
       config
     );
     return response.data;
@@ -18,7 +18,7 @@ export const getAllUser = async ({ filter, sort, size, number }) => {
 
 export const deleteUser = async (id) => {
   try {
-    const response = await axios.delete(`${API}${VERSION}/user/${id}`, config);
+    const response = await axios.delete(`${API}/${VERSION}/user/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -29,7 +29,7 @@ export const deleteUser = async (id) => {
 
 export const updateUser = async (id) => {
   try {
-    const response = await axios.delete(`${API}${VERSION}/user/${id}`, config);
+    const response = await axios.delete(`${API}/${VERSION}/user/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {

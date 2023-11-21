@@ -11,13 +11,13 @@ export class ActivityProgramService {
   async createActivityProgramService(req: Request): Promise<any> {
     try {
       const activityProgram = await db.activityProgram.findOne({
-        where: { name: req.body.name },
+        where: { activity: req.body.activity },
       });
 
       if (activityProgram)
         throw apiResponse(
           status.CONFLICT,
-          `Activity program ${req.body.name} already exist`
+          `Activity program ${req.body.activity} already exist`
         );
 
       const createActivityProgram = await db.activityProgram.create(req.body);
@@ -56,7 +56,7 @@ export class ActivityProgramService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: {
+          activity: {
             [Op.like]: `%${filter}%`,
           },
         };
@@ -83,15 +83,16 @@ export class ActivityProgramService {
       const activityProgramFilter = await db.activityProgram.findAll(
         paramQuerySQL
       );
+
       const activityPrograms = await db.activityProgram.findAll({
-        attributes: ["id", "name"],
+        attributes: ["id", "activity"],
       });
 
       if (!activityProgramFilter)
-        throw apiResponse(status.NOT_FOUND, "ActivityPrograms do not exist");
+        throw apiResponse(status.NOT_FOUND, "Activity program do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all activityPrograms success", {
+        apiResponse(status.OK, "Fetched all activity program success", {
           activityProgramFilter,
           activityPrograms,
         })
@@ -181,12 +182,9 @@ export class ActivityProgramService {
           "Activity program do not exist for the given id"
         );
 
-      const deleteActivityProgram = await db.activityProgram.destroy({
+      await db.activityProgram.destroy({
         where: { id: activityProgramExist.id },
       });
-
-      if (!deleteActivityProgram)
-        throw apiResponse(status.FORBIDDEN, "Delete activity program failed");
 
       return Promise.resolve(
         apiResponse(status.OK, "Delete activity progam success")
