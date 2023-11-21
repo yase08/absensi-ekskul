@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.ekskul, {
         foreignKey: "ekskul_id",
       });
+      this.belongsTo(models.user, {
+        foreignKey: "instructor_id",
+      });
     }
   }
   instructorAttendance.init(

@@ -78,18 +78,20 @@ export class RombelService {
       }
 
       const rombelFilter = await db.rombel.findAll(paramQuerySQL);
-      const rombels = await db.rombel.findAll({
-        attributes: ["id", "name"],
-      });
+      // const rombels = await db.rombel.findAll({
+      //   attributes: ["id", "name"],
+      // });
 
       if (!rombelFilter)
         throw apiResponse(status.NOT_FOUND, "Rombels do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all rombels success", {
-          rombelFilter,
-          rombels,
-        })
+        apiResponse(
+          status.OK,
+          "Fetched all rombels success",
+          rombelFilter
+          // rombels,
+        )
       );
     } catch (error: any) {
       return Promise.reject(

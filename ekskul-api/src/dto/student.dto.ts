@@ -1,7 +1,13 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
 import { Transform } from "class-transformer";
-import { IsNotEmpty, IsString, IsInt, IsEmail, MaxLength, MinLength } from "class-validator";
+import {
+  IsNotEmpty,
+  IsString,
+  IsInt,
+  IsEmail,
+  MaxLength,
+} from "class-validator";
 
 export class DTOStudent {
   @IsNotEmpty()
@@ -30,16 +36,6 @@ export class DTOStudent {
   @IsNotEmpty()
   @IsInt()
   rayon_id: number;
-
-  @IsNotEmpty()
-  @IsString()
-  image: string;
-
-  @IsString()
-  @IsNotEmpty({ message: "password is not empty" })
-  @MinLength(8)
-  password: string;
-  
 }
 
 export class DTOStudentById {

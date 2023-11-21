@@ -32,6 +32,7 @@ export class UserService {
         role: "instructor",
         password: hashedPassword,
       });
+      
       await createUser.addEkskul(ekskuls);
 
       if (!createUser)

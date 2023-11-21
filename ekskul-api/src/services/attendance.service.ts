@@ -1,7 +1,6 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { verifyToken } from "../libs/jwt.lib";
 import { exportExcel } from "../libs/excel.lib";
 import { ISession } from "../interfaces/user.interface";
 
@@ -148,9 +147,9 @@ export class AttendanceService {
         ];
 
         const attendanceFilter = await db.attendance.findAll(paramQuerySQL);
-        const attendances = await db.attendance.findAll({
-          attributes: ["id", "name"],
-        });
+        // const attendances = await db.attendance.findAll({
+        //   attributes: ["id"],
+        // });
 
         if (!attendanceFilter || attendanceFilter.length === 0) {
           return Promise.resolve(
@@ -164,8 +163,8 @@ export class AttendanceService {
         const modifiedAttendances = attendanceFilter.map((attendance) => {
           return {
             id: attendance.id,
-            ekskul_id: attendance.ekskul.name,
-            student_id: attendance.student.name,
+            ekskul: attendance.ekskul.name,
+            student: attendance.student.name,
             category: attendance.category,
             date: attendance.date,
             createdAt: attendance.createdAt,
@@ -174,10 +173,12 @@ export class AttendanceService {
         });
 
         return Promise.resolve(
-          apiResponse(status.OK, "Fetched all attendances success", {
-            modifiedAttendances,
-            attendances,
-          })
+          apiResponse(
+            status.OK,
+            "Fetched all attendances success",
+            modifiedAttendances
+            // attendances,
+          )
         );
       } else {
         throw apiResponse(

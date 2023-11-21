@@ -76,18 +76,20 @@ export class RayonService {
       }
 
       const rayonFilter = await db.rayon.findAll(paramQuerySQL);
-      const rayons = await db.rayon.findAll({
-        attributes: ["id", "name"],
-      });
+      // const rayons = await db.rayon.findAll({
+      //   attributes: ["id", "name"],
+      // });
 
       if (!rayonFilter)
         throw apiResponse(status.NOT_FOUND, "Rayons do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all rayons success", {
-          rayonFilter,
-          rayons,
-        })
+        apiResponse(
+          status.OK,
+          "Fetched all rayons success",
+          rayonFilter
+          // rayons,
+        )
       );
     } catch (error: any) {
       return Promise.reject(

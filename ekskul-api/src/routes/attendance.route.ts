@@ -6,7 +6,6 @@ import { authorization } from "../middlewares/authorization";
 import { validator } from "../middlewares/validator.middleware";
 import { DTOAttendance, DTOAttendanceById } from "../dto/attendance.dto";
 
-
 // class RouteUsers mengextends dari AttendanceController agar bisa memakai semua property dan method dari attendance controller
 class AttendanceRoutes extends AttendanceController {
   private router: Router;
@@ -19,7 +18,12 @@ class AttendanceRoutes extends AttendanceController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOAttendance)],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        // validator(DTOAttendance),
+      ],
       this.createAttendance
     );
     this.router.get(
@@ -29,7 +33,12 @@ class AttendanceRoutes extends AttendanceController {
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOAttendance)],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        validator(DTOAttendance),
+      ],
       this.updateAttendance
     );
 

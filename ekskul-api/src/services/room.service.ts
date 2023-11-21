@@ -1,18 +1,16 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { Op, where } from "sequelize";
+import { Op } from "sequelize";
 
 // Berfungsi untuk menghandle logic dari controler
 
-const db = require("../db/models");
+const db = require("../db/models/index.js");
 
 export class RoomService {
   async createRoomService(req: Request): Promise<any> {
     try {
-      const room = await db.room.findOne({
-        where: { name: req.body.name },
-      });
+      const room = await db.room.findOne({ where: { name: req.body.name } });
 
       if (room)
         throw apiResponse(
@@ -25,7 +23,9 @@ export class RoomService {
       if (!createRoom)
         throw apiResponse(status.FORBIDDEN, "Create new room failed");
 
-      return Promise.resolve(apiResponse(status.OK, "Create new room success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Create new room success")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -76,18 +76,20 @@ export class RoomService {
       }
 
       const roomFilter = await db.room.findAll(paramQuerySQL);
-      const rooms = await db.room.findAll({
-        attributes: ["id", "name"],
-      });
+      // const rooms = await db.room.findAll({
+      //   attributes: ["id", "name"],
+      // });
 
       if (!roomFilter)
         throw apiResponse(status.NOT_FOUND, "Rooms do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all rooms success", {
-          roomFilter,
-          rooms,
-        })
+        apiResponse(
+          status.OK,
+          "Fetched all rooms success",
+          roomFilter
+          // rooms,
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -132,9 +134,22 @@ export class RoomService {
           "Room do not exist for the given id"
         );
 
-      const updateRoom = await db.room.update(req.body, {where: {
-        id: roomExist.id,
-      }});
+      const roomSame = await db.room.findOne({
+        where: { name: req.body.name },
+      });
+
+      if (roomSame && roomSame.id !== roomExist.id) {
+        throw apiResponse(
+          status.CONFLICT,
+          `Room with the name ${req.body.name} already exists`
+        );
+      }
+
+      const updateRoom = await db.room.update(req.body, {
+        where: {
+          id: roomExist.id,
+        },
+      });
 
       if (!updateRoom)
         throw apiResponse(status.FORBIDDEN, "Update room failed");

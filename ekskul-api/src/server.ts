@@ -54,7 +54,7 @@ export class App {
     this.app.use(compression());
     this.app.use(morgan("dev"));
     this.app.use(nocache());
-    this.app.enable("trust proxy")
+    this.app.enable("trust proxy");
     this.app.use(hpp({ checkBody: true, checkQuery: true }));
     this.app.use(helmet({ contentSecurityPolicy: true }));
     if (!["production", "test"].includes(this.env)) {
@@ -76,13 +76,13 @@ export class App {
         credentials: true,
       })
     );
-    this.app.use(
-      rateLimit({
-        windowMs: 24 * 60 * 3,
-        max: 1000,
-        message: "Too many request, send back request after 3 minute",
-      })
-    );
+    // this.app.use(
+    //   rateLimit({
+    //     windowMs: 24 * 60 * 3,
+    //     max: 1000,
+    //     message: "Too many request, send back request after 3 minute",
+    //   })
+    // );
     this.app.use(
       SlowDown({
         windowMs: 24 * 60 * 1,
@@ -101,7 +101,7 @@ export class App {
     this.app.use(`${this.version}/ekskul`, EkskulRoutes);
     this.app.use(`${this.version}/student`, StudentRoutes);
     this.app.use(`${this.version}/user`, UserRoutes);
-    this.app.use(`${this.version}/activityProgram`, ActivityProgramRoutes);
+    this.app.use(`${this.version}/activity-program`, ActivityProgramRoutes);
     this.app.use(`${this.version}/schedule`, ScheduleRoutes);
     this.app.use(`${this.version}/gallery`, GalleryRoutes);
     this.app.use(`${this.version}/room`, RoomRoutes);
@@ -109,7 +109,7 @@ export class App {
     this.app.use(`${this.version}/task`, TaskRoute);
     this.app.use(`${this.version}/activity`, ActivityRoute);
     this.app.use(
-      `${this.version}/instructorAttendance`,
+      `${this.version}/instructor-attendance`,
       InstructorAttendanceRoute
     );
   }

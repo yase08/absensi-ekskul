@@ -2,12 +2,7 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
-import { Session } from "express-session";
-import { verifyToken } from "../libs/jwt.lib";
-
-interface ISession extends Session {
-  user: any;
-}
+import { ISession } from "../interfaces/user.interface";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -82,6 +77,19 @@ export class InstructorAttendanceService {
         };
       }
 
+      paramQuerySQL.include = [
+        {
+          model: db.user,
+          as: "user",
+          attributes: ["name"],
+        },
+        {
+          model: db.ekskul,
+          as: "ekskul",
+          attributes: ["name"],
+        },
+      ];
+
       if (sort) {
         const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
         const fieldName = sort.replace(/^-/, "");
@@ -112,18 +120,31 @@ export class InstructorAttendanceService {
       const instructorAttendanceFilter = await db.instructorAttendance.findAll(
         paramQuerySQL
       );
-      const instructors = await db.instructorAttendance.findAll({
-        attributes: ["id", "name"],
-      });
+      // const instructors = await db.instructorAttendance.findAll({
+      //   attributes: ["id"],
+      // });
 
       if (!instructorAttendanceFilter)
         throw apiResponse(status.NOT_FOUND, "Instructors do not exist");
 
+      const manipulatedResponse = instructorAttendanceFilter.map((item) => {
+        return {
+          id: item.id,
+          category: item.category,
+          user: item.user ? item.user.name : null,
+          ekskul: item.user ? item.ekskul.name : null,
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+        };
+      });
+
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all instructor success", {
-          instructorAttendanceFilter,
-          instructors,
-        })
+        apiResponse(
+          status.OK,
+          "Fetched all instructor success",
+          manipulatedResponse
+          // instructors,
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -178,7 +199,9 @@ export class InstructorAttendanceService {
           "Instructors do not exist for the given id"
         );
 
-      const updateInstructor = await db.instructorAttendance.update(req.body);
+      const updateInstructor = await db.instructorAttendance.update(req.body, {
+        where: { id: instructorExist.id },
+      });
 
       if (!updateInstructor)
         throw apiResponse(status.FORBIDDEN, "Update instructor failed");
