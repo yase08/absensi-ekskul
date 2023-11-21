@@ -31,6 +31,11 @@ class AttendanceRoutes extends AttendanceController {
       [authorization(), auth(), permission(["instructor", "admin"])],
       this.getAllAttendance
     );
+    this.router.get(
+      "/charts/weekly",
+      [authorization(), auth(), permission(["admin"])],
+      this.getWeeklyAttendanceChart
+    );
     this.router.put(
       "/:id",
       [

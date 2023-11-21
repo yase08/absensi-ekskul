@@ -7,7 +7,6 @@ import { upload } from "../libs/multer.lib";
 import { validator } from "../middlewares/validator.middleware";
 import { DTOGallery, DTOGalleryById } from "../dto/gallery.dto";
 
-
 // class RouteUsers mengextends dari GalleryController agar bisa memakai semua property dan method dari gallery controller
 class GalleryRoutes extends GalleryController {
   private router: Router;
