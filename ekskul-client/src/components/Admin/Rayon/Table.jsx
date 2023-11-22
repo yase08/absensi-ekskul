@@ -1,32 +1,28 @@
-import { useState, useEffect } from 'react';
-import { deleteRayon, getAllRayon } from '../../../services/rayon.service';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch, AiOutlineFileSearch } from 'react-icons/ai';
-import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { IoIosOptions } from 'react-icons/io';
-import { useDebouncedCallback } from 'use-debounce';
-import Swal from 'sweetalert2';
+import { useState, useEffect } from "react";
+import { deleteRayon, getAllRayon } from "../../../services/rayon.service";
+import {
+  AiOutlineArrowDown,
+  AiOutlineArrowUp,
+  AiOutlineSearch,
+} from "react-icons/ai";
+import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { useDebouncedCallback } from "use-debounce";
+import Swal from "sweetalert2";
 
 const TableEskul = ({ setFormOld }) => {
   const [data, setData] = useState([]);
-  const [filter, setFilter] = useState('');
-  const [sort, setSort] = useState('');
-  const [search, setSearch] = useState('');
-  const [changeFitur, setChangeFitur] = useState('');
-  const [size, setSize] = useState('10');
-  const [number, setNumber] = useState('1');
+  const [filter, setFilter] = useState("");
+  const [sort, setSort] = useState("");
+  const [search, setSearch] = useState("");
+  const [size, setSize] = useState("10");
+  const [number, setNumber] = useState("1");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [getAllData, setGetAllData] = useState(0);
   // const [rayonOptions, setRayonOptions] = useState([]);
-  const [loadingOption, setLoadingOption] = useState(false);
 
   const ToggleHandleSearch = () => {
     setSearch(!search);
-  };
-
-  const ToggleHandleChange = () => {
-    setChangeFitur(!changeFitur);
-    setSearch(false);
   };
 
   const debounced = useDebouncedCallback(
@@ -43,7 +39,7 @@ const TableEskul = ({ setFormOld }) => {
   //   setFilter(e.target.value);
   // };
 
-  const totalPages = Math.ceil(data.length / size); // Calculate total pages
+  const totalPages = Math.ceil(getAllData / size); // Calculate total pages
 
   const handlePrevPage = () => {
     if (number > 1) {
@@ -65,7 +61,7 @@ const TableEskul = ({ setFormOld }) => {
         <button
           key={i}
           className={`w-[40px] h-[40px] bg-primary rounded-md ${
-            i === number ? 'bg-blue-600' : 'hover:bg-blue-400'
+            i === number ? "bg-blue-600" : "hover:bg-blue-400"
           }`}
           onClick={() => setNumber(i)}
         >
@@ -78,7 +74,7 @@ const TableEskul = ({ setFormOld }) => {
   };
 
   const DescAndAsc = () => {
-    setSort(sort === '-id' ? '' : '-id');
+    setSort(sort === "-id" ? "" : "-id");
   };
 
   const pageSizeOptions = [10, 25, 50];
@@ -95,7 +91,7 @@ const TableEskul = ({ setFormOld }) => {
       const response = await getAllRayon({ filter, sort, size, number });
 
       if (response && response.data) {
-        console.log('API Response:', response.data);
+        console.log("API Response:", response.data);
         console.log(response);
 
         if (Array.isArray(response.data)) {
@@ -104,14 +100,12 @@ const TableEskul = ({ setFormOld }) => {
 
           // Filter the rayon options based on your criteria
           // Set the total data count
-          if (data.length === 0) {
-            setGetAllData(response.data.length);
-          }
+          setGetAllData(response.option);
         } else {
-          setError(new Error('Data is not an array'));
+          setError(new Error("Data is not an array"));
         }
       } else {
-        setError(new Error('Data retrieval failed'));
+        setError(new Error("Data retrieval failed"));
       }
     } catch (error) {
       setError(error);
@@ -124,39 +118,39 @@ const TableEskul = ({ setFormOld }) => {
     // event.preventDefault();
     setLoading(true);
 
-     try {
+    try {
       const response = await deleteRayon(id);
       const successMessage = response.statusMessage;
 
       Swal.fire({
-        icon: 'success',
-        title: 'Success!',
+        icon: "success",
+        title: "Success!",
         text: successMessage,
       });
 
-      handleGetRequest()
-      console.log('Response:', response.data);
+      handleGetRequest();
+      console.log("Response:", response.data);
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
 
       if (error.response) {
         const errorMessage = error.response.statusMessage;
         Swal.fire({
-          icon: 'error',
-          title: 'Error!',
+          icon: "error",
+          title: "Error!",
           text: errorMessage,
         });
       } else if (error.request) {
         Swal.fire({
-          icon: 'error',
-          title: 'Error!',
-          text: 'No response received from the server.',
+          icon: "error",
+          title: "Error!",
+          text: "No response received from the server.",
         });
       } else {
         Swal.fire({
-          icon: 'error',
-          title: 'Error!',
-          text: 'An unexpected error occurred.',
+          icon: "error",
+          title: "Error!",
+          text: "An unexpected error occurred.",
         });
       }
     } finally {
@@ -165,24 +159,6 @@ const TableEskul = ({ setFormOld }) => {
   };
 
   // setRayonOptions(['', ...data.map((item) => item.name)]);
-
-  const handleFilterChange = async (selectedOption) => {
-    setLoadingOption(true); // Set loading state to true
-    setFilter(selectedOption);
-    // setGetAllData(data.length)
-    // setNumber(1); // Reset the current page to the first page when the filter changes
-
-    try {
-      // Perform data fetching here
-      // Once the data is ready, set loadingOption to false
-      setLoadingOption(false);
-    } catch (error) {
-      // Handle errors if data fetching fails
-      setLoadingOption(false); // Ensure that loading is set to false in case of an error
-      console.error('Error fetching data:', error);
-    }
-  };
-
   useEffect(() => {
     handleGetRequest();
   }, [filter, sort, size, number]);
@@ -212,57 +188,32 @@ const TableEskul = ({ setFormOld }) => {
         <table className="min-w-full border-collapse w-full bg-transparent">
           <thead>
             <tr>
-              <th className="w-1/6 flex items-center gap-1 px-6 py-3 white text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
-                Rayon
+            <th className="px-6 py-3 flex text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
+                No
                 <button onClick={DescAndAsc}>
                   {sort ? <AiOutlineArrowUp /> : <AiOutlineArrowDown />}
                 </button>
               </th>
-              <th></th>
-              <th></th>
-              <th className="text-right pr-6 flex bg-transparent justify-end">
+              <th className="px-6 py-3 text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
+                Rayon
+              </th>
+              <th className="text-right bg-transparent">
                 <input
                   type="text"
                   placeholder="Search Here..."
-                  className={`bg-transparent border-b border-black outline-none transition-all duration-500 ${
-                    search ? 'w-[150px]' : 'w-0'
+                  className={`bg-transparent border-b border-black outline-none relative transition-all duration-500 ${
+                    search ? "w-[150px]" : "w-0"
                   }`}
                   // value={}
                   onChange={(e) => debounced(e.target.value)}
                 />
                 <button
-                  className={`mx-3 p-2 border rounded-full border-black hover:bg-black hover:text-white ${
-                    changeFitur ? '' : 'hidden'
+                  className={`mx-3 p-2 border rounded-full border-black hover:bg-black hover:text-white 
                   }`}
                   onClick={ToggleHandleSearch}
                 >
                   <AiOutlineSearch />
                 </button>
-                <div className="flex">
-                  <button
-                    onClick={ToggleHandleChange}
-                    className={`p-2 flex justify-center items-center  border-black ${
-                      changeFitur ? 'border rounded-md' : 'border-y border-l rounded-l-md'
-                    }`}
-                  >
-                    <AiOutlineFileSearch className={` ${changeFitur ? '' : 'mr-2'}`} />
-                  </button>
-                  <select
-                    name=""
-                    id=""
-                    className={`border-black outline-none py-1 rounded-r-md w-[85px] ${
-                      changeFitur ? 'hidden ' : 'border-r border-y'
-                    }`}
-                    value={filter}
-                    onChange={(e) => handleFilterChange(e.target.value)}
-                  >
-                    {/* {rayonOptions.map((option, index) => (
-                      <option key={index} value={option}>
-                        {loadingOption ? 'Loading...' : option}
-                      </option>
-                    ))} */}
-                  </select>
-                </div>
               </th>
             </tr>
           </thead>
@@ -271,20 +222,23 @@ const TableEskul = ({ setFormOld }) => {
               data.map((item, index) => (
                 <tr key={index} className="border-b hover:bg-gray-200">
                   <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
+                    {index + 1}
+                  </td>
+                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
                     {item.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-no-wrap"></td>
-                  <td className="px-6 py-4 whitespace-no-wrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      {/* Customize content here */}
-                    </span>
-                  </td>
                   <td className="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                    <button className="text-indigo-600 hover:text-indigo-900" onClick={() => setFormOld(item)}>
+                    <button
+                      className="text-indigo-600 hover:text-indigo-900"
+                      onClick={() => setFormOld(item)}
+                    >
                       Edit
                     </button>
                     <span className="px-2">|</span>
-                    <button className="text-red-600 hover:text-red-900 cursor-pointer" onClick={() => handleDeleteRequest(item.id)}>
+                    <button
+                      className="text-red-600 hover:text-red-900 cursor-pointer"
+                      onClick={() => handleDeleteRequest(item.id)}
+                    >
                       Delete
                     </button>
                   </td>
@@ -305,7 +259,7 @@ const TableEskul = ({ setFormOld }) => {
               <button className="text-black" onClick={handlePrevPage}>
                 <BiLeftArrow />
               </button>
-              {totalPages > 1 && generatePaginationButtons()}
+              {totalPages >= 1 && generatePaginationButtons()}
               <button className="text-black" onClick={handleNextPage}>
                 <BiRightArrow />
               </button>

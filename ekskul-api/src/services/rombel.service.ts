@@ -51,7 +51,7 @@ export class RombelService {
       let limit: number;
       let offset: number;
 
-      const totalRows = await db.activity.count();
+      const totalRows = await db.rombel.count();
 
       if (filter) {
         paramQuerySQL.where = {
