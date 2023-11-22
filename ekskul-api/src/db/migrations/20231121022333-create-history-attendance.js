@@ -2,19 +2,21 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("instructorAttendances", {
+    await queryInterface.createTable("historyAttendances", {
       id: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
-      instructor_id: {
-        type: Sequelize.UUID,
-        references: {
-          model: "users",
-          key: "id",
-        },
+      totalAttendance: {
+        type: Sequelize.INTEGER,
+      },
+      startDate: {
+        type: Sequelize.DATE,
+      },
+      endDate: {
+        type: Sequelize.DATE,
       },
       ekskul_id: {
         type: Sequelize.UUID,
@@ -22,9 +24,6 @@ module.exports = {
           model: "ekskuls",
           key: "id",
         },
-      },
-      category: {
-        type: Sequelize.ENUM("hadir", "sakit", "izin", "alpa"),
       },
       createdAt: {
         allowNull: false,
@@ -37,6 +36,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("instructorAttendances");
+    await queryInterface.dropTable("historyAttendances");
   },
 };

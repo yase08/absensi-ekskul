@@ -1,17 +1,19 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class room extends Model {
+  class historyAttendance extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.belongsTo(models.ekskul, {
+        foreignKey: "ekskul_id",
+      });
     }
   }
-  room.init(
+  historyAttendance.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -19,12 +21,18 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
       },
-      name: DataTypes.STRING,
+      totalAttendance: DataTypes.INTEGER,
+      startDate: DataTypes.DATE,
+      endDate: DataTypes.DATE,
+      ekskul_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
     },
     {
       sequelize,
-      modelName: "room",
+      modelName: "historyAttendance",
     }
   );
-  return room;
+  return historyAttendance;
 };

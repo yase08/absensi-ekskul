@@ -69,6 +69,8 @@ export class GalleryService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.gallery.count();
+
       if (filter) {
         paramQuerySQL.where = {
           name: {
@@ -103,15 +105,12 @@ export class GalleryService {
         paramQuerySQL.offset = offset;
       }
 
-      const galleryFilter = await db.gallery.findAll(paramQuerySQL);
-      // const galleries = await db.gallery.findAll({
-      //   attributes: ["id", "name"],
-      // });
+      const gallery = await db.gallery.findAll(paramQuerySQL);
 
-      if (!galleryFilter)
+      if (!gallery)
         throw apiResponse(status.NOT_FOUND, "Gallery do not exist");
 
-      const manipulatedGallery = galleryFilter.map((item) => {
+      const manipulatedGallery = gallery.map((item) => {
         return {
           id: item.id,
           name: item.name,
@@ -127,8 +126,8 @@ export class GalleryService {
         apiResponse(
           status.OK,
           "Fetched all gallery success",
-          manipulatedGallery
-          // galleries,
+          manipulatedGallery,
+          totalRows,
         )
       );
     } catch (error: any) {

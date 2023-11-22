@@ -49,6 +49,8 @@ export class RayonService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.rayon.count();
+
       if (filter) {
         paramQuerySQL.where = {
           name: {
@@ -75,21 +77,12 @@ export class RayonService {
         paramQuerySQL.offset = offset;
       }
 
-      const rayonFilter = await db.rayon.findAll(paramQuerySQL);
-      // const rayons = await db.rayon.findAll({
-      //   attributes: ["id", "name"],
-      // });
+      const rayon = await db.rayon.findAll(paramQuerySQL);
 
-      if (!rayonFilter)
-        throw apiResponse(status.NOT_FOUND, "Rayons do not exist");
+      if (!rayon) throw apiResponse(status.NOT_FOUND, "Rayons do not exist");
 
       return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Fetched all rayons success",
-          rayonFilter
-          // rayons,
-        )
+        apiResponse(status.OK, "Fetched all rayons success", rayon, totalRows)
       );
     } catch (error: any) {
       return Promise.reject(

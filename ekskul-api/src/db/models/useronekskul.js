@@ -13,8 +13,20 @@ module.exports = (sequelize, DataTypes) => {
   }
   userOnEkskul.init(
     {
-      user_id: DataTypes.INTEGER,
-      ekskul_id: DataTypes.INTEGER,
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
+      user_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      ekskul_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
     },
     {
       sequelize,

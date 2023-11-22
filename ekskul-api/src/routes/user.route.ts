@@ -5,6 +5,7 @@ import { permission } from "../middlewares/permission";
 import { authorization } from "../middlewares/authorization";
 import { validator } from "../middlewares/validator.middleware";
 import { DTOUser, DTOUserById } from "../dto/user.dto";
+import { upload } from "../libs/multer.lib";
 
 // class RouteUsers mengextends dari UserController agar bisa memakai semua property dan method dari user controller
 class UserRoutes extends UserController {
@@ -18,13 +19,24 @@ class UserRoutes extends UserController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin"]), validator(DTOUser)],
+      [
+        authorization(),
+        auth(),
+        permission(["admin"]),
+        // validator(DTOUser),
+        upload.single("image"),
+      ],
       this.createUser
     );
     this.router.get(
       "/",
       [authorization(), auth(), permission(["admin"])],
       this.getAllUser
+    );
+    this.router.get(
+      "/admin",
+      [authorization(), auth(), permission(["admin"])],
+      this.getAllAdmin
     );
     this.router.get(
       "/:id",
@@ -38,7 +50,13 @@ class UserRoutes extends UserController {
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"]), validator(DTOUser)],
+      [
+        authorization(),
+        auth(),
+        permission(["admin"]),
+        validator(DTOUser),
+        upload.single("images"),
+      ],
       this.updateUser
     );
     this.router.delete(

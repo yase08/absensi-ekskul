@@ -5,19 +5,22 @@ module.exports = {
     await queryInterface.createTable("studentOnEkskuls", {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
+        unique: true,
       },
       student_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        allowNull: false,
         references: {
           model: "students",
           key: "id",
         },
       },
       ekskul_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        allowNull: false,
         references: {
           model: "ekskuls",
           key: "id",

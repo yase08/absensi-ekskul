@@ -24,10 +24,28 @@ module.exports = (sequelize, DataTypes) => {
   }
   activity.init(
     {
-      schedule_id: DataTypes.INTEGER,
-      rombel_id: DataTypes.INTEGER,
-      room_id: DataTypes.INTEGER,
-      ekskul_id: DataTypes.INTEGER,
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
+      schedule_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      rombel_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      room_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      ekskul_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
       startTime: DataTypes.STRING,
       endTime: DataTypes.STRING,
     },

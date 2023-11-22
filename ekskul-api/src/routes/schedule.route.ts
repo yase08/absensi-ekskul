@@ -21,32 +21,12 @@ class ScheduleRoutes extends ScheduleController {
       [authorization(), auth(), permission(["admin"]), validator(DTOSchedule)],
       this.createSchedule
     );
-    this.router.post(
-      "/activity",
-      [authorization(), auth(), permission(["admin"]), validator(DTOActivity)],
-      this.createActivityOnSchedule
-    );
-    this.router.put(
-      "/activity/:id",
-      [authorization(), auth(), permission(["admin"]), validator(DTOActivity)],
-      this.updateActivityOnSchedule
-    );
-    this.router.delete(
-      "/activity/:id",
-      [
-        authorization(),
-        auth(),
-        permission(["admin"]),
-        validator(DTOActivityById),
-      ],
-      this.deleteActivityOnSchedule
-    );
     this.router.get(
       "/",
       [authorization(), auth(), permission(["admin"])],
       this.getAllSchedule
     );
-    this.router.get("/data", this.getSchedule);
+    this.router.get("/ekskul", this.getSchedule);
 
     return this.router;
   }

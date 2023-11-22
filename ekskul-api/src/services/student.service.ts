@@ -2,6 +2,7 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
+import { v4 as uuidv4 } from "uuid";
 
 // Berfungsi untuk menghandle logic dari controler
 const db = require("../db/models/index.js");
@@ -24,7 +25,20 @@ export class StudentService {
       });
 
       const createStudent = await db.student.create(req.body);
-      await createStudent.addEkskul(ekskuls);
+
+      Promise.all(
+        ekskuls.map(async (ekskul) => {
+          try {
+            const createStudentEkskuls = await db.studentOnEkskul.create({
+              student_id: createStudent.id,
+              ekskul_id: ekskul.id,
+            });
+            return createStudentEkskuls;
+          } catch (error) {
+            console.error(error);
+          }
+        })
+      );
 
       if (!createStudent)
         throw apiResponse(status.FORBIDDEN, "Create new student failed");
@@ -33,6 +47,7 @@ export class StudentService {
         apiResponse(status.OK, "Create new student success")
       );
     } catch (error: any) {
+      console.log(error);
       return Promise.reject(
         apiResponse(
           error.statusCode || status.INTERNAL_SERVER_ERROR,
@@ -76,6 +91,8 @@ export class StudentService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.student.count();
+
       if (filter) {
         paramQuerySQL.where = {
           name: {
@@ -102,15 +119,12 @@ export class StudentService {
         paramQuerySQL.offset = offset;
       }
 
-      const studentFilter = await db.student.findAll(paramQuerySQL);
-      // const students = await db.student.findAll({
-      //   attributes: ["id", "name"],
-      // });
+      const student = await db.student.findAll(paramQuerySQL);
 
-      if (!studentFilter)
+      if (!student)
         throw apiResponse(status.NOT_FOUND, "Students do not exist");
 
-      const manipulatedStudent = studentFilter.map((student: any) => {
+      const manipulatedStudent = student.map((student: any) => {
         return {
           id: student.id,
           name: student.name,
@@ -135,8 +149,8 @@ export class StudentService {
         apiResponse(
           status.OK,
           "Fetched all students success",
-          manipulatedStudent
-          // students,
+          manipulatedStudent,
+          totalRows
         )
       );
     } catch (error: any) {

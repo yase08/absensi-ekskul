@@ -17,9 +17,7 @@ export function validator(MetaType: ClassConstructor<any>): Handler {
     Object.assign(property, req.body, req.params, req.query);
 
     const object: Record<string, any> = plainToClass(MetaType, property);
-    console.log(object);
     const errorsResponse: ValidationError[] = await validate(object);
-    console.log(errorsResponse);
 
     const errorMessage = errorsResponse.map((val: ValidationError) =>
       apiResponse(400, Object.values(val.constraints!)[0])

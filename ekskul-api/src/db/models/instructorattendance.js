@@ -18,7 +18,16 @@ module.exports = (sequelize, DataTypes) => {
   }
   instructorAttendance.init(
     {
-      instructor_id: DataTypes.INTEGER,
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
+      instructor_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
       category: DataTypes.ENUM("hadir", "sakit", "izin", "alpa"),
     },
     {

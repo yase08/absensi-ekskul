@@ -40,6 +40,8 @@ export class ActivityService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.activity.count();
+
       paramQuerySQL.include = [
         { model: db.rombel, as: "rombel", attributes: ["name"] },
         { model: db.room, as: "room", attributes: ["name"] },
@@ -71,9 +73,9 @@ export class ActivityService {
         };
       }
 
-      const activityFilter = await db.activity.findAll(paramQuerySQL);
+      const activity = await db.activity.findAll(paramQuerySQL);
 
-      const manipulatedActivity = activityFilter.map((activity) => {
+      const manipulatedActivity = activity.map((activity) => {
         return {
           id: activity.id,
           startTime: activity.startTime,
@@ -87,7 +89,7 @@ export class ActivityService {
         };
       });
 
-      if (!activityFilter || activityFilter.length === 0) {
+      if (!activity || activity.length === 0) {
         throw apiResponse(status.NOT_FOUND, "Activities do not exist");
       }
 
@@ -95,7 +97,8 @@ export class ActivityService {
         apiResponse(
           status.OK,
           "Fetched all activities success",
-          manipulatedActivity
+          manipulatedActivity,
+          totalRows
         )
       );
     } catch (error: any) {

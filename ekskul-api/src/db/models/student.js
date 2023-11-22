@@ -22,12 +22,24 @@ module.exports = (sequelize, DataTypes) => {
   }
   student.init(
     {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
       name: DataTypes.STRING,
       nis: DataTypes.STRING,
       email: DataTypes.STRING,
       mobileNumber: DataTypes.STRING,
-      rombel_id: DataTypes.INTEGER,
-      rayon_id: DataTypes.INTEGER,
+      rombel_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      rayon_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
     },
     {
       sequelize,

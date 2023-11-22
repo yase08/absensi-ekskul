@@ -1,7 +1,7 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
 import { Transform } from "class-transformer";
-import { IsNotEmpty, IsString, IsInt, IsArray } from "class-validator";
+import { IsNotEmpty, IsString, IsInt, IsArray, IsUUID } from "class-validator";
 
 export class DTOGallery {
   @IsNotEmpty()
@@ -17,8 +17,8 @@ export class DTOGallery {
   images: Array<string>;
 
   @IsNotEmpty()
-  @IsInt()
-  ekskul_id: number;
+  @IsUUID()
+  ekskul_id: string;
 }
 
 export class DTOGalleryById {

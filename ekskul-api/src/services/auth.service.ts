@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { createPasswordResetToken, hashToken } from "../libs/crypto.libs";
 import { sendMailer } from "../libs/nodemailer.lib";
 import { Op } from "sequelize";
+import { ISession } from "@/interfaces/user.interface";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -28,6 +29,8 @@ export class AuthService {
       if (!hashedPassword)
         throw apiResponse(status.BAD_REQUEST, "Incorect email or password");
 
+      await db.user.update({ isActive: true }, { where: { id: user.id } });
+
       const userOnEkskul = await db.userOnEkskul.findAll({
         where: { user_id: user.id },
       });
@@ -48,6 +51,58 @@ export class AuthService {
 
       return Promise.resolve(
         apiResponse(status.OK, "Login success", token, undefined)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async logoutService(req: Request): Promise<any> {
+    try {
+      const user_Id = (req.session as ISession).user.id;
+
+      if (!user_Id)
+        throw apiResponse(status.BAD_REQUEST, "You are not logged in");
+
+      await db.user.update({ isActive: false }, { where: { id: user_Id } });
+      req.session["user"] = null;
+
+      return Promise.resolve(apiResponse(status.OK, "Logout success"));
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getCountService(req: Request): Promise<any> {
+    try {
+      const adminCount = await db.user.count({ where: { role: "admin" } });
+      const instructorCount = await db.user.count({
+        where: { role: "instructor" },
+      });
+      const studentCount = await db.student.count();
+      const activeUserCount = await db.user.count({
+        where: { isActive: true },
+      });
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Get count of admin, instructor, student, and active user success", {
+          adminCount,
+          instructorCount,
+          studentCount,
+          activeUserCount,
+        })
       );
     } catch (error: any) {
       return Promise.reject(

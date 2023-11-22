@@ -23,8 +23,6 @@ export const permission = (allowedRoles: string[]): Handler => {
         decodedToken["role"].includes(role)
       );
 
-      console.log(decodedToken["role"]);
-
       if (!isAllowed) {
         throw apiResponse(status.UNAUTHORIZED, "Your role is not allowed");
       }

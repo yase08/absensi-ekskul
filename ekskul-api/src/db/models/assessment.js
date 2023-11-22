@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class assessment extends Model {
     /**
@@ -19,13 +17,28 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  assessment.init({
-    grade: DataTypes.INTEGER,
-    task_id: DataTypes.INTEGER,
-    student_id: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'assessment',
-  });
+  assessment.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
+      grade: DataTypes.INTEGER,
+      task_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      student_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+    },
+    {
+      sequelize,
+      modelName: "assessment",
+    }
+  );
   return assessment;
 };

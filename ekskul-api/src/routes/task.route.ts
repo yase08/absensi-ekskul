@@ -18,7 +18,7 @@ class TaskRoutes extends TaskController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["instructor"]), validator(DTOTask)],
+      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOTask)],
       this.createTask
     );
     this.router.get(

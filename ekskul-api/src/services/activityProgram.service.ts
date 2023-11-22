@@ -54,6 +54,8 @@ export class ActivityProgramService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.activityProgram.count();
+
       if (filter) {
         paramQuerySQL.where = {
           activity: {
@@ -80,22 +82,18 @@ export class ActivityProgramService {
         paramQuerySQL.offset = offset;
       }
 
-      const activityProgramFilter = await db.activityProgram.findAll(
+      const activityProgram = await db.activityProgram.findAll(
         paramQuerySQL
       );
 
-      const activityPrograms = await db.activityProgram.findAll({
-        attributes: ["id", "activity"],
-      });
-
-      if (!activityProgramFilter)
+      if (!activityProgram)
         throw apiResponse(status.NOT_FOUND, "Activity program do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all activity program success", {
-          activityProgramFilter,
-          activityPrograms,
-        })
+        apiResponse(status.OK, "Fetched all activity program success", 
+          activityProgram,
+          totalRows
+        )
       );
     } catch (error: any) {
       return Promise.reject(

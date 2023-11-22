@@ -15,6 +15,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   schedule.init(
     {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
       day: DataTypes.STRING,
     },
     {

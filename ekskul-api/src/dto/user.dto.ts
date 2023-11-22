@@ -8,6 +8,7 @@ import {
   MaxLength,
   MinLength,
   IsInt,
+  IsOptional,
 } from "class-validator";
 
 export class DTOUser {
@@ -25,9 +26,9 @@ export class DTOUser {
   @MaxLength(13)
   mobileNumber: string;
 
-  @IsNotEmpty()
   @IsString()
-  image: string;
+  @IsOptional()
+  image?: string;
 
   @IsString()
   @IsNotEmpty({ message: "password is not empty" })

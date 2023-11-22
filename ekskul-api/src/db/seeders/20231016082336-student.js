@@ -1,5 +1,6 @@
 "use strict";
 
+const { v4: uuidv4 } = require("uuid");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -8,6 +9,7 @@ module.exports = {
       "students",
       [
         {
+          id: uuidv4(),
           name: "Ujang",
           nis: "1210002",
           email: "ujang@gmail.com",
@@ -18,6 +20,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           name: "Mamat",
           nis: "1210003",
           email: "mamat@gmail.com",
@@ -28,6 +31,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           name: "Udin",
           nis: "1210004",
           email: "udin@gmail.com",
@@ -38,6 +42,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           name: "Budi",
           nis: "1210005",
           email: "budi@gmail.com",
@@ -48,6 +53,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           name: "Alif",
           nis: "1210006",
           email: "alif@gmail.com",
@@ -58,6 +64,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           name: "Fadhil",
           nis: "1210007",
           email: "fadhil@gmail.com",
@@ -78,6 +85,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           name: "Rio",
           nis: "1210009",
           email: "rio@gmail.com",
@@ -88,6 +96,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           name: "Alam",
           nis: "12100010",
           email: "alam@gmail.com",
