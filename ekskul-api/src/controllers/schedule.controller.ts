@@ -15,45 +15,6 @@ export class ScheduleController extends ScheduleService {
     }
   };
 
-  createActivityOnSchedule = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
-    try {
-      const serviceResponse: APIResponse =
-        await this.createActivityOnScheduleService(req);
-      return res.status(serviceResponse.statusCode).json(serviceResponse);
-    } catch (error: any) {
-      return res.status(error.statusCode).json(error);
-    }
-  };
-
-  updateActivityOnSchedule = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
-    try {
-      const serviceResponse: APIResponse =
-        await this.updateActivityOnScheduleService(req);
-      return res.status(serviceResponse.statusCode).json(serviceResponse);
-    } catch (error: any) {
-      return res.status(error.statusCode).json(error);
-    }
-  };
-
-  deleteActivityOnSchedule = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
-    try {
-      const serviceResponse: APIResponse =
-        await this.deleteActivityOnScheduleService(req);
-      return res.status(serviceResponse.statusCode).json(serviceResponse);
-    } catch (error: any) {
-      return res.status(error.statusCode).json(error);
-    }
-  };
-
   getAllSchedule = async (req: Request, res: Response): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.getAllScheduleService(

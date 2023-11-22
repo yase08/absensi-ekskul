@@ -7,6 +7,7 @@ import {
   IsInt,
   IsEmail,
   MaxLength,
+  IsUUID,
 } from "class-validator";
 
 export class DTOStudent {
@@ -30,12 +31,12 @@ export class DTOStudent {
   mobileNumber: string;
 
   @IsNotEmpty()
-  @IsInt()
-  rombel_id: number;
+  @IsUUID()
+  rombel_id: string;
 
   @IsNotEmpty()
-  @IsInt()
-  rayon_id: number;
+  @IsUUID()
+  rayon_id: string;
 }
 
 export class DTOStudentById {

@@ -62,6 +62,8 @@ export class AssessmentService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.assessment.count();
+
       if (filter) {
         paramQuerySQL.where = {
           student_id: {
@@ -95,17 +97,12 @@ export class AssessmentService {
         paramQuerySQL.offset = offset;
       }
 
-      const assessmentFilter = await db.assessment.findAll(paramQuerySQL);
+      const assessment = await db.assessment.findAll(paramQuerySQL);
 
-      // const assessments = await db.assessment.findAll({
-      //   attributes: ["id"],
-      //   include: [{ model: db.student, as: "student", attributes: ["name"] }],
-      // });
-
-      if (!assessmentFilter)
+      if (!assessment)
         throw apiResponse(status.NOT_FOUND, "Assessments do not exist");
 
-      const manipulatedResponse = assessmentFilter.map((item) => ({
+      const manipulatedResponse = assessment.map((item) => ({
         id: item.id,
         grade: item.grade,
         student: item.student ? item.student.name : null,
@@ -118,8 +115,8 @@ export class AssessmentService {
         apiResponse(
           status.OK,
           "Fetched all assessments success",
-          manipulatedResponse
-          // assessments,
+          manipulatedResponse,
+          totalRows
         )
       );
     } catch (error: any) {

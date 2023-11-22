@@ -14,7 +14,7 @@ export class InstructorAttendanceService {
       const instructor_Id = (req.session as ISession).user.id;
       const ekskulIds = (req.session as ISession).user.ekskul;
 
-      const selectedEkskulId = Number(req.query.ekskul_id);
+      const selectedEkskulId = req.query.ekskul_id as string;
 
       if (ekskulIds.includes(selectedEkskulId)) {
         const userOnEkskul = await db.userOnEkskul.findOne({
@@ -22,7 +22,6 @@ export class InstructorAttendanceService {
         });
 
         if (userOnEkskul) {
-          // Jika terkait, buat data kehadiran
           const createInstructorAttendance = db.instructorAttendance.create({
             ...req.body,
             ekskul_id: selectedEkskulId,
@@ -35,7 +34,6 @@ export class InstructorAttendanceService {
             apiResponse(status.OK, "Create new instructor success")
           );
         } else {
-          // Jika tidak terkait, lewati data kehadiran ini dan beri respons error
           throw apiResponse(
             status.FORBIDDEN,
             `Instructor with ID ${instructor_Id} is not associated with the selected ekskul`
@@ -70,6 +68,8 @@ export class InstructorAttendanceService {
       const paramQuerySQL: any = {};
       let limit: number;
       let offset: number;
+
+      const totalRows = await db.instructorAttendance.count();
 
       if (filter) {
         paramQuerySQL.where = {
@@ -117,17 +117,14 @@ export class InstructorAttendanceService {
         }
       }
 
-      const instructorAttendanceFilter = await db.instructorAttendance.findAll(
+      const instructorAttendance = await db.instructorAttendance.findAll(
         paramQuerySQL
       );
-      // const instructors = await db.instructorAttendance.findAll({
-      //   attributes: ["id"],
-      // });
 
-      if (!instructorAttendanceFilter)
+      if (!instructorAttendance)
         throw apiResponse(status.NOT_FOUND, "Instructors do not exist");
 
-      const manipulatedResponse = instructorAttendanceFilter.map((item) => {
+      const manipulatedResponse = instructorAttendance.map((item) => {
         return {
           id: item.id,
           category: item.category,
@@ -142,8 +139,8 @@ export class InstructorAttendanceService {
         apiResponse(
           status.OK,
           "Fetched all instructor success",
-          manipulatedResponse
-          // instructors,
+          manipulatedResponse,
+          totalRows,
         )
       );
     } catch (error: any) {

@@ -41,6 +41,8 @@ export class ScheduleService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.schedule.count();
+
       paramQuerySQL.include = {
         model: db.activity,
         include: [
@@ -77,19 +79,37 @@ export class ScheduleService {
         paramQuerySQL.offset = offset;
       }
 
-      const scheduleFilter = await db.schedule.findAll(paramQuerySQL);
-      const schedules = await db.schedule.findAll({
-        attributes: ["id", "day"],
+      const schedule = await db.schedule.findAll(paramQuerySQL);
+
+      const modifiedSchedules = schedule.map((schedule) => {
+        return {
+          id: schedule.id,
+          day: schedule.day,
+          createdAt: schedule.createdAt,
+          updatedAt: schedule.updatedAt,
+          activities: schedule.activities.map((activity) => {
+            return {
+              id: activity.id,
+              rombel: activity.rombel ? activity.rombel.name : null,
+              room: activity.room ? activity.room.name : null,
+              ekskul: activity.ekskul ? activity.ekskul.name : null,
+              createdAt: activity.createdAt,
+              updatedAt: activity.updatedAt,
+            };
+          }),
+        };
       });
 
-      if (!scheduleFilter)
+      if (!schedule)
         throw apiResponse(status.NOT_FOUND, "Schedules do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all schedules success", {
-          scheduleFilter,
-          schedules,
-        })
+        apiResponse(
+          status.OK,
+          "Fetched all schedules success",
+          modifiedSchedules,
+          totalRows
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -119,88 +139,28 @@ export class ScheduleService {
       if (!schedules)
         throw apiResponse(status.NOT_FOUND, "Schedule do not exist");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched schedule data", schedules)
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async createActivityOnScheduleService(req: Request): Promise<any> {
-    try {
-      const newActivity = await db.activity.create(req.body);
-
-      if (!newActivity)
-        throw apiResponse(status.FORBIDDEN, "Create new activity failed");
+      const modifiedSchedules = schedules.map((schedule) => {
+        return {
+          id: schedule.id,
+          day: schedule.day,
+          createdAt: schedule.createdAt,
+          updatedAt: schedule.updatedAt,
+          activities: schedule.activities.map((activity) => {
+            return {
+              id: activity.id,
+              rombel: activity.rombel ? activity.rombel.name : null,
+              room: activity.room ? activity.room.name : null,
+              ekskul: activity.ekskul ? activity.ekskul.name : null,
+              createdAt: activity.createdAt,
+              updatedAt: activity.updatedAt,
+            };
+          }),
+        };
+      });
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new schedule success")
+        apiResponse(status.OK, "Fetched schedule data", modifiedSchedules)
       );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async updateActivityOnScheduleService(req: Request): Promise<any> {
-    try {
-      const activity = await db.activity.findOne({
-        where: { id: req.params.id },
-      });
-      console.log(activity);
-
-      if (!activity)
-        throw apiResponse(status.NOT_FOUND, "Activity does not exist");
-
-      const updateActivity = await db.activity.update(req.body, {
-        where: { id: activity.id },
-      });
-
-      if (!updateActivity)
-        throw apiResponse(status.NOT_FOUND, "Cant update activity");
-
-      return Promise.resolve(apiResponse(status.OK, "Update activity success"));
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async deleteActivityOnScheduleService(req: Request): Promise<any> {
-    try {
-      const activity = await db.activity.findOne({
-        where: { id: req.params.id },
-      });
-      console.log(activity);
-
-      if (!activity)
-        throw apiResponse(status.NOT_FOUND, "Activity does not exist");
-
-      const updateActivity = await db.activity.destroy({
-        where: { id: activity.id },
-      });
-
-      if (!updateActivity)
-        throw apiResponse(status.NOT_FOUND, "Cant delete activity");
-
-      return Promise.resolve(apiResponse(status.OK, "Delete activity success"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

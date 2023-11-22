@@ -101,7 +101,7 @@ const countAttendancePerWeekService = async () => {
   }
 };
 
-cron.schedule("* * * * *", () => {
+cron.schedule("0 0 * * 0", () => {
   countAttendancePerWeekService();
 });
 
@@ -109,8 +109,7 @@ export class AttendanceService {
   async createAttendanceService(req: Request): Promise<any> {
     try {
       const ekskuls = (req.session as ISession).user.ekskul;
-      const selectedEkskulId = Number(req.query.ekskul_id);
-      console.log(ekskuls);
+      const selectedEkskulId = req.query.ekskul_id as string;
 
       if (ekskuls.includes(selectedEkskulId)) {
         const createAttendancePromises = [];
@@ -164,27 +163,74 @@ export class AttendanceService {
 
   async exportAttendance(req: Request): Promise<any> {
     try {
-      // const attendanceData = await db.attendance.findAll();
-      const attendanceData = [
-        {
-          siswa_id: 1,
-          category: "hadir",
-          date: "2021-10-01",
-        },
-      ];
+      const date = Date.now();
+      const options = { timeZone: "Asia/Jakarta" };
+      const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
+      const formattedDate = dateTimeFormat.format(date);
 
-      const columns = [
-        { header: "Student", key: "siswa_id", width: 15 },
-        { header: "Category", key: "category", width: 15 },
-        { header: "Date", key: "date", width: 15 },
-      ];
-      const file = "ajdoad.xlsx"; // Use 'filename' here
+      const ekskuls = (req.session as ISession).user.ekskul;
+      const selectedEkskulId = req.query.ekskul_id as string;
+      const ekskul = await db.ekskul.findOne({
+        where: { id: selectedEkskulId },
+      });
 
-      const exportSuccess = await exportExcel(columns, attendanceData, file);
+      if (ekskuls.includes(selectedEkskulId)) {
+        const attendances = await db.attendance.findAll({
+          where: {
+            ekskul_id: selectedEkskulId,
+          },
+          include: [
+            {
+              model: db.student,
+              as: "student",
+              attributes: ["name"],
+            },
+            {
+              model: db.ekskul,
+              as: "ekskul",
+              attributes: ["name"],
+            },
+          ],
+          attributes: ["category", "date"],
+        });
 
-      if (!exportSuccess) throw apiResponse(status.FORBIDDEN, "Export failed");
+        const modifiedAttendances = attendances.map((attendance) => {
+          return {
+            no: attendances.indexOf(attendance) + 1,
+            student_name: attendance.student ? attendance.student.name : null,
+            ekskul_name: attendance.ekskul ? attendance.ekskul.name : null,
+            category: attendance.category,
+            date: attendance.date,
+          };
+        });
 
-      return Promise.resolve(apiResponse(status.OK, "Export Success"));
+        const columns = [
+          { header: "No", key: "no", width: 15 },
+          { header: "Siswa", key: "student_name", width: 15 },
+          { header: "Ekstrakurikuler", key: "ekskul_name", width: 15 },
+          { header: "Keterangan", key: "category", width: 15 },
+          { header: "Tanggal", key: "date", width: 15 },
+        ];
+        const file = `data-kehadiran-${ekskul.name}.xlsx`;
+
+        const exportSuccess = await exportExcel(
+          columns,
+          modifiedAttendances,
+          file
+        );
+
+        if (!exportSuccess)
+          throw apiResponse(status.FORBIDDEN, "Export failed");
+
+        return Promise.resolve(
+          apiResponse(status.OK, "Export Success", attendances)
+        );
+      } else {
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Ekskul does not exist for the given id"
+        );
+      }
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -199,18 +245,20 @@ export class AttendanceService {
   async getAllAttendanceService(req: Request): Promise<any> {
     try {
       const ekskuls = (req.session as ISession).user.ekskul;
-      const selectedEkskulId = req.query.ekskul_id;
+      const selectedEkskulId = req.query.ekskul_id as string;
 
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
       const page: any = req.query.page;
 
-      if (ekskuls.includes(Number(selectedEkskulId))) {
+      if (ekskuls.includes(selectedEkskulId)) {
         const paramQuerySQL: any = {
           where: { ekskul_id: selectedEkskulId },
         };
         let limit: number;
         let offset: number;
+
+        const totalRows = await db.attendance.count();
 
         if (sort) {
           const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
@@ -243,12 +291,9 @@ export class AttendanceService {
           },
         ];
 
-        const attendanceFilter = await db.attendance.findAll(paramQuerySQL);
-        // const attendances = await db.attendance.findAll({
-        //   attributes: ["id"],
-        // });
+        const attendance = await db.attendance.findAll(paramQuerySQL);
 
-        if (!attendanceFilter || attendanceFilter.length === 0) {
+        if (!attendance || attendance.length === 0) {
           return Promise.resolve(
             apiResponse(
               status.NOT_FOUND,
@@ -257,7 +302,7 @@ export class AttendanceService {
           );
         }
 
-        const modifiedAttendances = attendanceFilter.map((attendance) => {
+        const modifiedAttendances = attendance.map((attendance) => {
           return {
             id: attendance.id,
             ekskul: attendance.ekskul.name,
@@ -273,8 +318,8 @@ export class AttendanceService {
           apiResponse(
             status.OK,
             "Fetched all attendances success",
-            modifiedAttendances
-            // attendances,
+            modifiedAttendances,
+            totalRows
           )
         );
       } else {

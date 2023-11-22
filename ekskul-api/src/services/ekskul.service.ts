@@ -51,6 +51,8 @@ export class EkskulService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.ekskul.count();
+
       if (filter) {
         paramQuerySQL.where = {
           name: {
@@ -77,20 +79,17 @@ export class EkskulService {
         paramQuerySQL.offset = offset;
       }
 
-      const ekskulFilter = await db.ekskul.findAll(paramQuerySQL);
-      // const ekskuls = await db.ekskul.findAll({
-      //   attributes: ["id", "name"],
-      // });
+      const ekskul = await db.ekskul.findAll(paramQuerySQL);
 
-      if (!ekskulFilter)
+      if (!ekskul)
         throw apiResponse(status.NOT_FOUND, "Ekskuls do not exist");
 
       return Promise.resolve(
         apiResponse(
           status.OK,
           "Fetched all ekskuls success",
-          ekskulFilter
-          // ekskuls,
+          ekskul,
+          totalRows,
         )
       );
     } catch (error: any) {

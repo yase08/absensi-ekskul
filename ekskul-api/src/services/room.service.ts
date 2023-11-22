@@ -48,6 +48,8 @@ export class RoomService {
       const paramQuerySQL: any = {};
       let limit: number;
       let offset: number;
+      
+      const totalRows = await db.room.count();
 
       if (filter) {
         paramQuerySQL.where = {
@@ -75,20 +77,17 @@ export class RoomService {
         paramQuerySQL.offset = offset;
       }
 
-      const roomFilter = await db.room.findAll(paramQuerySQL);
-      // const rooms = await db.room.findAll({
-      //   attributes: ["id", "name"],
-      // });
+      const room = await db.room.findAll(paramQuerySQL);
 
-      if (!roomFilter)
+      if (!room)
         throw apiResponse(status.NOT_FOUND, "Rooms do not exist");
 
       return Promise.resolve(
         apiResponse(
           status.OK,
           "Fetched all rooms success",
-          roomFilter
-          // rooms,
+          room,
+          totalRows,
         )
       );
     } catch (error: any) {

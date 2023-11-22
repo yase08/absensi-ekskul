@@ -1,24 +1,24 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
 import { Transform } from "class-transformer";
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class DTOActivity {
   @IsNotEmpty()
-  @IsInt()
-  ekskul_id: number;
+  @IsUUID()
+  ekskul_id: string;
 
   @IsNotEmpty()
-  @IsInt()
-  room_id: number;
+  @IsUUID()
+  room_id: string;
 
   @IsNotEmpty()
-  @IsInt()
-  rombel_id: number;
+  @IsUUID()
+  rombel_id: string;
 
   @IsNotEmpty()
-  @IsInt()
-  schedule_id: number;
+  @IsUUID()
+  schedule_id: string;
 
   @IsNotEmpty()
   @IsString()

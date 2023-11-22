@@ -15,10 +15,19 @@ module.exports = (sequelize, DataTypes) => {
   }
   historyAttendance.init(
     {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
       totalAttendance: DataTypes.INTEGER,
       startDate: DataTypes.DATE,
       endDate: DataTypes.DATE,
-      ekskul_id: DataTypes.INTEGER,
+      ekskul_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
     },
     {
       sequelize,

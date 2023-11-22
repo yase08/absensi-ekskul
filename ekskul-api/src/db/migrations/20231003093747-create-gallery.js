@@ -5,9 +5,9 @@ module.exports = {
     await queryInterface.createTable("galleries", {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
       name: {
         type: Sequelize.STRING,
@@ -22,12 +22,11 @@ module.exports = {
         type: Sequelize.JSON,
       },
       ekskul_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         references: {
           model: "ekskuls",
           key: "id",
         },
-        unique: true,
       },
       createdAt: {
         allowNull: false,

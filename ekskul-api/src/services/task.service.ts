@@ -23,7 +23,7 @@ export class TaskService {
         );
 
       const createTask = await db.task.create({
-        author_id: Number(instructor_Id),
+        author_id: instructor_Id,
         ...req.body,
       });
 
@@ -54,6 +54,8 @@ export class TaskService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.task.count();
+
       if (filter) {
         paramQuerySQL.where = {
           name: {
@@ -80,18 +82,15 @@ export class TaskService {
         paramQuerySQL.offset = offset;
       }
 
-      const taskFilter = await db.task.findAll(paramQuerySQL);
-      const tasks = await db.task.findAll({
-        attributes: ["id", "name"],
-      });
+      const task = await db.task.findAll(paramQuerySQL);
 
-      if (!taskFilter)
+      if (!task)
         throw apiResponse(status.NOT_FOUND, "Tasks do not exist");
 
       return Promise.resolve(
         apiResponse(status.OK, "Fetched all tasks success", {
-          taskFilter,
-          tasks,
+          task,
+          totalRows
         })
       );
     } catch (error: any) {

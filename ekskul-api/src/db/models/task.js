@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class task extends Model {
     /**
@@ -19,13 +17,28 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  task.init({
-    name: DataTypes.STRING,
-    ekskul_id: DataTypes.INTEGER,
-    author_id: DataTypes.INTEGER,
-  }, {
-    sequelize,
-    modelName: 'task',
-  });
+  task.init(
+    {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
+      name: DataTypes.STRING,
+      ekskul_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      author_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+    },
+    {
+      sequelize,
+      modelName: "task",
+    }
+  );
   return task;
 };

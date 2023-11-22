@@ -38,7 +38,19 @@ export class UserService {
         password: hashedPassword,
       });
 
-      await createUser.addEkskul(ekskuls);
+      Promise.all(
+        ekskuls.map(async (ekskul) => {
+          try {
+            const createUserOnEkskuls = await db.userOnEkskul.create({
+              user_id: createUser.id,
+              ekskul_id: ekskul.id,
+            });
+            return createUserOnEkskuls;
+          } catch (error) {
+            console.error(error);
+          }
+        })
+      );
 
       if (!createUser)
         throw apiResponse(status.FORBIDDEN, "Create new user failed");
@@ -66,6 +78,8 @@ export class UserService {
       const paramQuerySQL: any = {};
       let limit: number;
       let offset: number;
+
+      const totalRows = await db.user.count();
 
       if (filter) {
         paramQuerySQL.where = {
@@ -97,16 +111,12 @@ export class UserService {
         paramQuerySQL.offset = offset;
       }
 
-      const userFilter = await db.user.findAll(paramQuerySQL);
-      // const users = await db.user.findAll({
-      //   attributes: ["id", "name"],
-      // });
+      const user = await db.user.findAll(paramQuerySQL);
 
-      if (!userFilter)
-        throw apiResponse(status.NOT_FOUND, "Users do not exist");
+      if (!user) throw apiResponse(status.NOT_FOUND, "Users do not exist");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all users success", userFilter)
+        apiResponse(status.OK, "Fetched all users success", user, totalRows)
       );
     } catch (error: any) {
       return Promise.reject(

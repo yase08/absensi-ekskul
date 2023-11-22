@@ -21,7 +21,7 @@ export const auth = (): Handler => {
       const decoded: string | JwtPayload = (await verifyToken(
         accesstoken
       )) as JwtPayload;
-      const user = await db.user.findOne({ where: { id: Number(decoded.id) } });
+      const user = await db.user.findOne({ where: { id: decoded.id } });
       const userOnEkskul = await db.userOnEkskul.findAll({
         where: { user_id: user.id },
       });
@@ -33,6 +33,7 @@ export const auth = (): Handler => {
         image: user.image,
         role: user.role,
         ekskul: ekskulIds,
+        isActive: user.isActive,
       };
       next();
     } catch (error: any) {

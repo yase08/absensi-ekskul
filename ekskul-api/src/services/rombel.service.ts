@@ -51,6 +51,8 @@ export class RombelService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.activity.count();
+
       if (filter) {
         paramQuerySQL.where = {
           name: {
@@ -77,20 +79,17 @@ export class RombelService {
         paramQuerySQL.offset = offset;
       }
 
-      const rombelFilter = await db.rombel.findAll(paramQuerySQL);
-      // const rombels = await db.rombel.findAll({
-      //   attributes: ["id", "name"],
-      // });
+      const rombel = await db.rombel.findAll(paramQuerySQL);
 
-      if (!rombelFilter)
+      if (!rombel)
         throw apiResponse(status.NOT_FOUND, "Rombels do not exist");
 
       return Promise.resolve(
         apiResponse(
           status.OK,
           "Fetched all rombels success",
-          rombelFilter
-          // rombels,
+          rombel,
+          totalRows,
         )
       );
     } catch (error: any) {

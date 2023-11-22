@@ -5,9 +5,9 @@ module.exports = {
     await queryInterface.createTable("historyAttendances", {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
       totalAttendance: {
         type: Sequelize.INTEGER,
@@ -19,7 +19,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
       ekskul_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         references: {
           model: "ekskuls",
           key: "id",

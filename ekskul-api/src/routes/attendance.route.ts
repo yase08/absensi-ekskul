@@ -36,6 +36,11 @@ class AttendanceRoutes extends AttendanceController {
       [authorization(), auth(), permission(["admin"])],
       this.getWeeklyAttendanceChart
     );
+    this.router.get(
+      "/export",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.exportToExcel
+    );
     this.router.put(
       "/:id",
       [

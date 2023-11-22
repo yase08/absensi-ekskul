@@ -1,5 +1,7 @@
 "use strict";
 
+const { v4: uuidv4 } = require("uuid");
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -7,6 +9,7 @@ module.exports = {
       "attendances",
       [
         {
+          id: uuidv4(),
           student_id: 1,
           ekskul_id: 1,
           category: "hadir",
@@ -15,6 +18,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           student_id: 1,
           ekskul_id: 2,
           category: "hadir",
@@ -23,6 +27,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           student_id: 2,
           ekskul_id: 1,
           category: "hadir",
@@ -31,6 +36,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           student_id: 2,
           ekskul_id: 2,
           category: "hadir",
@@ -39,6 +45,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           student_id: 3,
           ekskul_id: 1,
           category: "hadir",
@@ -47,6 +54,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
+          id: uuidv4(),
           student_id: 3,
           ekskul_id: 3,
           category: "hadir",
