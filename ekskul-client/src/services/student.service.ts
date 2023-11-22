@@ -30,10 +30,11 @@ export const deleteStudent = async (id) => {
   }
 };
 
-export const updateStudent = async (id) => {
+export const updateStudent = async (id, requestData) => {
   try {
-    const response = await axios.delete(
+    const response = await axios.put(
       `${API}/${VERSION}/student/${id}`,
+      requestData,
       config
     );
     return response.data;

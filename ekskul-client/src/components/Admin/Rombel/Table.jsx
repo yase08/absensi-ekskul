@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2';
 import { deleteRombel, getAllRombel } from '../../../services/rombel.service';
 import { useDebouncedCallback } from 'use-debounce';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineFileSearch, AiOutlineSearch } from 'react-icons/ai';
+import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch } from 'react-icons/ai';
 import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 
 const TableEskul = ({ setFormOld }) => {
@@ -10,23 +10,23 @@ const TableEskul = ({ setFormOld }) => {
   const [filter, setFilter] = useState('');
   const [sort, setSort] = useState('');
   const [search, setSearch] = useState('');
-  const [changeFitur, setChangeFitur] = useState('');
+  // const [changeFitur, setChangeFitur] = useState('');
   const [size, setSize] = useState('10');
   const [number, setNumber] = useState('1');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [getAllData, setGetAllData] = useState(0);
   // const [rayonOptions, setRayonOptions] = useState([]);
-  const [loadingOption, setLoadingOption] = useState(false);
-
+  // const [loadingOption, setLoadingOption] = useState(false);
+  
   const ToggleHandleSearch = () => {
     setSearch(!search);
   };
 
-  const ToggleHandleChange = () => {
-    setChangeFitur(!changeFitur);
-    setSearch(false);
-  };
+  // const ToggleHandleChange = () => {
+  //   setChangeFitur(!changeFitur);
+  //   setSearch(false);
+  // };
 
   const debounced = useDebouncedCallback(
     // function
@@ -37,10 +37,6 @@ const TableEskul = ({ setFormOld }) => {
     1500
   );
 
-  const handleInputChange = (e) => {
-    setFilter(e.target.value);
-  };
-
   const totalPages = Math.ceil(data.length / size); // Calculate total pages
 
   const handlePrevPage = () => {
@@ -48,7 +44,7 @@ const TableEskul = ({ setFormOld }) => {
       setNumber(number - 1);
     }
   };
-
+  
   const handleNextPage = () => {
     if (number < totalPages) {
       setNumber(number + 1);
@@ -57,8 +53,9 @@ const TableEskul = ({ setFormOld }) => {
 
   const generatePaginationButtons = () => {
     const paginationButtons = [];
-
-    for (let i = 1; i <= totalPages; i++) {
+    const maxPagesToShow = 5; // Define the number of pages to display
+  
+    for (let i = 1; i <= Math.min(totalPages, maxPagesToShow); i++) {
       paginationButtons.push(
         <button
           key={i}
@@ -71,9 +68,7 @@ const TableEskul = ({ setFormOld }) => {
         </button>
       );
     }
-
-    return paginationButtons;
-  };
+  }
 
   const DescAndAsc = () => {
     setSort(sort === '-id' ? '' : '-id');
@@ -90,24 +85,21 @@ const TableEskul = ({ setFormOld }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllRombel({ filter, sort, size, number});
-
+      const response = await getAllRombel({
+        filter,
+        sort,
+        size,
+        number
+      });
+  
       if (response && response.data) {
-        console.log('API Response:', response.data);
+        // Update state based on the received data
+        const rombelData = response.data;
+        setData(rombelData);
         console.log(response);
 
-        if (Array.isArray(response.data)) {
-          const rombelData = response.data;
-          setData(rombelData);
-
-          // Filter the rayon options based on your criteria
-          // Set the total data count
-          if (data.length === 0) {
-            setGetAllData(response.data.length);
-          }
-        } else {
-          setError(new Error('Data is not an array'));
-        }
+        // Set the total data count if the current data length is 0
+        setGetAllData(rombelData.length);
       } else {
         setError(new Error('Data retrieval failed'));
       }
@@ -161,22 +153,22 @@ const TableEskul = ({ setFormOld }) => {
       setLoading(false);
     }
   };
-  const handleFilterChange = async (selectedOption) => {
-    setLoadingOption(true); // Set loading state to true
-    setFilter(selectedOption);
-    // setGetAllData(data.length)
-    // setNumber(1); // Reset the current page to the first page when the filter changes
+  // const handleFilterChange = async (selectedOption) => {
+  //   setLoadingOption(true); // Set loading state to true
+  //   setFilter(selectedOption);
+  //   // setGetAllData(data.length)
+  //   // setNumber(1); // Reset the current page to the first page when the filter changes
 
-    try {
-      // Perform data fetching here
-      // Once the data is ready, set loadingOption to false
-      setLoadingOption(false);
-    } catch (error) {
-      // Handle errors if data fetching fails
-      setLoadingOption(false); // Ensure that loading is set to false in case of an error
-      console.error('Error fetching data:', error);
-    }
-  };
+  //   try {
+  //     // Perform data fetching here
+  //     // Once the data is ready, set loadingOption to false
+  //     setLoadingOption(false);
+  //   } catch (error) {
+  //     // Handle errors if data fetching fails
+  //     setLoadingOption(false); // Ensure that loading is set to false in case of an error
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
 
   useEffect(() => {
     handleGetRequest();
@@ -227,14 +219,13 @@ const TableEskul = ({ setFormOld }) => {
                   onChange={(e) => debounced(e.target.value)}
                 />
                 <button
-                  className={`mx-3 p-2 border rounded-full border-black hover:bg-black hover:text-white ${
-                    changeFitur ? '' : 'hidden'
+                  className={`mx-3 p-2 border rounded-full border-black hover:bg-black hover:text-white 
                   }`}
                   onClick={ToggleHandleSearch}
                 >
                   <AiOutlineSearch />
                 </button>
-                <div className="flex">
+                {/* <div className="flex">
                   <button
                     onClick={ToggleHandleChange}
                     className={`p-2 flex justify-center items-center  border-black ${
@@ -252,13 +243,8 @@ const TableEskul = ({ setFormOld }) => {
                     value={filter}
                     onChange={(e) => handleFilterChange(e.target.value)}
                   >
-                    {/* {rayonOptions.map((option, index) => (
-                      <option key={index} value={option}>
-                        {loadingOption ? 'Loading...' : option}
-                      </option>
-                    ))} */}
                   </select>
-                </div>
+                </div> */}
               </th>
             </tr>
           </thead>

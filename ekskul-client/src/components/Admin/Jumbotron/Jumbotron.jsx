@@ -22,7 +22,7 @@ const Jumbotron = ({expanded}) => {
                     </div>
                     <div className="w-full flex justify-between items-center ">
                         <div className='ml-5'>
-                            <p className='font-poppins text-lg font-bold opacity-80 max-2xl:text-sm'>Users</p>
+                            <p className='font-poppins text-lg font-bold opacity-80 max-2xl:text-sm'>Instruktur</p>
                             <p className='font-poppins text-3xl opacity-80 ml-3 mt-2 max-2xl:text-xl'>12</p>
                             <p className='font-poppins text-sm mt-2 opacity-60 max-2xl:text-xs'>Increased By 90%</p>
                         </div>
@@ -32,7 +32,7 @@ const Jumbotron = ({expanded}) => {
                     </div>
                     <div className="w-full flex justify-between items-center ">
                         <div className='ml-5'>
-                            <p className='font-poppins text-lg font-bold opacity-80 max-2xl:text-sm'>Reports</p>
+                            <p className='font-poppins text-lg font-bold opacity-80 max-2xl:text-sm'>Siswa</p>
                             <p className='font-poppins text-3xl opacity-80 ml-3 mt-2 max-2xl:text-xl'>50</p>
                             <p className='font-poppins text-sm mt-2 opacity-60 max-2xl:text-xs'>Increased By 90%</p>
                         </div>

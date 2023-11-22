@@ -35,7 +35,7 @@ export class ActivityProgramService {
       return Promise.reject(
         apiResponse(
           error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
+        error.statusMessage,
           error.message
         )
       );

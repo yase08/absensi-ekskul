@@ -214,12 +214,12 @@ const TableEskul = ({ setFormOld, setOpen }) => {
           <thead>
             <tr>
             <th className="w-1/6 flex items-center gap-1 px-6 py-3 white text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
-                Rombel
+                Ekskul
               <button onClick={DescAndAsc}>
                   {sort ? <AiOutlineArrowUp /> : <AiOutlineArrowDown />}
               </button>
               </th>
-              <th></th>
+              <th className='px-6 py-3 text-left'>Category</th>
               <th></th>
               <th className="text-right pr-6 flex bg-transparent justify-end">
                 <input

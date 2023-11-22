@@ -56,17 +56,17 @@ export class StudentService {
         include: [
           {
             model: db.rombel,
-            attributes: ["name"],
+            attributes: ["id", "name"],
             as: "rombel",
           },
           {
             model: db.rayon,
-            attributes: ["name"],
+            attributes: ["id", "name"],
             as: "rayon",
           },
           {
             model: db.ekskul,
-            attributes: ["name"],
+            attributes: ["id", "name"],
             through: {
               attributes: [],
             },
@@ -117,8 +117,14 @@ export class StudentService {
           nis: student.nis,
           email: student.email,
           mobileNumber: student.mobileNumber,
-          rombel: student.rombel ? student.rombel.name : null,
-          rayon: student.rayon ? student.rayon.name : null,
+          rombel: {
+            id: student.rombel ? student.rombel.id : null,
+            name: student.rombel ? student.rombel.name : null,
+          },
+          rayon: {
+            id: student.rayon ? student.rayon.id : null,
+            name: student.rayon ? student.rayon.name : null,
+          },
           ekskuls: student.ekskuls
             ? student.ekskuls.map((ekskul: any) => ekskul.name)
             : null,

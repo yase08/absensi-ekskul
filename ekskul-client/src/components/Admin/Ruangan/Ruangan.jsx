@@ -116,7 +116,7 @@ const Ruangan = () => {
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
       <div className="w-full flex flex-col gap-2">
-        <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">Tingkatan</h1>
+        <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">Ruangan</h1>
         <div className="bg-white rounded-md w-full h-auto flex">
           <div className="w-full p-[20px] flex">
             <form className="flex-col gap-3 flex w-full">

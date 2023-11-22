@@ -5,7 +5,7 @@ import { config } from "../utils/config";
 export const getAllActivityProgram = async ({ filter, sort, size, number }) => {
   try {
     const response = await axios.get(
-      `${API}/${VERSION}/activityProgram?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/activity-program?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
       config
     );
     return response.data;
@@ -19,7 +19,7 @@ export const getAllActivityProgram = async ({ filter, sort, size, number }) => {
 export const deleteActivityProgram = async (id) => {
   try {
     const response = await axios.delete(
-      `${API}/${VERSION}/activityProgram/${id}`,
+      `${API}/${VERSION}/activity-program/${id}`,
       config
     );
     return response.data;
@@ -30,10 +30,11 @@ export const deleteActivityProgram = async (id) => {
   }
 };
 
-export const updateActivityProgram = async (id) => {
+export const updateActivityProgram = async (id, requestData) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/activityProgram/${id}`,
+    const response = await axios.put(
+      `${API}/${VERSION}/activity-program/${id}`,
+      requestData,
       config
     );
     return response.data;
@@ -47,7 +48,7 @@ export const updateActivityProgram = async (id) => {
 export const createActivityProgram = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}/${VERSION}/activityProgram`,
+      `${API}/${VERSION}/activity-program`,
       requestData,
       config
     );

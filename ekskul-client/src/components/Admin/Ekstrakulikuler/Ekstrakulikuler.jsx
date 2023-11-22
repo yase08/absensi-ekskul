@@ -8,7 +8,7 @@ const Ekstrakulikuler = () => {
   const [isOpen, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    category: '',
+    category: '',   
   });
   const [formOld, setFormOld] = useState({});
   // const [id, setId] = useState('');
@@ -154,6 +154,7 @@ const Ekstrakulikuler = () => {
         <input value={formOld ? formOld.name : formData.name} type="text" name="name" id="" placeholder="Input Your Ekstrakulikuler" className='bg-transparent outline-none border p-3 rounded-md border-gray-400' onChange={handleInputChange}/>
         <label htmlFor="" className='text-xl'>Category</label>
         <select name='category' value={formOld ? formOld.category : formData.category} className='bg-transparent outline-none border p-3 rounded-md border-gray-400 text-opacity-40' onChange={ handleInputChange}>
+          <option selected disabled value="">Select Category</option>
           <option value="umum">Umum</option>
           <option value="produktif">Produktif</option>
           <option value="senbud">Seni Budaya</option>
