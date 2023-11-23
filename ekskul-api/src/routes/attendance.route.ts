@@ -4,7 +4,7 @@ import { Router } from "express";
 import { AttendanceController } from "../controllers/attendance.controller";
 import { authorization } from "../middlewares/authorization";
 import { validator } from "../middlewares/validator.middleware";
-import { DTOAttendance, DTOAttendanceById } from "../dto/attendance.dto";
+import { DTOAttendanceArray, DTOAttendanceById } from "../dto/attendance.dto";
 
 // class RouteUsers mengextends dari AttendanceController agar bisa memakai semua property dan method dari attendance controller
 class AttendanceRoutes extends AttendanceController {
@@ -22,7 +22,7 @@ class AttendanceRoutes extends AttendanceController {
         authorization(),
         auth(),
         permission(["instructor", "admin"]),
-        // validator(DTOAttendance),
+        validator(DTOAttendanceArray),
       ],
       this.createAttendance
     );
@@ -47,7 +47,7 @@ class AttendanceRoutes extends AttendanceController {
         authorization(),
         auth(),
         permission(["instructor", "admin"]),
-        validator(DTOAttendance),
+        validator(DTOAttendanceById),
       ],
       this.updateAttendance
     );

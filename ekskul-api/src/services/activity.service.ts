@@ -12,10 +12,10 @@ export class ActivityService {
       const createActivity = await db.activity.create(req.body);
 
       if (!createActivity)
-        throw apiResponse(status.FORBIDDEN, "Create new activity failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat aktivitas");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new activity success")
+        apiResponse(status.OK, "Aktivitas berhasil dibuat")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -75,6 +75,10 @@ export class ActivityService {
 
       const activity = await db.activity.findAll(paramQuerySQL);
 
+      if (!activity || activity.length === 0) {
+        throw apiResponse(status.NOT_FOUND, "Aktivitas tidak ditemukan");
+      }
+
       const manipulatedActivity = activity.map((activity) => {
         return {
           id: activity.id,
@@ -89,40 +93,13 @@ export class ActivityService {
         };
       });
 
-      if (!activity || activity.length === 0) {
-        throw apiResponse(status.NOT_FOUND, "Activities do not exist");
-      }
-
       return Promise.resolve(
         apiResponse(
           status.OK,
-          "Fetched all activities success",
+          "Berhasil mendapatkan semua aktivitas",
           manipulatedActivity,
           totalRows
         )
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getActivityService(req: Request): Promise<any> {
-    try {
-      const activity = await db.activity.findOne({
-        where: { id: req.params.id },
-      });
-
-      if (!activity)
-        throw apiResponse(status.NOT_FOUND, "Activity do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched activity success", activity)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -144,7 +121,7 @@ export class ActivityService {
       if (!activityExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Activity do not exist for the given id"
+          "Aktivitas dengan id tersebut tidak ditemukan"
         );
 
       const updateActivity = await db.activity.update(req.body, {
@@ -154,9 +131,9 @@ export class ActivityService {
       });
 
       if (!updateActivity)
-        throw apiResponse(status.FORBIDDEN, "Update activity failed");
+        throw apiResponse(status.FORBIDDEN, "Update aktivitas gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update activity success"));
+      return Promise.resolve(apiResponse(status.OK, "Update aktivitas sukses"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -177,14 +154,14 @@ export class ActivityService {
       if (!activityExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Activity do not exist for the given id"
+          "Aktivitas dengan id tersebut tidak ditemukan"
         );
 
-      const deleteActivity = await db.activity.destroy({
+      await db.activity.destroy({
         where: { id: activityExist.id },
       });
 
-      return Promise.resolve(apiResponse(status.OK, "Delete activity success"));
+      return Promise.resolve(apiResponse(status.OK, "Delete aktivitas sukses"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

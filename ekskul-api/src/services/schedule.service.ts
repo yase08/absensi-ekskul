@@ -13,11 +13,9 @@ export class ScheduleService {
       const createSchedule = await db.schedule.create(req.body);
 
       if (!createSchedule)
-        throw apiResponse(status.FORBIDDEN, "Create new schedule failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat jadwal");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new schedule success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Berhasil membuat jadwal"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -100,13 +98,13 @@ export class ScheduleService {
         };
       });
 
-      if (!schedule)
-        throw apiResponse(status.NOT_FOUND, "Schedules do not exist");
+      if (!schedule || schedule.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Jadwal tidak ditemukan");
 
       return Promise.resolve(
         apiResponse(
           status.OK,
-          "Fetched all schedules success",
+          "Berhasil mendapatkan jadwal",
           modifiedSchedules,
           totalRows
         )

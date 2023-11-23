@@ -3,31 +3,31 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
 
 export class DTOLogin {
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Email tidak boleh kosong" })
   @IsEmail()
-  @IsString()
+  @IsString({ message: "Email harus berupa string" })
   email: string;
 
-  @IsString()
+  @IsString({ message: "Password harus berupa string" })
   @IsNotEmpty({ message: "password is not empty" })
-  @MinLength(8)
+  @MinLength(8, { message: "Password minimal 8 karakter" })
   password: string;
 }
 
 export class DTOForgotPassword {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Email tidak boleh kosong" })
+  @IsString({ message: "Email harus berupa string" })
   @IsEmail()
   email: string;
 }
 
 export class DTOResetToken {
-  @IsNotEmpty({ message: "password is not empty" })
-  @MinLength(8)
-  @IsString()
+  @IsNotEmpty({ message: "Password tidak boleh kosong" })
+  @MinLength(8, { message: "Password minimal 8 karakter" })
+  @IsString({ message: "Password harus berupa string" })
   password: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Token tidak boleh kosong" })
+  @IsString({ message: "Token harus berupa string" })
   token: string;
 }

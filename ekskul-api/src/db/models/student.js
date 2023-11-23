@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
       nis: DataTypes.STRING,
       email: DataTypes.STRING,
       mobileNumber: DataTypes.STRING,
+      gender: {
+        type: DataTypes.ENUM("male", "female"),
+        allowNull: false,
+      },
       rombel_id: {
         type: DataTypes.UUID,
         allowNull: false,

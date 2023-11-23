@@ -1,17 +1,15 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { Transform } from "class-transformer";
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class DTORoom {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Nama ruangan tidak boleh kosong" })
+  @IsString({ message: "Nama ruangan harus berupa string" })
   name: string;
 }
 
 export class DTORoomById {
-  @IsNotEmpty()
-  @Transform(({ value }) => Number(value), { toClassOnly: true })
-  @IsInt()
-  id: number;
+  @IsNotEmpty({ message: "Id ruangan tidak boleh kosong" })
+  @IsUUID()
+  id: string;
 }

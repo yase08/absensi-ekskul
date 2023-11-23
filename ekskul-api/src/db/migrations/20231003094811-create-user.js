@@ -11,10 +11,12 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
         unique: true,
+        allowNull: false,
       },
       mobileNumber: {
         type: Sequelize.STRING,
@@ -22,14 +24,16 @@ module.exports = {
       },
       image: {
         type: Sequelize.STRING,
-        required: false,
+        allowNull: true
       },
       password: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       role: {
         type: Sequelize.ENUM("admin", "instructor"),
         defaultValue: "instructor",
+        allowNull: false,
       },
       isActive: {
         type: Sequelize.BOOLEAN,

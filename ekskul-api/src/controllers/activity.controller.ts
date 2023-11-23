@@ -22,15 +22,6 @@ export class ActivityController extends ActivityService {
     }
   };
 
-    getActivity = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const serviceResponse: APIResponse = await this.getActivityService(req);
-      return res.status(serviceResponse.statusCode).json(serviceResponse);
-    } catch (error: any) {
-      return res.status(error.statusCode).json(error);
-    }
-  };
-
   updateActivity = async (req: Request, res: Response): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.updateActivityService(req);

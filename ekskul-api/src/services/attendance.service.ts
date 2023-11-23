@@ -39,9 +39,98 @@ function getStartAndEndWeek(date) {
   };
 }
 
+function getStartAndEndMonth(date) {
+  const currentDate = date || new Date();
+
+  // Atur zona waktu ke 'Asia/Jakarta' (zona waktu Indonesia Barat)
+  const options = { timeZone: "Asia/Jakarta" };
+  const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
+
+  const startDate = new Date(currentDate);
+  const endDate = new Date(currentDate);
+
+  // Mengatur tanggal menjadi awal bulan
+  startDate.setDate(1);
+
+  // Mengatur tanggal menjadi akhir bulan
+  endDate.setMonth(endDate.getMonth() + 1);
+  endDate.setDate(0);
+
+  // Mendapatkan tanggal awal dan akhir dalam format string
+  const start = dateTimeFormat.format(startDate);
+  const end = dateTimeFormat.format(endDate);
+
+  return {
+    start,
+    end,
+  }
+}
+
 const countAttendancePerWeekService = async () => {
   try {
     const { start, end } = getStartAndEndWeek(new Date());
+    const ekskuls = await db.ekskul.findAll({
+      attributes: ["id"],
+    });
+
+    const totalAttendance = await Promise.all(
+      ekskuls.map(async (ekskul) => {
+        try {
+          const attendance = await db.attendance.count({
+            where: {
+              date: {
+                [Op.between]: [start, end],
+              },
+              ekskul_id: ekskul.id,
+            },
+          });
+          return attendance;
+        } catch (error) {
+          console.error(
+            `Error counting attendance for ekskul ${ekskul.id}:`,
+            error
+          );
+          return 0;
+        }
+      })
+    );
+
+    if (!totalAttendance)
+      throw apiResponse(status.NOT_FOUND, "No attendance found");
+
+    const createHistoryAttendance = await Promise.all(
+      totalAttendance.map(async (ekskulCount, index) => {
+        try {
+          const historyAttendance = await db.historyAttendance.create({
+            ekskul_id: ekskuls[index].id,
+            totalAttendance: ekskulCount,
+            startDate: start,
+            endDate: end,
+          });
+          return historyAttendance;
+        } catch (error) {
+          console.error(
+            `Error creating history attendance for ekskul ${ekskuls[index].id}:`,
+            error
+          );
+          return null;
+        }
+      })
+    );
+  } catch (error: any) {
+    return Promise.reject(
+      apiResponse(
+        error.statusCode || status.INTERNAL_SERVER_ERROR,
+        error.statusMessage,
+        error.message
+      )
+    );
+  }
+};
+
+const countAttendancePerMonthService = async () => {
+  try {
+    const { start, end } = getStartAndEndMonth(new Date());
     const ekskuls = await db.ekskul.findAll({
       attributes: ["id"],
     });
@@ -183,7 +272,19 @@ export class AttendanceService {
             {
               model: db.student,
               as: "student",
-              attributes: ["name"],
+              attributes: ["name", "nis"],
+              include: [
+                {
+                  model: db.rombel,
+                  as: "rombel",
+                  attributes: ["name"],
+                },
+                {
+                  model: db.rayon,
+                  as: "rayon",
+                  attributes: ["name"],
+                },
+              ],
             },
             {
               model: db.ekskul,
@@ -198,6 +299,13 @@ export class AttendanceService {
           return {
             no: attendances.indexOf(attendance) + 1,
             student_name: attendance.student ? attendance.student.name : null,
+            student_nis: attendance.student ? attendance.student.nis : null,
+            student_rombel: attendance.student
+              ? attendance.student.rombel.name
+              : null,
+            student_rayon: attendance.student
+              ? attendance.student.rayon.name
+              : null,
             ekskul_name: attendance.ekskul ? attendance.ekskul.name : null,
             category: attendance.category,
             date: attendance.date,
@@ -206,7 +314,10 @@ export class AttendanceService {
 
         const columns = [
           { header: "No", key: "no", width: 15 },
-          { header: "Siswa", key: "student_name", width: 15 },
+          { header: "Nama", key: "student_name", width: 15 },
+          { header: "Nis", key: "student_nis", width: 15 },
+          { header: "Rombel", key: "student_rombel", width: 15 },
+          { header: "Rayon", key: "student_rayon", width: 15 },
           { header: "Ekstrakurikuler", key: "ekskul_name", width: 15 },
           { header: "Keterangan", key: "category", width: 15 },
           { header: "Tanggal", key: "date", width: 15 },
@@ -222,9 +333,7 @@ export class AttendanceService {
         if (!exportSuccess)
           throw apiResponse(status.FORBIDDEN, "Export failed");
 
-        return Promise.resolve(
-          apiResponse(status.OK, "Export Success", attendances)
-        );
+        return Promise.resolve(apiResponse(status.OK, "Export Success"));
       } else {
         throw apiResponse(
           status.NOT_FOUND,

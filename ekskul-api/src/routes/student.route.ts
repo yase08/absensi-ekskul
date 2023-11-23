@@ -22,16 +22,6 @@ class StudentRoutes extends StudentController {
       this.createStudent
     );
     this.router.get(
-      "/:id",
-      [
-        authorization(),
-        auth(),
-        permission(["instructor", "admin"]),
-        validator(DTOStudentById),
-      ],
-      this.getStudent
-    );
-    this.router.get(
       "/",
       [authorization(), auth(), permission(["admin"])],
       this.getAllStudent

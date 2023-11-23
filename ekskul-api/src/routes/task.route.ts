@@ -26,16 +26,6 @@ class TaskRoutes extends TaskController {
       [authorization(), auth(), permission(["instructor", "admin"])],
       this.getAllTask
     );
-    this.router.get(
-      "/:id",
-      [
-        authorization(),
-        auth(),
-        permission(["instructor", "admin"]),
-        validator(DTOTaskById),
-      ],
-      this.getTask
-    );
     this.router.put(
       "/:id",
       [

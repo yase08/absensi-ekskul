@@ -1,47 +1,47 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { Transform } from "class-transformer";
 import {
   IsNotEmpty,
   IsString,
-  IsInt,
   IsEmail,
   MaxLength,
   IsUUID,
 } from "class-validator";
 
 export class DTOStudent {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Nama tidak boleh kosong" })
+  @IsString({ message: "Nama harus berupa string" })
   name: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(8)
+  @IsNotEmpty({ message: "NIS tidak boleh kosong" })
+  @IsString({ message: "NIS harus berupa string" })
+  @MaxLength(8, { message: "NIS tidak boleh lebih dari 8 karakter" })
   nis: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @IsEmail()
+  @IsNotEmpty({ message: "Email tidak boleh kosong" })
+  @IsString({ message: "Email harus berupa string" })
+  @IsEmail({}, { message: "Email tidak valid" })
   email: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(13)
+  @IsNotEmpty({ message: "No. HP tidak boleh kosong" })
+  @IsString({ message: "No. HP harus berupa string" })
+  @MaxLength(13, { message: "No. HP tidak valid" })
   mobileNumber: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Password tidak boleh kosong" })
   @IsUUID()
   rombel_id: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Password tidak boleh kosong" })
   @IsUUID()
   rayon_id: string;
+
+  @IsNotEmpty({ message: "Gender tidak boleh kosong" })
+  gender: string;
 }
 
 export class DTOStudentById {
-  @IsNotEmpty()
-  @Transform(({ value }) => Number(value), { toClassOnly: true })
-  @IsInt()
-  id: number;
+  @IsNotEmpty({ message: "Id tidak boleh kosong" })
+  @IsUUID()
+  id: string;
 }

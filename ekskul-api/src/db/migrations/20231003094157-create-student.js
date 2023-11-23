@@ -11,14 +11,21 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       nis: {
         type: Sequelize.STRING,
         unique: true,
+        allowNull: false,
+      },
+      gender: {
+        type: Sequelize.ENUM("male", "female"),
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
         unique: true,
+        allowNull: false,
       },
       mobileNumber: {
         type: Sequelize.STRING,

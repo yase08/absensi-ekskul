@@ -1,20 +1,19 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { Transform } from "class-transformer";
-import { IsNotEmpty, IsString, IsInt, IsUUID } from "class-validator";
+import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class DTOTask {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Nama tidak boleh kosong" })
+  @IsString({ message: "Tipe data harus string" })
   name: string;
 
+  @IsNotEmpty({ message: "Ekskul tidak boleh kosong" })
   @IsUUID()
   ekskul_id: string;
 }
 
 export class DTOTaskById {
-  @IsNotEmpty()
-  @Transform(({ value }) => Number(value), { toClassOnly: true })
-  @IsInt()
-  id: number;
+  @IsNotEmpty({ message: "ID tidak boleh kosong" })
+  @IsUUID()
+  id: string;
 }

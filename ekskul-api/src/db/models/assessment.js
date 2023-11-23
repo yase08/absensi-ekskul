@@ -25,13 +25,20 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
       },
-      grade: DataTypes.INTEGER,
+      grade: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       task_id: {
         type: DataTypes.UUID,
         allowNull: false,
       },
       student_id: {
         type: DataTypes.UUID,
+        allowNull: false,
+      },
+      date: {
+        type: DataTypes.DATE,
         allowNull: false,
       },
     },

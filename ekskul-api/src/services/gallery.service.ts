@@ -19,7 +19,7 @@ export class GalleryService {
       if (ekskulOnGallery)
         throw apiResponse(
           status.CONFLICT,
-          `Ekskul id ${req.body.ekskul_id} on gallery images already exist`
+          `Ekskul id ${req.body.ekskul_id} pada galeri sudah ada`
         );
 
       if (req.body.name) {
@@ -41,11 +41,9 @@ export class GalleryService {
       });
 
       if (!createGallery)
-        throw apiResponse(status.FORBIDDEN, "Create new gallery failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat galeri");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new gallery success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Galeri berhasil dibuat"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -107,8 +105,8 @@ export class GalleryService {
 
       const gallery = await db.gallery.findAll(paramQuerySQL);
 
-      if (!gallery)
-        throw apiResponse(status.NOT_FOUND, "Gallery do not exist");
+      if (!gallery || gallery.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
 
       const manipulatedGallery = gallery.map((item) => {
         return {
@@ -125,9 +123,9 @@ export class GalleryService {
       return Promise.resolve(
         apiResponse(
           status.OK,
-          "Fetched all gallery success",
+          "Berhasil mendapatkan semua galeri",
           manipulatedGallery,
-          totalRows,
+          totalRows
         )
       );
     } catch (error: any) {
@@ -167,12 +165,12 @@ export class GalleryService {
       });
 
       if (!galleries)
-        throw apiResponse(status.NOT_FOUND, "Gallery do not exist");
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
 
       return Promise.resolve(
         apiResponse(
           status.OK,
-          "Fetched all gallery success",
+          "Berhasil mendapatkan galeri",
           manipulatedGallery
         )
       );
@@ -193,26 +191,20 @@ export class GalleryService {
         where: { id: req.params.id },
       });
 
-      const directory = path.join(__dirname, `../public/gallery`);
-
       if (req.body.name) {
         req.body.slug = slugify(req.body.name.toLowerCase());
       }
 
       if (!galleryExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Gallery do not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
 
-      let galleryImages: string[] = [];
+      let files: Express.Multer.File[] = req.files as Express.Multer.File[];
+      let galleryImages: string[] = [...galleryExist.images];
 
-      if (Array.isArray(req.files) && req.files.length > 0) {
-        const newImages = req.files.map(
-          (file: Express.Multer.File) => `${directory}/${file.filename}`
-        );
-
-        galleryImages = [...newImages];
+      for (let i in files) {
+        const file = files[i];
+        const pathName = file.path;
+        galleryImages.push(pathName);
       }
 
       const updateGallery = await db.gallery.update(
@@ -228,9 +220,9 @@ export class GalleryService {
       );
 
       if (!updateGallery)
-        throw apiResponse(status.FORBIDDEN, "Update gallery failed");
+        throw apiResponse(status.FORBIDDEN, "Update galeri gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update gallery success"));
+      return Promise.resolve(apiResponse(status.OK, "Update galeri berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -249,16 +241,15 @@ export class GalleryService {
       });
 
       if (!galleryExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Gallery do not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
 
       await db.gallery.destroy({
         where: { id: galleryExist.id },
       });
 
-      return Promise.resolve(apiResponse(status.OK, "Delete gallery success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus galeri")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

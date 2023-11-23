@@ -11,9 +11,12 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
+        unique: true,
+        allowNull: false,
       },
       category: {
         type: Sequelize.ENUM("produktif", "umum", "senbud"),
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

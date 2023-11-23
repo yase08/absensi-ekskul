@@ -5,29 +5,25 @@ import { Op } from "sequelize";
 
 // Berfungsi untuk menghandle logic dari controler
 
-const db = require("../db/models");
+const db = require("../db/models/index.js");
 
 export class RombelService {
   async createRombelService(req: Request): Promise<any> {
     try {
-      const rombel = await db.rombel.findOne({
-        where: { name: req.body.name },
-      });
+      const rombel = await db.rombel.findOne({ where: { name: req.body.name } });
 
       if (rombel)
         throw apiResponse(
           status.CONFLICT,
-          `Rombel ${req.body.name} already exist`
+          `Rombel dengan nama ${req.body.name} sudah ada`
         );
 
       const createRombel = await db.rombel.create(req.body);
 
       if (!createRombel)
-        throw apiResponse(status.FORBIDDEN, "Create new rombel failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat rombel");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new rombel success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Rombel berhasil dibuat"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -51,7 +47,7 @@ export class RombelService {
       let limit: number;
       let offset: number;
 
-      const totalRows = await db.activity.count();
+      const totalRows = await db.rombel.count();
 
       if (filter) {
         paramQuerySQL.where = {
@@ -81,36 +77,11 @@ export class RombelService {
 
       const rombel = await db.rombel.findAll(paramQuerySQL);
 
-      if (!rombel)
-        throw apiResponse(status.NOT_FOUND, "Rombels do not exist");
+      if (!rombel || rombel.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Rombel tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Fetched all rombels success",
-          rombel,
-          totalRows,
-        )
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getRombelService(req: Request): Promise<any> {
-    try {
-      const rombel = await db.rombel.findOne({ where: { id: req.params.id } });
-
-      if (!rombel) throw apiResponse(status.NOT_FOUND, "Rombel do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched rombel success", rombel)
+        apiResponse(status.OK, "Berhasil mendapatkan rombel", rombel, totalRows)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -129,12 +100,11 @@ export class RombelService {
         where: { id: req.params.id },
       });
 
-      if (!rombelExist) {
+      if (!rombelExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rombel does not exist for the given id"
+          "Rombel dengan id tersebut tidak ditemukan"
         );
-      }
 
       const rombelSame = await db.rombel.findOne({
         where: { name: req.body.name },
@@ -143,7 +113,7 @@ export class RombelService {
       if (rombelSame && rombelSame.id !== rombelExist.id) {
         throw apiResponse(
           status.CONFLICT,
-          `Rombel with the name ${req.body.name} already exists`
+          `Rombel dengan nama ${req.body.name} sudah ada`
         );
       }
 
@@ -153,11 +123,10 @@ export class RombelService {
         },
       });
 
-      if (!updateRombel) {
-        throw apiResponse(status.FORBIDDEN, "Update rombel failed");
-      }
+      if (!updateRombel)
+        throw apiResponse(status.FORBIDDEN, "Update rombel gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update rombel success"));
+      return Promise.resolve(apiResponse(status.OK, "Update rombel berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -178,7 +147,7 @@ export class RombelService {
       if (!rombelExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rombel do not exist for the given id"
+          "Rombel dengan id tersebut tidak ditemukan"
         );
 
       const deleteRombel = await db.rombel.destroy({
@@ -186,9 +155,11 @@ export class RombelService {
       });
 
       if (!deleteRombel)
-        throw apiResponse(status.FORBIDDEN, "Delete rombel failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal menghapus rombel");
 
-      return Promise.resolve(apiResponse(status.OK, "Delete rombel success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus rombel")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

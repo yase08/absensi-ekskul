@@ -26,8 +26,15 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
       },
-      name: DataTypes.STRING,
-      category: DataTypes.ENUM("produktif", "umum", "senbud"),
+      name: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+      },
+      category: {
+        type: DataTypes.ENUM("produktif", "umum", "senbud"),
+        allowNull: false,
+      },
     },
     {
       sequelize,

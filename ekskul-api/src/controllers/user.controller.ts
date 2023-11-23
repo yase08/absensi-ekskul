@@ -31,9 +31,9 @@ export class UserController extends UserService {
     }
   };
 
-  getUser = async (req: Request, res: Response): Promise<Response> => {
+  getProfile = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getUserService(req);
+      const serviceResponse: APIResponse = await this.getProfileService(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);

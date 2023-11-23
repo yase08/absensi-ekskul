@@ -1,33 +1,27 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { Transform } from "class-transformer";
-import {
-  IsNotEmpty,
-  IsString,
-  IsInt,
-} from "class-validator";
+import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class DTOActivityProgram {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Nama aktivitas program tidak boleh kosong" })
+  @IsString({ message: "Ekskul harus berupa string" })
   activity: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Tugas aktivitas program tidak boleh kosong" })
+  @IsString({ message: "Tugas harus berupa string" })
   task: string;
 
-  @IsNotEmpty()
-  @IsString()
-  startDate: string;
+  @IsNotEmpty({ message: "Tanggal mulai tidak boleh kosong" })
+  @IsDate({ message: "Tanggal mulai harus berupa tanggal" })
+  startDate: Date;
 
-  @IsNotEmpty()
-  @IsString()
-  endDate: string;
+  @IsNotEmpty({ message: "Tanggal selesai tidak boleh kosong" })
+  @IsDate({ message: "Tanggal akhir harus berupa tanggal" })
+  endDate: Date;
 }
 
 export class DTOActivityProgramById {
-  @IsNotEmpty()
-  @Transform(({ value }) => Number(value), { toClassOnly: true })
-  @IsInt()
-  id: number;
+  @IsNotEmpty({ message: "ID aktivitas program tidak boleh kosong" })
+  @IsUUID()
+  id: string;
 }
