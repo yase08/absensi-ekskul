@@ -126,6 +126,7 @@ export class StudentService {
           nis: student.nis,
           email: student.email,
           mobileNumber: student.mobileNumber,
+          gender: student.gender,
           rombel: student.rombel
             ? {
                 id: student.rombel.id,
