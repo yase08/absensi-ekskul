@@ -22,7 +22,7 @@ class AssessmentRoutes extends AssessmentController {
         authorization(),
         auth(),
         permission(["instructor", "admin"]),
-        validator(DTOAssessmentArray),
+        // validator(DTOAssessmentArray),
       ],
       this.createAssessment
     );

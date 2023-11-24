@@ -22,7 +22,7 @@ class AttendanceRoutes extends AttendanceController {
         authorization(),
         auth(),
         permission(["instructor", "admin"]),
-        validator(DTOAttendanceArray),
+        // validator(DTOAttendanceArray),
       ],
       this.createAttendance
     );
@@ -47,7 +47,7 @@ class AttendanceRoutes extends AttendanceController {
         authorization(),
         auth(),
         permission(["instructor", "admin"]),
-        validator(DTOAttendance),
+        validator(DTOAttendanceById),
       ],
       this.updateAttendance
     );
