@@ -17,7 +17,7 @@ export class StudentService {
       if (student)
         throw apiResponse(
           status.CONFLICT,
-          `Student ${req.body.name} already exist`
+          `Siswa dengan nama ${req.body.name} sudah ada`
         );
 
       const ekskuls = await db.ekskul.findAll({
@@ -41,10 +41,10 @@ export class StudentService {
       );
 
       if (!createStudent)
-        throw apiResponse(status.FORBIDDEN, "Create new student failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat siswa");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new student success")
+        apiResponse(status.OK, "Berhasil membuat siswa")
       );
     } catch (error: any) {
       console.log(error);
@@ -121,8 +121,8 @@ export class StudentService {
 
       const student = await db.student.findAll(paramQuerySQL);
 
-      if (!student)
-        throw apiResponse(status.NOT_FOUND, "Students do not exist");
+      if (!student || student.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
 
       const manipulatedStudent = student.map((student: any) => {
         return {
@@ -148,7 +148,7 @@ export class StudentService {
       return Promise.resolve(
         apiResponse(
           status.OK,
-          "Fetched all students success",
+          "Berhasil mendapatkan siswa",
           manipulatedStudent,
           totalRows
         )
@@ -173,7 +173,7 @@ export class StudentService {
       if (!studentExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Student do not exist for the given id"
+          "Siswa tidak ditemukan"
         );
 
       const updateStudent = await db.student.update(req.body, {
@@ -183,9 +183,9 @@ export class StudentService {
       });
 
       if (!updateStudent)
-        throw apiResponse(status.FORBIDDEN, "Update student failed");
+        throw apiResponse(status.FORBIDDEN, "Update siswa gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update student success"));
+      return Promise.resolve(apiResponse(status.OK, "Update siswa berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -206,7 +206,7 @@ export class StudentService {
       if (!studentExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Student do not exist for the given id"
+          "Siswa tidak ditemukan"
         );
 
       await db.studentOnEkskul.destroy({
@@ -218,31 +218,9 @@ export class StudentService {
       });
 
       if (!deleteStudent)
-        throw apiResponse(status.FORBIDDEN, "Delete student failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal menghapus siswa");
 
-      return Promise.resolve(apiResponse(status.OK, "Delete student success"));
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getStudentService(req: Request): Promise<any> {
-    try {
-      const student = await db.student.findOne({
-        where: { id: req.params.id },
-      });
-
-      if (!student) throw apiResponse(status.NOT_FOUND, "Student do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched student success", student)
-      );
+      return Promise.resolve(apiResponse(status.OK, "Berhasil menghapus siswa"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

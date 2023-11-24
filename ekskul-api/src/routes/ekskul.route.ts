@@ -26,16 +26,6 @@ class EkskulRoutes extends EkskulController {
       [authorization(), auth(), permission(["admin"])],
       this.getAllEkskul
     );
-    this.router.get(
-      "/:id",
-      [
-        authorization(),
-        auth(),
-        permission(["instructor", "admin"]),
-        validator(DTOEkskulById),
-      ],
-      this.getEkskul
-    );
     this.router.put(
       "/:id",
       [authorization(), auth(), permission(["admin"]), validator(DTOEkskul)],

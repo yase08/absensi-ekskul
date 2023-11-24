@@ -39,14 +39,14 @@ class UserRoutes extends UserController {
       this.getAllAdmin
     );
     this.router.get(
-      "/:id",
+      "/profile",
       [
         authorization(),
         auth(),
         permission(["instructor", "admin"]),
         validator(DTOUserById),
       ],
-      this.getUser
+      this.getProfile
     );
     this.router.put(
       "/:id",

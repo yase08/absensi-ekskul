@@ -25,9 +25,11 @@ module.exports = {
       },
       category: {
         type: Sequelize.ENUM("hadir", "sakit", "izin", "alpa"),
+        allowNull: false,
       },
       date: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

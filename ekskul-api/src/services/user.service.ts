@@ -3,6 +3,7 @@ import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
 import { hashPassword } from "../libs/bcrypt.lib";
+import { ISession } from "../interfaces/user.interface";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -18,7 +19,7 @@ export class UserService {
       if (user)
         throw apiResponse(
           status.CONFLICT,
-          `User with email ${req.body.email} and mobile number ${req.body.mobileNumber} already exist`
+          `Pengguna dengan email ${req.body.email} atau nomor telepon ${req.body.mobileNumber} sudah ada`
         );
 
       let file: Express.Multer.File = req.file as Express.Multer.File;
@@ -53,9 +54,11 @@ export class UserService {
       );
 
       if (!createUser)
-        throw apiResponse(status.FORBIDDEN, "Create new user failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal menambahkan siswa");
 
-      return Promise.resolve(apiResponse(status.OK, "Create new user success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menambahkan siswa")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -113,10 +116,35 @@ export class UserService {
 
       const user = await db.user.findAll(paramQuerySQL);
 
-      if (!user) throw apiResponse(status.NOT_FOUND, "Users do not exist");
+      if (!user || user.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Pengguna tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all users success", user, totalRows)
+        apiResponse(status.OK, "Berhasil mendapatkan pengguna", user, totalRows)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getProfileService(req: Request): Promise<any> {
+    try {
+      const user_id = (req.session as ISession).user.id;
+
+      const user = await db.user.findOne({
+        where: { id: user_id },
+      });
+
+      if (!user) throw apiResponse(status.NOT_FOUND, "User tidak ditemukan");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil mendapatkan user", user)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -172,37 +200,12 @@ export class UserService {
       }
 
       const userFilter = await db.user.findAll(paramQuerySQL);
-      // const users = await db.user.findAll({
-      //   attributes: ["id", "name"],
-      // });
 
       if (!userFilter)
-        throw apiResponse(status.NOT_FOUND, "Users do not exist");
+        throw apiResponse(status.NOT_FOUND, "Admin tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all users success", userFilter)
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getUserService(req: Request): Promise<any> {
-    try {
-      const user = await db.user.findOne({
-        where: { id: req.params.id, role: "instructor" },
-      });
-
-      if (!user) throw apiResponse(status.NOT_FOUND, "User do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched user success", user)
+        apiResponse(status.OK, "Berhasil mendapatkan admin", userFilter)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -222,10 +225,7 @@ export class UserService {
       });
 
       if (!userExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "User do not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "User tidak ditemukan");
 
       if (req.body.password) {
         const hashedPassword = await hashPassword(req.body.password);
@@ -242,9 +242,11 @@ export class UserService {
       );
 
       if (!updateUser)
-        throw apiResponse(status.FORBIDDEN, "Update user failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal mengupdate pengguna");
 
-      return Promise.resolve(apiResponse(status.OK, "Update user success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil mengupdate pengguna")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -263,10 +265,7 @@ export class UserService {
       });
 
       if (!userExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "User do not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Pengguna tidak ditemukan");
 
       await db.userOnEkskul.destroy({
         where: {
@@ -278,7 +277,9 @@ export class UserService {
         where: { id: userExist.id },
       });
 
-      return Promise.resolve(apiResponse(status.OK, "Delete user success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus pengguna")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

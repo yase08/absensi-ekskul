@@ -1,50 +1,47 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { Transform } from "class-transformer";
-import { IsInt, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class DTOSchedule {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Hari tidak boleh kosong" })
+  @IsString({ message: "Hari harus berupa string" })
   day: string;
 }
 
 export class DTOScheduleById {
-  @IsNotEmpty()
-  @Transform(({ value }) => Number(value), { toClassOnly: true })
-  @IsInt()
+  @IsNotEmpty({ message: "Hari tidak boleh kosong" })
+  @IsUUID()
   id: string;
 }
 
 export class DTOActivity {
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Hari tidak boleh kosong" })
   @IsUUID()
   schedule_id: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Rombel tidak boleh kosong" })
   @IsUUID()
   rombel_id: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Ruangan tidak boleh kosong" })
   @IsUUID()
   room_id: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Ekstrakurikuler tidak boleh kosong" })
   @IsUUID()
   ekskul_id: string;
 
-  @IsNotEmpty()
-  @IsString()
-  startTime: string;
+  @IsNotEmpty({ message: "Waktu mulai tidak boleh kosong" })
+  @IsDate({ message: "Waktu mulai harus berupa tanggal" })
+  startTime: Date;
 
-  @IsNotEmpty()
-  @IsString()
-  endTime: string;
+  @IsNotEmpty({ message: "Waktu selesai tidak boleh kosong" })
+  @IsDate({ message: "Waktu selesai harus berupa tanggal" })
+  endTime: Date;
 }
 
 export class DTOActivityById {
-  @IsNotEmpty()
-  @Transform(({ value }) => Number(value), { toClassOnly: true })
-  @IsInt()
-  id: number;
+  @IsNotEmpty({ message: "ID aktivitas tidak boleh kosong" })
+  @IsString({ message: "ID aktivitas harus berupa string" })
+  id: string;
 }

@@ -19,7 +19,7 @@ export class TaskService {
       if (task)
         throw apiResponse(
           status.CONFLICT,
-          `Task ${req.body.name} already exist`
+          `Tugas dengan nama ${req.body.name} sudah ada`
         );
 
       const createTask = await db.task.create({
@@ -28,9 +28,9 @@ export class TaskService {
       });
 
       if (!createTask)
-        throw apiResponse(status.FORBIDDEN, "Create new task failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat tugas");
 
-      return Promise.resolve(apiResponse(status.OK, "Create new task success"));
+      return Promise.resolve(apiResponse(status.OK, "Berhasil membuat tugas"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -84,34 +84,11 @@ export class TaskService {
 
       const task = await db.task.findAll(paramQuerySQL);
 
-      if (!task)
-        throw apiResponse(status.NOT_FOUND, "Tasks do not exist");
+      if (!task || task.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Tugas tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all tasks success", {
-          task,
-          totalRows
-        })
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getTaskService(req: Request): Promise<any> {
-    try {
-      const task = await db.task.findOne({ where: { id: req.params.id } });
-
-      if (!task) throw apiResponse(status.NOT_FOUND, "Task do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched task success", task)
+        apiResponse(status.OK, "Berhasil mendapatkan tugas", task, totalRows)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -133,17 +110,30 @@ export class TaskService {
       if (!taskExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Tasks do not exist for the given id"
+          "Tugas dengan id tersebut tidak ditemukan"
         );
 
+      const taskSame = await db.task.findOne({
+        where: { name: req.body.name },
+      });
+
+      if (taskSame && taskSame.id !== taskExist.id) {
+        throw apiResponse(
+          status.CONFLICT,
+          `Tugas dengan nama ${req.body.name} sudah ada`
+        );
+      }
+
       const updateTask = await db.task.update(req.body, {
-        where: { id: taskExist.id },
+        where: {
+          id: taskExist.id,
+        },
       });
 
       if (!updateTask)
-        throw apiResponse(status.FORBIDDEN, "Update task failed");
+        throw apiResponse(status.FORBIDDEN, "Update tugas gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update task success"));
+      return Promise.resolve(apiResponse(status.OK, "Update tugas berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -164,7 +154,7 @@ export class TaskService {
       if (!taskExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Tasks do not exist for the given member_id"
+          "Tugas dengan id tersebut tidak ditemukan"
         );
 
       const deleteTask = await db.task.destroy({
@@ -172,9 +162,11 @@ export class TaskService {
       });
 
       if (!deleteTask)
-        throw apiResponse(status.FORBIDDEN, "Delete task failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal menghapus tugas");
 
-      return Promise.resolve(apiResponse(status.OK, "Delete task success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus tugas")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

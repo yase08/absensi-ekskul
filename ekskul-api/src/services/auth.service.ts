@@ -19,7 +19,7 @@ export class AuthService {
       const user = await db.user.findOne({ where: { email: req.body.email } });
 
       if (!user)
-        throw apiResponse(status.BAD_REQUEST, "Email is not registered");
+        throw apiResponse(status.BAD_REQUEST, "Email tidak terdaftar");
 
       const hashedPassword = await comparePassword(
         user.password,
@@ -27,7 +27,7 @@ export class AuthService {
       );
 
       if (!hashedPassword)
-        throw apiResponse(status.BAD_REQUEST, "Incorect email or password");
+        throw apiResponse(status.BAD_REQUEST, "Password salah atau email salah");
 
       await db.user.update({ isActive: true }, { where: { id: user.id } });
 
@@ -50,7 +50,7 @@ export class AuthService {
       );
 
       return Promise.resolve(
-        apiResponse(status.OK, "Login success", token, undefined)
+        apiResponse(status.OK, "Login berhasil", token, undefined)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -68,12 +68,12 @@ export class AuthService {
       const user_Id = (req.session as ISession).user.id;
 
       if (!user_Id)
-        throw apiResponse(status.BAD_REQUEST, "You are not logged in");
+        throw apiResponse(status.BAD_REQUEST, "Anda belum login");
 
       await db.user.update({ isActive: false }, { where: { id: user_Id } });
       req.session["user"] = null;
 
-      return Promise.resolve(apiResponse(status.OK, "Logout success"));
+      return Promise.resolve(apiResponse(status.OK, "Logout berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -97,7 +97,7 @@ export class AuthService {
       });
 
       return Promise.resolve(
-        apiResponse(status.OK, "Get count of admin, instructor, student, and active user success", {
+        apiResponse(status.OK, "Berhasil mendapatkan data", {
           adminCount,
           instructorCount,
           studentCount,
@@ -164,7 +164,7 @@ export class AuthService {
     try {
       const user = await db.user.findOne({ where: { email: req.body.email } });
       if (!user) {
-        throw apiResponse(status.BAD_REQUEST, "Email is not registered");
+        throw apiResponse(status.BAD_REQUEST, "Email tidak terdaftar");
       }
 
       const { resetToken, passwordResetToken, passwordResetExpires } =
@@ -188,7 +188,7 @@ export class AuthService {
       sendMailer(data.to, data.subject, data.html);
 
       return Promise.resolve(
-        apiResponse(status.OK, "Reset link has been sent to your email", data)
+        apiResponse(status.OK, "Silahkan cek email", data)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -211,7 +211,7 @@ export class AuthService {
       });
 
       if (!user) {
-        apiResponse(status.BAD_REQUEST, "Token expired, please try again");
+        apiResponse(status.BAD_REQUEST, "Token kadaluarsa, silahkan request ulang");
       }
 
       const updateHashedPassword = await hashPassword(req.body.password);
@@ -226,7 +226,7 @@ export class AuthService {
       );
 
       return Promise.resolve(
-        apiResponse(status.OK, "Successfully changed password")
+        apiResponse(status.OK, "Berhasil mengubah password")
       );
     } catch (error: any) {
       return Promise.reject(

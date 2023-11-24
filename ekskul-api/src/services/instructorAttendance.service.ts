@@ -28,21 +28,21 @@ export class InstructorAttendanceService {
             instructor_id: instructor_Id,
           });
           if (!createInstructorAttendance)
-            throw apiResponse(status.FORBIDDEN, "Create new instructor failed");
+            throw apiResponse(status.FORBIDDEN, "Absensi gagal ditambahkan");
 
           return Promise.resolve(
-            apiResponse(status.OK, "Create new instructor success")
+            apiResponse(status.OK, "Absensi berhasil ditambahkan")
           );
         } else {
           throw apiResponse(
             status.FORBIDDEN,
-            `Instructor with ID ${instructor_Id} is not associated with the selected ekskul`
+            `Instruktur dengan id ${instructor_Id} tidak terdaftar di ekskul ini`
           );
         }
       } else {
         throw apiResponse(
           status.NOT_FOUND,
-          "Ekskul does not exist for the given id"
+          "Ekskul tidak ditemukan"
         );
       }
     } catch (error: any) {
@@ -121,8 +121,8 @@ export class InstructorAttendanceService {
         paramQuerySQL
       );
 
-      if (!instructorAttendance)
-        throw apiResponse(status.NOT_FOUND, "Instructors do not exist");
+      if (!instructorAttendance || instructorAttendance.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Instruktur tidak ditemukan");
 
       const manipulatedResponse = instructorAttendance.map((item) => {
         return {
@@ -138,39 +138,9 @@ export class InstructorAttendanceService {
       return Promise.resolve(
         apiResponse(
           status.OK,
-          "Fetched all instructor success",
+          "Berhasil mendapatkan absensi instruktur",
           manipulatedResponse,
-          totalRows,
-        )
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getInstructorAttendanceService(req: Request): Promise<any> {
-    try {
-      const instructorAttendance = await db.instructorAttendance.findOne({
-        where: { id: req.params.id },
-      });
-
-      if (!instructorAttendance)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Instructor attendance do not exist"
-        );
-
-      return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Fetched instructor attendance success",
-          instructorAttendance
+          totalRows
         )
       );
     } catch (error: any) {
@@ -193,7 +163,7 @@ export class InstructorAttendanceService {
       if (!instructorExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Instructors do not exist for the given id"
+          "Instruktur tidak ditemukan"
         );
 
       const updateInstructor = await db.instructorAttendance.update(req.body, {
@@ -201,10 +171,10 @@ export class InstructorAttendanceService {
       });
 
       if (!updateInstructor)
-        throw apiResponse(status.FORBIDDEN, "Update instructor failed");
+        throw apiResponse(status.FORBIDDEN, "Update instruktur berhasil");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Update instructor success")
+        apiResponse(status.OK, "Update instruktur berhasil")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -226,7 +196,7 @@ export class InstructorAttendanceService {
       if (!instructorExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Instructors do not exist for the given member_id"
+          "Instruktur tidak ditemukan"
         );
 
       const deleteInstructor = await db.instructorAttendance.destroy({
@@ -234,10 +204,10 @@ export class InstructorAttendanceService {
       });
 
       if (!deleteInstructor)
-        throw apiResponse(status.FORBIDDEN, "Delete instructor failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal menghapus instruktur");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Delete instructor success")
+        apiResponse(status.OK, "Gagal menghapus instruktur")
       );
     } catch (error: any) {
       return Promise.reject(

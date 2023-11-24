@@ -32,8 +32,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      category: DataTypes.ENUM("hadir", "sakit", "izin", "alpa"),
-      date: DataTypes.STRING,
+      category: {
+        type: DataTypes.ENUM("hadir", "sakit", "izin", "alpa"),
+        allowNull: false,
+      },
+      date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
     },
     {
       sequelize,

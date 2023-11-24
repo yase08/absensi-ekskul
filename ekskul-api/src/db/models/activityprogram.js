@@ -21,8 +21,14 @@ module.exports = (sequelize, DataTypes) => {
       },
       activity: DataTypes.STRING,
       task: DataTypes.STRING,
-      startDate: DataTypes.STRING,
-      endDate: DataTypes.STRING,
+      startDate: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      endDate: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
     },
     {
       sequelize,

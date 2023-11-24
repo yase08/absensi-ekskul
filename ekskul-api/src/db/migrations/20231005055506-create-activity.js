@@ -38,10 +38,12 @@ module.exports = {
         },
       },
       startTime: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
+        allowNull: false
       },
       endTime: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,

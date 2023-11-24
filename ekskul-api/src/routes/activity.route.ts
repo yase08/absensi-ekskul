@@ -26,11 +26,6 @@ class ActivityRoutes extends ActivityController {
       [authorization(), auth(), permission(["admin"])],
       this.getAllActivity
     );
-    this.router.get(
-      "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOActivityById)],
-      this.getActivity
-    );
     this.router.put(
       "/:id",
       [authorization(), auth(), permission(["admin"]), validator(DTOActivity)],

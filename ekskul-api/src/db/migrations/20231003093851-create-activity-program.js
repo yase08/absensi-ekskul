@@ -11,15 +11,19 @@ module.exports = {
       },
       activity: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       task: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       startDate: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
+        allowNull: false,
       },
       endDate: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

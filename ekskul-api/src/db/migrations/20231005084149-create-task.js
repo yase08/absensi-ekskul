@@ -10,7 +10,8 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       ekskul_id: {
         type: Sequelize.UUID,

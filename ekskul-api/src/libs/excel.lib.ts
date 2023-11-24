@@ -9,17 +9,36 @@ export const exportExcel = async (
 ): Promise<any> => {
   return new Promise(async (resolve, reject) => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Sheet 1");
+    const worksheet = workbook.addWorksheet("Absensi", {
+      pageSetup: {
+        paperSize: 9,
+        orientation: "landscape",
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+        horizontalCentered: true,
+        verticalCentered: true,
+      },
+    });
 
     // Add custom header row
-    const customHeaderRow = worksheet.addRow(["No", "Siswa", "Ekstrakurikuler", "Tanggal", "Keterangan"]);
+    const customHeaderRow = worksheet.addRow([
+      "No",
+      "Nama",
+      "Nis",
+      "Rombel",
+      "Rayon",
+      "Ekstrakurikuler",
+      "Keterangan",
+      "Tanggal",
+    ]);
     customHeaderRow.eachCell((cell, colNumber) => {
       cell.font = { bold: true };
       cell.border = {
-        top: { style: "double", color: { argb: "00000000" } },
-        left: { style: "double", color: { argb: "00000000" } },
-        bottom: { style: "double", color: { argb: "00000000" } },
-        right: { style: "double", color: { argb: "00000000" } },
+        top: { style: "thin", color: { argb: "000000" } },
+        left: { style: "thin", color: { argb: "000000" } },
+        bottom: { style: "thin", color: { argb: "000000" } },
+        right: { style: "thin", color: { argb: "000000" } },
       };
     });
 
@@ -29,10 +48,10 @@ export const exportExcel = async (
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       row.eachCell((cell, colNumber) => {
         cell.border = {
-          top: { style: "double", color: { argb: "00000000" } },
-          left: { style: "double", color: { argb: "00000000" } },
-          bottom: { style: "double", color: { argb: "00000000" } },
-          right: { style: "double", color: { argb: "00000000" } },
+          top: { style: "thin", color: { argb: "000000" } },
+          left: { style: "thin", color: { argb: "000000" } },
+          bottom: { style: "thin", color: { argb: "000000" } },
+          right: { style: "thin", color: { argb: "000000" } },
         };
       });
     });

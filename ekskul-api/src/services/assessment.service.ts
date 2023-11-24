@@ -22,7 +22,7 @@ export class AssessmentService {
         if (existingAssessment) {
           throw apiResponse(
             status.CONFLICT,
-            `Assessment for student ${assessment.student_id} and task ${assessment.task_id} already exists`
+            `Penilaian untuk siswa ${assessment.student_id} dan tugas ${assessment.task_id} sudah ada`
           );
         }
         await db.assessment.create({
@@ -34,10 +34,10 @@ export class AssessmentService {
       const createAttendances = await Promise.all(createAssessmentPromises);
 
       if (!createAttendances)
-        throw apiResponse(status.FORBIDDEN, "Create new attendances failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat penilaian");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new assessment success")
+        apiResponse(status.OK, "Berhasil membuat penilaian")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -99,8 +99,8 @@ export class AssessmentService {
 
       const assessment = await db.assessment.findAll(paramQuerySQL);
 
-      if (!assessment)
-        throw apiResponse(status.NOT_FOUND, "Assessments do not exist");
+      if (!assessment || assessment.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Penilaian tidak ditemukan");
 
       const manipulatedResponse = assessment.map((item) => ({
         id: item.id,
@@ -114,33 +114,10 @@ export class AssessmentService {
       return Promise.resolve(
         apiResponse(
           status.OK,
-          "Fetched all assessments success",
+          "Berhasil mendapatkan data penilaian",
           manipulatedResponse,
           totalRows
         )
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getOneAssessmentService(req: Request): Promise<any> {
-    try {
-      const assessment = await db.assessment.findOne({
-        where: { id: req.params.id },
-      });
-
-      if (!assessment)
-        throw apiResponse(status.NOT_FOUND, "Assessment do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched all asesssment success", assessment)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -162,7 +139,7 @@ export class AssessmentService {
       if (!assessmentExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Assessments do not exist for the given member_id"
+          "Penilaian tidak ditemukan"
         );
 
       const updateAssessment = await db.assessment.update(req.body, {
@@ -172,10 +149,10 @@ export class AssessmentService {
       });
 
       if (!updateAssessment)
-        throw apiResponse(status.FORBIDDEN, "Update assessment failed");
+        throw apiResponse(status.FORBIDDEN, "Update penilaian gagal");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Update assessment success")
+        apiResponse(status.OK, "Update penilaian berhasil")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -197,7 +174,7 @@ export class AssessmentService {
       if (!assessmentExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Assessments do not exist for the given member_id"
+          "Penilaian tidak ditemukan"
         );
 
       await db.assessment.destroy({
@@ -205,7 +182,7 @@ export class AssessmentService {
       });
 
       return Promise.resolve(
-        apiResponse(status.OK, "Delete assessment success")
+        apiResponse(status.OK, "Berhasil menghapus penilaian")
       );
     } catch (error: any) {
       return Promise.reject(

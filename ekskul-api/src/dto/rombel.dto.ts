@@ -1,17 +1,15 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { Transform } from "class-transformer";
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class DTORombel {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Name rombel tidak boleh kosong" })
+  @IsString({ message: "Name rombel harus berupa string" })
   name: string;
 }
 
 export class DTORombelById {
-  @IsNotEmpty()
-  @Transform(({ value }) => Number(value), { toClassOnly: true })
-  @IsInt()
-  id: number;
+  @IsNotEmpty({ message: "ID tidak boleh kosong" })
+  @IsUUID()
+  id: string;
 }

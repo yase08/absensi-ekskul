@@ -1,33 +1,38 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { Transform } from "class-transformer";
+import { Type } from "class-transformer";
 import {
+  IsArray,
+  IsDate,
   IsNotEmpty,
   IsString,
-  IsInt,
+  IsUUID,
+  ValidateNested,
 } from "class-validator";
 
 export class DTOAttendance {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Kategori absensi tidak boleh kosong" })
+  @IsString({ message: "Kategori absensi harus berupa string" })
   category: string;
 
-  @IsNotEmpty()
-  @IsString()
-  date: string;
-<<<<<<< HEAD
+  @IsNotEmpty({ message: "Tanggal absensi tidak boleh kosong" })
+  @IsDate({ message: "Tanggal absensi harus berupa date" })
+  date: Date;
 
-  @IsNotEmpty()
-  @Transform(({ value }) => Number(value), { toClassOnly: true })
-  @IsInt()
-  ekskul_id: number;
-=======
->>>>>>> 9a5c4d384f579de1f1e1f60f9cebf6ba2a975b74
+  @IsNotEmpty({ message: "ID student tidak boleh kosong" })
+  @IsUUID()
+  student_id: string;
+}
+
+export class DTOAttendanceArray {
+  @IsArray({ message: "Array data absensi tidak valid" })
+  @ValidateNested({ each: true })
+  @Type(() => DTOAttendance)
+  attendanceArray: DTOAttendance[];
 }
 
 export class DTOAttendanceById {
-  @IsNotEmpty()
-  @Transform(({ value }) => Number(value), { toClassOnly: true })
-  @IsInt()
+  @IsNotEmpty({ message: "ID absensi tidak boleh kosong" })
+  @IsUUID()
   id: number;
 }

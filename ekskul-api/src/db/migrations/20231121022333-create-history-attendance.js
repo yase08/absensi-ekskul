@@ -18,6 +18,15 @@ module.exports = {
       endDate: {
         type: Sequelize.DATE,
       },
+      type: {
+        type: Sequelize.ENUM("week", "month"),
+      },
+      name: {
+        type: Sequelize.STRING,
+      },
+      year: {
+        type: Sequelize.STRING,
+      },
       ekskul_id: {
         type: Sequelize.UUID,
         references: {

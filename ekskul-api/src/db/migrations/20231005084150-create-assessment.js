@@ -25,8 +25,13 @@ module.exports = {
           key: "id",
         },
       },
+      date: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
       grade: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

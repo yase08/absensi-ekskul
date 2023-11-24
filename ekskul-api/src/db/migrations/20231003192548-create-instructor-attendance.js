@@ -26,6 +26,10 @@ module.exports = {
       category: {
         type: Sequelize.ENUM("hadir", "sakit", "izin", "alpa"),
       },
+      date: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

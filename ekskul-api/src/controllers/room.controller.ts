@@ -21,16 +21,7 @@ export class RoomController extends RoomService {
       return res.status(error.statusCode).json(error);
     }
   };
-
-  getRoom = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const serviceResponse: APIResponse = await this.getRoomService(req);
-      return res.status(serviceResponse.statusCode).json(serviceResponse);
-    } catch (error: any) {
-      return res.status(error.statusCode).json(error);
-    }
-  };
-
+  
   updateRoom = async (req: Request, res: Response): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.updateRoomService(req);

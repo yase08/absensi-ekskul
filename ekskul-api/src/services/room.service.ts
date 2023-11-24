@@ -15,16 +15,16 @@ export class RoomService {
       if (room)
         throw apiResponse(
           status.CONFLICT,
-          `Room ${req.body.name} already exist`
+          `Room dengan nama ${req.body.name} sudah ada`
         );
 
       const createRoom = await db.room.create(req.body);
 
       if (!createRoom)
-        throw apiResponse(status.FORBIDDEN, "Create new room failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat room");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new room success")
+        apiResponse(status.OK, "Room berhasil dibuat")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -48,7 +48,7 @@ export class RoomService {
       const paramQuerySQL: any = {};
       let limit: number;
       let offset: number;
-      
+
       const totalRows = await db.room.count();
 
       if (filter) {
@@ -79,36 +79,10 @@ export class RoomService {
 
       const room = await db.room.findAll(paramQuerySQL);
 
-      if (!room)
-        throw apiResponse(status.NOT_FOUND, "Rooms do not exist");
+      if (!room || room.length === 0) throw apiResponse(status.NOT_FOUND, "Room tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Fetched all rooms success",
-          room,
-          totalRows,
-        )
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getRoomService(req: Request): Promise<any> {
-    try {
-      const room = await db.room.findOne({ where: { id: req.params.id } });
-
-      if (!room) throw apiResponse(status.NOT_FOUND, "Room do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched room success", room)
+        apiResponse(status.OK, "Berhasil mendapatkan room", room, totalRows)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -130,7 +104,7 @@ export class RoomService {
       if (!roomExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Room do not exist for the given id"
+          "Room dengan id tersebut tidak ditemukan"
         );
 
       const roomSame = await db.room.findOne({
@@ -140,7 +114,7 @@ export class RoomService {
       if (roomSame && roomSame.id !== roomExist.id) {
         throw apiResponse(
           status.CONFLICT,
-          `Room with the name ${req.body.name} already exists`
+          `Room dengan nama ${req.body.name} sudah ada`
         );
       }
 
@@ -151,9 +125,9 @@ export class RoomService {
       });
 
       if (!updateRoom)
-        throw apiResponse(status.FORBIDDEN, "Update room failed");
+        throw apiResponse(status.FORBIDDEN, "Update room gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update room success"));
+      return Promise.resolve(apiResponse(status.OK, "Update room berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -174,7 +148,7 @@ export class RoomService {
       if (!roomExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Room do not exist for the given id"
+          "Room dengan id tersebut tidak ditemukan"
         );
 
       const deleteRoom = await db.room.destroy({
@@ -182,9 +156,9 @@ export class RoomService {
       });
 
       if (!deleteRoom)
-        throw apiResponse(status.FORBIDDEN, "Delete room failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal menghapus room");
 
-      return Promise.resolve(apiResponse(status.OK, "Delete room success"));
+      return Promise.resolve(apiResponse(status.OK, "Berhasil menghapus room"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
