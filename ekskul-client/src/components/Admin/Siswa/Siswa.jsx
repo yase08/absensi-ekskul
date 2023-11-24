@@ -17,8 +17,14 @@ const Siswa = () => {
     nis: "",
     email: "",
     mobileNumber: "",
-    rombel_id: "",
-    rayon_id: "",
+    rombel: {
+      id: "",
+      name: "",
+    },
+    rayon: {
+      id: "",
+      name: "",
+    },
     ekskuls: [],
   });
   const [formOld, setFormOld] = useState({});
@@ -32,16 +38,44 @@ const Siswa = () => {
     const name = e.target.name;
     const value = e.target.value;
 
-    if (name === "ekskul_id") {
-      // Get the index from the name attribute (ekskul_id_0, ekskul_id_1, etc.)
-      const index = Number(name.split("_")[2]);
+    if (name.startsWith("ekskul_id")) {     
+      const index = name.substring(name.lastIndexOf("_") + 1);
+      if (formOld) {
+        const updatedEkskulsOld = [...formOld.ekskuls]; // Make a copy of ekskuls array
+        updatedEkskulsOld[index] = value;
+        setFormOld({
+          ...formOld,
+          ekskuls: updatedEkskulsOld,
+        });
+        console.log(formOld);
+      } else {
+        const updatedEkskuls = [...formData.ekskuls]; // Make a copy of ekskuls array
+        updatedEkskuls[index] = value;
+        setFormData({
+          ...formData,
+          ekskuls: updatedEkskuls,
+        });
+      }
 
-      setFormData({
-        ...formData,
-        ekskuls: formData.ekskuls.map((item, i) =>
-          i === index ? Number(value) : item
-        ),
-      });
+     } else if (name === "rombel_id" || name === "rayon_id") {
+      if (formOld) {
+        setFormOld({
+          ...formOld,
+          [name]: {
+            id: value,
+            name: '', 
+          },
+        });
+      } else {
+        setFormData({
+          ...formData,
+          [name]: {
+            id: value,
+            name: '', 
+          },
+        });
+      }
+
     } else {
       if (formOld) {
         setFormOld({
@@ -158,21 +192,26 @@ const Siswa = () => {
     setLoading(true);
 
     try {
-      const response = await createStudent({
-        ...formData,
-        rombel_id: Number(formData.rombel_id),
-        rayon_id: Number(formData.rayon_id),
-      });
+      const response = await createStudent(formData);
 
       console.log(formData);
       const successMessage = response.statusMessage;
 
       Swal.fire({
         icon: "success",
-        title: "Success ww!",
+        title: "Berhasil Membuat Siswa Baru!",
         text: successMessage,
       });
       setOpen(!isOpen);
+      setFormData({
+        name: "",
+        nis: "",
+        email: "",
+        mobileNumber: "",
+        rombel_id: "",
+        rayon_id: "",
+        ekskuls: []
+      })
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
@@ -349,8 +388,8 @@ const Siswa = () => {
                       Rombel
                     </label>
                     <select
-                      name="rombel_id"
-                      value={formOld ? formOld.rombel.id : formData.rombel_id}
+                      name="rombel"
+                      value={formOld ? formOld.rombel.id : formData.rombel.id}
                       className="w-full bg-transparent outline-none border p-3 rounded-md border-gray-400 text-opacity-40"
                       onChange={handleInputChange}
                     >
@@ -359,7 +398,7 @@ const Siswa = () => {
                       </option>
                       {rombel.map((item, index) => {
                         return (
-                          <option key={index} value={Number(item.id)}>
+                          <option key={index} value={item.id}>
                             {item.name}
                           </option>
                         );
@@ -371,8 +410,8 @@ const Siswa = () => {
                       Rayon
                     </label>
                     <select
-                      name="rayon_id"
-                      value={formOld ? formOld.rayon.id : formData.rayon_id}
+                      name="rayon"
+                      value={formOld ? formOld.rayon.id : formData.rayon.id}
                       className="w-full bg-transparent outline-none border p-3 rounded-md border-gray-400 text-opacity-40"
                       onChange={handleInputChange}
                     >
@@ -381,7 +420,7 @@ const Siswa = () => {
                       </option>
                       {rayon.map((item, index) => {
                         return (
-                          <option key={index} value={Number(item.id)}>
+                          <option key={index} value={item.id}>
                             {item.name}
                           </option>
                         );
@@ -404,7 +443,7 @@ const Siswa = () => {
                     </option>
                     {ekskul.map((item, index) => {
                       return (
-                        <option key={index} value={Number(item.id)}>
+                        <option key={index} value={item.id}>
                           {item.name}
                         </option>
                       );
@@ -421,7 +460,7 @@ const Siswa = () => {
                     </option>
                     {ekskul.map((item, index) => {
                       return (
-                        <option key={index} value={Number(item.id)}>
+                        <option key={index} value={item.id}>
                           {item.name}
                         </option>
                       );

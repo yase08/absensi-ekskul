@@ -1,2 +1,2 @@
-export const API = "http://localhost:5000/api";
+export const API = "http://localhost:7000/api";
 export const VERSION = "v1";
