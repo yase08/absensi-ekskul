@@ -158,12 +158,10 @@ export class GalleryService {
           name: item.name,
           slug: item.slug,
           ekskul: item.ekskul
-            ? item.ekskul.map((ekskul: any) => {
-                return {
-                  id: ekskul.id,
-                  name: ekskul.name,
-                };
-              })
+            ? {
+                id: item.ekskul.id,
+                name: item.ekskul.name,
+              }
             : null,
           images: JSON.parse(item.images),
           createdAt: item.createdAt,

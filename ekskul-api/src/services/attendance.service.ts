@@ -453,20 +453,16 @@ export class AttendanceService {
           return {
             id: attendance.id,
             ekskul: attendance.ekskul
-              ? attendance.ekskul.map((ekskul: any) => {
-                  return {
-                    id: ekskul.id,
-                    name: ekskul.name,
-                  };
-                })
+              ? {
+                  id: attendance.ekskul.id,
+                  name: attendance.ekskul.name,
+                }
               : null,
             student: attendance.student
-              ? attendance.student.map((student: any) => {
-                  return {
-                    id: student.id,
-                    name: student.name,
-                  };
-                })
+              ? {
+                  id: attendance.student.id,
+                  name: attendance.student.name,
+                }
               : null,
             category: attendance.category,
             date: attendance.date,

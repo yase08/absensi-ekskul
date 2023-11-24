@@ -127,28 +127,22 @@ export class StudentService {
           email: student.email,
           mobileNumber: student.mobileNumber,
           rombel: student.rombel
-            ? student.rombel.map((rombel: any) => {
-                return {
-                  id: rombel.id,
-                  name: rombel.name,
-                };
-              })
+            ? {
+                id: student.rombel.id,
+                name: student.rombel.name,
+              }
             : null,
           rayon: student.rayon
-            ? student.rayon.map((rayon: any) => {
-                return {
-                  id: rayon.id,
-                  name: rayon.name,
-                };
-              })
+            ? {
+                id: student.rayon.id,
+                name: student.rayon.name,
+              }
             : null,
           ekskuls: student.ekskuls
-            ? student.ekskuls.map((ekskul: any) => {
-                return {
-                  id: ekskul.id,
-                  name: ekskul.name,
-                };
-              })
+          ? {
+            id: student.rombel.id,
+            name: student.rombel.name,
+          }
             : null,
         };
       });
