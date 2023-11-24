@@ -13,6 +13,7 @@ import SlowDown from "express-slow-down";
 import hpp from "hpp";
 import session from "express-session";
 import { swaggerClient, swaggerServe } from "./libs/swagger.lib";
+import 'reflect-metadata';
 import AuthRoutes from "./routes/auth.route";
 import AttendanceRoutes from "./routes/attendance.route";
 import RayonRoutes from "./routes/rayon.route";
@@ -76,13 +77,13 @@ export class App {
         credentials: true,
       })
     );
-    // this.app.use(
-    //   rateLimit({
-    //     windowMs: 24 * 60 * 3,
-    //     max: 1000,
-    //     message: "Too many request, send back request after 3 minute",
-    //   })
-    // );
+    this.app.use(
+      rateLimit({
+        windowMs: 24 * 60 * 3,
+        max: 1000,
+        message: "Too many request, send back request after 3 minute",
+      })
+    );
     this.app.use(
       SlowDown({
         windowMs: 24 * 60 * 1,

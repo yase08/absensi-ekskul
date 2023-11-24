@@ -4,6 +4,7 @@ import { validator } from "../middlewares/validator.middleware";
 import { DTOForgotPassword, DTOLogin, DTOResetToken } from "../dto/auth.dto";
 import { authorization } from "../middlewares/authorization";
 import { auth } from "../middlewares/authentication";
+import { permission } from "../middlewares/permission";
 
 // class RouteUsers mengextends dari AuthController agar bisa memakai semua property dan method dari auth controller
 class AuthRoutes extends AuthController {
@@ -27,6 +28,15 @@ class AuthRoutes extends AuthController {
       "/reset-token/:token",
       [validator(DTOResetToken)],
       this.resetToken
+    );
+    this.router.get(
+      "/profile",
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+      ],
+      this.getProfile
     );
 
     return this.router;

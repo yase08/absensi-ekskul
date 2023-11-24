@@ -26,6 +26,7 @@ export const exportExcel = async (
       "No",
       "Nama",
       "Nis",
+      "JK",
       "Rombel",
       "Rayon",
       "Ekstrakurikuler",

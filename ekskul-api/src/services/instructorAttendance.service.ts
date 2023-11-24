@@ -40,10 +40,7 @@ export class InstructorAttendanceService {
           );
         }
       } else {
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Ekskul tidak ditemukan"
-        );
+        throw apiResponse(status.NOT_FOUND, "Ekskul tidak ditemukan");
       }
     } catch (error: any) {
       return Promise.reject(
@@ -81,12 +78,12 @@ export class InstructorAttendanceService {
         {
           model: db.user,
           as: "user",
-          attributes: ["name"],
+          attributes: ["id", "name"],
         },
         {
           model: db.ekskul,
           as: "ekskul",
-          attributes: ["name"],
+          attributes: ["id", "name"],
         },
       ];
 
@@ -128,8 +125,22 @@ export class InstructorAttendanceService {
         return {
           id: item.id,
           category: item.category,
-          user: item.user ? item.user.name : null,
-          ekskul: item.user ? item.ekskul.name : null,
+          user: item.user
+            ? item.user.map((user: any) => {
+                return {
+                  id: user.id,
+                  name: user.name,
+                };
+              })
+            : null,
+          ekskul: item.ekskul
+            ? item.ekskul.map((ekskul: any) => {
+                return {
+                  id: ekskul.id,
+                  name: ekskul.name,
+                };
+              })
+            : null,
           created_at: item.created_at,
           updated_at: item.updated_at,
         };
@@ -161,10 +172,7 @@ export class InstructorAttendanceService {
       });
 
       if (!instructorExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Instruktur tidak ditemukan"
-        );
+        throw apiResponse(status.NOT_FOUND, "Instruktur tidak ditemukan");
 
       const updateInstructor = await db.instructorAttendance.update(req.body, {
         where: { id: instructorExist.id },
@@ -194,10 +202,7 @@ export class InstructorAttendanceService {
       });
 
       if (!instructorExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Instruktur tidak ditemukan"
-        );
+        throw apiResponse(status.NOT_FOUND, "Instruktur tidak ditemukan");
 
       const deleteInstructor = await db.instructorAttendance.destroy({
         where: { id: instructorExist.id },

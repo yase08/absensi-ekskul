@@ -75,8 +75,8 @@ export class AssessmentService {
       paramQuerySQL.attributes = ["id", "grade", "createdAt", "updatedAt"];
 
       paramQuerySQL.include = [
-        { model: db.student, as: "student", attributes: ["name"] },
-        { model: db.task, as: "task", attributes: ["name"] },
+        { model: db.student, as: "student", attributes: ["id", "name"] },
+        { model: db.task, as: "task", attributes: ["id", "name"] },
       ];
 
       if (sort) {
@@ -105,8 +105,22 @@ export class AssessmentService {
       const manipulatedResponse = assessment.map((item) => ({
         id: item.id,
         grade: item.grade,
-        student: item.student ? item.student.name : null,
-        task: item.task ? item.task.name : null,
+        student: item.student
+          ? item.student.map((student: any) => {
+              return {
+                id: student.id,
+                name: student.name,
+              };
+            })
+          : null,
+        task: item.task
+          ? item.task.map((task: any) => {
+              return {
+                id: task.id,
+                name: task.name,
+              };
+            })
+          : null,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
       }));
@@ -137,10 +151,7 @@ export class AssessmentService {
       });
 
       if (!assessmentExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Penilaian tidak ditemukan"
-        );
+        throw apiResponse(status.NOT_FOUND, "Penilaian tidak ditemukan");
 
       const updateAssessment = await db.assessment.update(req.body, {
         where: {
@@ -172,10 +183,7 @@ export class AssessmentService {
       });
 
       if (!assessmentExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Penilaian tidak ditemukan"
-        );
+        throw apiResponse(status.NOT_FOUND, "Penilaian tidak ditemukan");
 
       await db.assessment.destroy({
         where: { id: assessmentExist.id },

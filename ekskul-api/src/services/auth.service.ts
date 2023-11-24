@@ -238,4 +238,28 @@ export class AuthService {
       );
     }
   }
+
+  async getProfileService(req: Request): Promise<any> {
+    try {
+      const user_id = (req.session as ISession).user.id;
+
+      const user = await db.user.findOne({
+        where: { id: user_id },
+      });
+
+      if (!user) throw apiResponse(status.NOT_FOUND, "User tidak ditemukan");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil mendapatkan user", user)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
 }

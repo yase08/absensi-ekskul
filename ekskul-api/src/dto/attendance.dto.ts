@@ -1,9 +1,6 @@
-// Berfungsi untuk memvalidasi req.body / req.params / req.query
-
 import { Type } from "class-transformer";
 import {
   IsArray,
-  IsDate,
   IsNotEmpty,
   IsString,
   IsUUID,
@@ -16,8 +13,8 @@ export class DTOAttendance {
   category: string;
 
   @IsNotEmpty({ message: "Tanggal absensi tidak boleh kosong" })
-  @IsDate({ message: "Tanggal absensi harus berupa date" })
-  date: Date;
+  @IsString({ message: "Tanggal absensi harus berupa string" })
+  date: string;
 
   @IsNotEmpty({ message: "ID student tidak boleh kosong" })
   @IsUUID()
@@ -25,7 +22,7 @@ export class DTOAttendance {
 }
 
 export class DTOAttendanceArray {
-  @IsArray({ message: "Array data absensi tidak valid" })
+  // @IsArray({ message: "Array data absensi tidak valid" })
   @ValidateNested({ each: true })
   @Type(() => DTOAttendance)
   attendanceArray: DTOAttendance[];
