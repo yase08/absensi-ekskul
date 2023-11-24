@@ -139,10 +139,12 @@ export class StudentService {
               }
             : null,
           ekskuls: student.ekskuls
-          ? {
-            id: student.rombel.id,
-            name: student.rombel.name,
-          }
+            ? student.ekskuls.map((ekskul) => {
+                return {
+                  id: ekskul.id,
+                  name: ekskul.name,
+                };
+              })
             : null,
         };
       });
