@@ -106,20 +106,16 @@ export class AssessmentService {
         id: item.id,
         grade: item.grade,
         student: item.student
-          ? item.student.map((student: any) => {
-              return {
-                id: student.id,
-                name: student.name,
-              };
-            })
+          ? {
+              id: item.student.id,
+              name: item.student.name,
+            }
           : null,
         task: item.task
-          ? item.task.map((task: any) => {
-              return {
-                id: task.id,
-                name: task.name,
-              };
-            })
+          ? {
+              id: item.task.id,
+              name: item.task.name,
+            }
           : null,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,

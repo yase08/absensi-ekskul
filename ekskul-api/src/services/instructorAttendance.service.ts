@@ -126,20 +126,16 @@ export class InstructorAttendanceService {
           id: item.id,
           category: item.category,
           user: item.user
-            ? item.user.map((user: any) => {
-                return {
-                  id: user.id,
-                  name: user.name,
-                };
-              })
+            ? {
+                id: item.user.id,
+                name: item.user.name,
+              }
             : null,
           ekskul: item.ekskul
-            ? item.ekskul.map((ekskul: any) => {
-                return {
-                  id: ekskul.id,
-                  name: ekskul.name,
-                };
-              })
+            ? {
+                id: item.ekskul.id,
+                name: item.ekskul.name,
+              }
             : null,
           created_at: item.created_at,
           updated_at: item.updated_at,

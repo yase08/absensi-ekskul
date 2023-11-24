@@ -85,36 +85,28 @@ export class ActivityService {
           startTime: activity.startTime,
           endTime: activity.endTime,
           rombel: activity.rombel
-            ? activity.rombel.map((rombel: any) => {
-                return {
-                  id: rombel.id,
-                  name: rombel.name,
-                };
-              })
+            ? {
+                id: activity.rombel.id,
+                name: activity.rombel.name,
+              }
             : null,
           room: activity.room
-            ? activity.room.map((room: any) => {
-                return {
-                  id: room.id,
-                  name: room.name,
-                };
-              })
+            ? {
+                id: activity.room.id,
+                name: activity.room.name,
+              }
             : null,
           ekskul: activity.ekskul
-            ? activity.ekskul.map((ekskul: any) => {
-                return {
-                  id: ekskul.id,
-                  name: ekskul.name,
-                };
-              })
+            ? {
+                id: activity.ekskul.id,
+                name: activity.ekskul.name,
+              }
             : null,
           schedule: activity.schedule
-            ? activity.schedule.map((schedule: any) => {
-                return {
-                  id: schedule.id,
-                  name: schedule.name,
-                };
-              })
+            ? {
+                id: activity.schedule.id,
+                name: activity.schedule.name,
+              }
             : null,
           createdAt: activity.createdAt,
           updatedAt: activity.updatedAt,
