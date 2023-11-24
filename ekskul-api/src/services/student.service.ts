@@ -43,9 +43,7 @@ export class StudentService {
       if (!createStudent)
         throw apiResponse(status.FORBIDDEN, "Gagal membuat siswa");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Berhasil membuat siswa")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Berhasil membuat siswa"));
     } catch (error: any) {
       console.log(error);
       return Promise.reject(
@@ -82,9 +80,6 @@ export class StudentService {
           {
             model: db.ekskul,
             attributes: ["id", "name"],
-            through: {
-              attributes: [],
-            },
           },
         ],
       };
@@ -131,16 +126,29 @@ export class StudentService {
           nis: student.nis,
           email: student.email,
           mobileNumber: student.mobileNumber,
-          rombel: {
-            id: student.rombel ? student.rombel.id : null,
-            name: student.rombel ? student.rombel.name : null,
-          },
-          rayon: {
-            id: student.rayon ? student.rayon.id : null,
-            name: student.rayon ? student.rayon.name : null,
-          },
+          rombel: student.rombel
+            ? student.rombel.map((rombel: any) => {
+                return {
+                  id: rombel.id,
+                  name: rombel.name,
+                };
+              })
+            : null,
+          rayon: student.rayon
+            ? student.rayon.map((rayon: any) => {
+                return {
+                  id: rayon.id,
+                  name: rayon.name,
+                };
+              })
+            : null,
           ekskuls: student.ekskuls
-            ? student.ekskuls.map((ekskul: any) => ekskul.name)
+            ? student.ekskuls.map((ekskul: any) => {
+                return {
+                  id: ekskul.id,
+                  name: ekskul.name,
+                };
+              })
             : null,
         };
       });
@@ -171,10 +179,7 @@ export class StudentService {
       });
 
       if (!studentExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Siswa tidak ditemukan"
-        );
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
 
       const updateStudent = await db.student.update(req.body, {
         where: {
@@ -204,10 +209,7 @@ export class StudentService {
       });
 
       if (!studentExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Siswa tidak ditemukan"
-        );
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
 
       await db.studentOnEkskul.destroy({
         where: { student_id: studentExist.id },
@@ -220,7 +222,9 @@ export class StudentService {
       if (!deleteStudent)
         throw apiResponse(status.FORBIDDEN, "Gagal menghapus siswa");
 
-      return Promise.resolve(apiResponse(status.OK, "Berhasil menghapus siswa"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus siswa")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

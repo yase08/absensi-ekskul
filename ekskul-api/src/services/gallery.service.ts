@@ -147,7 +147,7 @@ export class GalleryService {
           {
             model: db.ekskul,
             as: "ekskul",
-            attributes: ["name"],
+            attributes: ["id", "name"],
           },
         ],
       });
@@ -157,7 +157,14 @@ export class GalleryService {
           id: item.id,
           name: item.name,
           slug: item.slug,
-          ekskul: item.ekskul ? item.ekskul.name : null,
+          ekskul: item.ekskul
+            ? item.ekskul.map((ekskul: any) => {
+                return {
+                  id: ekskul.id,
+                  name: ekskul.name,
+                };
+              })
+            : null,
           images: JSON.parse(item.images),
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,

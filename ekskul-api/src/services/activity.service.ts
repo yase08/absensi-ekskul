@@ -43,10 +43,10 @@ export class ActivityService {
       const totalRows = await db.activity.count();
 
       paramQuerySQL.include = [
-        { model: db.rombel, as: "rombel", attributes: ["name"] },
-        { model: db.room, as: "room", attributes: ["name"] },
-        { model: db.ekskul, as: "ekskul", attributes: ["name"] },
-        { model: db.schedule, as: "schedule", attributes: ["day"] },
+        { model: db.rombel, as: "rombel", attributes: ["id", "name"] },
+        { model: db.room, as: "room", attributes: ["id", "name"] },
+        { model: db.ekskul, as: "ekskul", attributes: ["id", "name"] },
+        { model: db.schedule, as: "schedule", attributes: ["id", "name"] },
       ];
 
       if (sort) {
@@ -84,10 +84,38 @@ export class ActivityService {
           id: activity.id,
           startTime: activity.startTime,
           endTime: activity.endTime,
-          rombel: activity.rombel ? activity.rombel.name : null,
-          room: activity.room ? activity.room.name : null,
-          ekskul: activity.ekskul ? activity.ekskul.name : null,
-          schedule: activity.schedule ? activity.schedule.name : null,
+          rombel: activity.rombel
+            ? activity.rombel.map((rombel: any) => {
+                return {
+                  id: rombel.id,
+                  name: rombel.name,
+                };
+              })
+            : null,
+          room: activity.room
+            ? activity.room.map((room: any) => {
+                return {
+                  id: room.id,
+                  name: room.name,
+                };
+              })
+            : null,
+          ekskul: activity.ekskul
+            ? activity.ekskul.map((ekskul: any) => {
+                return {
+                  id: ekskul.id,
+                  name: ekskul.name,
+                };
+              })
+            : null,
+          schedule: activity.schedule
+            ? activity.schedule.map((schedule: any) => {
+                return {
+                  id: schedule.id,
+                  name: schedule.name,
+                };
+              })
+            : null,
           createdAt: activity.createdAt,
           updatedAt: activity.updatedAt,
         };

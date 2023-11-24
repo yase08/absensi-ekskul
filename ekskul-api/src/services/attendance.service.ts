@@ -7,14 +7,11 @@ import { ISession } from "../interfaces/user.interface";
 import { Op } from "sequelize";
 import * as cron from "node-cron";
 
-// Berfungsi untuk menghandle logic dari controler
-
 const db = require("../db/models");
 
 function getStartAndEndWeek(date) {
   const currentDate = date || new Date();
 
-  // Atur zona waktu ke 'Asia/Jakarta' (zona waktu Indonesia Barat)
   const options = { timeZone: "Asia/Jakarta" };
   const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
 
@@ -22,15 +19,12 @@ function getStartAndEndWeek(date) {
   const startDate = new Date(currentDate);
   const endDate = new Date(currentDate);
 
-  // Mengatur tanggal menjadi hari Senin
   startDate.setDate(
     startDate.getDate() - currentDay + (currentDay === 0 ? -6 : 1)
   );
 
-  // Mengatur tanggal menjadi hari Minggu
   endDate.setDate(endDate.getDate() - currentDay + (currentDay === 0 ? 0 : 7));
 
-  // Mendapatkan tanggal awal dan akhir dalam format string
   const start = dateTimeFormat.format(startDate);
   const end = dateTimeFormat.format(endDate);
 
@@ -40,32 +34,23 @@ function getStartAndEndWeek(date) {
   };
 }
 
-function getStartAndEndMonth(date) {
-  const currentDate = date || new Date();
+const getWeekNumber = (date) => {
+  const currentDate: any = Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(date));
 
-  // Atur zona waktu ke 'Asia/Jakarta' (zona waktu Indonesia Barat)
-  const options = { timeZone: "Asia/Jakarta" };
-  const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
+  currentDate.setDate(
+    currentDate.getDate() -
+      currentDate.getDay() +
+      (currentDate.getDay() === 0 ? 1 : -currentDate.getDay() + 1)
+  );
 
-  const startDate = new Date(currentDate);
-  const endDate = new Date(currentDate);
+  const yearStart: any = new Date(currentDate.getFullYear(), 0, 1);
 
-  // Mengatur tanggal menjadi awal bulan
-  startDate.setDate(1);
+  const weekNumber = Math.ceil(((currentDate - yearStart) / 86400000 + 1) / 7);
 
-  // Mengatur tanggal menjadi akhir bulan
-  endDate.setMonth(endDate.getMonth() + 1);
-  endDate.setDate(0);
-
-  // Mendapatkan tanggal awal dan akhir dalam format string
-  const start = dateTimeFormat.format(startDate);
-  const end = dateTimeFormat.format(endDate);
-
-  return {
-    start,
-    end,
-  }
-}
+  return weekNumber;
+};
 
 const countAttendancePerWeekService = async () => {
   try {
@@ -102,9 +87,17 @@ const countAttendancePerWeekService = async () => {
     const createHistoryAttendance = await Promise.all(
       totalAttendance.map(async (ekskulCount, index) => {
         try {
+          const weekNumber = getWeekNumber(
+            Intl.DateTimeFormat("en-US", {
+              timeZone: "Asia/Jakarta",
+            }).format(new Date())
+          );
           const historyAttendance = await db.historyAttendance.create({
             ekskul_id: ekskuls[index].id,
             totalAttendance: ekskulCount,
+            type: "week",
+            year: new Date().getFullYear(),
+            name: `week-${weekNumber}`,
             startDate: start,
             endDate: end,
           });
@@ -128,6 +121,29 @@ const countAttendancePerWeekService = async () => {
     );
   }
 };
+
+function getStartAndEndMonth(date) {
+  const currentDate = date || new Date();
+
+  const options = { timeZone: "Asia/Jakarta" };
+  const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
+
+  const startDate = new Date(currentDate);
+  const endDate = new Date(currentDate);
+
+  startDate.setDate(1);
+
+  endDate.setMonth(endDate.getMonth() + 1);
+  endDate.setDate(0);
+
+  const start = dateTimeFormat.format(startDate);
+  const end = dateTimeFormat.format(endDate);
+
+  return {
+    start,
+    end,
+  };
+}
 
 const countAttendancePerMonthService = async () => {
   try {
@@ -164,11 +180,15 @@ const countAttendancePerMonthService = async () => {
     const createHistoryAttendance = await Promise.all(
       totalAttendance.map(async (ekskulCount, index) => {
         try {
+          const monthName = new Date().getMonth();
           const historyAttendance = await db.historyAttendance.create({
             ekskul_id: ekskuls[index].id,
             totalAttendance: ekskulCount,
             startDate: start,
             endDate: end,
+            type: "month",
+            year: new Date().getFullYear(),
+            name: `${monthName}`,
           });
           return historyAttendance;
         } catch (error) {
@@ -191,9 +211,21 @@ const countAttendancePerMonthService = async () => {
   }
 };
 
-cron.schedule("0 0 * * 0", () => {
-  countAttendancePerWeekService();
-});
+// cron.schedule("0 0 * * 0", () => {
+//   countAttendancePerWeekService();
+// });
+
+// cron.schedule("0 0 1 * *", () => {
+//   countAttendancePerMonthService();
+// });
+
+// cron.schedule("* * * * *", () => {
+//   countAttendancePerWeekService();
+// });
+
+// cron.schedule("* * * * *", () => {
+//   countAttendancePerMonthService();
+// });
 
 export class AttendanceService {
   async createAttendanceService(req: Request): Promise<any> {
@@ -272,7 +304,7 @@ export class AttendanceService {
             {
               model: db.student,
               as: "student",
-              attributes: ["name", "nis"],
+              attributes: ["name", "nis", "gender"],
               include: [
                 {
                   model: db.rombel,
@@ -300,6 +332,11 @@ export class AttendanceService {
             no: attendances.indexOf(attendance) + 1,
             student_name: attendance.student ? attendance.student.name : null,
             student_nis: attendance.student ? attendance.student.nis : null,
+            student_gender: attendance.student
+              ? attendance.student.gender === "male"
+                ? "Laki-laki"
+                : "Perempuan"
+              : null,
             student_rombel: attendance.student
               ? attendance.student.rombel.name
               : null,
@@ -316,6 +353,7 @@ export class AttendanceService {
           { header: "No", key: "no", width: 15 },
           { header: "Nama", key: "student_name", width: 15 },
           { header: "Nis", key: "student_nis", width: 15 },
+          { header: "JK", key: "student_gender", width: 15 },
           { header: "Rombel", key: "student_rombel", width: 15 },
           { header: "Rayon", key: "student_rayon", width: 15 },
           { header: "Ekstrakurikuler", key: "ekskul_name", width: 15 },
@@ -390,12 +428,12 @@ export class AttendanceService {
         paramQuerySQL.include = [
           {
             model: db.ekskul,
-            attributes: ["name"],
+            attributes: ["id", "name"],
             as: "ekskul",
           },
           {
             model: db.student,
-            attributes: ["name"],
+            attributes: ["id", "name"],
             as: "student",
           },
         ];
@@ -414,8 +452,22 @@ export class AttendanceService {
         const modifiedAttendances = attendance.map((attendance) => {
           return {
             id: attendance.id,
-            ekskul: attendance.ekskul.name,
-            student: attendance.student.name,
+            ekskul: attendance.ekskul
+              ? attendance.ekskul.map((ekskul: any) => {
+                  return {
+                    id: ekskul.id,
+                    name: ekskul.name,
+                  };
+                })
+              : null,
+            student: attendance.student
+              ? attendance.student.map((student: any) => {
+                  return {
+                    id: student.id,
+                    name: student.name,
+                  };
+                })
+              : null,
             category: attendance.category,
             date: attendance.date,
             createdAt: attendance.createdAt,
@@ -585,9 +637,18 @@ export class AttendanceService {
 
   async getWeeklyAttendanceChartService(req: Request): Promise<any> {
     try {
-      const { start, end } = getStartAndEndWeek(new Date());
       const weeklyAttendanceData = await db.historyAttendance.findAll({
-        attributes: ["startDate", "endDate", "totalAttendance"],
+        where: {
+          type: "week",
+        },
+        attributes: [
+          "startDate",
+          "endDate",
+          "totalAttendance",
+          "type",
+          "name",
+          "year",
+        ],
         include: [
           {
             model: db.ekskul,
@@ -597,21 +658,35 @@ export class AttendanceService {
         ],
       });
 
-      const formattedData = weeklyAttendanceData.map((attendance) => {
-        return {
+      const formattedData = {};
+
+      weeklyAttendanceData.forEach((attendance) => {
+        const weekName = `week ${attendance.name}`;
+        if (!formattedData[weekName]) {
+          formattedData[weekName] = [];
+        }
+
+        formattedData[weekName].push({
           ekskulName: attendance.ekskul.name,
           startDate: attendance.startDate,
+          year: attendance.year,
           endDate: attendance.endDate,
           totalAttendance: attendance.totalAttendance,
-        };
+        });
+      });
+
+      const sortedWeeks = Object.keys(formattedData).sort();
+
+      const sortedFormattedData = {};
+      sortedWeeks.forEach((week) => {
+        sortedFormattedData[week] = formattedData[week];
       });
 
       return Promise.resolve(
         apiResponse(
           status.OK,
           "Fetched weekly attendance success",
-          formattedData
-          // attendances,
+          sortedFormattedData
         )
       );
     } catch (error: any) {
