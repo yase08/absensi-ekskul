@@ -25,7 +25,16 @@ const Siswa = () => {
       id: "",
       name: "",
     },
-    ekskuls: [],
+    ekskuls: [{
+      id: "",
+      name: ""
+    },
+    {
+      id: "",
+      name: ""
+    }
+    ],
+    gender: ""
   });
   const [formOld, setFormOld] = useState({});
   const [rombel, setRombel] = useState({});
@@ -37,6 +46,7 @@ const Siswa = () => {
   const handleInputChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
+    console.log(formOld);
 
     if (name.startsWith("ekskul_id")) {     
       const index = name.substring(name.lastIndexOf("_") + 1);
@@ -47,7 +57,6 @@ const Siswa = () => {
           ...formOld,
           ekskuls: updatedEkskulsOld,
         });
-        console.log(formOld);
       } else {
         const updatedEkskuls = [...formData.ekskuls]; // Make a copy of ekskuls array
         updatedEkskuls[index] = value;
@@ -57,14 +66,14 @@ const Siswa = () => {
         });
       }
 
-     } else if (name === "rombel_id" || name === "rayon_id") {
+     } else if (name === "rombel" || name === "rayon") {
       if (formOld) {
         setFormOld({
           ...formOld,
           [name]: {
             id: value,
-            name: '', 
-          },
+            name: ''
+          }
         });
       } else {
         setFormData({
@@ -192,8 +201,13 @@ const Siswa = () => {
     setLoading(true);
 
     try {
-      const response = await createStudent(formData);
-
+      const { rombel, rayon, ...otherFormData } = formData;
+      console.log(formData); 
+      const response = await createStudent({
+        ...otherFormData, 
+        rombel_id: rombel, 
+        rayon_id: rayon, 
+      });
       console.log(formData);
       const successMessage = response.statusMessage;
 
@@ -210,7 +224,8 @@ const Siswa = () => {
         mobileNumber: "",
         rombel_id: "",
         rayon_id: "",
-        ekskuls: []
+        ekskuls: [],
+        gender: ""
       })
       console.log("Response:", response.data);
     } catch (error) {
@@ -247,7 +262,7 @@ const Siswa = () => {
     console.log(formOld);
 
     try {
-      const response = await updateStudent(formOld.id, formOld);
+      const response = await updateStudent(formOld.id, {...formOld, rayon_id: formOld.rayon.id, rombel_id: formOld.rombel.id});
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -304,7 +319,7 @@ const Siswa = () => {
       <div className="w-full flex flex-col gap-2">
         <div className="flex justify-between">
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
-            Program
+            Siswa
           </h1>
           <button
             onClick={toggleExpansion}
@@ -326,7 +341,7 @@ const Siswa = () => {
             <div className="flex justify-between p-5 border-b border-gray-300  relative group">
               <p className="font-semibold opacity-70">
                 {" "}
-                {formOld ? "Edit Data Program" : "Add Data Program"}
+                {formOld ? "Edit Data Siswa" : "Add Data Siswa"}
               </p>
               <button onClick={toggleExpansion}>
                 <AiOutlineClose className="text-2xl" />
@@ -382,6 +397,21 @@ const Siswa = () => {
                   placeholder="Input your number"
                   className="bg-transparent outline-none border p-3 rounded-md border-gray-400"
                 />
+                <label htmlFor="" className="text-xl">
+                  Gender
+                </label>
+                <select
+                      name="gender"
+                      value={formOld ? formOld.gender : formData.gender}
+                      className="w-full bg-transparent outline-none border p-3 rounded-md border-gray-400 text-opacity-40"
+                      onChange={handleInputChange}
+                    >
+                      <option selected disabled value="">
+                        Pilih Gender
+                      </option>
+                      <option value="male">Laki-laki</option>
+                      <option value="female">Perempuan</option>
+                    </select>
                 <div className="flex gap-5">
                   <div className="flex gap-2 flex-col w-full">
                     <label htmlFor="" className="text-xl">
@@ -434,7 +464,7 @@ const Siswa = () => {
                 <div className="flex gap-5">
                   <select
                     name={`ekskul_id_${0}`}
-                    value={formOld ? formOld.ekskuls[0] : formData.ekskuls[0]}
+                    value={formOld ? formOld.ekskuls[0].id : formData.ekskuls[0].id}
                     className="w-full bg-transparent outline-none border p-3 rounded-md border-gray-400 text-opacity-40"
                     onChange={handleInputChange}
                   >
@@ -451,7 +481,7 @@ const Siswa = () => {
                   </select>
                   <select
                     name={`ekskul_id_${1}`}
-                    value={formOld ? formOld.ekskuls[1] : formData.ekskuls[1]}
+                    value={formOld ? formOld.ekskuls[1].id : formData.ekskuls[1].id}
                     className="w-full bg-transparent outline-none border p-3 rounded-md border-gray-400 text-opacity-40"
                     onChange={handleInputChange}
                   >

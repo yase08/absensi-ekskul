@@ -65,7 +65,7 @@ export class StudentService {
       const page: any = req.query.page;
 
       const paramQuerySQL: any = {
-        attributes: ["id", "name", "nis", "email", "mobileNumber"],
+        attributes: ["id", "name", "nis", "email", "mobileNumber", "gender"],
         include: [
           {
             model: db.rombel,

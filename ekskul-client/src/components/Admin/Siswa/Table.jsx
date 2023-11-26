@@ -155,6 +155,7 @@ const TableEskul = ({ setFormOld, setOpen }) => {
 
   const handleEdit = async (item) => {
     setFormOld(item);
+    console.log(item);
     setOpen(true);
   };
 
@@ -182,8 +183,8 @@ const TableEskul = ({ setFormOld, setOpen }) => {
   }
 
   return (
-    <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
-      <div className="overflow-x-auto hidden-scroll w-full">
+    <div className="bg-transparent overflow-x-auto p-7 max-md:px-5 h-auto w-full">
+      <div className="w-full">
         <table className="min-w-full border-collapse w-full">
           <thead>
             <tr>
@@ -211,7 +212,10 @@ const TableEskul = ({ setFormOld, setOpen }) => {
               <th className="px-6 py-3 text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
                 Rayon
               </th>
-              <th className="text-right bg-transparent">
+              <th className="px-6 py-3 text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
+                Ekskul
+              </th>
+              <th className="text-right bg-transparent flex">
                 <input
                   type="text"
                   placeholder="Search Here..."
@@ -278,6 +282,12 @@ const TableEskul = ({ setFormOld, setOpen }) => {
                   </td>
                   <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
                     {item.rayon.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
+                    {item.ekskuls.map((ekskul, index) => (
+                      <span className="bg-primary text-white font-bold mr-1 p-2 border rounded-md" key={index}>{ekskul.name}</span>
+                    )
+                    )}
                   </td>
                   {/* <td className="px-6 py-4 whitespace-no-wrap">
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">

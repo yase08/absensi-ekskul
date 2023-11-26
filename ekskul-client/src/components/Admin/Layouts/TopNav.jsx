@@ -9,6 +9,8 @@ import { useState, useEffect } from 'react';
 // import AdminPicture from './AdminPicture';
 // import axios from 'axios';
 import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
+import { logOut } from '../../../services/auth.service'
 
 
 // eslint-disable-next-line react/prop-types
@@ -29,11 +31,50 @@ const TopNav = ({toggleExpansion, toggleOpenProfile, expanded, toggleChangeNavba
       }
     }, []);
 
-    const handleLogout = () => {
-        sessionStorage.removeItem("token")
-        navigate("/admin")
+    const handleLogout = async (event) => {
+        event.preventDefault();
+        
+        try {
+            const response = await logOut();
+            console.log(response);
+            const successMessage = response.statusMessage;
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: successMessage,
+            });
+            navigate("/login")
+            // sessionStorage.removeItem("token")
+          console.log('Response:', response.data);
+        } catch (error) {
+          console.error('Error:', error);
     
+          if (error.response) {
+            const errorMessage = error.response.statusMessage;
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: errorMessage,
+            });
+          } else if (error.request) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: 'No response received from the server.',
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: 'An unexpected error occurred.',
+            });
+          }
+        } finally {
+        //   setLoading(false);
+        }
       }
+
 
   
     const toggleDropdown = () => {

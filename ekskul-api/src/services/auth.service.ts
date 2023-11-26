@@ -92,9 +92,7 @@ export class AuthService {
         where: { role: "instructor" },
       });
       const studentCount = await db.student.count();
-      const activeUserCount = await db.user.count({
-        where: { isActive: true },
-      });
+      const activeUserCount = await db.user.count();
 
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mendapatkan data", {
