@@ -531,7 +531,7 @@ export class AttendanceService {
     }
   }
 
-  async getWeeklyAttendanceChartService(req: Request): Promise<any> {
+  async getHistoryWeeklyAttendanceService(req: Request): Promise<any> {
     try {
       const weeklyAttendanceData = await db.historyAttendance.findAll({
         where: {
