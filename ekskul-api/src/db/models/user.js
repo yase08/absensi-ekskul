@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.ekskul, {
         through: "userOnEkskuls",
         foreignKey: "user_id",
+        as: "ekskuls",
       });
     }
   }

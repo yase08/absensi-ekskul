@@ -2,10 +2,10 @@ import axios from "axios";
 import { API, VERSION } from "../utils/baseUrl";
 import { config } from "../utils/config";
 
-export const getAllStudent = async ({ filter, sort, size, number }) => {
+export const getAllStudent = async () => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/student?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/student`,
       config
     );
     return response.data;
@@ -19,7 +19,7 @@ export const getAllStudent = async ({ filter, sort, size, number }) => {
 export const deleteStudent = async (id) => {
   try {
     const response = await axios.delete(
-      `${API}${VERSION}/student/${id}`,
+      `${API}/${VERSION}/student/${id}`,
       config
     );
     return response.data;
@@ -30,10 +30,11 @@ export const deleteStudent = async (id) => {
   }
 };
 
-export const updateStudent = async (id) => {
+export const updateStudent = async (id, requestData) => {
   try {
-    const response = await axios.delete(
-      `${API}${VERSION}/student/${id}`,
+    const response = await axios.put(
+      `${API}/${VERSION}/student/${id}`,
+      requestData,
       config
     );
     return response.data;
@@ -47,7 +48,7 @@ export const updateStudent = async (id) => {
 export const createStudent = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/student`,
+      `${API}/${VERSION}/student`,
       requestData,
       config
     );

@@ -64,6 +64,19 @@ export class TaskService {
         };
       }
 
+      paramQuerySQL.include = [
+        {
+          model: db.ekskul,
+          as: "ekskul",
+          attributes: ["id", "name"],
+        },
+        {
+          model: db.user,
+          as: "user",
+          attributes: ["id", "name"],
+        },
+      ];
+
       if (sort) {
         const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
         const fieldName = sort.replace(/^-/, "");
@@ -84,11 +97,22 @@ export class TaskService {
 
       const task = await db.task.findAll(paramQuerySQL);
 
+      const modifiedTask = task.map((task) => {
+        return {
+          id: task.id,
+          name: task.name,
+          ekskul: task.ekskul.name,
+          user: task.user.name,
+          createdAt: task.createdAt,
+          updatedAt: task.updatedAt,
+        };
+      });
+
       if (!task || task.length === 0)
         throw apiResponse(status.NOT_FOUND, "Tugas tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Berhasil mendapatkan tugas", task, totalRows)
+        apiResponse(status.OK, "Berhasil mendapatkan tugas", modifiedTask, totalRows)
       );
     } catch (error: any) {
       return Promise.reject(

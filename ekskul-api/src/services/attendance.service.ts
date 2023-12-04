@@ -2,6 +2,7 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { exportExcel } from "../libs/excel.lib";
+import { formatDate, getWeekNumberAndYear, getMonthAndYear } from "../libs/date.lib";
 import { ISession } from "../interfaces/user.interface";
 import { Op } from "sequelize";
 import * as cron from "node-cron";
@@ -237,7 +238,6 @@ export class AttendanceService {
 
         for (const attendance of req.body) {
           const studentId = attendance.student_id;
-
           const studentOnEkskul = await db.studentOnEkskul.findOne({
             where: { student_id: studentId, ekskul_id: selectedEkskulId },
           });
@@ -495,6 +495,106 @@ export class AttendanceService {
       );
     }
   }
+
+  async getChartAttendanceService(req: Request): Promise<any> {
+    try {
+      const weeklyAttendance = {};
+      const monthlyAttendance = {};
+      const dailyAttendance = {};
+      // const ekskuls = (req.session as ISession).user.ekskul;
+      const selectedType = req.query.type;
+
+      const sort: string =
+        typeof req.query.sort === "string" ? req.query.sort : "";
+      const page: any = req.query.page;
+
+      // if (ekskuls.includes(Number(selectedEkskulId))) {
+        const paramQuerySQL: any = {
+          where: { category: selectedType },
+        };
+        let limit: number;
+        let offset: number;
+
+        if (sort) {
+          const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
+          const fieldName = sort.replace(/^-/, "");
+          paramQuerySQL.order = [[fieldName, sortOrder]];
+        }
+
+        if (page && page.size && page.number) {
+          limit = parseInt(page.size, 10);
+          offset = (parseInt(page.number, 10) - 1) * limit;
+          paramQuerySQL.limit = limit;
+          paramQuerySQL.offset = offset;
+        } else {
+          limit = 10;
+          offset = 0;
+          paramQuerySQL.limit = limit;
+          paramQuerySQL.offset = offset;
+        }
+
+        const attendanceFilter = await db.attendance.findAll(paramQuerySQL);         
+
+        if (!attendanceFilter || attendanceFilter.length === 0) {
+          return Promise.resolve(
+            apiResponse(
+              status.NOT_FOUND,
+              "No attendances found with the specified filter"
+            )
+          );
+        }
+
+        attendanceFilter.forEach((attendance) => {
+          
+            const formattedDate = formatDate(attendance.date)
+            
+            if (!dailyAttendance[formattedDate]) {
+              dailyAttendance[formattedDate] = []
+            }
+            dailyAttendance[formattedDate].push(attendance)
+
+            const { weekNumber, year } = getWeekNumberAndYear(attendance.date)
+
+            const weekKey = `${year}-W${weekNumber}`
+            if (!weeklyAttendance[weekKey]) {
+              weeklyAttendance[weekKey] = []
+            }
+            weeklyAttendance[weekKey].push(attendance)
+
+            const { month, formattedYear } = getMonthAndYear(attendance.date)
+
+            const monthKey = `${formattedYear}-${month}`
+            if (!monthlyAttendance[monthKey]) {
+              monthlyAttendance[monthKey] = []
+            }
+            monthlyAttendance[monthKey].push(attendance)
+
+        })
+
+        return Promise.resolve(
+          apiResponse(status.OK, "Fetched all attendances success", {
+            weeklyAttendance,
+            monthlyAttendance,
+            dailyAttendance,
+            // attendances,
+          })
+        );
+      // } else {
+      //   throw apiResponse(
+      //     status.NOT_FOUND,
+      //     "Ekskul do not exist for the given id"
+      //   );
+      // }
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+``}
 
   async updateAttendanceService(req: Request): Promise<any> {
     try {

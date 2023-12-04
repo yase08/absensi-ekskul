@@ -2,10 +2,10 @@ import axios from "axios";
 import { API, VERSION } from "../utils/baseUrl";
 import { config } from "../utils/config";
 
-export const getAllEkskul = async ({ filter, sort, size, number }) => {
+export const getAllEkskul = async () => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/ekskul?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/ekskul`,
       config
     );
     return response.data;
@@ -18,7 +18,7 @@ export const getAllEkskul = async ({ filter, sort, size, number }) => {
 
 export const deleteEkskul = async (id) => {
   try {
-    const response = await axios.delete(`${API}${VERSION}/ekskul/${id}`, config);
+    const response = await axios.delete(`${API}/${VERSION}/ekskul/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -27,10 +27,11 @@ export const deleteEkskul = async (id) => {
   }
 };
 
-export const updateEkskul = async (id) => {
+export const updateEkskul = async (id, requestData) => {
   try {
-    const response = await axios.delete(
-      `${API}${VERSION}/ekskul/${id}`,
+    const response = await axios.put(
+      `${API}/${VERSION}/ekskul/${id}`,
+      requestData,
       config
     );
     return response.data;
@@ -44,7 +45,7 @@ export const updateEkskul = async (id) => {
 export const createEkskul = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/ekskul`,
+      `${API}/${VERSION}/ekskul`,
       requestData,
       config
     );

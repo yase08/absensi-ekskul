@@ -46,7 +46,7 @@ export class ActivityService {
         { model: db.rombel, as: "rombel", attributes: ["id", "name"] },
         { model: db.room, as: "room", attributes: ["id", "name"] },
         { model: db.ekskul, as: "ekskul", attributes: ["id", "name"] },
-        { model: db.schedule, as: "schedule", attributes: ["id", "name"] },
+        { model: db.schedule, as: "schedule", attributes: ["id", "day"] },
       ];
 
       if (sort) {
@@ -105,7 +105,7 @@ export class ActivityService {
           schedule: activity.schedule
             ? {
                 id: activity.schedule.id,
-                name: activity.schedule.name,
+                day: activity.schedule.day,
               }
             : null,
           createdAt: activity.createdAt,

@@ -2,15 +2,19 @@ import Dashboard from "../pages/User/Dashboard/Landing";
 import AdminDashboard from "../pages/Admin/Dashboard/Dashboard";
 import RombelDashboard from "../pages/Admin/Rombel/Rombel";
 import RayonDashboard from "../pages/Admin/Rayon/Rayon";
-import EkstrakulikulerDashboard from "../pages/Admin/Ekstrakulikuler/Ekstrakulikuler";
+import EkstrakurikulerDashboard from "../pages/Admin/Ekstrakurikuler/Ekstrakurikuler";
 import JadwalDashboard from "../pages/Admin/Jadwal/Jadwal";
 import RuanganDashboard from "../pages/Admin/Ruangan/Ruangan";
 import ProgramDashboard from "../pages/Admin/Program/Program";
 import SiswaDashboard from "../pages/Admin/Siswa/Siswa";
-import ProfileDashboard from "../pages/Admin/Profile/Profile"
-import GalleryDashboard from "../pages/Admin/Gallery/Gallery"
-import Login from "../pages/Admin/Login/Login"
+import ProfileDashboard from "../pages/Admin/Profile/Profile";
+import GalleryDashboard from "../pages/Admin/Gallery/Gallery";
+import AbsensiDashboard from "../pages/Admin/Absensi/Absensi";
+import Login from "../pages/Admin/Login/Login";
 import { createBrowserRouter } from "react-router-dom";
+import PenilaianDashboard from "../pages/Admin/Penilaian/Penilaian";
+import TugasDashboard from "../pages/Admin/Tugas/Tugas";
+import HariDashboard from "../pages/Admin/Hari/Hari";
 
 const router = createBrowserRouter([
   {
@@ -22,12 +26,24 @@ const router = createBrowserRouter([
   //   element: <NotFoundPage />,
   // },
   {
-    path: "/admin",
+    path: "/login",
     element: <Login />,
   },
   {
     path: "/admin/dashboard",
     element: <AdminDashboard />,
+  },
+  {
+    path: "/admin/hari",
+    element: <HariDashboard />,
+  },
+  {
+    path: "/admin/penilaian",
+    element: <PenilaianDashboard />,
+  },
+  {
+    path: "/admin/penugasan",
+    element: <TugasDashboard />,
   },
   {
     path: "/admin/rombel",
@@ -38,8 +54,12 @@ const router = createBrowserRouter([
     element: <RayonDashboard />,
   },
   {
-    path: "/admin/ekstrakulikuler",
-    element: <EkstrakulikulerDashboard />,
+    path: "/admin/absensi",
+    element: <AbsensiDashboard />,
+  },
+  {
+    path: "/admin/ekstrakurikuler",
+    element: <EkstrakurikulerDashboard />,
   },
   {
     path: "/admin/jadwal",
@@ -59,12 +79,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin/profile",
-    element: <ProfileDashboard/>,
+    element: <ProfileDashboard />,
   },
   {
     path: "/admin/gallery",
-    element: <GalleryDashboard/>,
+    element: <GalleryDashboard />,
   },
 ]);
 
-export default router
+export default router;

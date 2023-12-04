@@ -18,8 +18,7 @@ export class AuthService {
     try {
       const user = await db.user.findOne({ where: { email: req.body.email } });
 
-      if (!user)
-        throw apiResponse(status.BAD_REQUEST, "Email tidak terdaftar");
+      if (!user) throw apiResponse(status.BAD_REQUEST, "Email tidak terdaftar");
 
       const hashedPassword = await comparePassword(
         user.password,
@@ -27,7 +26,10 @@ export class AuthService {
       );
 
       if (!hashedPassword)
-        throw apiResponse(status.BAD_REQUEST, "Password salah atau email salah");
+        throw apiResponse(
+          status.BAD_REQUEST,
+          "Password salah atau email salah"
+        );
 
       await db.user.update({ isActive: true }, { where: { id: user.id } });
 
@@ -67,8 +69,7 @@ export class AuthService {
     try {
       const user_Id = (req.session as ISession).user.id;
 
-      if (!user_Id)
-        throw apiResponse(status.BAD_REQUEST, "Anda belum login");
+      if (!user_Id) throw apiResponse(status.BAD_REQUEST, "Anda belum login");
 
       await db.user.update({ isActive: false }, { where: { id: user_Id } });
       req.session["user"] = null;
@@ -92,9 +93,7 @@ export class AuthService {
         where: { role: "instructor" },
       });
       const studentCount = await db.student.count();
-      const activeUserCount = await db.user.count({
-        where: { isActive: true },
-      });
+      const activeUserCount = await db.user.count();
 
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mendapatkan data", {
@@ -211,7 +210,10 @@ export class AuthService {
       });
 
       if (!user) {
-        apiResponse(status.BAD_REQUEST, "Token kadaluarsa, silahkan request ulang");
+        apiResponse(
+          status.BAD_REQUEST,
+          "Token kadaluarsa, silahkan request ulang"
+        );
       }
 
       const updateHashedPassword = await hashPassword(req.body.password);
@@ -243,21 +245,55 @@ export class AuthService {
     try {
       const user_id = (req.session as ISession).user.id;
 
-      const user = await db.user.findOne({
-        where: { id: user_id },
-      });
+      const paramQuerySQL: any = {
+        include: [
+          {
+            model: db.ekskul,
+            as: "ekskuls",
+            attributes: ["id", "name"],
+          },
+        ],
+      };
 
-      if (!user) throw apiResponse(status.NOT_FOUND, "User tidak ditemukan");
+      paramQuerySQL.where = {
+        id: user_id,
+      };
+
+      const user = await db.user.findOne(paramQuerySQL);
+
+      if (!user) {
+        return Promise.resolve(
+          apiResponse(status.NOT_FOUND, "User tidak ditemukan")
+        );
+      }
+
+      const modifiedUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        mobileNumber: user.mobileNumber,
+        image: user.image,
+        role: user.role,
+        ekskul: user.ekskuls.map((ekskul) => {
+          return {
+            id: ekskul.id,
+            name: ekskul.name,
+          };
+        }),
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
 
       return Promise.resolve(
-        apiResponse(status.OK, "Berhasil mendapatkan user", user)
+        apiResponse(status.OK, "Berhasil mendapatkan user", modifiedUser)
       );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
           error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
+          error.statusMessage || "Internal Server Error",
+          error.message || "Internal Server Error"
         )
       );
     }

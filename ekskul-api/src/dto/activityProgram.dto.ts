@@ -12,11 +12,11 @@ export class DTOActivityProgram {
   task: string;
 
   @IsNotEmpty({ message: "Tanggal mulai tidak boleh kosong" })
-  @IsDate({ message: "Tanggal mulai harus berupa tanggal" })
+  @IsString({ message: "Tanggal mulai harus berupa tanggal" })
   startDate: Date;
 
   @IsNotEmpty({ message: "Tanggal selesai tidak boleh kosong" })
-  @IsDate({ message: "Tanggal akhir harus berupa tanggal" })
+  @IsString({ message: "Tanggal akhir harus berupa tanggal" })
   endDate: Date;
 }
 

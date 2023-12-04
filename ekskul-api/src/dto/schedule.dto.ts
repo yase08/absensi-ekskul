@@ -32,11 +32,11 @@ export class DTOActivity {
   ekskul_id: string;
 
   @IsNotEmpty({ message: "Waktu mulai tidak boleh kosong" })
-  @IsDate({ message: "Waktu mulai harus berupa tanggal" })
+  @IsString({ message: "Waktu mulai harus berupa tanggal" })
   startTime: Date;
 
   @IsNotEmpty({ message: "Waktu selesai tidak boleh kosong" })
-  @IsDate({ message: "Waktu selesai harus berupa tanggal" })
+  @IsString({ message: "Waktu selesai harus berupa tanggal" })
   endTime: Date;
 }
 

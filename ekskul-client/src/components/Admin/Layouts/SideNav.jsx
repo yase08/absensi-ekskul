@@ -13,6 +13,8 @@ import { useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { BsJoystick } from 'react-icons/bs'
 import { IoDiamondSharp } from 'react-icons/io5'
+import { GrTask } from "react-icons/gr";
+import { MdCoPresent, MdOutlineAssessment } from "react-icons/md";
 import Button from "../../../components/Admin/Layouts/Button";
 // import ColorSettingForm from './ColorSettingForm'
 
@@ -214,9 +216,9 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                         </div>
                 </div>
                     )}
-                    <nav className={`bg-white max-lg:border-r h-[100vh] z-50 transition-all duration-[700ms] fixed ${expanded ? 'max-lg:w-[320px] lg:w-[65px] ':'max-lg:w-0 overflow-y-scroll hidden-scroll lg:w-[320px]'}`}>
+                    <nav className={`bg-white max-lg:border-r h-[100vh] z-50 transition-all duration-[700ms] fixed  ${expanded ? 'max-lg:w-[320px] lg:w-[65px] ':'max-lg:w-0 overflow-y-scroll hidden-scroll lg:w-[320px]'}`}>
                <Button toggleExpansion={toggleExpansion} expanded={expanded}/>
-               <div>
+               <div className='max-lg:overflow-hidden'>
 
                         <ul className="w-full bg-transparent flex justify-center items-center h-[72px]">
                             <button onClick={toggleExpansion} className={`cursor-pointer uppercase font-semibold opacity-75 font antialiased tracking-[2px] font-poppins ${expanded ? 'lg:hidden':'max-lg:hidden'}`}>Eksul</button>
@@ -303,9 +305,9 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                     <div                            
                     className={`bg-transparent w-full ${expanded ? 'lg:px-1':''}`}>
                         <a
-                            href='/admin/ekstrakulikuler'
+                            href='/admin/ekstrakurikuler'
                            onMouseEnter={handleNavbarHomeMouseEnter2} onMouseLeave={handleNavbarHomeMouseLeave2}
-                            className={`relative flex items-center    ${currentPath === '/admin/ekstrakulikuler' || currentPath === '/admin/ekstrakulikuler/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute ') : 'w-full h-[60px] '} ${currentPath === '/admin/ekstrakulikuler' || currentPath === '/admin/ekstrakulikuler/' ? (expanded ? 'w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md' : 'before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute ') : 'w-full h-[60px] '} ${expanded ? 'items-center lg:justify-center animate-fade-in-out max-lg:px-8' : 'justify-between lg:px-9'}`}
+                            className={`relative flex items-center    ${currentPath === '/admin/ekstrakurikuler' || currentPath === '/admin/ekstrakurikuler/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute ') : 'w-full h-[60px] '} ${currentPath === '/admin/ekstrakurikuler' || currentPath === '/admin/ekstrakurikuler/' ? (expanded ? 'w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md' : 'before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute ') : 'w-full h-[60px] '} ${expanded ? 'items-center lg:justify-center animate-fade-in-out max-lg:px-8' : 'justify-between lg:px-9'}`}
                             >
                                 <div className='flex gap-x-[24.5px] items-center '>
                                <GiBasketballBall className={`opacity-100 ${expanded ? (currentPath === '/data' ? 'text-2xl opacity-100 text-white' : 'text-2xl opacity-60 text-black') : 'opacity-60'}`}/>
@@ -316,6 +318,72 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                                         <div className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${expanded ? 'max-lg:hidden' : 'hidden'}`}>
                                  <div className='bg-black py-[4px] px-[5px] rounded-sm '>
                                         <p className='font-semibold font-poppins text-sm z-50'>Esktrakulikuler </p>
+                                 </div>
+                             </div>
+                        )}
+                    </div>
+                  </div>
+                  <div className={`flex flex-col gap-y-[13px] relative   ${expanded?'':'w-full h-[55px] mt-[15px] flex justify-center'}`}>
+                    <div                            
+                    className={`bg-transparent w-full ${expanded ? 'lg:px-1':''}`}>
+                        <a
+                            href='/admin/absensi'
+                           onMouseEnter={handleNavbarHomeMouseEnter2} onMouseLeave={handleNavbarHomeMouseLeave2}
+                            className={`relative flex items-center    ${currentPath === '/admin/absensi' || currentPath === '/admin/absensi/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute ') : 'w-full h-[60px] '} ${currentPath === '/admin/absensi' || currentPath === '/admin/absensi/' ? (expanded ? 'w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md' : 'before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute ') : 'w-full h-[60px] '} ${expanded ? 'items-center lg:justify-center animate-fade-in-out max-lg:px-8' : 'justify-between lg:px-9'}`}
+                            >
+                                <div className='flex gap-x-[24.5px] items-center '>
+                               <MdCoPresent  className={`opacity-100 ${expanded ? (currentPath === '/data' ? 'text-2xl opacity-100 text-white' : 'text-2xl opacity-60 text-black') : 'opacity-60'}`}/>
+                                <p  className={`opacity-60 text-sm ${expanded ? 'lg:hidden' : ''} transition-opacity`}>Absensi Siswa</p>
+                                </div>
+                            </a>
+                            {infoHome2Navbar && (
+                                        <div className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${expanded ? 'max-lg:hidden' : 'hidden'}`}>
+                                 <div className='bg-black py-[4px] px-[5px] rounded-sm '>
+                                        <p className='font-semibold font-poppins text-sm z-50'>Absensi </p>
+                                 </div>
+                             </div>
+                        )}
+                    </div>
+                  </div>
+                  <div className={`flex flex-col gap-y-[13px] relative   ${expanded?'':'w-full h-[55px] mt-[15px] flex justify-center'}`}>
+                    <div                            
+                    className={`bg-transparent w-full ${expanded ? 'lg:px-1':''}`}>
+                        <a
+                            href='/admin/penilaian'
+                           onMouseEnter={handleNavbarHomeMouseEnter2} onMouseLeave={handleNavbarHomeMouseLeave2}
+                            className={`relative flex items-center    ${currentPath === '/admin/penilaian' || currentPath === '/admin/penilaian/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute ') : 'w-full h-[60px] '} ${currentPath === '/admin/penilaian' || currentPath === '/admin/penilaian/' ? (expanded ? 'w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md' : 'before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute ') : 'w-full h-[60px] '} ${expanded ? 'items-center lg:justify-center animate-fade-in-out max-lg:px-8' : 'justify-between lg:px-9'}`}
+                            >
+                                <div className='flex gap-x-[24.5px] items-center '>
+                               <MdOutlineAssessment className={`opacity-100 ${expanded ? (currentPath === '/data' ? 'text-2xl opacity-100 text-white' : 'text-2xl opacity-60 text-black') : 'opacity-60'}`}/>
+                                <p  className={`opacity-60 text-sm ${expanded ? 'lg:hidden' : ''} transition-opacity`}>Penilaian</p>
+                                </div>
+                            </a>
+                            {infoHome2Navbar && (
+                                        <div className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${expanded ? 'max-lg:hidden' : 'hidden'}`}>
+                                 <div className='bg-black py-[4px] px-[5px] rounded-sm '>
+                                        <p className='font-semibold font-poppins text-sm z-50'>Penilaian </p>
+                                 </div>
+                             </div>
+                        )}
+                    </div>
+                  </div>
+                  <div className={`flex flex-col gap-y-[13px] relative   ${expanded?'':'w-full h-[55px] mt-[15px] flex justify-center'}`}>
+                    <div                            
+                    className={`bg-transparent w-full ${expanded ? 'lg:px-1':''}`}>
+                        <a
+                            href='/admin/penugasan'
+                           onMouseEnter={handleNavbarHomeMouseEnter2} onMouseLeave={handleNavbarHomeMouseLeave2}
+                            className={`relative flex items-center    ${currentPath === '/admin/penugasan' || currentPath === '/admin/penugasan/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute ') : 'w-full h-[60px] '} ${currentPath === '/admin/penugasan' || currentPath === '/admin/penugasan/' ? (expanded ? 'w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md' : 'before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute ') : 'w-full h-[60px] '} ${expanded ? 'items-center lg:justify-center animate-fade-in-out max-lg:px-8' : 'justify-between lg:px-9'}`}
+                            >
+                                <div className='flex gap-x-[24.5px] items-center '>
+                               <GrTask className={`opacity-100 ${expanded ? (currentPath === '/data' ? 'text-2xl opacity-100 text-white' : 'text-2xl opacity-60 text-black') : 'opacity-60'}`}/>
+                                <p  className={`opacity-60 text-sm ${expanded ? 'lg:hidden' : ''} transition-opacity`}>Penugasan</p>
+                                </div>
+                            </a>
+                            {infoHome2Navbar && (
+                                        <div className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${expanded ? 'max-lg:hidden' : 'hidden'}`}>
+                                 <div className='bg-black py-[4px] px-[5px] rounded-sm '>
+                                        <p className='font-semibold font-poppins text-sm z-50'>Penilaian </p>
                                  </div>
                              </div>
                         )}

@@ -17,8 +17,16 @@ class AuthRoutes extends AuthController {
 
   routes(): Router {
     this.router.post("/login", [validator(DTOLogin)], this.login);
-    this.router.get("/count", [authorization(), auth()], this.getCount);
-    this.router.post("/logout", [authorization(), auth()], this.logout);
+    this.router.get(
+      "/count",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.getCount
+    );
+    this.router.post(
+      "/logout",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.logout
+    );
     this.router.post(
       "/forgot-password",
       [validator(DTOForgotPassword)],
@@ -31,11 +39,7 @@ class AuthRoutes extends AuthController {
     );
     this.router.get(
       "/profile",
-      [
-        authorization(),
-        auth(),
-        permission(["instructor", "admin"]),
-      ],
+      [authorization(), auth(), permission(["admin", "instructor"])],
       this.getProfile
     );
 

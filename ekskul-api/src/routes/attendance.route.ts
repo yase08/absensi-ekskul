@@ -22,7 +22,7 @@ class AttendanceRoutes extends AttendanceController {
         authorization(),
         auth(),
         permission(["instructor", "admin"]),
-        validator(DTOAttendanceArray),
+        // validator(DTOAttendanceArray),
       ],
       this.createAttendance
     );

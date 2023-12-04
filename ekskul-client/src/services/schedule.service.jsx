@@ -5,7 +5,7 @@ import { config } from "../utils/config";
 export const getAllSchedule = async ({ filter, sort, size, number }) => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/schedule?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/schedule?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
       config
     );
     return response.data;
@@ -18,7 +18,7 @@ export const getAllSchedule = async ({ filter, sort, size, number }) => {
 
 export const getSchedule = async () => {
   try {
-    const response = await axios.get(`${API}${VERSION}/schedule/data`);
+    const response = await axios.get(`${API}/${VERSION}/schedule/data`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -30,7 +30,7 @@ export const getSchedule = async () => {
 export const deleteActivity = async (id) => {
   try {
     const response = await axios.delete(
-      `${API}${VERSION}/schedule/activity/${id}`,
+      `${API}/${VERSION}/schedule/activity/${id}`,
       config
     );
     return response.data;
@@ -44,7 +44,7 @@ export const deleteActivity = async (id) => {
 export const updateActivity = async (id) => {
   try {
     const response = await axios.delete(
-      `${API}${VERSION}/schedule/activity/${id}`,
+      `${API}/${VERSION}/schedule/activity/${id}`,
       config
     );
     return response.data;
@@ -58,7 +58,7 @@ export const updateActivity = async (id) => {
 export const createSchedule = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/schedule`,
+      `${API}/${VERSION}/schedule`,
       requestData,
       config
     );
@@ -73,7 +73,7 @@ export const createSchedule = async (requestData) => {
 export const createActivity = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/schedule/activity`,
+      `${API}/${VERSION}/schedule/activity`,
       requestData,
       config
     );

@@ -5,7 +5,7 @@ import { config } from "../utils/config";
 export const getAllGallery = async ({ filter, sort, size, number }) => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/gallery?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/gallery?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
       config
     );
     return response.data;
@@ -19,7 +19,7 @@ export const getAllGallery = async ({ filter, sort, size, number }) => {
 export const getGallery = async (slug) => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/gallery/${slug}`,
+      `${API}/${VERSION}/gallery/${slug}`,
       config
     );
     return response.data;
@@ -33,7 +33,7 @@ export const getGallery = async (slug) => {
 export const deleteGallery = async (id) => {
   try {
     const response = await axios.delete(
-      `${API}${VERSION}/gallery/${id}`,
+      `${API}/${VERSION}/gallery/${id}`,
       config
     );
     return response.data;
@@ -47,7 +47,7 @@ export const deleteGallery = async (id) => {
 export const updateGallery = async (id) => {
   try {
     const response = await axios.delete(
-      `${API}${VERSION}/gallery/${id}`,
+      `${API}/${VERSION}/gallery/${id}`,
       config
     );
     return response.data;
@@ -61,7 +61,7 @@ export const updateGallery = async (id) => {
 export const createGallery = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/gallery`,
+      `${API}/${VERSION}/gallery`,
       requestData,
       config
     );

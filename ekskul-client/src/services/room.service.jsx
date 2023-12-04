@@ -5,7 +5,7 @@ import { config } from "../utils/config";
 export const getAllRoom = async ({ filter, sort, size, number }) => {
   try {
     const response = await axios.get(
-      `${API}${VERSION}/room?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/room?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
       config
     );
     return response.data;
@@ -18,7 +18,7 @@ export const getAllRoom = async ({ filter, sort, size, number }) => {
 
 export const deleteRoom = async (id) => {
   try {
-    const response = await axios.delete(`${API}${VERSION}/room/${id}`, config);
+    const response = await axios.delete(`${API}/${VERSION}/room/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -27,10 +27,11 @@ export const deleteRoom = async (id) => {
   }
 };
 
-export const updateRoom = async (id) => {
+export const updateRoom = async (id, requestData) => {
   try {
-    const response = await axios.delete(
-      `${API}${VERSION}/room/${id}`,
+    const response = await axios.put(
+      `${API}/${VERSION}/room/${id}`,
+      requestData,
       config
     );
     return response.data;
@@ -44,7 +45,7 @@ export const updateRoom = async (id) => {
 export const createRoom = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/room`,
+      `${API}/${VERSION}/room`,
       requestData,
       config
     );

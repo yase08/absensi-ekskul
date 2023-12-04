@@ -12,7 +12,7 @@ const Jumbotron = () => {
            <span className="text-[#ff914d]">kuler</span>
         </p>
         <h1 className="font-bold text-[48px] leading-[normal] text-[#004aad]">WIKRAMA</h1>
-        <p className='capitalize my-2'>segala informasi tentang ekstrakulikuler di <span className='uppercase'>smk wikrama bogor</span> ada di sini</p>
+        <p className='capitalize my-2'>segala informasi tentang ekstrakurikuler di <span className='uppercase'>smk wikrama bogor</span> ada di sini</p>
         <button className='bg-[#004AAD] p-[22px] text-white rounded-xl capitalize mt-5 text-[20px] font-bold'>get ekstrakurikuler</button>
       </div>
       <div className='w-[38%] absolute top-0 right-0'>

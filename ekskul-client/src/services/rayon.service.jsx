@@ -2,10 +2,10 @@ import axios from "axios";
 import { API, VERSION } from "../utils/baseUrl";
 import { config } from "../utils/config";
 
-export const getAllRayon = async ({ filter, sort, size, number }) => {
+export const getAllRayon = async () => {
   try {
     const response = await axios.get(
-      `${API}/${VERSION}/rayon?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/rayon`,
       config
     );
     return response.data;
@@ -18,7 +18,7 @@ export const getAllRayon = async ({ filter, sort, size, number }) => {
 
 export const deleteRayon = async (id) => {
   try {
-    const response = await axios.delete(`${API}${VERSION}/rayon/${id}`, config);
+    const response = await axios.delete(`${API}/${VERSION}/rayon/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -27,16 +27,17 @@ export const deleteRayon = async (id) => {
   }
 };
 
-export const updateRayon = async (id) => {
+export const updateRayon = async (id, requestData) => {
   try {
-    const response = await axios.delete(
-      `${API}${VERSION}/rayon/${id}`,
+    const response = await axios.put(
+      `${API}/${VERSION}/rayon/${id}`,
+      requestData,
       config
     );
     return response.data;
   } catch (error) {
     if (error.response) {
-      throw error.response.data.message;
+      throw error.response.data;
     }
   }
 };
@@ -44,14 +45,14 @@ export const updateRayon = async (id) => {
 export const createRayon = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}${VERSION}/rayon`,
+      `${API}/${VERSION}/rayon`,
       requestData,
       config
     );
-    return response.data;
+    return response.data.statusMessage;
   } catch (error) {
     if (error.response) {
-      throw error.response.data.message;
+      throw error.response.data;
     }
   }
 };

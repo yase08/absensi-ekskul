@@ -8,7 +8,7 @@ export class DTOInstructorAttendance {
   category: string;
 
   @IsNotEmpty({ message: "Waktu absensi tidak boleh kosong" })
-  @IsDate({ message: "Waktu absensi harus berupa tanggal" })
+  @IsString({ message: "Waktu absensi harus berupa tanggal" })
   date: Date;
 }
 

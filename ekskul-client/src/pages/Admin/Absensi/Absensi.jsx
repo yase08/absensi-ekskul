@@ -1,15 +1,14 @@
-
 import SideNav from "../../../components/Admin/Layouts/SideNav";
 import TopNav from "../../../components/Admin/Layouts/TopNav"
 import {useState} from "react";
-import EkstrakulikulerComponent from "../../../components/Admin/Ekstrakulikuler/Ekstrakulikuler"
+import AbsensiComponent from "../../../components/Admin/Absensi/Absensi"
 import Tein from "../../../components/Admin/magic/Tein";
 import ColorSettingForm from "../../../components/Admin/Layouts/HiddenColor/Navbar";
 // import Jumbotron from "../../../components/Admin/Jumbotron/Jumbotron";
 
 
-const Ekstrakulikuler = () => {
-    const [expanded, setExpanded] = useState(true);
+const Absensi = () => {
+    const [expanded, setExpanded] = useState(false);
     // Inside your component's state declarations
 const [loading, setLoading] = useState(false);
 
@@ -40,16 +39,15 @@ const [loading, setLoading] = useState(false);
     };
 
     return (
-        <> 
-        < div className = "flex overflow-hidden " > 
+        <> < div className = "flex overflow-hidden " > 
         <SideNav expanded={expanded} toggleExpansion={toggleExpansion} changeNavbar={changeNavbar} toggleOpenHelpNav={toggleOpenHelpNav}/>
-
+        
         <div
             className={`w-full transition-all overflow-hidden duration-[700ms] ${expanded
                 ? 'lg:ml-[65.5px]'
                 : 'lg:ml-[320px]'}`}>
             <TopNav toggleOpenChangeBg={toggleOpenChangeBg} toggleExpansion={toggleExpansion} toggleChangeNavbar={toggleChangeNavbar} expanded={expanded} toggleOpenProfile={toggleOpenProfile}/>
-            <EkstrakulikulerComponent/>
+            <AbsensiComponent/>
         </div>
         {openHelpNav && (
         <Tein toggleOpenHelpNav={toggleOpenHelpNav} setLoading={setLoading} loading={loading}/>
@@ -66,4 +64,4 @@ const [loading, setLoading] = useState(false);
     )
 }
 
-export default Ekstrakulikuler
+export default Absensi

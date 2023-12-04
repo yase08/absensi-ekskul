@@ -14,7 +14,7 @@ export class DTOGallery {
   name: string;
 
   @IsNotEmpty({ message: "Tanggal tidak boleh kosong" })
-  @IsDate({ message: "Tipe data harus tanggal" })
+  @IsString({ message: "Tipe data harus tanggal" })
   date: Date;
 
   @IsNotEmpty({ message: "Gambar tidak boleh kosong" })

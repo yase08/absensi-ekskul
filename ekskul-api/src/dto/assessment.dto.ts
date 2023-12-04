@@ -5,7 +5,7 @@ import {
   IsNotEmpty,
   IsInt,
   IsUUID,
-  IsDate,
+  IsString,
   IsArray,
   ValidateNested,
 } from "class-validator";
@@ -24,7 +24,7 @@ export class DTOAssessment {
   student_id: string;
 
   @IsNotEmpty({ message: "Waktu tidak boleh kosong" })
-  @IsDate({ message: "Waktu harus berupa tanggal" })
+  @IsString({ message: "Waktu harus berupa tanggal" })
   date: Date;
 }
 
