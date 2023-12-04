@@ -21,10 +21,10 @@ const SiswaComponent = () => {
     nis: "",
     email: "",
     mobileNumber: "",
-    gender: "",
-    rombel_id: "",
-    rayon_id: "",
-    ekskul_id: "",
+    // gender: "",
+    // rombel_id: "",
+    // rayon_id: "",
+    // ekskul_id: "",
   });
   const [formOld, setFormOld] = useState({});
   const [loading, setLoading] = useState(false);
@@ -180,18 +180,14 @@ const SiswaComponent = () => {
   };
 
   const handleInputChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-
     if (formOld) {
       setFormOld({
         ...formOld,
-        [name]: value,
       });
     } else {
       setFormData({
         ...formData,
-        [name]: value,
+        [e.target.name]: e.target.value,
       });
     }
   };
@@ -204,7 +200,7 @@ const SiswaComponent = () => {
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
-      <div className="w-full flex flex-col gap-2">
+      <div className="w-full flex flex-col gap-3">
         <div className="flex justify-between">
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
             Siswa
@@ -272,7 +268,7 @@ const SiswaComponent = () => {
             placeholder="Masukan nomer telpon"
             onChange={handleInputChange}
           />
-          <label htmlFor="" className="text-lg">
+          {/* <label htmlFor="" className="text-lg">
             Jenis Kelamin
           </label>
           <Select
@@ -323,7 +319,7 @@ const SiswaComponent = () => {
             // value={formOld ? formOld.ekskul : formData.ekskul}
             onChange={handleInputChange}
             options={ekskulOption}
-          />
+          /> */}
         </form>
       </Modal>
     </div>

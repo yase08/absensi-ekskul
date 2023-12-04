@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { deleteStudent, getAllStudent } from "../../../services/student.service";
+import {
+  deleteStudent,
+  getAllStudent,
+} from "../../../services/student.service";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
-import { Table, Input, Space, Button } from "antd";
+import { Table, Input, Space, Button, Tag } from "antd";
 
 const TableSiswa = ({ setFormOld }) => {
   const [searchText, setSearchText] = useState("");
@@ -258,6 +261,7 @@ const TableSiswa = ({ setFormOld }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("rombel"),
+      render: (rombel) => (rombel ? rombel.name : "-"),
     },
     {
       title: "Rayon",
@@ -266,14 +270,21 @@ const TableSiswa = ({ setFormOld }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("rayon"),
+      render: (rayon) => (rayon ? rayon.name : "-"),
     },
     {
       title: "Ekstrakurikuler",
-      dataIndex: "ekskul",
-      sorter: handleSort("ekskul"),
+      dataIndex: "ekskuls",
+      sorter: handleSort("ekskuls"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("ekskul"),
+      ...getColumnSearchProps("ekskuls"),
+      render: (ekskuls) =>
+        ekskuls
+          ? ekskuls.map((ekskul) => {
+              return <Tag key={ekskul.id} color="geekblue" style={{ marginRight: 5 }}>{ekskul.name}</Tag>;
+            })
+          : "-",
     },
     {
       title: "Aksi",
@@ -332,6 +343,7 @@ const TableSiswa = ({ setFormOld }) => {
           )}
           pagination={getPaginationConfig()}
           loading={loading}
+          scroll={{ x: "max-content" }}
         />
       </div>
     </div>

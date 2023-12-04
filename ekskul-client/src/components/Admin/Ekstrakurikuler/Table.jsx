@@ -284,6 +284,7 @@ const TableEkskul = ({ setFormOld, setOpen }) => {
           )}
           pagination={getPaginationConfig()}
           loading={loading}
+          scroll={{ x: "max-content" }}
         />
       </div>
     </div>

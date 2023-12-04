@@ -1,103 +1,157 @@
-import { useState, useEffect } from "react";
-import {
-  AiOutlineArrowDown,
-  AiOutlineArrowUp,
-  AiOutlineSearch,
-} from "react-icons/ai";
-import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
-import { useDebouncedCallback } from "use-debounce";
-import Swal from "sweetalert2";
+import { useState, useEffect, useRef } from "react";
 import {
   deleteActivity,
   getAllActivity,
 } from "../../../services/activity.service";
+import Swal from "sweetalert2";
+import { SearchOutlined } from "@ant-design/icons";
+import { Table, Input, Space, Button } from "antd";
 
-const TableJadwal = () => {
+const TableJadwal = ({ setFormOld }) => {
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
-  const [filter, setFilter] = useState("");
-  const [sort, setSort] = useState("");
-  const [search, setSearch] = useState("");
-  const [size, setSize] = useState("10");
-  const [number, setNumber] = useState("1");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [getAllData, setGetAllData] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const searchInput = useRef(null);
+  const pageSizeOptions = [10, 20, 50];
+  const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
 
-  const ToggleHandleSearch = () => {
-    setSearch(!search);
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
   };
 
-  const debounced = useDebouncedCallback(
-    // function
-    (value) => {
-      setFilter(value);
-      console.log(value);
+  const handleSort = (dataIndex) => (a, b) => {
+    const valueA = String(a[dataIndex]).toLowerCase();
+    const valueB = String(b[dataIndex]).toLowerCase();
+
+    return valueA.localeCompare(valueB);
+  };
+
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: "block",
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: false,
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            close
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1677ff" : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      String(record[dataIndex]).toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
     },
-    // delay in ms
-    1500
-  );
+    render: (text) => (searchedColumn === dataIndex ? <div>{text}</div> : text),
+  });
 
-  const totalPages = Math.ceil(getAllData / size); // Calculate total pages
-
-  const handlePrevPage = () => {
-    if (number > 1) {
-      setNumber(number - 1);
-    }
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
   };
 
-  const handleNextPage = () => {
-    if (number < totalPages) {
-      setNumber(number + 1);
-    }
+  const handleChangePageSize = (current, size) => {
+    setCurrentPage(1);
+    setPageSize(size);
   };
 
-  const generatePaginationButtons = () => {
-    const paginationButtons = [];
-
-    for (let i = 1; i <= totalPages; i++) {
-      paginationButtons.push(
-        <button
-          key={i}
-          className={`w-[40px] h-[40px] bg-primary rounded-md ${
-            i === number ? "bg-blue-600" : "hover:bg-blue-400"
-          }`}
-          onClick={() => setNumber(i)}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return paginationButtons;
-  };
-
-  const DescAndAsc = () => {
-    setSort(sort === "-name" ? "name" : "-name");
-  };
-
-  const pageSizeOptions = [10, 25, 50];
-
-  const handlePageSize = (e) => {
-    const newSize = e.target.value;
-    setSize(newSize);
-    setNumber(1);
-  };
+  const getPaginationConfig = () => ({
+    current: currentPage,
+    pageSize: pageSize,
+    total: data.length,
+    pageSizeOptions: pageSizeOptions,
+    showSizeChanger: true,
+    onChange: handleChangePage,
+    onShowSizeChange: handleChangePageSize,
+  });
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllActivity({ filter, sort, size, number });
+      const response = await getAllActivity();
 
       if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
         if (Array.isArray(response.data)) {
-          const jadwalData = response.data;
-          setData(jadwalData);
-
-          // Filter the jadwal options based on your criteria
-          // Set the total data count
-          setGetAllData(response.option);
+          const activityData = response.data;
+          setData(activityData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -125,7 +179,6 @@ const TableJadwal = () => {
       });
 
       handleGetRequest();
-      console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
 
@@ -154,9 +207,93 @@ const TableJadwal = () => {
     }
   };
 
+  const columns = [
+    {
+      title: "No",
+      dataIndex: "no",
+      render: (text, record, index) => index + 1,
+      width: "10%",
+    },
+    {
+      title: "Hari",
+      dataIndex: "schedule",
+      sorter: handleSort("schedule"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("schedule"),
+      render: (schedule) => schedule.day ? schedule.day : "-",
+    },
+    {
+      title: "Ekstrakurikuler",
+      dataIndex: "ekskul",
+      sorter: handleSort("ekskul"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("ekskul"),
+      render: (ekskul) => ekskul.name ? ekskul.name : "-",
+    },
+    {
+      title: "Ruangan",
+      dataIndex: "room",
+      sorter: handleSort("room"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("room"),
+      render: (room) => room.name ? room.name : "-",
+    },
+    {
+      title: "Rombel",
+      dataIndex: "rombel",
+      sorter: handleSort("rombel"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("rombel"),
+      render: (rombel) => rombel ? rombel.name : "-",
+    },
+    {
+      title: "Jam Mulai",
+      dataIndex: "startTime",
+      sorter: handleSort("startTime"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("startTime"),
+      render: (startTime) => startTime ? startTime : "-",
+    },
+    {
+      title: "Jam Berakhir",
+      dataIndex: "endTime",
+      sorter: handleSort("endTime"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("endTime"),
+      render: (endTime) => endTime ? endTime : "-",
+    },
+    {
+      title: "Aksi",
+      dataIndex: "action",
+      width: "20%",
+      render: (_, record) => (
+        <Space size={"middle"}>
+          <a
+            className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
+            onClick={() => setFormOld(record)}
+          >
+            Edit
+          </a>
+          <a
+            className="bg-red-500 hover:bg-red-600 text-white font-normal py-2 px-4 rounded"
+            onClick={() => handleDeleteRequest(record.id)}
+          >
+            Delete
+          </a>
+        </Space>
+      ),
+    },
+  ];
+
   useEffect(() => {
     handleGetRequest();
-  }, [filter, sort, size, number]);
+  }, []);
 
   if (loading) {
     return (
@@ -176,184 +313,20 @@ const TableJadwal = () => {
   if (error) {
     return <p>{error.message}</p>;
   }
+
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
       <div className="overflow-x-auto hidden-scroll w-full">
-        <div>
-          <div className="text-right bg-transparent">
-            <input
-              type="text"
-              placeholder="Search Here..."
-              className={`bg-transparent border-b border-black outline-none relative transition-all duration-500 ${
-                search ? "w-[150px]" : "w-0"
-              }`}
-              // value={}
-              onChange={(e) => debounced(e.target.value)}
-            />
-            <button
-              className={`mx-3 p-2 border rounded-full border-black hover:bg-black hover:text-white 
-                }`}
-              onClick={ToggleHandleSearch}
-            >
-              <AiOutlineSearch />
-            </button>
-          </div>
-        </div>
-        <table className="border-collapse w-full">
-          <thead>
-            <tr>
-              <th className="px-6 py-3 text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
-                No
-              </th>
-              <th className="px-6 py-3 text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
-                Hari
-              </th>
-              <th className="px-6 py-3 flex text-left gap-1 text-base leading-4 text-gray-600 uppercase tracking-wider">
-                Ekstrakurikuler
-                <button onClick={DescAndAsc}>
-                  {sort === "-name" ? (
-                    <AiOutlineArrowUp />
-                  ) : (
-                    <AiOutlineArrowDown />
-                  )}
-                </button>
-              </th>
-              <th className="px-6 py-3 text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
-                Ruangan
-              </th>
-              <th className="px-6 py-3 text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
-                Rombel
-              </th>
-              <th className="px-6 py-3 text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
-                Waktu Mulai
-              </th>
-              <th className="px-6 py-3 text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
-                Waktu Berakhir
-              </th>
-              <th className="px-6 py-3 text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
-                Aksi
-              </th>
-            </tr>
-          </thead>
-          <tbody className="w-full">
-            {data.length > 0 ? (
-              data.map((item, index) => (
-                <tr key={index} className="border-b hover:bg-gray-200 ">
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
-                    {index + 1}
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
-                    {item.schedule.day}
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
-                    {item.ekskul.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
-                    {item.room.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
-                    {item.rombel.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
-                    {new Intl.DateTimeFormat("id-ID", {
-                      timeStyle: "short", // or "medium", "long", "full"
-                      dateStyle: "short", // or "medium", "long", "full"
-                    }).format(new Date(item.startTime))}
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
-                    {new Intl.DateTimeFormat("id-ID", {
-                      timeStyle: "short", // or "medium", "long", "full"
-                      dateStyle: "short", // or "medium", "long", "full"
-                    }).format(new Date(item.endTime))}
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
-                    <button
-                      className="text-indigo-600 hover:text-indigo-900"
-                      onClick={() => setFormOld(item)}
-                    >
-                      Edit
-                    </button>
-                    <span className="px-2">|</span>
-                    <button
-                      className="text-red-600 hover:text-red-900 cursor-pointer"
-                      onClick={() => handleDeleteRequest(item.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="px-6 py-4 text-center">
-                  <div>
-                    <span className="w-full flex items-center justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        xmlnsXlink="http://www.w3.org/1999/xlink"
-                        version="1.1"
-                        x="0px"
-                        y="0px"
-                        className="w-[100px] h-[100px] opacity-60"
-                        viewBox="0 0 500 625"
-                        enableBackground="new 0 0 500 500"
-                        xmlSpace="preserve"
-                      >
-                        <g>
-                          <g>
-                            <g>
-                              <path d="M460.8,115.9c0,36.2,0,72.3,0,108.5c0,57.7,0,115.3,0,173c0,13.3,0,26.5,0,39.8c3.3-3.3,6.7-6.7,10-10     c-14.7,0-29.3,0-44,0c-35.2,0-70.4,0-105.5,0c-42.4,0-84.8,0-127.2,0c-36.8,0-73.6,0-110.4,0c-12.1,0-24.2,0-36.3,0     c-5.7,0-11.7-0.5-17.4,0c-0.2,0-0.5,0-0.8,0c3.3,3.3,6.7,6.7,10,10c0-12.4,0-24.9,0-37.3c0-29.9,0-59.8,0-89.7     c0-36,0-71.9,0-107.9c0-31.3,0-62.5,0-93.8c0-10.3,0-20.6,0-30.9c0-4.8,0.4-9.9,0-14.7c0-0.2,0-0.4,0-0.6c-3.3,3.3-6.7,6.7-10,10     c37.9,0,75.7,0,113.6,0c5.4,0,10.8,0,16.1,0c-2.4-1-4.7-2-7.1-2.9c19.1,15.3,38.2,30.5,57.4,45.8c5.1,4.1,11.1,10.5,17.9,10.7     c6,0.2,12.1,0,18.1,0c57.9,0,115.7,0,173.6,0c17.3,0,34.6,0,51.9,0c12.9,0,12.9-20,0-20c-27.5,0-55,0-82.5,0c-44,0-88,0-132,0     c-10,0-20.1,0-30.1,0c2.4,1,4.7,2,7.1,2.9c-22.4-17.8-44.6-35.8-67.1-53.5c-4.5-3.5-8.9-3-14.1-3c-7.3,0-14.6,0-21.9,0     c-20.3,0-40.6,0-60.9,0c-13.3,0-26.7,0-40,0c-5.4,0-10,4.6-10,10c0,12.4,0,24.9,0,37.3c0,29.9,0,59.8,0,89.7c0,36,0,71.9,0,107.9     c0,31.3,0,62.5,0,93.8c0,15.1-0.6,30.4,0,45.6c0,0.2,0,0.4,0,0.6c0,5.4,4.6,10,10,10c14.7,0,29.3,0,44,0c35.2,0,70.4,0,105.5,0     c42.4,0,84.8,0,127.2,0c36.8,0,73.6,0,110.4,0c17.9,0,35.9,0.7,53.7,0c0.3,0,0.5,0,0.8,0c5.4,0,10-4.6,10-10     c0-36.2,0-72.3,0-108.5c0-57.7,0-115.3,0-173c0-13.3,0-26.5,0-39.8C480.8,103,460.8,103,460.8,115.9z" />
-                            </g>
-                          </g>
-                          <g>
-                            <g>
-                              <path d="M30,206.8c14.6,0,29.2,0,43.9,0c35.1,0,70.2,0,105.3,0c42.3,0,84.5,0,126.8,0c36.6,0,73.1,0,109.7,0     c17.8,0,35.8,0.7,53.6,0c0.3,0,0.5,0,0.8,0c12.9,0,12.9-20,0-20c-14.6,0-29.2,0-43.9,0c-35.1,0-70.2,0-105.3,0     c-42.3,0-84.5,0-126.8,0c-36.6,0-73.1,0-109.7,0c-17.8,0-35.8-0.7-53.6,0c-0.3,0-0.5,0-0.8,0C17.1,186.8,17.1,206.8,30,206.8     L30,206.8z" />
-                            </g>
-                          </g>
-                        </g>
-                        <g>
-                          <g>
-                            <g>
-                              <g>
-                                <path d="M150.4,268c11.4,11.4,22.7,22.7,34.1,34.1c9.1,9.1,23.3-5,14.1-14.1c-11.4-11.4-22.7-22.7-34.1-34.1      C155.4,244.8,141.3,258.9,150.4,268L150.4,268z" />
-                              </g>
-                            </g>
-                            <g>
-                              <g>
-                                <path d="M184.5,253.9c-11.4,11.4-22.7,22.7-34.1,34.1c-9.1,9.1,5,23.3,14.1,14.1c11.4-11.4,22.7-22.7,34.1-34.1      C207.7,258.9,193.6,244.8,184.5,253.9L184.5,253.9z" />
-                              </g>
-                            </g>
-                          </g>
-                          <g>
-                            <g>
-                              <g>
-                                <path d="M301.4,268c11.4,11.4,22.7,22.7,34.1,34.1c9.1,9.1,23.3-5,14.1-14.1c-11.4-11.4-22.7-22.7-34.1-34.1      C306.4,244.8,292.3,258.9,301.4,268L301.4,268z" />
-                              </g>
-                            </g>
-                            <g>
-                              <g>
-                                <path d="M335.5,253.9c-11.4,11.4-22.7,22.7-34.1,34.1c-9.1,9.1,5,23.3,14.1,14.1c11.4-11.4,22.7-22.7,34.1-34.1      C358.7,258.9,344.6,244.8,335.5,253.9L335.5,253.9z" />
-                              </g>
-                            </g>
-                          </g>
-                        </g>
-                        <g>
-                          <g>
-                            <path d="M219.2,380.2c9.6-7,20.8-10.7,32.6-10.2c10.7,0.4,19.9,4.5,28.8,10.2c10.8,7,20.9-10.3,10.1-17.3    c-11.8-7.6-24.6-12.5-38.9-13c-15-0.5-30.6,4.1-42.7,13c-4.4,3.2-6.5,8.7-3.6,13.7C208.1,380.9,214.8,383.4,219.2,380.2    L219.2,380.2z" />
-                          </g>
-                        </g>
-                      </svg>
-                    </span>
-                    <p className="text-center text-gray-500 text-xl">
-                      No data available
-                    </p>
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <Table
+          columns={columns}
+          dataSource={data.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )}
+          pagination={getPaginationConfig()}
+          loading={loading}
+          scroll={{ x: "max-content" }}
+        />
       </div>
     </div>
   );

@@ -2,7 +2,11 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { exportExcel } from "../libs/excel.lib";
-import { formatDate, getWeekNumberAndYear, getMonthAndYear } from "../libs/date.lib";
+import {
+  formatDate,
+  getWeekNumberAndYear,
+  getMonthAndYear,
+} from "../libs/date.lib";
 import { ISession } from "../interfaces/user.interface";
 import { Op } from "sequelize";
 import * as cron from "node-cron";
@@ -496,24 +500,23 @@ export class AttendanceService {
     }
   }
 
-  async getChartAttendanceService(req: Request): Promise<any> {
+  async getDetailAttendanceService(req: Request): Promise<any> {
     try {
-      const weeklyAttendance = {};
-      const monthlyAttendance = {};
-      const dailyAttendance = {};
-      // const ekskuls = (req.session as ISession).user.ekskul;
-      const selectedType = req.query.type;
+      const ekskuls = (req.session as ISession).user.ekskul;
+      const selectedEkskulId = req.query.ekskul_id as string;
 
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
       const page: any = req.query.page;
 
-      // if (ekskuls.includes(Number(selectedEkskulId))) {
+      if (ekskuls.includes(selectedEkskulId)) {
         const paramQuerySQL: any = {
-          where: { category: selectedType },
+          where: { ekskul_id: selectedEkskulId },
         };
         let limit: number;
         let offset: number;
+
+        const totalRows = await db.attendance.count();
 
         if (sort) {
           const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
@@ -533,9 +536,22 @@ export class AttendanceService {
           paramQuerySQL.offset = offset;
         }
 
-        const attendanceFilter = await db.attendance.findAll(paramQuerySQL);         
+        paramQuerySQL.include = [
+          {
+            model: db.ekskul,
+            attributes: ["id", "name"],
+            as: "ekskul",
+          },
+          {
+            model: db.student,
+            attributes: ["id", "name"],
+            as: "student",
+          },
+        ];
 
-        if (!attendanceFilter || attendanceFilter.length === 0) {
+        const attendance = await db.attendance.findAll(paramQuerySQL);
+
+        if (!attendance || attendance.length === 0) {
           return Promise.resolve(
             apiResponse(
               status.NOT_FOUND,
@@ -544,41 +560,134 @@ export class AttendanceService {
           );
         }
 
-        attendanceFilter.forEach((attendance) => {
-          
-            const formattedDate = formatDate(attendance.date)
-            
-            if (!dailyAttendance[formattedDate]) {
-              dailyAttendance[formattedDate] = []
-            }
-            dailyAttendance[formattedDate].push(attendance)
-
-            const { weekNumber, year } = getWeekNumberAndYear(attendance.date)
-
-            const weekKey = `${year}-W${weekNumber}`
-            if (!weeklyAttendance[weekKey]) {
-              weeklyAttendance[weekKey] = []
-            }
-            weeklyAttendance[weekKey].push(attendance)
-
-            const { month, formattedYear } = getMonthAndYear(attendance.date)
-
-            const monthKey = `${formattedYear}-${month}`
-            if (!monthlyAttendance[monthKey]) {
-              monthlyAttendance[monthKey] = []
-            }
-            monthlyAttendance[monthKey].push(attendance)
-
-        })
+        const modifiedAttendances = attendance.map((attendance) => {
+          return {
+            id: attendance.id,
+            ekskul: attendance.ekskul
+              ? {
+                  id: attendance.ekskul.id,
+                  name: attendance.ekskul.name,
+                }
+              : null,
+            student: attendance.student
+              ? {
+                  id: attendance.student.id,
+                  name: attendance.student.name,
+                }
+              : null,
+            category: attendance.category,
+            date: attendance.date,
+            createdAt: attendance.createdAt,
+            updatedAt: attendance.updatedAt,
+          };
+        });
 
         return Promise.resolve(
-          apiResponse(status.OK, "Fetched all attendances success", {
-            weeklyAttendance,
-            monthlyAttendance,
-            dailyAttendance,
-            // attendances,
-          })
+          apiResponse(
+            status.OK,
+            "Fetched all attendances success",
+            modifiedAttendances,
+            totalRows
+          )
         );
+      } else {
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Ekskul do not exist for the given id"
+        );
+      }
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getChartAttendanceService(req: Request): Promise<any> {
+    try {
+      const weeklyAttendance = {};
+      const monthlyAttendance = {};
+      const dailyAttendance = {};
+      // const ekskuls = (req.session as ISession).user.ekskul;
+      const selectedType = req.query.type;
+
+      const sort: string =
+        typeof req.query.sort === "string" ? req.query.sort : "";
+      const page: any = req.query.page;
+
+      // if (ekskuls.includes(Number(selectedEkskulId))) {
+      const paramQuerySQL: any = {
+        where: { category: selectedType },
+      };
+      let limit: number;
+      let offset: number;
+
+      if (sort) {
+        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
+        const fieldName = sort.replace(/^-/, "");
+        paramQuerySQL.order = [[fieldName, sortOrder]];
+      }
+
+      if (page && page.size && page.number) {
+        limit = parseInt(page.size, 10);
+        offset = (parseInt(page.number, 10) - 1) * limit;
+        paramQuerySQL.limit = limit;
+        paramQuerySQL.offset = offset;
+      } else {
+        limit = 10;
+        offset = 0;
+        paramQuerySQL.limit = limit;
+        paramQuerySQL.offset = offset;
+      }
+
+      const attendanceFilter = await db.attendance.findAll(paramQuerySQL);
+
+      if (!attendanceFilter || attendanceFilter.length === 0) {
+        return Promise.resolve(
+          apiResponse(
+            status.NOT_FOUND,
+            "No attendances found with the specified filter"
+          )
+        );
+      }
+
+      attendanceFilter.forEach((attendance) => {
+        const formattedDate = formatDate(attendance.date);
+
+        if (!dailyAttendance[formattedDate]) {
+          dailyAttendance[formattedDate] = [];
+        }
+        dailyAttendance[formattedDate].push(attendance);
+
+        const { weekNumber, year } = getWeekNumberAndYear(attendance.date);
+
+        const weekKey = `${year}-W${weekNumber}`;
+        if (!weeklyAttendance[weekKey]) {
+          weeklyAttendance[weekKey] = [];
+        }
+        weeklyAttendance[weekKey].push(attendance);
+
+        const { month, formattedYear } = getMonthAndYear(attendance.date);
+
+        const monthKey = `${formattedYear}-${month}`;
+        if (!monthlyAttendance[monthKey]) {
+          monthlyAttendance[monthKey] = [];
+        }
+        monthlyAttendance[monthKey].push(attendance);
+      });
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched all attendances success", {
+          weeklyAttendance,
+          monthlyAttendance,
+          dailyAttendance,
+          // attendances,
+        })
+      );
       // } else {
       //   throw apiResponse(
       //     status.NOT_FOUND,
@@ -594,7 +703,8 @@ export class AttendanceService {
         )
       );
     }
-``}
+    ``;
+  }
 
   async updateAttendanceService(req: Request): Promise<any> {
     try {

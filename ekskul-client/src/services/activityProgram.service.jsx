@@ -2,10 +2,10 @@ import axios from "axios";
 import { API, VERSION } from "../utils/baseUrl";
 import { config } from "../utils/config";
 
-export const getAllActivityProgram = async ({ filter, sort, size, number }) => {
+export const getAllActivityProgram = async () => {
   try {
     const response = await axios.get(
-      `${API}/${VERSION}/activity-program?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/activity-program`,
       config
     );
     return response.data;
