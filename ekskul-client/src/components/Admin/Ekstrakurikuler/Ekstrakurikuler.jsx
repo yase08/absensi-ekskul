@@ -11,7 +11,7 @@ const EkstrakurikulerComponent = () => {
     name: "",
     category: "",
   });
-  const [formOld, setFormOld] = useState({});
+  const [formOld, setFormOld] = useState("");
   const [loading, setLoading] = useState(false);
 
   const showModal = () => {
@@ -77,17 +77,18 @@ const EkstrakurikulerComponent = () => {
     }
   };
 
-  const handleInputChange = (name, value) => {
-    if (formOld && formOld.id) {
-      setFormOld({
-        ...formOld,
-        [name]: value,
-      });
+  const handleInputChange = (e, inputName) => {
+    const newValue = e.target ? e.target.value : e;
+    if (formOld) {
+      setFormOld((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     }
   };
 
@@ -127,20 +128,17 @@ const EkstrakurikulerComponent = () => {
             size="large"
             id=""
             placeholder="Masukan nama ekstrakurikuler"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, "name")}
           />
           <label htmlFor="" className="text-lg">
             Kategori
           </label>
           <Select
+            size="large"
+            placeholder="Pilih kategori"
             className="w-full"
             value={formOld ? formOld.category : formData.category}
-            onChange={(selectedOption) =>
-              handleInputChange(
-                "category",
-                selectedOption ? selectedOption.value : ""
-              )
-            }
+            onChange={(value) => handleInputChange(value, "category")}
             options={[
               {
                 value: "umum",

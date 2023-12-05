@@ -21,10 +21,14 @@ const SiswaComponent = () => {
     nis: "",
     email: "",
     mobileNumber: "",
-    // gender: "",
-    // rombel_id: "",
-    // rayon_id: "",
-    // ekskul_id: "",
+    gender: "",
+    rombel_id: "",
+    rayon_id: "",
+    ekskuls: [
+      {
+        ekskul_id: "",
+      }
+    ],
   });
   const [formOld, setFormOld] = useState({});
   const [loading, setLoading] = useState(false);
@@ -179,16 +183,18 @@ const SiswaComponent = () => {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e, inputName) => {
+    const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormOld({
-        ...formOld,
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     } else {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value,
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     }
   };
 
@@ -233,7 +239,7 @@ const SiswaComponent = () => {
             name="name"
             size="large"
             placeholder="Masukan nama"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, "name")}
           />
           <label htmlFor="" className="text-lg">
             Nis
@@ -244,7 +250,7 @@ const SiswaComponent = () => {
             name="nis"
             size="large"
             placeholder="Masukan nis"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, "nis")}
           />
           <label htmlFor="" className="text-lg">
             Email
@@ -255,7 +261,7 @@ const SiswaComponent = () => {
             name="email"
             size="large"
             placeholder="Masukan email"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, "email")}
           />
           <label htmlFor="" className="text-lg">
             Nomer Telpon
@@ -266,15 +272,16 @@ const SiswaComponent = () => {
             name="mobileNumber"
             size="large"
             placeholder="Masukan nomer telpon"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, "mobileNumber")}
           />
-          {/* <label htmlFor="" className="text-lg">
+          <label htmlFor="" className="text-lg">
             Jenis Kelamin
           </label>
           <Select
             className="w-full"
-            // value={formOld ? formOld.gender : formData.gender}
-            onChange={handleInputChange}
+            placeholder="Pilih Jenis Kelamin"
+            value={formOld ? formOld.gender : formData.gender}
+            onChange={(e) => handleInputChange(e, "gender")}
             options={[
               {
                 value: "female",
@@ -291,9 +298,10 @@ const SiswaComponent = () => {
           </label>
           <Select
             className="w-full"
-            // value={formOld ? formOld.rombel : formData.rombel}
-            onChange={handleInputChange}
+            value={formOld ? formOld.rombel : formData.rombel}
+            onChange={(e) => handleInputChange(e, "rombel_id")}
             options={rombelOption}
+            placeholder="Pilih Rombel"
           />
           <label htmlFor="" className="text-lg">
             Rayon
@@ -301,25 +309,21 @@ const SiswaComponent = () => {
           <Select
             className="w-full"
             value={formOld ? formOld.rayon : formData.rayon}
-            onChange={(selectedOption) => {
-              handleInputChange({
-                target: {
-                  name: "rayon",
-                  value: selectedOption.value,
-                },
-              });
-            }}
+            onChange={(e) => handleInputChange(e, "rayon_id")}
             options={rayonOption}
+            placeholder="Pilih Rayon"
           />
           <label htmlFor="" className="text-lg">
             Ekskul
           </label>
           <Select
             className="w-full"
-            // value={formOld ? formOld.ekskul : formData.ekskul}
-            onChange={handleInputChange}
+            mode="multiple"
+            placeholder="Pilih Ekstrakurikuler"
+            value={formOld ? formOld.ekskuls : formData.ekskuls}
+            onChange={(e) => handleInputChange(e, "ekskuls")}
             options={ekskulOption}
-          /> */}
+          />
         </form>
       </Modal>
     </div>

@@ -4,50 +4,98 @@ import { AiOutlineClose } from "react-icons/ai";
 import Swal from "sweetalert2";
 import { createTask, updateTask } from "../../../services/task.service";
 import { useProfile } from "../../../context/ProfileContext";
+import { Modal, Select, Input } from "antd";
+import { getAllEkskul } from "../../../services/ekskul.service";
 
 const TugasComponent = () => {
-  const [isOpen, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     ekskul_id: "",
   });
   const [formOld, setFormOld] = useState({});
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const { profile } = useProfile();
 
-  const handleInputChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-
+  const handleInputChange = (e, inputName) => {
+    const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormOld({
-        ...formOld,
-        [name]: value,
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     }
   };
 
-  const handlePostRequest = async (event) => {
+  const handleGetEkskulRequest = async () => {
+    try {
+      const response = await getAllEkskul();
+
+      if (response && response.data) {
+        console.log("API Response:", response.data);
+        console.log(response);
+
+        if (Array.isArray(response.data)) {
+          const ekskulData = response.data;
+          setEkskul(ekskulData);
+        } else {
+          console.log("Data is not an array");
+        }
+      } else {
+        console.log("Data retrieval failed");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const ekskulOption = ekskul.map((item) => ({
+    label: item.name,
+    value: item.id,
+  }));
+
+  const showModal = () => {
+    setOpen(true);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
+  const handleOk = async (event) => {
     event.preventDefault();
     setLoading(true);
 
     try {
-      const response = await createTask(formData);
-      console.log(formData);
-      const successMessage = response.statusMessage;
+      if (formOld && formOld.id) {
+        const response = await updateTask(formOld.id, formOld);
+        const successMessage = response.statusMessage;
 
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: successMessage,
-      });
-      setOpen(!isOpen);
-      console.log("Response:", response.data);
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: successMessage,
+        });
+        setFormOld({});
+      } else {
+        const response = await createTask(formData);
+        const successMessage = response.statusMessage;
+
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: successMessage,
+        });
+      }
     } catch (error) {
       console.error("Error:", error);
 
@@ -73,63 +121,14 @@ const TugasComponent = () => {
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleUpdateRequest = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    console.log(formOld);
-
-    try {
-      const response = await updateTask(formOld.id, formOld);
-      const successMessage = response.statusMessage;
-
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: successMessage,
-      });
-      setFormOld("");
-      setOpen(!isOpen);
-      console.log("Response:", response.data);
-    } catch (error) {
-      console.error("Error:", error);
-
-      if (error.response) {
-        const errorMessage = error.response.statusMessage;
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: errorMessage,
-        });
-      } else if (error.request) {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "No response received from the server.",
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "An unexpected error occurred.",
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const toggleExpansion = () => {
-    setOpen(!isOpen);
-    if (formOld) {
-      setFormOld("");
+      setConfirmLoading(false);
+      setOpen(false);
     }
   };
 
   useEffect(() => {
     profile;
+    handleGetEkskulRequest();
   }, []);
 
   return (
@@ -140,7 +139,7 @@ const TugasComponent = () => {
             Tugas Siswa
           </h1>
           <button
-            onClick={toggleExpansion}
+            onClick={showModal}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
             Add Data
@@ -150,65 +149,38 @@ const TugasComponent = () => {
           <Table setFormOld={setFormOld} setOpen={setOpen} />
         </div>
       </div>
-      {isOpen && (
-        <div
-          className="bg-transparent flex items-center justify-center w-full absolute top-0 left-0 h-full z-50"
-          style={{ backdropFilter: "blur(5px)" }}
-        >
-          <div className="bg-light w-[600px] h-auto border shadow-md">
-            <div className="flex justify-between p-5 border-b border-gray-300  relative group">
-              <p className="font-semibold opacity-70">
-                {" "}
-                {formOld ? "Edit Data Program" : "Add Data Program"}
-              </p>
-              <button onClick={toggleExpansion}>
-                <AiOutlineClose className="text-2xl" />
-              </button>
-            </div>
-            <div className="w-full h-full">
-              <form action="" className="flex flex-col p-5 gap-2">
-                <label htmlFor="" className="text-xl">
-                  Nama Tugas
-                </label>
-                <input
-                  value={formOld ? formOld.name : formData.name}
-                  onChange={handleInputChange}
-                  type="text"
-                  name="name"
-                  id=""
-                  placeholder="Masukan nama tugas"
-                  className="bg-transparent outline-none border p-3 rounded-md border-gray-400"
-                />
-                <label htmlFor="" className="text-xl">
-                  Ekstrakurikuler
-                </label>
-                <select
-                  name="ekskul_id"
-                  className="w-full bg-transparent outline-none border p-3 rounded-md border-gray-400 text-opacity-40"
-                  onChange={handleInputChange}
-                >
-                  <option selected disabled value="">
-                    Pilih Ekstrakurikuler
-                  </option>
-                  {profile.ekskul.map((data) => {
-                    return (
-                      <option value={data.id} key={data.id}>
-                        {data.name}
-                      </option>
-                    );
-                  })}
-                </select>
-                <button
-                  className="bg-blue-500 p-2 mt-4 rounded-md text-white"
-                  onClick={formOld ? handleUpdateRequest : handlePostRequest}
-                >
-                  Submit
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        title={formOld && formOld.id ? "Edit Data" : "Tambah Data"}
+        open={open}
+        onOk={handleOk}
+        confirmLoading={confirmLoading}
+        onCancel={handleCancel}
+      >
+        <form action="" className="flex flex-col p-5 gap-2">
+          <label htmlFor="" className="text-lg">
+            Tugas Siswa
+          </label>
+          <Input
+            value={formOld ? formOld.name : formData.name}
+            type="text"
+            name="name"
+            size="large"
+            placeholder="Masukan nama tugas"
+            onChange={(e) => handleInputChange(e, "name")}
+          />
+          <label htmlFor="" className="text-lg">
+            Ekstrakurikuler
+          </label>
+          <Select
+            size="large"
+            placeholder="Pilih Ekstrakurikuler"
+            className="w-full"
+            value={formOld ? formOld.ekskul_id : formData.ekskul_id}
+            onChange={(value) => handleInputChange(value, "ekskul_id")}
+            options={ekskulOption}
+          />
+        </form>
+      </Modal>
     </div>
   );
 };
