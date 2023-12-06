@@ -22,7 +22,6 @@ export class InstructorAttendanceService {
         if (userOnEkskul) {
           const createInstructorAttendance = db.instructorAttendance.create({
             ...req.body,
-            ekskul_id: req.body.ekskul_id,
             instructor_id: instructor_Id,
           });
           if (!createInstructorAttendance)
@@ -135,8 +134,7 @@ export class InstructorAttendanceService {
                 name: item.ekskul.name,
               }
             : null,
-          created_at: item.created_at,
-          updated_at: item.updated_at,
+          date: item.date,
         };
       });
 

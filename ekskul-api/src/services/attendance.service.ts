@@ -582,6 +582,15 @@ export class AttendanceService {
         typeof req.query.sort === "string" ? req.query.sort : "";
       const page: any = req.query.page;
 
+      if (!selectedStudentId) {
+        return Promise.resolve(
+          apiResponse(
+            status.BAD_REQUEST,
+            "Missing required parameter: student_id"
+          )
+        );
+      }
+
       if (ekskuls.includes(selectedEkskulId)) {
         const paramQuerySQL: any = {
           where: { ekskul_id: selectedEkskulId, student_id: selectedStudentId },
@@ -650,8 +659,6 @@ export class AttendanceService {
               : null,
             category: attendance.category,
             date: attendance.date,
-            createdAt: attendance.createdAt,
-            updatedAt: attendance.updatedAt,
           };
         });
 
