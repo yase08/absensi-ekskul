@@ -2,12 +2,9 @@ import axios from "axios";
 import { API, VERSION } from "../utils/baseUrl";
 import { config } from "../utils/config";
 
-export const getAllSchedule = async ({ filter, sort, size, number }) => {
+export const getAllSchedule = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/schedule?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
-      config
-    );
+    const response = await axios.get(`${API}/${VERSION}/schedule`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -19,6 +16,17 @@ export const getAllSchedule = async ({ filter, sort, size, number }) => {
 export const getSchedule = async () => {
   try {
     const response = await axios.get(`${API}/${VERSION}/schedule/data`);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response.data.message;
+    }
+  }
+};
+
+export const getDay = async () => {
+  try {
+    const response = await axios.get(`${API}/${VERSION}/schedule/day`, config);
     return response.data;
   } catch (error) {
     if (error.response) {

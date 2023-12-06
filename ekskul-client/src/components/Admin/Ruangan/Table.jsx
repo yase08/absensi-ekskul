@@ -3,6 +3,8 @@ import { deleteRoom, getAllRoom } from "../../../services/room.service";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
+import { BsPencil } from "react-icons/bs";
+import { LuTrash } from "react-icons/lu";
 
 const TableRoom = ({ setFormOld }) => {
   const [searchText, setSearchText] = useState("");
@@ -224,18 +226,18 @@ const TableRoom = ({ setFormOld }) => {
       dataIndex: "action",
       width: "20%",
       render: (_, record) => (
-        <Space size={"middle"}>
-          <a
-            className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
-            onClick={() => setFormOld(record)}
-          >
-            Edit
+        <Space
+          size={"middle"}
+          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
+        >
+          <a className="hover:text-blue-500" onClick={() => setFormOld(record)}>
+            <BsPencil size={20} />
           </a>
           <a
-            className="bg-red-500 hover:bg-red-600 text-white font-normal py-2 px-4 rounded"
+            className="hover:text-red-500"
             onClick={() => handleDeleteRequest(record.id)}
           >
-            Delete
+            <LuTrash size={20} />
           </a>
         </Space>
       ),

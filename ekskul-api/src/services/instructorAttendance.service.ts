@@ -14,17 +14,15 @@ export class InstructorAttendanceService {
       const instructor_Id = (req.session as ISession).user.id;
       const ekskulIds = (req.session as ISession).user.ekskul;
 
-      const selectedEkskulId = req.query.ekskul_id as string;
-
-      if (ekskulIds.includes(selectedEkskulId)) {
+      if (ekskulIds.includes(req.body.ekskul_id)) {
         const userOnEkskul = await db.userOnEkskul.findOne({
-          where: { user_id: instructor_Id, ekskul_id: selectedEkskulId },
+          where: { user_id: instructor_Id, ekskul_id: req.body.ekskul_id },
         });
 
         if (userOnEkskul) {
           const createInstructorAttendance = db.instructorAttendance.create({
             ...req.body,
-            ekskul_id: selectedEkskulId,
+            ekskul_id: req.body.ekskul_id,
             instructor_id: instructor_Id,
           });
           if (!createInstructorAttendance)

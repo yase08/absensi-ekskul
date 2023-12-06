@@ -1,37 +1,165 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TableJadwal from "./Table";
 import Swal from "sweetalert2";
 import {
   createActivity,
   updateActivity,
 } from "../../../services/activity.service";
-import { Modal, DatePicker, Input } from "antd";
-const { RangePicker } = DatePicker;
+import { Modal, Select, TimePicker } from "antd";
+import { getAllRombel } from "../../../services/rombel.service";
+import { getAllEkskul } from "../../../services/ekskul.service";
+import { getAllRoom } from "../../../services/room.service";
+import { getDay } from "../../../services/schedule.service";
 
 const Jadwal = () => {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    activity: "",
-    task: "",
-    startDate: "",
-    endDate: "",
+    ekskul_id: "",
+    schedule_id: "",
+    room_id: "",
+    rombel_id: "",
+    // startTime: "",
+    // endTime: "",
+    // time: "",
   });
+  const [rombel, setRombel] = useState([]);
+  const [hari, setHari] = useState([]);
+  const [ekskul, setEkskul] = useState([]);
+  const [room, setRoom] = useState([]);
   const [formOld, setFormOld] = useState("");
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e, inputName) => {
+    const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormOld({
-        ...formOld,
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     } else {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value,
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     }
   };
+
+  const handleGetRombelRequest = async () => {
+    try {
+      const response = await getAllRombel();
+
+      if (response && response.data) {
+        console.log("API Response:", response.data);
+        console.log(response);
+
+        if (Array.isArray(response.data)) {
+          const rombelData = response.data;
+          setRombel(rombelData);
+        } else {
+          console.log("Data is not an array");
+        }
+      } else {
+        console.log("Data retrieval failed");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGetRoomRequest = async () => {
+    try {
+      const response = await getAllRoom();
+
+      if (response && response.data) {
+        console.log("API Response:", response.data);
+        console.log(response);
+
+        if (Array.isArray(response.data)) {
+          const roomData = response.data;
+          setRoom(roomData);
+        } else {
+          console.log("Data is not an array");
+        }
+      } else {
+        console.log("Data retrieval failed");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGetHariRequest = async () => {
+    try {
+      const response = await getDay();
+
+      if (response && response.data) {
+        console.log("API Response:", response.data);
+        console.log(response);
+
+        if (Array.isArray(response.data)) {
+          const hariData = response.data;
+          setHari(hariData);
+        } else {
+          console.log("Data is not an array");
+        }
+      } else {
+        console.log("Data retrieval failed");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGetEkskulRequest = async () => {
+    try {
+      const response = await getAllEkskul();
+
+      if (response && response.data) {
+        console.log("API Response:", response.data);
+        console.log(response);
+
+        if (Array.isArray(response.data)) {
+          const ekskulData = response.data;
+          setEkskul(ekskulData);
+        } else {
+          console.log("Data is not an array");
+        }
+      } else {
+        console.log("Data retrieval failed");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const rombelOption = rombel.map((item) => ({
+    label: item.name,
+    value: item.id,
+  }));
+
+  const hariOption = hari.map((item) => ({
+    label: item.day,
+    value: item.id,
+  }));
+
+  const ekskulOption = ekskul.map((item) => ({
+    label: item.name,
+    value: item.id,
+  }));
+
+  const roomOption = room.map((item) => ({
+    label: item.name,
+    value: item.id,
+  }));
 
   const showModal = () => {
     setOpen(true);
@@ -39,6 +167,8 @@ const Jadwal = () => {
 
   const handleCancel = () => {
     setOpen(false);
+    setFormOld({});
+    setFormData({});
   };
 
   const handleOk = async (event) => {
@@ -96,6 +226,13 @@ const Jadwal = () => {
     }
   };
 
+  useEffect(() => {
+    handleGetEkskulRequest();
+    handleGetHariRequest();
+    handleGetRoomRequest();
+    handleGetRombelRequest();
+  }, []);
+
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
       <div className="w-full flex flex-col gap-2">
@@ -123,41 +260,63 @@ const Jadwal = () => {
       >
         <form action="" className="flex flex-col p-5 gap-3">
           <label htmlFor="" className="text-lg">
-            Nama
+            Hari
           </label>
-          <Input
-            value={formOld ? formOld.name : formData.name}
-            type="text"
-            name="activity"
+          <Select
             size="large"
-            placeholder="Masukan nama"
-            onChange={handleInputChange}
+            className="w-full"
+            value={formOld ? formOld.schedule : formData.schedule}
+            onChange={(e) => handleInputChange(e, "schedule_id")}
+            options={hariOption}
+            placeholder="Pilih Hari"
           />
           <label htmlFor="" className="text-lg">
-            Tugas
+            Rombel
           </label>
-          <Input
-            value={formOld ? formOld.task : formData.task}
-            type="text"
-            name="task"
+          <Select
             size="large"
-            placeholder="Masukan Nama Tugas"
-            onChange={handleInputChange}
+            className="w-full"
+            value={formOld ? formOld.rombel : formData.rombel}
+            onChange={(e) => handleInputChange(e, "rombel_id")}
+            options={rombelOption}
+            placeholder="Pilih Rombel"
           />
           <label htmlFor="" className="text-lg">
-            Tanggal Mulai & Tanggal Berakhir
+            Ekstrakurikuler
           </label>
-          <RangePicker
-            placeholder={["Tanggal Mulai", "Tanggal Berakhir"]}
+          <Select
             size="large"
-            name="date"
-            onChange={handleInputChange}
+            className="w-full"
+            placeholder="Pilih Ekstrakurikuler"
+            value={formOld ? formOld.ekskul : formData.ekskul}
+            onChange={(e) => handleInputChange(e, "ekskul_id")}
+            options={ekskulOption}
+          />
+          <label htmlFor="" className="text-lg">
+            Ruangan
+          </label>
+          <Select
+            size="large"
+            className="w-full"
+            placeholder="Pilih Ruangan"
+            value={formOld ? formOld.room : formData.room}
+            onChange={(e) => handleInputChange(e, "room_id")}
+            options={roomOption}
+          />
+          <label htmlFor="" className="text-lg">
+            Jam Mulai & Jam Berakhir
+          </label>
+          {/* <TimePicker.RangePicker
+            size="large"
+            format={"HH:mm"}
+            onChange={(e) => handleInputChange(e, "time")}
+            placeholder={["Jam Mulai", "Jam Berakhir"]}
             value={
               formOld
-                ? [formOld.startDate, formOld.endDate]
-                : [formData.startDate, formData.endDate]
+                ? [formOld.startTime, formOld.endTime]
+                : [formData.startTime, formData.endTime]
             }
-          />
+          /> */}
         </form>
       </Modal>
     </div>

@@ -69,22 +69,25 @@ const TugasComponent = () => {
 
   const handleCancel = () => {
     setOpen(false);
+    setFormOld({});
+    setFormData({});
+    console.log(formOld, formData);
   };
 
   const handleOk = async (event) => {
-    event.preventDefault();
     setLoading(true);
 
     try {
       if (formOld && formOld.id) {
         const response = await updateTask(formOld.id, formOld);
-        const successMessage = response.statusMessage;
+        const successMessage = response.data;
 
         Swal.fire({
           icon: "success",
           title: "Success!",
           text: successMessage,
         });
+        event.preventDefault();
         setFormOld({});
       } else {
         const response = await createTask(formData);
@@ -95,6 +98,7 @@ const TugasComponent = () => {
           title: "Success!",
           text: successMessage,
         });
+        event.preventDefault();
       }
     } catch (error) {
       console.error("Error:", error);

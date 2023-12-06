@@ -26,6 +26,17 @@ export class ScheduleController extends ScheduleService {
     }
   };
 
+  getAllDay = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getAllDayService(
+        req
+      );
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
   getSchedule = async (req: Request, res: Response): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.getScheduleService(req);

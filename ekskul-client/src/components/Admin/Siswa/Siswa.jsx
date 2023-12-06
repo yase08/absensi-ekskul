@@ -314,7 +314,7 @@ const SiswaComponent = () => {
             placeholder="Pilih Rayon"
           />
           <label htmlFor="" className="text-lg">
-            Ekskul
+            Eksktrakurikuler
           </label>
           <Select
             className="w-full"

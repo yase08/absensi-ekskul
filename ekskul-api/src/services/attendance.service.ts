@@ -13,6 +13,48 @@ import * as cron from "node-cron";
 
 const db = require("../db/models");
 
+function calculateAttendanceValueBasedOnCategory(category: string): number {
+  const result = category === "hadir" ? 1 : 0;
+
+  return result;
+}
+
+function calculateTotalAttendanceByCategory(
+  attendance: any[]
+): Record<string, number> {
+  const totalAttendanceByStudent: Record<string, number> = {};
+
+  attendance.forEach((attendance) => {
+    const studentId = attendance.student.id;
+    const category = attendance.category;
+
+    if (!totalAttendanceByStudent[studentId]) {
+      totalAttendanceByStudent[studentId] = 0;
+    }
+
+    totalAttendanceByStudent[studentId] +=
+      calculateAttendanceValueBasedOnCategory(category);
+  });
+
+  return totalAttendanceByStudent;
+}
+
+function calculateTotalAttendance(attendance: any[]): Record<string, number> {
+  const totalAttendanceByStudent: Record<string, number> = {};
+
+  attendance.forEach((attendance) => {
+    const studentId = attendance.student.id;
+
+    if (!totalAttendanceByStudent[studentId]) {
+      totalAttendanceByStudent[studentId] = 0;
+    }
+
+    totalAttendanceByStudent[studentId] += 1;
+  });
+
+  return totalAttendanceByStudent;
+}
+
 function getStartAndEndWeek(date) {
   const currentDate = date || new Date();
 
@@ -393,8 +435,9 @@ export class AttendanceService {
     }
   }
 
-  async getAllAttendanceService(req: Request): Promise<any> {
+  async getStudentAttendanceService(req: Request): Promise<any> {
     try {
+      // Extracting ekskul information from the user session
       const ekskuls = (req.session as ISession).user.ekskul;
       const selectedEkskulId = req.query.ekskul_id as string;
 
@@ -402,6 +445,7 @@ export class AttendanceService {
         typeof req.query.sort === "string" ? req.query.sort : "";
       const page: any = req.query.page;
 
+      // Checking if the selected ekskul is in the user's ekskul list
       if (ekskuls.includes(selectedEkskulId)) {
         const paramQuerySQL: any = {
           where: { ekskul_id: selectedEkskulId },
@@ -409,14 +453,17 @@ export class AttendanceService {
         let limit: number;
         let offset: number;
 
+        // Count total number of rows in the attendance table
         const totalRows = await db.attendance.count();
 
+        // Sorting logic based on the provided sort parameter
         if (sort) {
           const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
           const fieldName = sort.replace(/^-/, "");
           paramQuerySQL.order = [[fieldName, sortOrder]];
         }
 
+        // Pagination logic
         if (page && page.size && page.number) {
           limit = parseInt(page.size, 10);
           offset = (parseInt(page.number, 10) - 1) * limit;
@@ -429,6 +476,7 @@ export class AttendanceService {
           paramQuerySQL.offset = offset;
         }
 
+        // Include associations (ekskul and student) in the query
         paramQuerySQL.include = [
           {
             model: db.ekskul,
@@ -442,8 +490,10 @@ export class AttendanceService {
           },
         ];
 
+        // Fetch attendance data based on the query parameters
         const attendance = await db.attendance.findAll(paramQuerySQL);
 
+        // Handle case where no attendance records are found
         if (!attendance || attendance.length === 0) {
           return Promise.resolve(
             apiResponse(
@@ -453,32 +503,53 @@ export class AttendanceService {
           );
         }
 
-        const modifiedAttendances = attendance.map((attendance) => {
+        // Calculate total attendance for each student based on the "category" column
+        const totalAttendanceStudentByPresentCategory =
+          calculateTotalAttendanceByCategory(attendance);
+
+        // Calculate total attendance for each student by all category
+        const totalAttendanceStudent = calculateTotalAttendance(attendance);
+
+        const result: Record<string, number> = {};
+
+        // Iterate through each student
+        Object.keys(totalAttendanceStudentByPresentCategory).forEach(
+          (studentId) => {
+            // Calculate the percentage and store it in the result object
+            result[studentId] =
+              (totalAttendanceStudentByPresentCategory[studentId] /
+                totalAttendanceStudent[studentId]) *
+              100;
+          }
+        );
+        // Fetch all students
+        const students = await db.student.findAll();
+
+        const modifiedAttendances = students.map((student) => {
+          const studentId = student.id;
+          const studentAttendance = attendance.find(
+            (a) => a.student.id === studentId
+          );
+
           return {
-            id: attendance.id,
-            ekskul: attendance.ekskul
+            id: studentId,
+            name: studentAttendance?.student
+              ? studentAttendance.student.name
+              : null,
+            ekskul: studentAttendance?.ekskul
               ? {
-                  id: attendance.ekskul.id,
-                  name: attendance.ekskul.name,
+                  id: studentAttendance.ekskul.id,
+                  name: studentAttendance.ekskul.name,
                 }
               : null,
-            student: attendance.student
-              ? {
-                  id: attendance.student.id,
-                  name: attendance.student.name,
-                }
-              : null,
-            category: attendance.category,
-            date: attendance.date,
-            createdAt: attendance.createdAt,
-            updatedAt: attendance.updatedAt,
+            percentage: Math.round(result[studentId]) || 0,
           };
         });
 
         return Promise.resolve(
           apiResponse(
             status.OK,
-            "Fetched all attendances success",
+            "Fetched all attendances successfully",
             modifiedAttendances,
             totalRows
           )
@@ -486,10 +557,11 @@ export class AttendanceService {
       } else {
         throw apiResponse(
           status.NOT_FOUND,
-          "Ekskul do not exist for the given id"
+          "Ekskul does not exist for the given id"
         );
       }
     } catch (error: any) {
+      // Handle errors and return an appropriate API response
       return Promise.reject(
         apiResponse(
           error.statusCode || status.INTERNAL_SERVER_ERROR,
@@ -504,6 +576,7 @@ export class AttendanceService {
     try {
       const ekskuls = (req.session as ISession).user.ekskul;
       const selectedEkskulId = req.query.ekskul_id as string;
+      const selectedStudentId = req.query.student_id as string;
 
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
@@ -511,7 +584,7 @@ export class AttendanceService {
 
       if (ekskuls.includes(selectedEkskulId)) {
         const paramQuerySQL: any = {
-          where: { ekskul_id: selectedEkskulId },
+          where: { ekskul_id: selectedEkskulId, student_id: selectedStudentId },
         };
         let limit: number;
         let offset: number;

@@ -15,18 +15,18 @@ export class AttendanceController extends AttendanceService {
     }
   };
 
-  getWeeklyAttendanceChart = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
-    try {
-      const serviceResponse: APIResponse =
-        await this.getWeeklyAttendanceChartService(req);
-      return res.status(serviceResponse.statusCode).json(serviceResponse);
-    } catch (error: any) {
-      return res.status(error.statusCode).json(error);
-    }
-  };
+  // getWeeklyAttendanceChart = async (
+  //   req: Request,
+  //   res: Response
+  // ): Promise<Response> => {
+  //   try {
+  //     const serviceResponse: APIResponse =
+  //       await this.getWeeklyAttendanceChartService(req);
+  //     return res.status(serviceResponse.statusCode).json(serviceResponse);
+  //   } catch (error: any) {
+  //     return res.status(error.statusCode).json(error);
+  //   }
+  // };
 
   exportToExcel = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -39,16 +39,31 @@ export class AttendanceController extends AttendanceService {
 
   getAllAttendance = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getAllAttendanceService(
-        req
-      );
+      const serviceResponse: APIResponse =
+        await this.getStudentAttendanceService(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
     }
   };
 
-  getChartAttendance = async (req: Request, res: Response): Promise<Response> => {
+  getDetailAttendance = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.getDetailAttendanceService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  getChartAttendance = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.getChartAttendanceService(
         req
@@ -58,7 +73,6 @@ export class AttendanceController extends AttendanceService {
       return res.status(error.statusCode).json(error);
     }
   };
-  
 
   updateAttendance = async (req: Request, res: Response): Promise<Response> => {
     try {

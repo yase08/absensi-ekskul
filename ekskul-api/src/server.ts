@@ -55,6 +55,7 @@ export class App {
     this.app.use(compression());
     this.app.use(morgan("dev"));
     this.app.use(nocache());
+    this.app.use("/gallery", express.static("public"));
     this.app.enable("trust proxy");
     this.app.use(hpp({ checkBody: true, checkQuery: true }));
     // this.app.use(helmet({ contentSecurityPolicy: true }));

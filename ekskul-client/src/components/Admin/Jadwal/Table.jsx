@@ -6,8 +6,10 @@ import {
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
+import { BsPencil } from "react-icons/bs";
+import { LuTrash } from "react-icons/lu";
 
-const TableJadwal = ({ setFormOld }) => {
+const TableJadwal = ({ setFormOld, setOpen }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
@@ -26,6 +28,11 @@ const TableJadwal = ({ setFormOld }) => {
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
+  };
+
+  const handleEdit = async (item) => {
+    setFormOld(item);
+    setOpen(true);
   };
 
   const handleSort = (dataIndex) => (a, b) => {
@@ -221,7 +228,7 @@ const TableJadwal = ({ setFormOld }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("schedule"),
-      render: (schedule) => schedule.day ? schedule.day : "-",
+      render: (schedule) => (schedule.day ? schedule.day : "-"),
     },
     {
       title: "Ekstrakurikuler",
@@ -230,7 +237,7 @@ const TableJadwal = ({ setFormOld }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("ekskul"),
-      render: (ekskul) => ekskul.name ? ekskul.name : "-",
+      render: (ekskul) => (ekskul.name ? ekskul.name : "-"),
     },
     {
       title: "Ruangan",
@@ -239,7 +246,7 @@ const TableJadwal = ({ setFormOld }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("room"),
-      render: (room) => room.name ? room.name : "-",
+      render: (room) => (room.name ? room.name : "-"),
     },
     {
       title: "Rombel",
@@ -248,7 +255,7 @@ const TableJadwal = ({ setFormOld }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("rombel"),
-      render: (rombel) => rombel ? rombel.name : "-",
+      render: (rombel) => (rombel ? rombel.name : "-"),
     },
     {
       title: "Jam Mulai",
@@ -257,7 +264,7 @@ const TableJadwal = ({ setFormOld }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("startTime"),
-      render: (startTime) => startTime ? startTime : "-",
+      render: (startTime) => (startTime ? startTime : "-"),
     },
     {
       title: "Jam Berakhir",
@@ -266,25 +273,25 @@ const TableJadwal = ({ setFormOld }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("endTime"),
-      render: (endTime) => endTime ? endTime : "-",
+      render: (endTime) => (endTime ? endTime : "-"),
     },
     {
       title: "Aksi",
       dataIndex: "action",
       width: "20%",
       render: (_, record) => (
-        <Space size={"middle"}>
-          <a
-            className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
-            onClick={() => setFormOld(record)}
-          >
-            Edit
+        <Space
+          size={"middle"}
+          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
+        >
+          <a className="hover:text-blue-500" onClick={() => handleEdit(record)}>
+            <BsPencil size={20} />
           </a>
           <a
-            className="bg-red-500 hover:bg-red-600 text-white font-normal py-2 px-4 rounded"
+            className="hover:text-red-500"
             onClick={() => handleDeleteRequest(record.id)}
           >
-            Delete
+            <LuTrash size={20} />
           </a>
         </Space>
       ),

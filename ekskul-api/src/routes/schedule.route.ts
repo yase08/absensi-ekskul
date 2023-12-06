@@ -26,6 +26,11 @@ class ScheduleRoutes extends ScheduleController {
       [authorization(), auth(), permission(["admin"])],
       this.getAllSchedule
     );
+    this.router.get(
+      "/day",
+      [authorization(), auth(), permission(["admin"])],
+      this.getAllDay
+    );
     this.router.get("/ekskul", this.getSchedule);
 
     return this.router;

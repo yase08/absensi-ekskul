@@ -4,10 +4,7 @@ import { config } from "../utils/config";
 
 export const getAllTask = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/task`,
-      config
-    );
+    const response = await axios.get(`${API}/${VERSION}/task`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -27,9 +24,13 @@ export const deleteTask = async (id) => {
   }
 };
 
-export const updateTask = async (id) => {
+export const updateTask = async (id, requestData) => {
   try {
-    const response = await axios.delete(`${API}/${VERSION}/task/${id}`, config);
+    const response = await axios.put(
+      `${API}/${VERSION}/task/${id}`,
+      requestData,
+      config
+    );
     return response.data;
   } catch (error) {
     if (error.response) {

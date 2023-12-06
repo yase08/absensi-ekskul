@@ -20,6 +20,7 @@ const EkstrakurikulerComponent = () => {
 
   const handleCancel = () => {
     setOpen(false);
+    setFormOld({});
   };
 
   const handleOk = async (event) => {

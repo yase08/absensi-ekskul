@@ -169,6 +169,51 @@ export class StudentService {
     }
   }
 
+  async getStudentByEkskulService(req: Request): Promise<any> {
+    try {
+      const ekskul: string =
+        typeof req.query.ekskul === "string" ? req.query.ekskul : "";
+
+      const paramQuerySQL: any = {
+        attributes: ["id", "name"],
+      };
+
+      if (ekskul) {
+        paramQuerySQL.where = {
+          ekskul_id: ekskul,
+        };
+      }
+
+      const student = await db.student.findAll(paramQuerySQL);
+
+      if (!student || student.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+
+      const manipulatedStudent = student.map((student: any) => {
+        return {
+          id: student.id,
+          name: student.name,
+        };
+      });
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan siswa",
+          manipulatedStudent,
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
   async updateStudentService(req: Request): Promise<any> {
     try {
       const studentExist = await db.student.findOne({

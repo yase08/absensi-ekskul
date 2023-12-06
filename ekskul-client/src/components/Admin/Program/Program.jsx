@@ -39,6 +39,8 @@ const Program = () => {
 
   const handleCancel = () => {
     setOpen(false);
+    setFormOld({});
+    setFormData({});
   };
 
   const handleOk = async (event) => {

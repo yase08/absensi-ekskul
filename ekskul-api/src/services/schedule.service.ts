@@ -120,6 +120,33 @@ export class ScheduleService {
     }
   }
 
+  async getAllDayService(req: Request): Promise<any> {
+    try {
+      const schedule = await db.schedule.findAll({
+        attributes: ["id", "day"],
+      });
+
+      if (!schedule || schedule.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Jadwal tidak ditemukan");
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan hari",
+          schedule,
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
   async getScheduleService(req: Request): Promise<any> {
     try {
       const schedules = await db.schedule.findAll({
