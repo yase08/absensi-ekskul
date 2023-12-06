@@ -537,10 +537,7 @@ export class AttendanceService {
               ? studentAttendance.student.name
               : null,
             ekskul: studentAttendance?.ekskul
-              ? {
-                  id: studentAttendance.ekskul.id,
-                  name: studentAttendance.ekskul.name,
-                }
+              ? studentAttendance.ekskul.name
               : null,
             percentage: Math.round(result[studentId]) || 0,
           };
