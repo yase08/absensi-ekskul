@@ -24,6 +24,21 @@ export const getSchedule = async () => {
   }
 };
 
+export const updateSchedule = async (id, requestData) => {
+  try {
+    const response = await axios.put(
+      `${API}/${VERSION}/schedule/${id}`,
+      requestData,
+      config
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response.data.message;
+    }
+  }
+};
+
 export const getDay = async () => {
   try {
     const response = await axios.get(`${API}/${VERSION}/schedule/day`, config);

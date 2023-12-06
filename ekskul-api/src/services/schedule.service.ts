@@ -130,11 +130,7 @@ export class ScheduleService {
         throw apiResponse(status.NOT_FOUND, "Jadwal tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Berhasil mendapatkan hari",
-          schedule,
-        )
+        apiResponse(status.OK, "Berhasil mendapatkan hari", schedule)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -207,6 +203,50 @@ export class ScheduleService {
       return Promise.resolve(
         apiResponse(status.OK, "Fetched schedule data", modifiedSchedules)
       );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async updateScheduleService(req: Request): Promise<any> {
+    try {
+      const scheduleExist = await db.schedule.findOne({
+        where: { id: req.params.id },
+      });
+
+      if (!scheduleExist)
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Hari dengan id tersebut tidak ditemukan"
+        );
+
+      const scheduleSame = await db.schedule.findOne({
+        where: { name: req.body.name },
+      });
+
+      if (scheduleSame && scheduleSame.id !== scheduleExist.id) {
+        throw apiResponse(
+          status.CONFLICT,
+          `Hari dengan nama ${req.body.name} sudah ada`
+        );
+      }
+
+      const updateSchedule = await db.schedule.update(req.body, {
+        where: {
+          id: scheduleExist.id,
+        },
+      });
+
+      if (!updateSchedule)
+        throw apiResponse(status.FORBIDDEN, "Update hari gagal");
+
+      return Promise.resolve(apiResponse(status.OK, "Update hari berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

@@ -171,18 +171,18 @@ export class StudentService {
 
   async getStudentByEkskulService(req: Request): Promise<any> {
     try {
-      const ekskul: string =
-        typeof req.query.ekskul === "string" ? req.query.ekskul : "";
+      const ekskul_id = req.query.ekskul_id as string;
 
       const paramQuerySQL: any = {
         attributes: ["id", "name"],
+        include: [
+          {
+            model: db.ekskul,
+            attributes: [],
+            where: { id: ekskul_id },
+          },
+        ],
       };
-
-      if (ekskul) {
-        paramQuerySQL.where = {
-          ekskul_id: ekskul,
-        };
-      }
 
       const student = await db.student.findAll(paramQuerySQL);
 
@@ -199,8 +199,8 @@ export class StudentService {
       return Promise.resolve(
         apiResponse(
           status.OK,
-          "Berhasil mendapatkan siswa",
-          manipulatedStudent,
+          "Berhasil mendapatkan siswa berdasarkan ekskul",
+          manipulatedStudent
         )
       );
     } catch (error: any) {

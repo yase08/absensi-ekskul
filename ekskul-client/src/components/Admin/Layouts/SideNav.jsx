@@ -13,6 +13,7 @@ import { useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { BsJoystick } from 'react-icons/bs'
 import { IoDiamondSharp } from 'react-icons/io5'
+import { WiDayCloudy } from "react-icons/wi";
 import { GrTask } from "react-icons/gr";
 import { MdCoPresent, MdOutlineAssessment } from "react-icons/md";
 import Button from "../../../components/Admin/Layouts/Button";
@@ -461,6 +462,29 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                                         <div className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${expanded ? 'max-lg:hidden' : 'hidden'}`}>
                                  <div className='bg-black py-[4px] px-[5px] rounded-sm '>
                                         <p className='font-semibold font-poppins text-sm z-50'>Jadwal </p>
+                                 </div>
+                             </div>
+                        )}
+                    </div>
+                 </div>
+                 
+                <div className={`flex flex-col gap-y-[13px] relative   ${expanded?'':'w-full h-[55px] mt-[15px] flex justify-center'}`}>
+                    <div                            
+                    className={`bg-transparent w-full ${expanded ? 'lg:px-1':''}`}>
+                        <a
+                            href='/admin/hari'
+                           onMouseEnter={handleNavbarHomeMouseEnter3} onMouseLeave={handleNavbarHomeMouseLeave3}
+                            className={`relative flex items-center    ${currentPath === '/admin/hari' || currentPath === '/admin/hari/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute ') : 'w-full h-[60px] '} ${currentPath === '/admin/hari' || currentPath === '/admin/hari/' ? (expanded ? 'w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md' : 'before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute ') : 'w-full h-[60px] '} ${expanded ? 'items-center lg:justify-center animate-fade-in-out max-lg:px-8' : 'justify-between lg:px-9'}`}
+                            >
+                                <div className='flex gap-x-[24.5px] items-center '>
+                               <WiDayCloudy className={`opacity-100 ${expanded ? (currentPath === '/data' ? 'text-2xl opacity-100 text-white' : 'text-2xl opacity-60 text-black') : 'opacity-60'}`}/>
+                                <p  className={`opacity-60 text-sm ${expanded ? 'lg:hidden' : ''} transition-opacity`}>Hari</p>
+                                </div>
+                            </a>
+                            {infoHome3Navbar && (
+                                        <div className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${expanded ? 'max-lg:hidden' : 'hidden'}`}>
+                                 <div className='bg-black py-[4px] px-[5px] rounded-sm '>
+                                        <p className='font-semibold font-poppins text-sm z-50'>Hari </p>
                                  </div>
                              </div>
                         )}
