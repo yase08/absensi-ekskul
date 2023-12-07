@@ -8,7 +8,7 @@ export function useProfile() {
 }
 
 export function ProfileProvider({ children }) {
-  const [profile, setProfile] = useState({});
+  const [profile, setProfile] = useState  ({});
 
   useEffect(() => {
     const fetchData = async () => {

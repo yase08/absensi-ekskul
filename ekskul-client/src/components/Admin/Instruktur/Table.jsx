@@ -2,10 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { getAllAttendance } from "../../../services/attendance.service";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
-import { useEkskul } from "../../../context/EkskulContext";
+import { getAllInstructorAttendance } from "../../../services/instructorAttendance.service";
 
-const TableAbsensi = () => {
-  const { ekskul } = useEkskul();
+const TableInstruktur = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
@@ -144,7 +143,7 @@ const TableAbsensi = () => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllAttendance(ekskul);
+      const response = await getAllInstructorAttendance();
 
       if (response && response.data) {
         if (Array.isArray(response.data)) {
@@ -173,11 +172,13 @@ const TableAbsensi = () => {
     },
     {
       title: "Nama",
-      dataIndex: "name",
-      sorter: handleSort("name"),
+      dataIndex: "user",
+      sorter: handleSort("user"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("name"),
+      render: (user) => (user ? user.name : "-"),
+
     },
     {
       title: "Ekskul",
@@ -187,36 +188,38 @@ const TableAbsensi = () => {
       width: "20%",
       ...getColumnSearchProps("ekskul"),
       render: (ekskul) => (ekskul ? ekskul.name : "-"),
+
     },
-    {
-      title: "%",
-      dataIndex: "percentage",
-      sorter: handleSort("percentage"),
+    {   
+      title: "Date",
+      dataIndex: "date",
+      sorter: handleSort("date"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("percentage"),
+      ...getColumnSearchProps("date"),
+      render: (text) => {
+        return new Intl.DateTimeFormat("en-US").format(new Date(text));
+      },
     },
-    {
-      title: "Aksi",
-      dataIndex: "action",
-      width: "20%",
-      render: (_, record) => (
-        <Space size={"middle"}>
-          <a
-            className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
-          >
-            Detail
-          </a>
-        </Space>
-      ),
-    },
+    // {
+    //   title: "Aksi",
+    //   dataIndex: "action",
+    //   width: "20%",
+    //   render: () => (
+    //     <Space size={"middle"}>
+    //       <a
+    //         className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
+    //       >
+    //         Detail
+    //       </a>
+    //     </Space>
+    //   ),
+    // },
   ];
 
   useEffect(() => {
-    if (ekskul) {
-      handleGetRequest();
-    }
-  }, [ekskul]);
+    handleGetRequest();
+  }, []);
 
   if (loading) {
     return (
@@ -238,21 +241,21 @@ const TableAbsensi = () => {
   }
 
   return (
-      <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
-        <div className="overflow-x-auto hidden-scroll w-full">
-          <Table
-            columns={columns}
-            dataSource={data.slice(
-              (currentPage - 1) * pageSize,
-              currentPage * pageSize
-            )}
-            pagination={getPaginationConfig()}
-            loading={loading}
-            scroll={{ x: "max-content" }}
-          />
-        </div>
+    <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
+      <div className="overflow-x-auto hidden-scroll w-full">
+        <Table
+          columns={columns}
+          dataSource={data.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )}
+          pagination={getPaginationConfig()}
+          loading={loading}
+          scroll={{ x: "max-content" }}
+        />
       </div>
+    </div>
   );
 }
 
-export default TableAbsensi
+export default TableInstruktur

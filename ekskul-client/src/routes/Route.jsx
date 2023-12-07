@@ -10,11 +10,13 @@ import SiswaDashboard from "../pages/Admin/Siswa/Siswa";
 import ProfileDashboard from "../pages/Admin/Profile/Profile";
 import GalleryDashboard from "../pages/Admin/Gallery/Gallery";
 import AbsensiDashboard from "../pages/Admin/Absensi/Absensi";
+import AbsensiPostDashboard from "../pages/Admin/Absensi/AbsensiPost";
 import Login from "../pages/Admin/Login/Login";
 import { createBrowserRouter } from "react-router-dom";
 import PenilaianDashboard from "../pages/Admin/Penilaian/Penilaian";
 import TugasDashboard from "../pages/Admin/Tugas/Tugas";
 import HariDashboard from "../pages/Admin/Hari/Hari";
+import InstrukturDashboard from "../pages/Admin/Instruktur/Instruktur";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +60,10 @@ const router = createBrowserRouter([
     element: <AbsensiDashboard />,
   },
   {
+    path: "/admin/absensi/tambah",
+    element: <AbsensiPostDashboard />,
+  },
+  {
     path: "/admin/ekstrakurikuler",
     element: <EkstrakurikulerDashboard />,
   },
@@ -84,6 +90,10 @@ const router = createBrowserRouter([
   {
     path: "/admin/gallery",
     element: <GalleryDashboard />,
+  },
+  {
+    path: "/admin/instruktur",
+    element: <InstrukturDashboard />,
   },
 ]);
 

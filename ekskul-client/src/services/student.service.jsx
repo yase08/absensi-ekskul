@@ -16,6 +16,20 @@ export const getAllStudent = async () => {
   }
 };
 
+export const getAllStudentByEkskul = async (ekskul_id) => {
+  try {
+    const response = await axios.get(
+      `${API}/${VERSION}/student?ekskul=${ekskul_id}`,
+      config
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response.data.message;
+    }
+  }
+};
+
 export const deleteStudent = async (id) => {
   try {
     const response = await axios.delete(

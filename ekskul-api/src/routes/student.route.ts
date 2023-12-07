@@ -23,7 +23,7 @@ class StudentRoutes extends StudentController {
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin", "instructor"])],
       this.getAllStudent
     );
     this.router.get(

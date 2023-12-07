@@ -563,7 +563,7 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                     <div                            
                     className={`bg-transparent w-full ${expanded ? 'lg:px-1':''}`}>
                         <a
-                            href='/admin/ruangan'
+                            href='/admin/instruktur'
                             onMouseEnter={handleNavbarHomeMouseEnter8} onMouseLeave={handleNavbarHomeMouseLeave8}
                             className={`relative flex items-center    ${currentPath === '/admin/instruktur' || currentPath === '/admin/instruktur/' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute ') : 'w-full h-[60px] '} ${currentPath === '/admin/instruktur' || currentPath === '/admin/instruktur/' ? (expanded ? 'w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md' : 'before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute ') : 'w-full h-[60px] '} ${expanded ? 'items-center lg:justify-center animate-fade-in-out max-lg:px-8' : 'justify-between lg:px-9'}`}
                             >

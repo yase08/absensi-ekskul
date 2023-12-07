@@ -2,10 +2,10 @@ import axios from "axios";
 import { API, VERSION } from "../utils/baseUrl";
 import { config } from "../utils/config";
 
-export const getAllAttendance = async ({ filter, sort, size, number }) => {
+export const getAllAttendance = async (ekskul_id) => {
   try {
     const response = await axios.get(
-      `${API}/${VERSION}/attendance?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+      `${API}/${VERSION}/attendance?ekskul_id=${ekskul_id}`,
       config
     );
     return response.data;
@@ -30,10 +30,10 @@ export const updateAttendance = async (id) => {
   }
 };
 
-export const createAttendance = async (requestData) => {
+export const createAttendance = async (requestData, ekskul_id) => {
   try {
     const response = await axios.post(
-      `${API}/${VERSION}/attendance`,
+      `${API}/${VERSION}/attendance?ekskul_id=${ekskul_id}`,
       requestData,
       config
     );
