@@ -1,57 +1,108 @@
 import Table from "./Table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import Swal from "sweetalert2";
 import {
-  createAttendance,
-  updateAttendance,
-} from "../../../services/attendance.service";
+  createSchedule,
+  updateSchedule,
+} from "../../../services/schedule.service";
+import { useProfile } from "../../../context/ProfileContext";
+import { Modal, Select, Input } from "antd";
+import { getAllEkskul } from "../../../services/ekskul.service";
 
 const HariComponent = () => {
-  const [isOpen, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
-    activity: "",
-    task: "",
-    startDate: "",
-    endDate: "",
+    name: "",
+    ekskul_id: "",
   });
   const [formOld, setFormOld] = useState({});
-  // const [id, setId] = useState('');
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { profile } = useProfile();
 
-  const handleInputChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-
+  const handleInputChange = (e, inputName) => {
+    const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormOld({
-        ...formOld,
-        [name]: value,
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     }
   };
 
-  const handlePostRequest = async (event) => {
-    event.preventDefault();
+  const handleGetEkskulRequest = async () => {
+    try {
+      const response = await getAllEkskul();
+
+      if (response && response.data) {
+        console.log("API Response:", response.data);
+        console.log(response);
+
+        if (Array.isArray(response.data)) {
+          const ekskulData = response.data;
+          setEkskul(ekskulData);
+        } else {
+          console.log("Data is not an array");
+        }
+      } else {
+        console.log("Data retrieval failed");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const ekskulOption = ekskul.map((item) => ({
+    label: item.name,
+    value: item.id,
+  }));
+
+  const showModal = () => {
+    setOpen(true);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+    setFormOld({});
+    setFormData({});
+    console.log(formOld, formData);
+  };
+
+  const handleOk = async (event) => {
     setLoading(true);
 
     try {
-      const response = await createAttendance(formData);
-      console.log(formData);
-      const successMessage = response.statusMessage;
+      if (formOld && formOld.id) {
+        const response = await updateSchedule(formOld.id, formOld);
+        const successMessage = response.data;
 
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: successMessage,
-      });
-      setOpen(!isOpen);
-      console.log("Response:", response.data);
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: successMessage,
+        });
+        event.preventDefault();
+        setFormOld({});
+      } else {
+        const response = await createSchedule(formData);
+        const successMessage = response.statusMessage;
+
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: successMessage,
+        });
+        event.preventDefault();
+      }
     } catch (error) {
       console.error("Error:", error);
 
@@ -77,70 +128,25 @@ const HariComponent = () => {
       }
     } finally {
       setLoading(false);
+      setConfirmLoading(false);
+      setOpen(false);
     }
   };
 
-  const handleUpdateRequest = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    console.log(formOld);
-
-    try {
-      const response = await updateAttendance(formOld.id, formOld);
-      const successMessage = response.statusMessage;
-
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: successMessage,
-      });
-      setFormOld("");
-      setOpen(!isOpen);
-      console.log("Response:", response.data);
-    } catch (error) {
-      console.error("Error:", error);
-
-      if (error.response) {
-        const errorMessage = error.response.statusMessage;
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: errorMessage,
-        });
-      } else if (error.request) {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "No response received from the server.",
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "An unexpected error occurred.",
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const toggleExpansion = () => {
-    setOpen(!isOpen);
-    if (formOld) {
-      setFormOld("");
-    }
-  };
+  useEffect(() => {
+    profile;
+    handleGetEkskulRequest();
+  }, []);
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
       <div className="w-full flex flex-col gap-2">
         <div className="flex justify-between">
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
-            Hari
+            Hari Siswa
           </h1>
           <button
-            onClick={toggleExpansion}
+            onClick={showModal}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
             Add Data
@@ -150,82 +156,27 @@ const HariComponent = () => {
           <Table setFormOld={setFormOld} setOpen={setOpen} />
         </div>
       </div>
-      {isOpen && (
-        <div
-          className="bg-transparent flex items-center justify-center w-full absolute top-0 left-0 h-full z-50"
-          style={{ backdropFilter: "blur(5px)" }}
-        >
-          <div className="bg-light w-[600px] h-auto border shadow-md">
-            <div className="flex justify-between p-5 border-b border-gray-300  relative group">
-              <p className="font-semibold opacity-70">
-                {" "}
-                {formOld ? "Edit Data Program" : "Add Data Program"}
-              </p>
-              <button onClick={toggleExpansion}>
-                <AiOutlineClose className="text-2xl" />
-              </button>
-            </div>
-            <div className="w-full h-full">
-              <form action="" className="flex flex-col p-5 gap-2">
-                <label htmlFor="" className="text-xl">
-                  Aktivitas
-                </label>
-                <input
-                  value={formOld ? formOld.activity : formData.activity}
-                  onChange={handleInputChange}
-                  type="text"
-                  name="activity"
-                  id=""
-                  placeholder="Input Your Activity"
-                  className="bg-transparent outline-none border p-3 rounded-md border-gray-400"
-                />
-                <label htmlFor="" className="text-xl">
-                  Tugas
-                </label>
-                <input
-                  value={formOld ? formOld.task : formData.task}
-                  onChange={handleInputChange}
-                  type="text"
-                  name="task"
-                  id=""
-                  placeholder="Input Your Task"
-                  className="bg-transparent outline-none border p-3 rounded-md border-gray-400"
-                />
-                <label htmlFor="" className="text-xl">
-                  Tanggal Mulai
-                </label>
-                <input
-                  value={formOld ? formOld.startDate : formData.startDate}
-                  onChange={handleInputChange}
-                  type="date"
-                  name="startDate"
-                  id=""
-                  placeholder=""
-                  className="bg-transparent outline-none border p-3 rounded-md border-gray-400"
-                />
-                <label htmlFor="" className="text-xl">
-                  Tanggal Akhir
-                </label>
-                <input
-                  value={formOld ? formOld.endDate : formData.endDate}
-                  onChange={handleInputChange}
-                  type="date"
-                  name="endDate"
-                  id=""
-                  placeholder=""
-                  className="bg-transparent outline-none border p-3 rounded-md border-gray-400"
-                />
-                <button
-                  className="bg-blue-500 p-2 mt-4 rounded-md text-white"
-                  onClick={formOld ? handleUpdateRequest : handlePostRequest}
-                >
-                  Submit
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        title={formOld && formOld.id ? "Edit Data" : "Tambah Data"}
+        open={open}
+        onOk={handleOk}
+        confirmLoading={confirmLoading}
+        onCancel={handleCancel}
+      >
+        <form action="" className="flex flex-col p-5 gap-2">
+          <label htmlFor="" className="text-lg">
+            Hari
+          </label>
+          <Input
+            value={formOld ? formOld.name : formData.name}
+            type="text"
+            name="name"
+            size="large"
+            placeholder="Masukan nama hari"
+            onChange={(e) => handleInputChange(e, "name")}
+          />
+        </form>
+      </Modal>
     </div>
   );
 };

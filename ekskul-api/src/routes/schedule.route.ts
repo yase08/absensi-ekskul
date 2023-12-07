@@ -21,6 +21,11 @@ class ScheduleRoutes extends ScheduleController {
       [authorization(), auth(), permission(["admin"]), validator(DTOSchedule)],
       this.createSchedule
     );
+    this.router.put(
+      "/:id",
+      [authorization(), auth(), permission(["admin"]), validator(DTOSchedule)],
+      this.updateSchedule
+    );
     this.router.get(
       "/",
       [authorization(), auth(), permission(["admin"])],
