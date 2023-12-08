@@ -10,6 +10,7 @@ import {
 import { ISession } from "../interfaces/user.interface";
 import { Op } from "sequelize";
 import * as cron from "node-cron";
+import { getISOWeek } from "date-fns";
 
 const db = require("../db/models");
 
@@ -55,52 +56,8 @@ function calculateTotalAttendance(attendance: any[]): Record<string, number> {
   return totalAttendanceByStudent;
 }
 
-function getStartAndEndWeek(date) {
-  const currentDate = date || new Date();
-
-  const options = { timeZone: "Asia/Jakarta" };
-  const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
-
-  const currentDay = currentDate.getDay();
-  const startDate = new Date(currentDate);
-  const endDate = new Date(currentDate);
-
-  startDate.setDate(
-    startDate.getDate() - currentDay + (currentDay === 0 ? -6 : 1)
-  );
-
-  endDate.setDate(endDate.getDate() - currentDay + (currentDay === 0 ? 0 : 7));
-
-  const start = dateTimeFormat.format(startDate);
-  const end = dateTimeFormat.format(endDate);
-
-  return {
-    start,
-    end,
-  };
-}
-
-const getWeekNumber = (date) => {
-  const currentDate: any = Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Jakarta",
-  }).format(new Date(date));
-
-  currentDate.setDate(
-    currentDate.getDate() -
-      currentDate.getDay() +
-      (currentDate.getDay() === 0 ? 1 : -currentDate.getDay() + 1)
-  );
-
-  const yearStart: any = new Date(currentDate.getFullYear(), 0, 1);
-
-  const weekNumber = Math.ceil(((currentDate - yearStart) / 86400000 + 1) / 7);
-
-  return weekNumber;
-};
-
 const countAttendancePerWeekService = async () => {
   try {
-    const { start, end } = getStartAndEndWeek(new Date());
     const ekskuls = await db.ekskul.findAll({
       attributes: ["id"],
     });
@@ -110,9 +67,6 @@ const countAttendancePerWeekService = async () => {
         try {
           const attendance = await db.attendance.count({
             where: {
-              date: {
-                [Op.between]: [start, end],
-              },
               ekskul_id: ekskul.id,
             },
           });
@@ -127,25 +81,23 @@ const countAttendancePerWeekService = async () => {
       })
     );
 
-    if (!totalAttendance)
+    if (!totalAttendance) {
       throw apiResponse(status.NOT_FOUND, "No attendance found");
+    }
+
+    const number = 0;
+
+    const weekNumber = (number += 1);
 
     const createHistoryAttendance = await Promise.all(
       totalAttendance.map(async (ekskulCount, index) => {
         try {
-          const weekNumber = getWeekNumber(
-            Intl.DateTimeFormat("en-US", {
-              timeZone: "Asia/Jakarta",
-            }).format(new Date())
-          );
           const historyAttendance = await db.historyAttendance.create({
             ekskul_id: ekskuls[index].id,
             totalAttendance: ekskulCount,
             type: "week",
             year: new Date().getFullYear(),
             name: `week-${weekNumber}`,
-            startDate: start,
-            endDate: end,
           });
           return historyAttendance;
         } catch (error) {
@@ -157,43 +109,20 @@ const countAttendancePerWeekService = async () => {
         }
       })
     );
+
+    return createHistoryAttendance;
   } catch (error: any) {
-    return Promise.reject(
-      apiResponse(
-        error.statusCode || status.INTERNAL_SERVER_ERROR,
-        error.statusMessage,
-        error.message
-      )
+    console.error("Error in countAttendancePerWeekService:", error);
+    throw apiResponse(
+      error.statusCode || status.INTERNAL_SERVER_ERROR,
+      error.statusMessage || "Internal Server Error",
+      error.message || "An unexpected error occurred"
     );
   }
 };
 
-function getStartAndEndMonth(date) {
-  const currentDate = date || new Date();
-
-  const options = { timeZone: "Asia/Jakarta" };
-  const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
-
-  const startDate = new Date(currentDate);
-  const endDate = new Date(currentDate);
-
-  startDate.setDate(1);
-
-  endDate.setMonth(endDate.getMonth() + 1);
-  endDate.setDate(0);
-
-  const start = dateTimeFormat.format(startDate);
-  const end = dateTimeFormat.format(endDate);
-
-  return {
-    start,
-    end,
-  };
-}
-
 const countAttendancePerMonthService = async () => {
   try {
-    const { start, end } = getStartAndEndMonth(new Date());
     const ekskuls = await db.ekskul.findAll({
       attributes: ["id"],
     });
@@ -203,9 +132,6 @@ const countAttendancePerMonthService = async () => {
         try {
           const attendance = await db.attendance.count({
             where: {
-              date: {
-                [Op.between]: [start, end],
-              },
               ekskul_id: ekskul.id,
             },
           });
@@ -230,8 +156,6 @@ const countAttendancePerMonthService = async () => {
           const historyAttendance = await db.historyAttendance.create({
             ekskul_id: ekskuls[index].id,
             totalAttendance: ekskulCount,
-            startDate: start,
-            endDate: end,
             type: "month",
             year: new Date().getFullYear(),
             name: `${monthName}`,
@@ -246,6 +170,8 @@ const countAttendancePerMonthService = async () => {
         }
       })
     );
+
+    return createHistoryAttendance;
   } catch (error: any) {
     return Promise.reject(
       apiResponse(
@@ -265,8 +191,13 @@ const countAttendancePerMonthService = async () => {
 //   countAttendancePerMonthService();
 // });
 
-// cron.schedule("* * * * *", () => {
-//   countAttendancePerWeekService();
+// cron.schedule("* * * * *", async () => {
+//   try {
+//     await countAttendancePerWeekService();
+//     console.log("Attendance per week count completed successfully.");
+//   } catch (error) {
+//     console.error("Error in cron job:", error);
+//   }
 // });
 
 // cron.schedule("* * * * *", () => {
@@ -453,9 +384,6 @@ export class AttendanceService {
         let limit: number;
         let offset: number;
 
-        // Count total number of rows in the attendance table
-        const totalRows = await db.attendance.count();
-
         // Sorting logic based on the provided sort parameter
         if (sort) {
           const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
@@ -531,23 +459,39 @@ export class AttendanceService {
             (a) => a.student.id === studentId
           );
 
+          // Filter out entries where both ekskul and name are null
+          if (
+            !studentAttendance ||
+            (!studentAttendance.ekskul && !studentAttendance.student.name)
+          ) {
+            return null; // Skip this entry
+          }
+
           return {
             id: studentId,
             name: studentAttendance?.student
               ? studentAttendance.student.name
               : null,
-            ekskul: studentAttendance?.ekskul.id === selectedEkskulId
+            ekskul: studentAttendance?.ekskul
               ? studentAttendance.ekskul.name
               : null,
             percentage: Math.round(result[studentId]) || 0,
           };
         });
 
+        // Remove null entries from the array
+        const filteredAttendances = modifiedAttendances.filter(
+          (entry) => entry !== null
+        );
+
+        // Count total number of rows in the attendance table
+        const totalRows = filteredAttendances.length;
+
         return Promise.resolve(
           apiResponse(
             status.OK,
             "Fetched all attendances successfully",
-            modifiedAttendances,
+            filteredAttendances,
             totalRows
           )
         );
@@ -765,12 +709,6 @@ export class AttendanceService {
           // attendances,
         })
       );
-      // } else {
-      //   throw apiResponse(
-      //     status.NOT_FOUND,
-      //     "Ekskul do not exist for the given id"
-      //   );
-      // }
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -824,14 +762,7 @@ export class AttendanceService {
         where: {
           type: "week",
         },
-        attributes: [
-          "startDate",
-          "endDate",
-          "totalAttendance",
-          "type",
-          "name",
-          "year",
-        ],
+        attributes: ["totalAttendance", "type", "name", "year"],
         include: [
           {
             model: db.ekskul,
@@ -851,9 +782,7 @@ export class AttendanceService {
 
         formattedData[weekName].push({
           ekskulName: attendance.ekskul.name,
-          startDate: attendance.startDate,
           year: attendance.year,
-          endDate: attendance.endDate,
           totalAttendance: attendance.totalAttendance,
         });
       });

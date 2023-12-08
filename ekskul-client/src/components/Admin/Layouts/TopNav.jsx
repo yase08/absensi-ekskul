@@ -8,7 +8,7 @@ import { AiOutlineMail, AiOutlineBell, AiOutlineClose } from "react-icons/ai";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { logOut } from "../../../services/auth.service";
+import { logout } from "../../../services/auth.service";
 import { useProfile } from "../../../context/ProfileContext";
 
 // eslint-disable-next-line react/prop-types
@@ -40,7 +40,7 @@ const TopNav = ({
     event.preventDefault();
 
     try {
-      const response = await logOut();
+      const response = await logout();
       console.log(response);
       const successMessage = response.statusMessage;
 
@@ -50,7 +50,7 @@ const TopNav = ({
         text: successMessage,
       });
       navigate("/login");
-      // sessionStorage.removeItem("token")
+      sessionStorage.removeItem("token");
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);

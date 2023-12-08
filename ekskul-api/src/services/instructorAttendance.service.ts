@@ -63,8 +63,6 @@ export class InstructorAttendanceService {
       let limit: number;
       let offset: number;
 
-      const totalRows = await db.instructorAttendance.count();
-
       if (filter) {
         paramQuerySQL.where = {
           name: { [Op.like]: `%${filter}%` },
@@ -137,6 +135,8 @@ export class InstructorAttendanceService {
           date: item.date,
         };
       });
+
+      const totalRows = instructorAttendance.length;
 
       return Promise.resolve(
         apiResponse(

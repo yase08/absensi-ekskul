@@ -15,18 +15,18 @@ export class AttendanceController extends AttendanceService {
     }
   };
 
-  // getWeeklyAttendanceChart = async (
-  //   req: Request,
-  //   res: Response
-  // ): Promise<Response> => {
-  //   try {
-  //     const serviceResponse: APIResponse =
-  //       await this.getWeeklyAttendanceChartService(req);
-  //     return res.status(serviceResponse.statusCode).json(serviceResponse);
-  //   } catch (error: any) {
-  //     return res.status(error.statusCode).json(error);
-  //   }
-  // };
+  getWeeklyAttendanceChart = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.getHistoryWeeklyAttendanceService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
 
   exportToExcel = async (req: Request, res: Response): Promise<any> => {
     try {

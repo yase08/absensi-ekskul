@@ -57,9 +57,9 @@ export const resetToken = async (token, requestData) => {
   }
 };
 
-export const logOut = async () => {
+export const logout = async () => {
   try {
-    const response = await axios.post(`${API}/${VERSION}/auth/logout`, config);
+    const response = await axios.get(`${API}/${VERSION}/auth/logout`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -78,8 +78,3 @@ export const getUsersCount = async () => {
     }
   }
 };
-
-// export const getUserData = (token) => {
-//   const decode = jwtDecode(token);
-//   return decode;
-// };

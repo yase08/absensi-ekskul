@@ -13,6 +13,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      date: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
       ekskul_id: {
         type: Sequelize.UUID,
         allowNull: false,

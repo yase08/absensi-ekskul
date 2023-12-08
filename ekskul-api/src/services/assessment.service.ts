@@ -25,11 +25,14 @@ export class AssessmentService {
             `Penilaian untuk siswa ${assessment.student_id} dan tugas ${assessment.task_id} sudah ada`
           );
         }
-        await db.assessment.create({
+        const createAssessment = await db.assessment.create({
           student_id: assessment.student_id,
           task_id: assessment.task_id,
+          date: assessment.date,
           grade: assessment.grade,
         });
+
+        console.log(createAssessment);
       }
       const createAttendances = await Promise.all(createAssessmentPromises);
 
@@ -50,19 +53,28 @@ export class AssessmentService {
     }
   }
 
-  async getAllAssessmentService(req: Request): Promise<any> {
+  async getAllAssessmentByTaskService(req: Request): Promise<any> {
     try {
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
       const filter: string =
         typeof req.query.filter === "string" ? req.query.filter : "";
       const page: any = req.query.page;
+      const task_id = req.query.task_id as string;
 
-      const paramQuerySQL: any = {};
+      const paramQuerySQL: any = {
+        where: {
+          task_id: task_id,
+        },
+      };
       let limit: number;
       let offset: number;
 
-      const totalRows = await db.assessment.count();
+      const totalRows = await db.assessment.count({
+        where: {
+          task_id: task_id,
+        },
+      });
 
       if (filter) {
         paramQuerySQL.where = {
@@ -111,15 +123,105 @@ export class AssessmentService {
               name: item.student.name,
             }
           : null,
-        task: item.task
-          ? {
-              id: item.task.id,
-              name: item.task.name,
-            }
-          : null,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
       }));
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan data penilaian",
+          manipulatedResponse,
+          totalRows
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getTaskAssessmentService(req: Request): Promise<any> {
+    try {
+      const sort: string =
+        typeof req.query.sort === "string" ? req.query.sort : "";
+      const filter: string =
+        typeof req.query.filter === "string" ? req.query.filter : "";
+      const page: any = req.query.page;
+
+      const paramQuerySQL: any = {};
+      let limit: number;
+      let offset: number;
+
+      const totalRows = await db.assessment.count();
+
+      if (filter) {
+        paramQuerySQL.where = {
+          student_id: {
+            [Op.like]: `%${filter}%`,
+          },
+        };
+      }
+
+      paramQuerySQL.attributes = ["id", "date", "createdAt", "updatedAt"];
+
+      paramQuerySQL.include = [
+        { model: db.task, as: "task", attributes: ["id", "name"] },
+      ];
+
+      if (sort) {
+        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
+        const fieldName = sort.replace(/^-/, "");
+        paramQuerySQL.order = [[fieldName, sortOrder]];
+      }
+
+      if (page && page.size && page.number) {
+        limit = parseInt(page.size, 10);
+        offset = (parseInt(page.number, 10) - 1) * limit;
+        paramQuerySQL.limit = limit;
+        paramQuerySQL.offset = offset;
+      } else {
+        limit = 10;
+        offset = 0;
+        paramQuerySQL.limit = limit;
+        paramQuerySQL.offset = offset;
+      }
+
+      const assessment = await db.assessment.findAll(paramQuerySQL);
+      const task = await db.task.findAll({
+        include: [
+          {
+            model: db.ekskul,
+            as: "ekskul",
+            attributes: ["name"],
+          },
+        ],
+      });
+
+      if (!assessment || assessment.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Penilaian tidak ditemukan");
+
+      const manipulatedResponse = task.map((item) => {
+        const taskId = item.id;
+        const taskAssessment = assessment.filter(
+          (assessment) => assessment.task.id === taskId
+        );
+
+        return {
+          id: item.id,
+          task: item.name,
+          ekskul: item.ekskul.name,
+          date: item.date,
+          totalAssessment: taskAssessment.length,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+        };
+      });
 
       return Promise.resolve(
         apiResponse(

@@ -29,7 +29,12 @@ class AssessmentRoutes extends AssessmentController {
     this.router.get(
       "/",
       [authorization(), auth(), permission(["instructor", "admin"])],
-      this.getAllAssessment
+      this.getTaskAssessment
+    );
+    this.router.get(
+      "/detail",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getAllAssessmentByTask
     );
     this.router.put(
       "/:id",

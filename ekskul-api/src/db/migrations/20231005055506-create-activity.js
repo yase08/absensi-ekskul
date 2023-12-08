@@ -16,12 +16,9 @@ module.exports = {
           key: "id",
         },
       },
-      rombel_id: {
-        type: Sequelize.UUID,
-        references: {
-          model: "rombels",
-          key: "id",
-        },
+      grade: {
+        type: Sequelize.ENUM("X", "XI", "XII"),
+        allowNull: false,
       },
       room_id: {
         type: Sequelize.UUID,
@@ -38,12 +35,12 @@ module.exports = {
         },
       },
       startTime: {
-        type: Sequelize.DATE,
-        allowNull: false
+        type: Sequelize.TIME,
+        allowNull: false,
       },
       endTime: {
-        type: Sequelize.DATE,
-        allowNull: false
+        type: Sequelize.TIME,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

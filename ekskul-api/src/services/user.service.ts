@@ -36,6 +36,7 @@ export class UserService {
 
       const createUser = await db.user.create({
         ...req.body,
+        role: req.body.role === "admin" ? "admin" : "instructor",
         password: hashedPassword,
       });
 
@@ -54,10 +55,10 @@ export class UserService {
       );
 
       if (!createUser)
-        throw apiResponse(status.FORBIDDEN, "Gagal menambahkan siswa");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat pengguna baru");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Berhasil menambahkan siswa")
+        apiResponse(status.OK, "Berhasil membuat pengguna baru")
       );
     } catch (error: any) {
       return Promise.reject(

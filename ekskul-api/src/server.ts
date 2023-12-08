@@ -13,7 +13,7 @@ import SlowDown from "express-slow-down";
 import hpp from "hpp";
 import session from "express-session";
 import { swaggerClient, swaggerServe } from "./libs/swagger.lib";
-import 'reflect-metadata';
+import "reflect-metadata";
 import AuthRoutes from "./routes/auth.route";
 import AttendanceRoutes from "./routes/attendance.route";
 import RayonRoutes from "./routes/rayon.route";
@@ -57,8 +57,8 @@ export class App {
     this.app.use(nocache());
     this.app.use("/gallery", express.static("public"));
     this.app.enable("trust proxy");
+    this.app.use(helmet({ contentSecurityPolicy: false }));
     this.app.use(hpp({ checkBody: true, checkQuery: true }));
-    // this.app.use(helmet({ contentSecurityPolicy: true }));
     if (!["production", "test"].includes(this.env)) {
       this.app.use(`${this.version}/docs`, swaggerServe, swaggerClient());
     }

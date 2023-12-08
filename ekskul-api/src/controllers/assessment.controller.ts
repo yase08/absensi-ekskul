@@ -15,9 +15,20 @@ export class AssessmentController extends AssessmentService {
     }
   };
 
-  getAllAssessment = async (req: Request, res: Response): Promise<Response> => {
+  getTaskAssessment = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getAllAssessmentService(
+      const serviceResponse: APIResponse = await this.getTaskAssessmentService(
+        req
+      );
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  getAllAssessmentByTask = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getAllAssessmentByTaskService(
         req
       );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
