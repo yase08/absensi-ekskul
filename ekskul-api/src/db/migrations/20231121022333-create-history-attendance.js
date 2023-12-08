@@ -12,17 +12,8 @@ module.exports = {
       totalAttendance: {
         type: Sequelize.INTEGER,
       },
-      startDate: {
-        type: Sequelize.DATE,
-      },
-      endDate: {
-        type: Sequelize.DATE,
-      },
-      type: {
-        type: Sequelize.ENUM("week", "month"),
-      },
-      name: {
-        type: Sequelize.STRING,
+      weekNumber: {
+        type: Sequelize.INTEGER,
       },
       year: {
         type: Sequelize.STRING,

@@ -22,11 +22,9 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       name: DataTypes.STRING,
-      type: DataTypes.ENUM("week", "month"),
+      weekNumber: DataTypes.INTEGER,
       year: DataTypes.DATE,
       totalAttendance: DataTypes.INTEGER,
-      startDate: DataTypes.DATE,
-      endDate: DataTypes.DATE,
       ekskul_id: {
         type: DataTypes.UUID,
         allowNull: false,

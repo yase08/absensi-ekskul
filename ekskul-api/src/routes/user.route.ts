@@ -33,11 +33,6 @@ class UserRoutes extends UserController {
       [authorization(), auth(), permission(["admin"])],
       this.getAllUser
     );
-    this.router.get(
-      "/admin",
-      [authorization(), auth(), permission(["admin"])],
-      this.getAllAdmin
-    );
     this.router.put(
       "/:id",
       [

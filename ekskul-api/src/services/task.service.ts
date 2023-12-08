@@ -103,6 +103,7 @@ export class TaskService {
           name: task.name,
           ekskul: task.ekskul.name,
           user: task.user.name,
+          date: task.date,
           createdAt: task.createdAt,
           updatedAt: task.updatedAt,
         };

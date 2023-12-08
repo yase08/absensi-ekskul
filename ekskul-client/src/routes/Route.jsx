@@ -18,7 +18,7 @@ import PenilaianDashboard from "../pages/Admin/Tugas/Nilai";
 import PenilaianPostDashboard from "../pages/Admin/Tugas/PenilaianPost";
 import TugasDashboard from "../pages/Admin/Tugas/Tugas";
 import HariDashboard from "../pages/Admin/Hari/Hari";
-import InstrukturDashboard from "../pages/Admin/Instruktur/Instruktur";
+import UserDashboard from "../pages/Admin/User/User";
 
 const router = createBrowserRouter([
   {
@@ -42,8 +42,8 @@ const router = createBrowserRouter([
     element: <PenilaianDashboard />,
   },
   {
-    path: "/admin/penugasan/penilaian/:id",
-    element: <PenilaianPostDashboard />,
+    path: "/admin/user",
+    element: <UserDashboard />,
   },
   {
     path: "/admin/penugasan",

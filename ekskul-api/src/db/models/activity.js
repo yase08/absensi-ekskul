@@ -11,9 +11,6 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.schedule, {
         foreignKey: "schedule_id",
       });
-      this.belongsTo(models.rombel, {
-        foreignKey: "rombel_id",
-      });
       this.belongsTo(models.room, {
         foreignKey: "room_id",
       });
@@ -34,8 +31,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         allowNull: false,
       },
-      rombel_id: {
-        type: DataTypes.UUID,
+      grade: {
+        type: DataTypes.ENUM("X", "XI", "XII"),
         allowNull: false,
       },
       room_id: {
@@ -47,11 +44,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       startTime: {
-        type: DataTypes.DATE,
+        type: DataTypes.TIME,
         allowNull: false,
       },
       endTime: {
-        type: DataTypes.DATE,
+        type: DataTypes.TIME,
         allowNull: false,
       },
     },

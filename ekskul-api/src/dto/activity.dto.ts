@@ -1,6 +1,6 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class DTOActivity {
   @IsNotEmpty({ message: "Ekskul tidak boleh kosong" })
@@ -11,21 +11,20 @@ export class DTOActivity {
   @IsUUID()
   room_id: string;
 
-  @IsNotEmpty({ message: "Rombel tidak boleh kosong" })
-  @IsUUID()
-  rombel_id: string;
+  @IsNotEmpty({ message: "Kelas tidak boleh kosong" })
+  grade: string;
 
   @IsNotEmpty({ message: "Jadwal tidak boleh kosong" })
   @IsUUID()
   schedule_id: string;
 
   @IsNotEmpty({ message: "Waktu mulai tidak boleh kosong" })
-  @IsString({ message: "Waktu mulai harus berupa tanggal" })
-  startTime: Date;
+  @IsString({ message: "Waktu mulai tidak sesuai dengan format jam" })
+  startTime: string;
 
   @IsNotEmpty({ message: "Waktu selesai tidak boleh kosong" })
-  @IsString({ message: "Waktu selesai harus berupa tanggal" })
-  endTime: Date;
+  @IsString({ message: "Waktu selesai tidak sesuai dengan format jam" })
+  endTime: string;
 }
 
 export class DTOActivityById {

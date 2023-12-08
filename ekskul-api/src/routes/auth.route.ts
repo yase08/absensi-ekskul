@@ -22,7 +22,7 @@ class AuthRoutes extends AuthController {
       [authorization(), auth(), permission(["admin", "instructor"])],
       this.getCount
     );
-    this.router.post(
+    this.router.get(
       "/logout",
       [authorization(), auth(), permission(["admin", "instructor"])],
       this.logout
