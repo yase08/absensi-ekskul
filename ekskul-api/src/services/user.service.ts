@@ -25,7 +25,7 @@ export class UserService {
       let file: Express.Multer.File = req.file as Express.Multer.File;
 
       if (file) {
-        req.body.image = file.path;
+        req.body.image = file.filename;
       }
 
       const hashedPassword = await hashPassword(req.body.password);
@@ -79,7 +79,24 @@ export class UserService {
         typeof req.query.filter === "string" ? req.query.filter : "";
       const page: any = req.query.page;
 
-      const paramQuerySQL: any = {};
+      const paramQuerySQL: any = {
+        attributes: [
+          "id",
+          "name",
+          "email",
+          "mobileNumber",
+          "image",
+          "role",
+          "isActive",
+        ],
+        include: [
+          {
+            model: db.ekskul,
+            attributes: ["id", "name"],
+            as: "ekskuls",
+          },
+        ],
+      };
       let limit: number;
       let offset: number;
 
@@ -92,10 +109,6 @@ export class UserService {
           },
         };
       }
-
-      paramQuerySQL.where = {
-        role: "instructor",
-      };
 
       if (sort) {
         const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
@@ -118,71 +131,33 @@ export class UserService {
       const user = await db.user.findAll(paramQuerySQL);
 
       if (!user || user.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+
+      const manipulatedUser = user.map((user: any) => {
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          mobileNumber: user.mobileNumber,
+          image: user.image,
+          role: user.role,
+          isActive: user.isActive,
+          ekskuls: user.ekskuls
+            ? user.ekskuls.map((ekskul) => {
+                return {
+                  id: ekskul.id,
+                  name: ekskul.name,
+                };
+              })
+            : null,
+        };
+      });
+
+      if (!user || user.length === 0)
         throw apiResponse(status.NOT_FOUND, "Pengguna tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Berhasil mendapatkan pengguna", user, totalRows)
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getAllAdminService(req: Request): Promise<any> {
-    try {
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const filter: string =
-        typeof req.query.filter === "string" ? req.query.filter : "";
-      const page: any = req.query.page;
-
-      const paramQuerySQL: any = {};
-      let limit: number;
-      let offset: number;
-
-      if (filter) {
-        paramQuerySQL.where = {
-          name: {
-            [Op.like]: `%${filter}%`,
-          },
-        };
-      }
-
-      paramQuerySQL.where = {
-        role: "admin",
-      };
-
-      if (sort) {
-        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-        const fieldName = sort.replace(/^-/, "");
-        paramQuerySQL.order = [[fieldName, sortOrder]];
-      }
-
-      if (page && page.size && page.number) {
-        limit = parseInt(page.size, 10);
-        offset = (parseInt(page.number, 10) - 1) * limit;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      } else {
-        limit = 10;
-        offset = 0;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      }
-
-      const userFilter = await db.user.findAll(paramQuerySQL);
-
-      if (!userFilter)
-        throw apiResponse(status.NOT_FOUND, "Admin tidak ditemukan");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Berhasil mendapatkan admin", userFilter)
+        apiResponse(status.OK, "Berhasil mendapatkan pengguna", manipulatedUser, totalRows)
       );
     } catch (error: any) {
       return Promise.reject(

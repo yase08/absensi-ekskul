@@ -85,19 +85,14 @@ const countAttendancePerWeekService = async () => {
       throw apiResponse(status.NOT_FOUND, "No attendance found");
     }
 
-    const number = 0;
-
-    const weekNumber = (number += 1);
-
     const createHistoryAttendance = await Promise.all(
       totalAttendance.map(async (ekskulCount, index) => {
         try {
           const historyAttendance = await db.historyAttendance.create({
             ekskul_id: ekskuls[index].id,
             totalAttendance: ekskulCount,
-            type: "week",
             year: new Date().getFullYear(),
-            name: `week-${weekNumber}`,
+            weekNumber: 1,
           });
           return historyAttendance;
         } catch (error) {

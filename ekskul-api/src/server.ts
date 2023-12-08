@@ -43,7 +43,7 @@ export class App {
     this.version = "/api/v1";
     this.env = process.env.NODE_ENV!;
     this.server = http.createServer(this.app);
-    this.port = +process.env.PORT!;
+    this.port = 8000;
     this.plugins();
     this.route();
   }

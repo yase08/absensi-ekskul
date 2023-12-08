@@ -12,8 +12,8 @@ module.exports = {
       totalAttendance: {
         type: Sequelize.INTEGER,
       },
-      name: {
-        type: Sequelize.STRING,
+      weekNumber: {
+        type: Sequelize.INTEGER,
       },
       year: {
         type: Sequelize.STRING,

@@ -15,6 +15,7 @@ import { createBrowserRouter } from "react-router-dom";
 import PenilaianDashboard from "../pages/Admin/Penilaian/Penilaian";
 import TugasDashboard from "../pages/Admin/Tugas/Tugas";
 import HariDashboard from "../pages/Admin/Hari/Hari";
+import UserDashboard from "../pages/Admin/User/User";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
   {
     path: "/admin/penilaian",
     element: <PenilaianDashboard />,
+  },
+  {
+    path: "/admin/user",
+    element: <UserDashboard />,
   },
   {
     path: "/admin/penugasan",
