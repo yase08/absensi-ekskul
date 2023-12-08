@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { getAllAttendance } from "../../../services/attendance.service";
+import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
-import { Link } from "react-router-dom";
+import { BsPencil } from "react-icons/bs";
+import { LuTrash } from "react-icons/lu";
+import { deleteAssessment, getAllAssessment } from "../../../../services/assessment.service";
+import { useParams } from "react-router-dom";
 
-const TableAbsensi = () => {
+const TableNilai = ({ setFormOld, setOpen }) => {
+  const task_id = useParams()
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
@@ -15,8 +19,6 @@ const TableAbsensi = () => {
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
 
-  const ekskul = localStorage.getItem("ekskul_id");
-
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -25,6 +27,11 @@ const TableAbsensi = () => {
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
+  };
+
+  const handleEdit = async (item) => {
+    setFormOld(item);
+    setOpen(true);
   };
 
   const handleSort = (dataIndex) => (a, b) => {
@@ -145,13 +152,12 @@ const TableAbsensi = () => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllAttendance(ekskul);
+      const response = await getAllAssessment(task_id);
 
       if (response && response.data) {
         if (Array.isArray(response.data)) {
-          const attendanceData = response.data;
-          setData(attendanceData);
-          console.log(attendanceData);
+          const taskData = response.data;
+          setData(taskData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -165,6 +171,48 @@ const TableAbsensi = () => {
     }
   };
 
+  const handleDeleteRequest = async (id) => {
+    setLoading(true);
+
+    try {
+      const response = await deleteAssessment(id);
+      const successMessage = response.statusMessage;
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: successMessage,
+      });
+
+      handleGetRequest();
+    } catch (error) {
+      console.error("Error:", error);
+
+      if (error.response) {
+        const errorMessage = error.response.statusMessage;
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "No response received from the server.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An unexpected error occurred.",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
       title: "No",
@@ -173,7 +221,7 @@ const TableAbsensi = () => {
       width: "10%",
     },
     {
-      title: "Nama",
+      title: "Tugas",
       dataIndex: "name",
       sorter: handleSort("name"),
       sortDirections: ["descend", "ascend"],
@@ -181,44 +229,62 @@ const TableAbsensi = () => {
       ...getColumnSearchProps("name"),
     },
     {
-      title: "Ekskul",
-      dataIndex: "ekskul",
-      sorter: handleSort("ekskul"),
+      title: "Siswa",
+      dataIndex: "student",
+      sorter: handleSort("student"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("ekskul"),
-      render: (ekskul) => (ekskul ? ekskul : "-"),
+      ...getColumnSearchProps("student"),
     },
     {
-      title: "%",
-      dataIndex: "percentage",
-      sorter: handleSort("percentage"),
+      title: "Tanggal",
+      dataIndex: "date",
+      sorter: handleSort("date"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("percentage"),
-      render: (percentage) => (percentage ? `${percentage}%` : "-" ),
+      ...getColumnSearchProps("date"),
     },
+    {
+        title: "Nilai",
+        dataIndex: "nilai",
+        sorter: handleSort("nilai"),
+        sortDirections: ["descend", "ascend"],
+        width: "20%",
+        ...getColumnSearchProps("nilai"),
+      },
     {
       title: "Aksi",
       dataIndex: "action",
       width: "20%",
       render: (_, record) => (
-        <Space size={"middle"}>
-          <Link to={`/admin/absensi/detail/${record.id}`}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
+        <Space
+          size={"middle"}
+          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
+        >
+          <a className="hover:text-blue-500" onClick={() => handleEdit(record)}>
+            <BsPencil size={20} />
+          </a>
+          <a
+            className="hover:text-red-500"
+            onClick={() => handleDeleteRequest(record.id)}
           >
-            Detail
-          </Link>
+            <LuTrash size={20} />
+          </a>
+          <a
+            className="hover:text-red-500"
+            href="/admin/penugasan/nilai"
+            // onClick={() => handleDeleteRequest(record.id)}
+          >
+            <LuTrash size={20} />
+          </a>
         </Space>
       ),
     },
   ];
 
   useEffect(() => {
-    if (ekskul) {
-      handleGetRequest();
-    }
-  }, [ekskul]);
+    handleGetRequest();
+  }, []);
 
   if (loading) {
     return (
@@ -240,22 +306,21 @@ const TableAbsensi = () => {
   }
 
   return (
-      <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
-        <div className="overflow-x-auto hidden-scroll w-full">
-          <Table
-            columns={columns}
-            dataSource={data.slice(
-              (currentPage - 1) * pageSize,
-              currentPage * pageSize
-            )}
-            pagination={getPaginationConfig()}
-            loading={loading}
-            scroll={{ x: "max-content" }}
-          />
-        </div>
-
+    <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
+      <div className="overflow-x-auto hidden-scroll w-full">
+        <Table
+          columns={columns}
+          dataSource={data.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )}
+          pagination={getPaginationConfig()}
+          loading={loading}
+          scroll={{ x: "max-content" }}
+        />
       </div>
+    </div>
   );
-}
+};
 
-export default TableAbsensi
+export default TableNilai;

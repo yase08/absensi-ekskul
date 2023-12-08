@@ -11,9 +11,11 @@ import ProfileDashboard from "../pages/Admin/Profile/Profile";
 import GalleryDashboard from "../pages/Admin/Gallery/Gallery";
 import AbsensiDashboard from "../pages/Admin/Absensi/Absensi";
 import AbsensiPostDashboard from "../pages/Admin/Absensi/AbsensiPost";
+import DetailAbsensiDashboard from "../pages/Admin/Absensi/Detail";
 import Login from "../pages/Admin/Login/Login";
 import { createBrowserRouter } from "react-router-dom";
-import PenilaianDashboard from "../pages/Admin/Penilaian/Penilaian";
+import PenilaianDashboard from "../pages/Admin/Tugas/Nilai";
+import PenilaianPostDashboard from "../pages/Admin/Tugas/PenilaianPost";
 import TugasDashboard from "../pages/Admin/Tugas/Tugas";
 import HariDashboard from "../pages/Admin/Hari/Hari";
 import InstrukturDashboard from "../pages/Admin/Instruktur/Instruktur";
@@ -23,10 +25,6 @@ const router = createBrowserRouter([
     path: "/",
     element: <Dashboard />,
   },
-  // {
-  //   path: "*",
-  //   element: <NotFoundPage />,
-  // },
   {
     path: "/login",
     element: <Login />,
@@ -40,8 +38,12 @@ const router = createBrowserRouter([
     element: <HariDashboard />,
   },
   {
-    path: "/admin/penilaian",
+    path: "/admin/penugasan/nilai/:id",
     element: <PenilaianDashboard />,
+  },
+  {
+    path: "/admin/penugasan/penilaian/:id",
+    element: <PenilaianPostDashboard />,
   },
   {
     path: "/admin/penugasan",
@@ -62,6 +64,10 @@ const router = createBrowserRouter([
   {
     path: "/admin/absensi/tambah",
     element: <AbsensiPostDashboard />,
+  },
+  {
+    path: "/admin/absensi/detail/:id",
+    element: <DetailAbsensiDashboard />,
   },
   {
     path: "/admin/ekstrakurikuler",

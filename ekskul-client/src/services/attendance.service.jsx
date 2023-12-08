@@ -16,6 +16,20 @@ export const getAllAttendance = async (ekskul_id) => {
   }
 };
 
+export const getAllAttendanceDetail = async (ekskul_id, student_id) => {
+  try {
+    const response = await axios.get(
+      `${API}/${VERSION}/attendance/detail?ekskul_id=${ekskul_id}&student_id=${student_id}`,
+      config
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response.data.message;
+    }
+  }
+};
+
 export const updateAttendance = async (id) => {
   try {
     const response = await axios.delete(

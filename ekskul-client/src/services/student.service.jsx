@@ -19,7 +19,7 @@ export const getAllStudent = async () => {
 export const getAllStudentByEkskul = async (ekskul_id) => {
   try {
     const response = await axios.get(
-      `${API}/${VERSION}/student?ekskul=${ekskul_id}`,
+      `${API}/${VERSION}/student/ekskul?ekskul_id=${ekskul_id}`,
       config
     );
     return response.data;

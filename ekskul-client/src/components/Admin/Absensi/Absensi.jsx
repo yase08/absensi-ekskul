@@ -1,15 +1,25 @@
 import { Select } from "antd/lib";
-import { useEkskul } from "../../../context/EkskulContext";
 import Table from "./Table";
 import { Link } from "react-router-dom";
 import { useProfile } from "../../../context/ProfileContext";
+import { useEffect, useState } from "react";
 
 const AbsensiComponent = () => {
-  const {setEkskul} = useEkskul();
+  const [selectedEkskul, setSelectedEkskul] = useState(null);
   const { profile } = useProfile();
   const handleInputChange = (value) => {
-    setEkskul(value)
+    if (localStorage.getItem("ekskul_id") !== null) {
+      localStorage.removeItem("ekskul_id");
+      localStorage.setItem("ekskul_id", value)
+    } else {
+      localStorage.setItem("ekskul_id", value)
+    }
+
   }
+
+  useEffect(() => {
+
+  }, [selectedEkskul])
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -23,7 +33,11 @@ const AbsensiComponent = () => {
             size="medium"
             placeholder="Pilih kategori"
             className=""
-            onChange={(value) => handleInputChange(value)}
+            value={selectedEkskul}
+            onChange={(value) => {
+              setSelectedEkskul(value)
+              handleInputChange(value)
+            }}
             options={profile.ekskul ? profile.ekskul.map((item) => ({
               value: item.id,
               label: item.name,

@@ -1,11 +1,20 @@
 import { useState, useEffect, useRef } from "react";
-import { getAllAttendance } from "../../../services/attendance.service";
+// import { getAllAttendance } from "../../../services/attendance.service";
 import { SearchOutlined } from "@ant-design/icons";
-import { Table, Input, Space, Button } from "antd";
-import { Link } from "react-router-dom";
+import { Table, Input, Space, Button, Modal, Select, DatePicker } from "antd";
+import { getAllAttendanceDetail, updateAttendance } from "../../../../services/attendance.service";
+import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const TableAbsensi = () => {
+  const { id } = useParams();
   const [searchText, setSearchText] = useState("");
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    category: "",
+    date: ""
+  });
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,6 +23,7 @@ const TableAbsensi = () => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const ekskul = localStorage.getItem("ekskul_id");
 
@@ -143,9 +153,44 @@ const TableAbsensi = () => {
     onShowSizeChange: handleChangePageSize,
   });
 
+  const categoryOption = [
+    {
+        label: "Hadir",
+        value: "hadir",
+    },
+    {
+        label: "Sakit",
+        value: "sakit",
+    },
+    {
+        label: "Izin",
+        value: "izin",
+    },
+    {
+        label: "Alfa",
+        value: "alfa",
+    },
+  ]
+
+  const showModal = () => {
+    setOpen(true);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
+  const handleInputChange = (e, inputName) => {
+    const newValue = e.target ? e.target.value : e;
+      setFormData((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
+};
+
   const handleGetRequest = async () => {
     try {
-      const response = await getAllAttendance(ekskul);
+      const response = await getAllAttendanceDetail(ekskul, id);
 
       if (response && response.data) {
         if (Array.isArray(response.data)) {
@@ -165,6 +210,50 @@ const TableAbsensi = () => {
     }
   };
 
+  const handleOk = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+  
+    try {
+      const response = await updateAttendance(formData, ekskul, id);
+      const successMessage = response.statusMessage;
+  
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: successMessage,
+      });
+    } catch (error) {
+      console.error("Error:", error);
+  
+      if (error.response) {
+        const errorMessage = error.response.data.statusMessage;
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "No response received from the server.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An unexpected error occurred.",
+        });
+      }
+    } finally {
+      setLoading(false);
+      setConfirmLoading(false);
+      setOpen(false);
+    }
+  };
+  
+
   const columns = [
     {
       title: "No",
@@ -174,51 +263,52 @@ const TableAbsensi = () => {
     },
     {
       title: "Nama",
-      dataIndex: "name",
-      sorter: handleSort("name"),
+      dataIndex: "student",
+      sorter: handleSort("student"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("name"),
+      ...getColumnSearchProps("student"),
+      render: (student) => (student ? student.name : "-")
     },
     {
-      title: "Ekskul",
-      dataIndex: "ekskul",
-      sorter: handleSort("ekskul"),
+      title: "Kategori",
+      dataIndex: "category",
+      sorter: handleSort("category"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("ekskul"),
-      render: (ekskul) => (ekskul ? ekskul : "-"),
+      ...getColumnSearchProps("category"),
     },
     {
-      title: "%",
-      dataIndex: "percentage",
-      sorter: handleSort("percentage"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("percentage"),
-      render: (percentage) => (percentage ? `${percentage}%` : "-" ),
-    },
+        title: "Tanggal",
+        dataIndex: "date",
+        sorter: handleSort("date"),
+        sortDirections: ["descend", "ascend"],
+        width: "20%",
+        ...getColumnSearchProps("date"),
+        render: (text) => (text ? Intl.DateTimeFormat("en-US").format(new Date(text)) : '-')
+      },
     {
       title: "Aksi",
       dataIndex: "action",
       width: "20%",
       render: (_, record) => (
         <Space size={"middle"}>
-          <Link to={`/admin/absensi/detail/${record.id}`}
+          <button onClick={() => {
+            setOpen(true);
+            setFormData(record)
+          }}
             className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
           >
-            Detail
-          </Link>
+            Edit
+          </button>
         </Space>
       ),
     },
   ];
 
   useEffect(() => {
-    if (ekskul) {
       handleGetRequest();
-    }
-  }, [ekskul]);
+  }, []);
 
   if (loading) {
     return (
@@ -253,7 +343,39 @@ const TableAbsensi = () => {
             scroll={{ x: "max-content" }}
           />
         </div>
-
+        <Modal
+        title={"Edit Data"}
+        open={open}
+        onOk={handleOk}
+        confirmLoading={confirmLoading}
+        onCancel={handleCancel}
+      >
+        <form action="" className="flex flex-col p-5 gap-3">
+          <label htmlFor="" className="text-lg">
+            Kategori
+          </label>
+          <Select
+            size="large"
+            className="w-full"
+            value={formData.category}
+            onChange={(e) => handleInputChange(e, "category")}
+            options={categoryOption}
+            placeholder="Pilih Kategory"
+          />
+          <label htmlFor="" className="text-lg">
+            Tanggal
+          </label>
+          <DatePicker
+          name="date"
+          value={selectedDate ? selectedDate : formData.date}
+          onChange={(selectedDate, dateString) => {
+            setSelectedDate(selectedDate);
+            console.log(selectedDate);
+            handleInputChange(dateString, "date");
+          }}
+          />
+        </form>
+      </Modal>
       </div>
   );
 }

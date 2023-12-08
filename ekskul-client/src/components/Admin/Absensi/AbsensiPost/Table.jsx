@@ -3,11 +3,9 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button, Checkbox } from "antd";
 import { getAllStudent, getAllStudentByEkskul } from "../../../../services/student.service";
 import { createAttendance } from "../../../../services/attendance.service";
-import { useEkskul } from "../../../../context/EkskulContext";
+import Swal from "sweetalert2";
 
 const TableAbsensiPost = ({ date }) => {
-  const {ekskul} = useEkskul();
-  console.log(ekskul)
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
@@ -18,6 +16,8 @@ const TableAbsensiPost = ({ date }) => {
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
   const [formData, setformData] = useState([]);
+
+  const ekskul = localStorage.getItem("ekskul_id");
 
   // Handler untuk checkbox
   const handleCheckboxChange = (studentId, category) => {
@@ -165,24 +165,41 @@ const TableAbsensiPost = ({ date }) => {
 
   
   const handlePostRequest = async () => {
+    setLoading(true);
+
     try {
       const response = await createAttendance(formData, ekskul);
+      const successMessage = response.statusMessage;
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: successMessage,
+      });
 
-        if (Array.isArray(response.data)) {
-          const attendanceData = response.data;
-          setData(attendanceData);
-        } else {
-          console.log("Data is not an array");
-        }
-      } else {
-        console.log("Data retrieval failed");
-      }
     } catch (error) {
-      console.log(error);
+      console.error("Error:", error);
+
+      if (error) {
+        const errorMessage = error.response.statusMessage;
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "No response received from the server.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An unexpected error occurred.",
+        });
+      }
     } finally {
       setLoading(false);
     }

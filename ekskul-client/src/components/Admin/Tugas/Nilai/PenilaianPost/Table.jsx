@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { getAllAttendance } from "../../../services/attendance.service";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
-import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import { getAllStudentByEkskul } from "../../../../../services/student.service";
+import { useParams } from "react-router-dom";
+import { createAssessment } from "../../../../../services/assessment.service";
 
-const TableAbsensi = () => {
+const TablePenilaianPost = ({ date }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
@@ -14,8 +16,25 @@ const TableAbsensi = () => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const [formData, setformData] = useState([]);
 
   const ekskul = localStorage.getItem("ekskul_id");
+  const task = useParams()
+
+  // Handler untuk checkbox
+  const handleInputChange = (studentId, grade) => {
+    const newAttendance = {
+      date : date,
+      student_id: studentId,
+      grade: grade,
+      task_id : task.id
+    };
+    const updatedformData = formData.filter(
+      (attendance) => attendance.student_id !== studentId
+    );
+    setformData([...updatedformData, newAttendance]);
+    console.log(formData);
+  };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -124,34 +143,16 @@ const TableAbsensi = () => {
     render: (text) => (searchedColumn === dataIndex ? <div>{text}</div> : text),
   });
 
-  const handleChangePage = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleChangePageSize = (current, size) => {
-    setCurrentPage(1);
-    setPageSize(size);
-  };
-
-  const getPaginationConfig = () => ({
-    current: currentPage,
-    pageSize: pageSize,
-    total: data.length,
-    pageSizeOptions: pageSizeOptions,
-    showSizeChanger: true,
-    onChange: handleChangePage,
-    onShowSizeChange: handleChangePageSize,
-  });
-
-  const handleGetRequest = async () => {
+  const handleGetStudentRequest = async () => {
     try {
-      const response = await getAllAttendance(ekskul);
+      const response = await getAllStudentByEkskul(ekskul);
+      console.log(response);
 
       if (response && response.data) {
         if (Array.isArray(response.data)) {
-          const attendanceData = response.data;
-          setData(attendanceData);
-          console.log(attendanceData);
+          const studentData = response.data;
+          setData(studentData);
+          console.log(studentData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -164,6 +165,49 @@ const TableAbsensi = () => {
       setLoading(false);
     }
   };
+
+  
+  const handlePostRequest = async () => {
+    setLoading(true);
+
+    try {
+      const response = await createAssessment(formData);
+      const successMessage = response.statusMessage;
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: successMessage,
+      });
+
+    } catch (error) {
+      console.error("Error:", error);
+
+      if (error) {
+        const errorMessage = error.response.statusMessage;
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "No response received from the server.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An unexpected error occurred.",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
 
   const columns = [
     {
@@ -181,44 +225,29 @@ const TableAbsensi = () => {
       ...getColumnSearchProps("name"),
     },
     {
-      title: "Ekskul",
-      dataIndex: "ekskul",
-      sorter: handleSort("ekskul"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("ekskul"),
-      render: (ekskul) => (ekskul ? ekskul : "-"),
+        title: "Nilai",
+        dataIndex: "grade",
+        sorter: handleSort("grade"),
+        sortDirections: ["descend", "ascend"],
+        width: "20%",
+        ...getColumnSearchProps("grade"),
+        render: (_, record) => (
+            <Input
+            value={formData.name}
+            type="number"
+            name="name"
+            size="large"
+            placeholder="Nilai"
+            onChange={(e) => handleInputChange(record.id, e.target.value)}
+          />
+        )
     },
-    {
-      title: "%",
-      dataIndex: "percentage",
-      sorter: handleSort("percentage"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("percentage"),
-      render: (percentage) => (percentage ? `${percentage}%` : "-" ),
-    },
-    {
-      title: "Aksi",
-      dataIndex: "action",
-      width: "20%",
-      render: (_, record) => (
-        <Space size={"middle"}>
-          <Link to={`/admin/absensi/detail/${record.id}`}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
-          >
-            Detail
-          </Link>
-        </Space>
-      ),
-    },
+        
   ];
 
   useEffect(() => {
-    if (ekskul) {
-      handleGetRequest();
-    }
-  }, [ekskul]);
+    handleGetStudentRequest();
+  }, []);
 
   if (loading) {
     return (
@@ -240,22 +269,24 @@ const TableAbsensi = () => {
   }
 
   return (
-      <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
-        <div className="overflow-x-auto hidden-scroll w-full">
-          <Table
-            columns={columns}
-            dataSource={data.slice(
-              (currentPage - 1) * pageSize,
-              currentPage * pageSize
-            )}
-            pagination={getPaginationConfig()}
-            loading={loading}
-            scroll={{ x: "max-content" }}
-          />
+    <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
+      <div className="overflow-x-auto hidden-scroll w-full">
+        <Table
+          columns={columns}
+          dataSource={data.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )}
+          pagination={false}
+          loading={loading}
+          scroll={{ x: "max-content" }}
+        />
+        <div className="flex justify-end">
+        <button onClick={handlePostRequest} className="my-5 bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded">Submit</button>
         </div>
-
       </div>
+    </div>
   );
 }
 
-export default TableAbsensi
+export default TablePenilaianPost

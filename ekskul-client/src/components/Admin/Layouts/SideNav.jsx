@@ -15,7 +15,7 @@ import { BsJoystick } from 'react-icons/bs'
 import { IoDiamondSharp } from 'react-icons/io5'
 import { WiDayCloudy } from "react-icons/wi";
 import { GrTask } from "react-icons/gr";
-import { MdCoPresent, MdOutlineAssessment } from "react-icons/md";
+import { MdCoPresent } from "react-icons/md";
 import Button from "../../../components/Admin/Layouts/Button";
 // import ColorSettingForm from './ColorSettingForm'
 
@@ -346,7 +346,7 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                         )}
                     </div>
                   </div>
-                  <div className={`flex flex-col gap-y-[13px] relative   ${expanded?'':'w-full h-[55px] mt-[15px] flex justify-center'}`}>
+                  {/* <div className={`flex flex-col gap-y-[13px] relative   ${expanded?'':'w-full h-[55px] mt-[15px] flex justify-center'}`}>
                     <div                            
                     className={`bg-transparent w-full ${expanded ? 'lg:px-1':''}`}>
                         <a
@@ -367,7 +367,7 @@ const SideNav = ({expanded, toggleExpansion, changeNavbar, toggleOpenHelpNav}) =
                              </div>
                         )}
                     </div>
-                  </div>
+                  </div> */}
                   <div className={`flex flex-col gap-y-[13px] relative   ${expanded?'':'w-full h-[55px] mt-[15px] flex justify-center'}`}>
                     <div                            
                     className={`bg-transparent w-full ${expanded ? 'lg:px-1':''}`}>

@@ -219,7 +219,7 @@ const TableTugas = ({ setFormOld, setOpen }) => {
       width: "10%",
     },
     {
-      title: "Nama",
+      title: "Tugas",
       dataIndex: "name",
       sorter: handleSort("name"),
       sortDirections: ["descend", "ascend"],
@@ -257,6 +257,13 @@ const TableTugas = ({ setFormOld, setOpen }) => {
           <a
             className="hover:text-red-500"
             onClick={() => handleDeleteRequest(record.id)}
+          >
+            <LuTrash size={20} />
+          </a>
+          <a  
+            className="hover:text-red-500"
+            href={`/admin/penugasan/nilai/${record.id}`}
+            // onClick={() => handleDeleteRequest(record.id)}
           >
             <LuTrash size={20} />
           </a>
