@@ -29,6 +29,7 @@ import UserRoutes from "./routes/user.route";
 import TaskRoute from "./routes/task.route";
 import ActivityRoute from "./routes/activity.route";
 import InstructorAttendanceRoute from "./routes/instructorAttendance.route";
+import path from "path";
 
 // Membuat class App yang yang berfungsi sebagai server express
 export class App {
@@ -55,7 +56,11 @@ export class App {
     this.app.use(compression());
     this.app.use(morgan("dev"));
     this.app.use(nocache());
-    this.app.use("/gallery", express.static("public"));
+    this.app.use("/images", express.static("public"));
+    this.app.get('/images/:filename', (req, res) => {
+      const { filename } = req.params;
+      res.sendFile(path.join(__dirname, 'public/images', filename));
+    });
     this.app.enable("trust proxy");
     this.app.use(helmet({ contentSecurityPolicy: false }));
     this.app.use(hpp({ checkBody: true, checkQuery: true }));

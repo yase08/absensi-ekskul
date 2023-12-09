@@ -250,7 +250,7 @@ const TableUser = ({ setFormOld, setOpen }) => {
       width: "20%",
       ...getColumnSearchProps("image"),
       render: (image) => {
-        return <img src={`/gallery/${image}`} />;
+        return <img className="w-10 h-10" src={`http://localhost:8000/images/${image}`} />;
       },
     },
     {

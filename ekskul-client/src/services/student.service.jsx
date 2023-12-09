@@ -29,7 +29,6 @@ export const getAllStudentByEkskul = async (ekskul_id) => {
     }
   }
 };
-
 export const deleteStudent = async (id) => {
   try {
     const response = await axios.delete(
