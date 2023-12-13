@@ -1,13 +1,10 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
+const axiosPrivate = useAxiosPrivate();
 
 export const getAllStudent = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/student`,
-      config
-    );
+    const response = await axiosPrivate.get(`/student`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -18,10 +15,7 @@ export const getAllStudent = async () => {
 
 export const deleteStudent = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/student/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/student/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -32,11 +26,7 @@ export const deleteStudent = async (id) => {
 
 export const updateStudent = async (id, requestData) => {
   try {
-    const response = await axios.put(
-      `${API}/${VERSION}/student/${id}`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.put(`/student/${id}`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -47,11 +37,7 @@ export const updateStudent = async (id, requestData) => {
 
 export const createStudent = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/student`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/student`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {

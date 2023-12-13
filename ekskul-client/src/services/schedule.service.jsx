@@ -1,10 +1,10 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
+const axiosPrivate = useAxiosPrivate();
 
 export const getAllSchedule = async () => {
   try {
-    const response = await axios.get(`${API}/${VERSION}/schedule`, config);
+    const response = await axiosPrivate.get(`/schedule`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -15,7 +15,7 @@ export const getAllSchedule = async () => {
 
 export const getSchedule = async () => {
   try {
-    const response = await axios.get(`${API}/${VERSION}/schedule/data`);
+    const response = await axiosPrivate.get(`/schedule/data`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -26,11 +26,7 @@ export const getSchedule = async () => {
 
 export const updateSchedule = async (id, requestData) => {
   try {
-    const response = await axios.put(
-      `${API}/${VERSION}/schedule/${id}`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.put(`/schedule/${id}`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -41,7 +37,7 @@ export const updateSchedule = async (id, requestData) => {
 
 export const getDay = async () => {
   try {
-    const response = await axios.get(`${API}/${VERSION}/schedule/day`, config);
+    const response = await axiosPrivate.get(`/schedule/day`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -52,10 +48,7 @@ export const getDay = async () => {
 
 export const deleteActivity = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/schedule/activity/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/schedule/activity/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -66,10 +59,7 @@ export const deleteActivity = async (id) => {
 
 export const updateActivity = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/schedule/activity/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/schedule/activity/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -80,11 +70,7 @@ export const updateActivity = async (id) => {
 
 export const createSchedule = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/schedule`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/schedule`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -95,11 +81,7 @@ export const createSchedule = async (requestData) => {
 
 export const createActivity = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/schedule/activity`,
-      requestData,
-      config
-    );
+    const response = await axios.post(`/schedule/activity`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {

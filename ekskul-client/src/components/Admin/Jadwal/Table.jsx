@@ -1,16 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  deleteActivity,
-  getAllActivity,
-} from "../../../services/activity.service";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const TableJadwal = ({ setFormOld, setOpen }) => {
   const [searchText, setSearchText] = useState("");
+  const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -153,11 +151,11 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllActivity();
+      const response = await axiosPrivate.get(`/activity`);
 
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          const activityData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const activityData = response.data.data;
           setData(activityData);
         } else {
           setError(new Error("Data is not an array"));
@@ -176,7 +174,7 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     setLoading(true);
 
     try {
-      const response = await deleteActivity(id);
+      const response = await axiosPrivate.delete(`/schedule`, id);
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -301,25 +299,6 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
   useEffect(() => {
     handleGetRequest();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

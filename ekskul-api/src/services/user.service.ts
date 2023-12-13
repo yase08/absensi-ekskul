@@ -3,7 +3,7 @@ import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
 import { hashPassword } from "../libs/bcrypt.lib";
-import { ISession } from "../interfaces/user.interface";
+import fs from "fs";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -157,7 +157,12 @@ export class UserService {
         throw apiResponse(status.NOT_FOUND, "Pengguna tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Berhasil mendapatkan pengguna", manipulatedUser, totalRows)
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan pengguna",
+          manipulatedUser,
+          totalRows
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -178,6 +183,14 @@ export class UserService {
 
       if (!userExist)
         throw apiResponse(status.NOT_FOUND, "User tidak ditemukan");
+
+      if (req.file) {
+        if (userExist.image) {
+          fs.unlinkSync(`../public/images/${userExist.image}`);
+        }
+        
+        req.body.image = req.file.filename;
+      }
 
       if (req.body.password) {
         const hashedPassword = await hashPassword(req.body.password);
@@ -218,6 +231,10 @@ export class UserService {
 
       if (!userExist)
         throw apiResponse(status.NOT_FOUND, "Pengguna tidak ditemukan");
+
+      if (userExist.image) {
+        fs.unlinkSync(`../public/images/${userExist.image}`);
+      }
 
       await db.userOnEkskul.destroy({
         where: {

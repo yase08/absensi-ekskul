@@ -2,13 +2,11 @@ import Table from "./Table";
 import { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import Swal from "sweetalert2";
-import {
-  createAttendance,
-  updateAttendance,
-} from "../../../services/attendance.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const AbsensiComponent = () => {
   const [isOpen, setOpen] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
   const [formData, setFormData] = useState({
     activity: "",
     task: "",
@@ -41,7 +39,7 @@ const AbsensiComponent = () => {
     setLoading(true);
 
     try {
-      const response = await createAttendance(formData);
+      const response = await axiosPrivate.post(`/attendance`, formData);
       console.log(formData);
       const successMessage = response.statusMessage;
 
@@ -86,7 +84,11 @@ const AbsensiComponent = () => {
     console.log(formOld);
 
     try {
-      const response = await updateAttendance(formOld.id, formOld);
+      const response = await axiosPrivate.put(
+        `/attendance`,
+        formOld.id,
+        formOld
+      );
       const successMessage = response.statusMessage;
 
       Swal.fire({

@@ -2,9 +2,10 @@ import { useState } from "react";
 import TableEskul from "./Table";
 import Swal from "sweetalert2";
 import "./Rayon.css";
-import { createRayon, updateRayon } from "../../../services/rayon.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const Rayon = () => {
+  const axiosPrivate = useAxiosPrivate();
   const [formData, setFormData] = useState({
     name: "",
   });
@@ -33,9 +34,7 @@ const Rayon = () => {
     setLoading(true);
 
     try {
-      const response = await createRayon({
-        name: formData.name,
-      });
+      const response = await axiosPrivate.post(`/rayon`, formData);
       const successMessage = response;
 
       Swal.fire({
@@ -68,7 +67,7 @@ const Rayon = () => {
     console.log(formOld);
 
     try {
-      const response = await updateRayon(formOld.id, formOld);
+      const response = await axiosPrivate.put(`/rayon`, formOld.id, formOld);
       const successMessage = response.statusMessage;
 
       Swal.fire({

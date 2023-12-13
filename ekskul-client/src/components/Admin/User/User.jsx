@@ -1,14 +1,14 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { createUser, updateUser } from "../../../services/user.service";
 import { useProfile } from "../../../context/ProfileContext";
 import { Modal, Select, Input, Upload, Button, Space } from "antd";
-import { getAllEkskul } from "../../../services/ekskul.service";
 import { LuUpload } from "react-icons/lu";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const UserComponent = () => {
   const [open, setOpen] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
   const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -16,17 +16,35 @@ const UserComponent = () => {
     mobileNumber: "",
     password: "",
     role: "",
-    image: "",
-    ekskuls: "",
+    image: {},
+    ekskuls: [
+      {
+        ekskul_id: "",
+      },
+    ],
   });
   const [fileList, setFileList] = useState([]);
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const { profile } = useProfile();
+  const [onDataUpdate, setOnDataUpdate] = useState(false);
 
   const handleFileChange = ({ fileList }) => {
     setFileList(fileList);
+
+    if (fileList.length > 0) {
+      const file = fileList[0].originFileObj;
+      setFormData((prevData) => ({
+        ...prevData,
+        image: file,
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        image: "",
+      }));
+    }
   };
 
   const handleInputChange = (e, inputName) => {
@@ -46,14 +64,11 @@ const UserComponent = () => {
 
   const handleGetEkskulRequest = async () => {
     try {
-      const response = await getAllEkskul();
+      const response = await axiosPrivate.get(`/ekskul`);
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const ekskulData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const ekskulData = response.data.data;
           setEkskul(ekskulData);
         } else {
           console.log("Data is not an array");
@@ -88,27 +103,33 @@ const UserComponent = () => {
     setLoading(true);
 
     try {
-      const formDataWithFile = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        formDataWithFile.append(key, value);
-      });
-
-      if (fileList.length > 0) {
-        formDataWithFile.append("image", fileList[0].originFileObj);
-      }
-
       if (formOld && formOld.id) {
-        const response = await updateUser(formOld.id, formDataWithFile);
+        const response = await axiosPrivate.put(
+          `/user`,
+          formOld.id,
+          formOld
+        );
         const successMessage = response.data;
 
-        message.success(successMessage);
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: successMessage,
+        });
+
+        setOnDataUpdate((prev) => !prev);
         setFormOld({});
       } else {
-        console.log(formDataWithFile);
-        const response = await createUser(formDataWithFile);
+        const response = await createUser(formData);
         const successMessage = response.statusMessage;
+        setOnDataUpdate((prev) => !prev);
 
-        message.success(successMessage);
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: successMessage,
+        });
+
         event.preventDefault();
       }
     } catch (error) {
@@ -161,7 +182,11 @@ const UserComponent = () => {
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table
+            setFormOld={setFormOld}
+            setOpen={setOpen}
+            onDataUpdate={setOnDataUpdate}
+          />
         </div>
       </div>
       <Modal
@@ -218,10 +243,8 @@ const UserComponent = () => {
           <label htmlFor="" className="text-lg">
             Foto Profil
           </label>
-          <Upload>
-            <Button onChange={handleFileChange} icon={<LuUpload />}>
-              Tekan Untuk Upload
-            </Button>
+          <Upload onChange={handleFileChange}>
+            <Button icon={<LuUpload />}>Tekan Untuk Upload</Button>
           </Upload>
           <label htmlFor="" className="text-lg">
             Role

@@ -1,14 +1,15 @@
 import { useState } from "react";
 import TableEskul from "./Table";
 import Swal from "sweetalert2";
-import { createRoom, updateRoom } from "../../../services/room.service";
+import "./Ruangan.css"; // Import a CSS file for styling (create this file if not already present)
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const Ruangan = () => {
   const [formData, setFormData] = useState({
     name: "",
   });
   const [formOld, setFormOld] = useState("");
-
+  const axiosPrivate = useAxiosPrivate();
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
@@ -32,28 +33,36 @@ const Ruangan = () => {
     setLoading(true);
 
     try {
-      const response = await createRoom({
-        name: formData.name,
-      });
-      const successMessage = response;
+      const response = await axiosPrivate.post(`/room`, formData);
+      const successMessage = response.statusMessage;
 
       Swal.fire({
         icon: "success",
         title: "Success!",
         text: successMessage,
       });
+      console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: error,
-      });
-      if (error.statusMessage) {
+
+      if (error.response) {
+        const errorMessage = error.response.statusMessage;
         Swal.fire({
           icon: "error",
           title: "Error!",
-          text: error.statusMessage,
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "No response received from the server.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An unexpected error occurred.",
         });
       }
     } finally {
@@ -67,7 +76,7 @@ const Ruangan = () => {
     console.log(formOld);
 
     try {
-      const response = await updateRoom(formOld.id, formOld);
+      const response = await axiosPrivate.put(`/room`, formOld.id, formOld);
       const successMessage = response.statusMessage;
 
       Swal.fire({

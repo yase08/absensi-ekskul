@@ -15,10 +15,7 @@ export function ProfileProvider({ children }) {
       try {
         const response = await getProfile();
         setProfile(response.data);
-      } catch (error) {
-        setError(error);
-      } finally {
-      }
+      } catch (error) {}
     };
 
     fetchData();

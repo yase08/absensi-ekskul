@@ -25,9 +25,9 @@ export class DTOUser {
   @MaxLength(13, { message: "Nomor HP tidak valid" })
   mobileNumber: string;
 
-  @IsString({ message: "Jenis kelamin harus berupa string" })
-  @IsOptional()
-  image?: string;
+  // @IsString({ message: "Jenis kelamin harus berupa string" })
+  // @IsOptional()
+  // image?: string;
 
   @IsString({ message: "Password harus berupa string" })
   @IsNotEmpty({ message: "Password tidak boleh kosong" })

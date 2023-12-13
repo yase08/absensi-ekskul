@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { ExpressError } from "../helpers/error.helper";
 
-const secretKey: string = process.env.SECRET_KEY || "";
+const secretKey: string = process.env.ACCESS_TOKEN_SECRET || "";
 
 // Berfungsi untuk handle json web token
 
@@ -13,8 +13,10 @@ export const verifyToken = async (
       accessToken,
       secretKey
     );
-    return decodedToken
+    return decodedToken;
   } catch (error) {
-    return Promise.reject(new ExpressError("Verified token expired or invalid"))
+    return Promise.reject(
+      new ExpressError("Verified token expired or invalid")
+    );
   }
 };

@@ -1,17 +1,12 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import {
-  createStudent,
-  updateStudent,
-} from "../../../services/student.service";
-import { getAllRombel } from "../../../services/rombel.service";
-import { getAllRayon } from "../../../services/rayon.service";
-import { getAllEkskul } from "../../../services/ekskul.service";
 import { Modal, Select, Input } from "antd";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const SiswaComponent = () => {
   const [open, setOpen] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
   const [rombel, setRombel] = useState([]);
   const [rayon, setRayon] = useState([]);
   const [ekskul, setEkskul] = useState([]);
@@ -27,7 +22,7 @@ const SiswaComponent = () => {
     ekskuls: [
       {
         ekskul_id: "",
-      }
+      },
     ],
   });
   const [formOld, setFormOld] = useState({});
@@ -35,14 +30,11 @@ const SiswaComponent = () => {
 
   const handleGetRombelRequest = async () => {
     try {
-      const response = await getAllRombel();
+      const response = await axiosPrivate.get(`/rombel`);
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const rombelData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const rombelData = response.data.data;
           setRombel(rombelData);
         } else {
           console.log("Data is not an array");
@@ -59,14 +51,11 @@ const SiswaComponent = () => {
 
   const handleGetRayonRequest = async () => {
     try {
-      const response = await getAllRayon();
+      const response = await axiosPrivate.get(`/rayon`);
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const rayonData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const rayonData = response.data.data;
           setRayon(rayonData);
         } else {
           console.log("Data is not an array");
@@ -83,14 +72,11 @@ const SiswaComponent = () => {
 
   const handleGetEkskulRequest = async () => {
     try {
-      const response = await getAllEkskul();
+      const response = await axiosPrivate.get(`/ekskul`);
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const ekskulData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const ekskulData = response.data.data;
           setEkskul(ekskulData);
         } else {
           console.log("Data is not an array");
@@ -134,7 +120,11 @@ const SiswaComponent = () => {
 
     try {
       if (formOld && formOld.id) {
-        const response = await updateStudent(formOld.id, formOld);
+        const response = await axiosPrivate.put(
+          `/student`,
+          formOld.id,
+          formOld
+        );
         const successMessage = response.statusMessage;
 
         Swal.fire({
@@ -144,7 +134,7 @@ const SiswaComponent = () => {
         });
         setFormOld({});
       } else {
-        const response = await createStudent(formData);
+        const response = await axiosPrivate.post(`/student`, formData);
         const successMessage = response.statusMessage;
 
         Swal.fire({

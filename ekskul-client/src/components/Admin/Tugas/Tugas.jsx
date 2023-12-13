@@ -1,14 +1,13 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
 import Swal from "sweetalert2";
-import { createTask, updateTask } from "../../../services/task.service";
 import { useProfile } from "../../../context/ProfileContext";
 import { Modal, Select, Input } from "antd";
-import { getAllEkskul } from "../../../services/ekskul.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const TugasComponent = () => {
   const [open, setOpen] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
   const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -36,14 +35,10 @@ const TugasComponent = () => {
 
   const handleGetEkskulRequest = async () => {
     try {
-      const response = await getAllEkskul();
-
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const ekskulData = response.data;
+      const response = await axiosPrivate.get(`/ekskul`);
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const ekskulData = response.data.data;
           setEkskul(ekskulData);
         } else {
           console.log("Data is not an array");
@@ -79,7 +74,7 @@ const TugasComponent = () => {
 
     try {
       if (formOld && formOld.id) {
-        const response = await updateTask(formOld.id, formOld);
+        const response = await axiosPrivate.put(`/task`, formOld.id, formOld);
         const successMessage = response.data;
 
         Swal.fire({
@@ -90,7 +85,7 @@ const TugasComponent = () => {
         event.preventDefault();
         setFormOld({});
       } else {
-        const response = await createTask(formData);
+        const response = await axiosPrivate.post(`/task`, formData);
         const successMessage = response.statusMessage;
 
         Swal.fire({

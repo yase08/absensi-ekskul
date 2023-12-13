@@ -16,6 +16,7 @@ import PenilaianDashboard from "../pages/Admin/Penilaian/Penilaian";
 import TugasDashboard from "../pages/Admin/Tugas/Tugas";
 import HariDashboard from "../pages/Admin/Hari/Hari";
 import UserDashboard from "../pages/Admin/User/User";
+import DetailGalleryDashboard from "../pages/Admin/Gallery/Detail/Detail";
 
 const router = createBrowserRouter([
   {
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
   {
     path: "/admin/gallery",
     element: <GalleryDashboard />,
+  },
+  {
+    path: "/admin/gallery/detail/:slug",
+    element: <DetailGalleryDashboard />,
   },
 ]);
 

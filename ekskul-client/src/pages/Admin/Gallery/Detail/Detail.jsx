@@ -1,12 +1,12 @@
 import { useState } from "react";
-import Tein from "../../../components/Admin/magic/Tein";
-import ColorSettingForm from "../../../components/Admin/Layouts/HiddenColor/Navbar";
-import SideNav from "../../../components/Admin/Layouts/SideNav";
-import TopNav from "../../../components/Admin/Layouts/TopNav";
-import GalleryComponent from "../../../components/Admin/Gallery/Gallery";
+import Tein from "../../../../components/Admin/magic/Tein";
+import ColorSettingForm from "../../../../components/Admin/Layouts/HiddenColor/Navbar";
+import SideNav from "../../../../components/Admin/Layouts/SideNav";
+import TopNav from "../../../../components/Admin/Layouts/TopNav";
+import DetailGalleryComponent from "../../../../components/Admin/Gallery/Gallery";
 // import Jumbotron from "../../../components/Admin/Jumbotron/Jumbotron";
 
-const Gallery = () => {
+const DetailGallery = () => {
   const [expanded, setExpanded] = useState(false);
   // Inside your component's state declarations
   const [loading, setLoading] = useState(false);
@@ -39,7 +39,6 @@ const Gallery = () => {
 
   return (
     <>
-      {" "}
       <div className="flex overflow-hidden ">
         <SideNav
           expanded={expanded}
@@ -60,7 +59,7 @@ const Gallery = () => {
             expanded={expanded}
             toggleOpenProfile={toggleOpenProfile}
           />
-          <GalleryComponent />
+          <DetailGalleryComponent />
         </div>
         {openHelpNav && (
           <Tein
@@ -84,4 +83,4 @@ const Gallery = () => {
   );
 };
 
-export default Gallery;
+export default DetailGallery;

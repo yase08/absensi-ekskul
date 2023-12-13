@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
 import TableJadwal from "./Table";
 import Swal from "sweetalert2";
-import {
-  createActivity,
-  updateActivity,
-} from "../../../services/activity.service";
 import { Modal, Select, TimePicker } from "antd";
-import { getAllRombel } from "../../../services/rombel.service";
-import { getAllEkskul } from "../../../services/ekskul.service";
-import { getAllRoom } from "../../../services/room.service";
-import { getDay } from "../../../services/schedule.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const Jadwal = () => {
   const [open, setOpen] = useState(false);
@@ -23,6 +16,7 @@ const Jadwal = () => {
     // time: "",
   });
   const [rombel, setRombel] = useState([]);
+  const axiosPrivate = useAxiosPrivate();
   const [hari, setHari] = useState([]);
   const [ekskul, setEkskul] = useState([]);
   const [room, setRoom] = useState([]);
@@ -47,14 +41,11 @@ const Jadwal = () => {
 
   const handleGetRombelRequest = async () => {
     try {
-      const response = await getAllRombel();
+      const response = await axiosPrivate.get(`/rombel`);
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const rombelData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const rombelData = response.data.data;
           setRombel(rombelData);
         } else {
           console.log("Data is not an array");
@@ -71,14 +62,11 @@ const Jadwal = () => {
 
   const handleGetRoomRequest = async () => {
     try {
-      const response = await getAllRoom();
+      const response = await axiosPrivate.get(`/room`);
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const roomData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const roomData = response.data.data;
           setRoom(roomData);
         } else {
           console.log("Data is not an array");
@@ -95,14 +83,11 @@ const Jadwal = () => {
 
   const handleGetHariRequest = async () => {
     try {
-      const response = await getDay();
+      const response = await axiosPrivate.get(`/schedule`);
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const hariData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const hariData = response.data.data;
           setHari(hariData);
         } else {
           console.log("Data is not an array");
@@ -119,14 +104,10 @@ const Jadwal = () => {
 
   const handleGetEkskulRequest = async () => {
     try {
-      const response = await getAllEkskul();
-
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const ekskulData = response.data;
+      const response = await axiosPrivate.get(`/ekskul`);
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const ekskulData = response.data.data;
           setEkskul(ekskulData);
         } else {
           console.log("Data is not an array");
@@ -177,7 +158,11 @@ const Jadwal = () => {
 
     try {
       if (formOld && formOld.id) {
-        const response = await updateActivity(formOld.id, formOld);
+        const response = await axiosPrivate.put(
+          `/activity`,
+          formOld.id,
+          formOld
+        );
         const successMessage = response.statusMessage;
 
         Swal.fire({
@@ -187,7 +172,7 @@ const Jadwal = () => {
         });
         setFormOld({});
       } else {
-        const response = await createActivity(formData);
+        const response = await axiosPrivate.post(`/activity`, formData);
         const successMessage = response.statusMessage;
 
         Swal.fire({

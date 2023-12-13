@@ -1,21 +1,23 @@
 import { useState, useEffect, useRef } from "react";
-import { deleteEkskul, getAllEkskul } from "../../../services/ekskul.service";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const TableEkskul = ({ setFormOld, setOpen }) => {
   const [searchText, setSearchText] = useState("");
+  const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const [filteredData, setFilteredData] = useState([]);
+  const searchInput = useRef(null);
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -136,7 +138,7 @@ const TableEkskul = ({ setFormOld, setOpen }) => {
   const getPaginationConfig = () => ({
     current: currentPage,
     pageSize: pageSize,
-    total: data.length,
+    total: filteredData.length,
     pageSizeOptions: pageSizeOptions,
     showSizeChanger: true,
     onChange: handleChangePage,
@@ -145,11 +147,13 @@ const TableEkskul = ({ setFormOld, setOpen }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllEkskul();
+      const response = await axiosPrivate.get(
+        `/ekskul`
+      );
 
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          const ekskulData = response.data;
+      if (response.status === 200 && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const ekskulData = response.data.data;
           setData(ekskulData);
         } else {
           setError(new Error("Data is not an array"));
@@ -168,7 +172,7 @@ const TableEkskul = ({ setFormOld, setOpen }) => {
     setLoading(true);
 
     try {
-      const response = await deleteEkskul(id);
+      const response = await axiosPrivate.delete(`/ekskul`, id);
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -260,25 +264,6 @@ const TableEkskul = ({ setFormOld, setOpen }) => {
   useEffect(() => {
     handleGetRequest();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

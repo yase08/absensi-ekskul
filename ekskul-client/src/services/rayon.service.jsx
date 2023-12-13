@@ -1,13 +1,10 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
+const axiosPrivate = useAxiosPrivate();
 
 export const getAllRayon = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/rayon`,
-      config
-    );
+    const response = await axiosPrivate.get(`/rayon`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -18,7 +15,7 @@ export const getAllRayon = async () => {
 
 export const deleteRayon = async (id) => {
   try {
-    const response = await axios.delete(`${API}/${VERSION}/rayon/${id}`, config);
+    const response = await axiosPrivate.delete(`/rayon/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -29,11 +26,7 @@ export const deleteRayon = async (id) => {
 
 export const updateRayon = async (id, requestData) => {
   try {
-    const response = await axios.put(
-      `${API}/${VERSION}/rayon/${id}`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.put(`/rayon/${id}`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -44,11 +37,7 @@ export const updateRayon = async (id, requestData) => {
 
 export const createRayon = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/rayon`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/rayon`, requestData);
     return response.data.statusMessage;
   } catch (error) {
     if (error.response) {

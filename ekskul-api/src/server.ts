@@ -7,6 +7,7 @@ import compression from "compression";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import http, { Server } from "http";
+import cookieParser from "cookie-parser";
 import consola from "consola";
 import nocache from "nocache";
 import SlowDown from "express-slow-down";
@@ -29,6 +30,7 @@ import UserRoutes from "./routes/user.route";
 import TaskRoute from "./routes/task.route";
 import ActivityRoute from "./routes/activity.route";
 import InstructorAttendanceRoute from "./routes/instructorAttendance.route";
+import path from "path";
 
 // Membuat class App yang yang berfungsi sebagai server express
 export class App {
@@ -55,8 +57,10 @@ export class App {
     this.app.use(compression());
     this.app.use(morgan("dev"));
     this.app.use(nocache());
-    this.app.use("/gallery", express.static("public"));
-    this.app.enable("trust proxy");
+    this.app.use(
+      "/images",
+      express.static(path.join(__dirname, "public/images"))
+    );
     this.app.use(helmet({ contentSecurityPolicy: false }));
     this.app.use(hpp({ checkBody: true, checkQuery: true }));
     if (!["production", "test"].includes(this.env)) {
@@ -64,27 +68,34 @@ export class App {
     }
     this.app.use(
       session({
+        name: "session",
         resave: false,
         saveUninitialized: false,
         secret: process.env.SESSION_SECRET_KEY as string,
-        cookie: { httpOnly: true, sameSite: "strict" },
+        cookie: {
+          maxAge: 24 * 60 * 60 * 1000,
+          secure: false,
+          httpOnly: true,
+          sameSite: "strict",
+        },
       })
     );
+    this.app.use(cookieParser());
     this.app.use(
       cors({
-        origin: "*",
+        origin: "http://localhost:5173",
         methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization", "Accept"],
         credentials: true,
       })
     );
-    this.app.use(
-      rateLimit({
-        windowMs: 24 * 60 * 3,
-        max: 1000,
-        message: "Too many request, send back request after 3 minute",
-      })
-    );
+    // this.app.use(
+    //   rateLimit({
+    //     windowMs: 24 * 60 * 3,
+    //     max: 1000,
+    //     message: "Too many request, send back request after 3 minute",
+    //   })
+    // );
     this.app.use(
       SlowDown({
         windowMs: 24 * 60 * 1,

@@ -1,13 +1,10 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
+const axiosPrivate = useAxiosPrivate();
 
 export const getAllRombel = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/rombel`,
-      config
-    );
+    const response = await axiosPrivate.get(`/rombel`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -18,7 +15,7 @@ export const getAllRombel = async () => {
 
 export const deleteRombel = async (id) => {
   try {
-    const response = await axios.delete(`${API}/${VERSION}/rombel/${id}`, config);
+    const response = await axiosPrivate.delete(`/rombel/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -29,11 +26,7 @@ export const deleteRombel = async (id) => {
 
 export const updateRombel = async (id, requestData) => {
   try {
-    const response = await axios.put(
-      `${API}/${VERSION}/rombel/${id}`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.put(`/rombel/${id}`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -44,11 +37,7 @@ export const updateRombel = async (id, requestData) => {
 
 export const createRombel = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/rombel`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/rombel`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {

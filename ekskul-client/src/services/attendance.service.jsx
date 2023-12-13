@@ -1,13 +1,10 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
-export const getAllAttendance = async ({ filter, sort, size, number }) => {
+const axiosPrivate = useAxiosPrivate();
+
+export const getAllAttendance = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/attendance?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
-      config
-    );
+    const response = await axiosPrivate.get(`/attendance`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -18,10 +15,7 @@ export const getAllAttendance = async ({ filter, sort, size, number }) => {
 
 export const updateAttendance = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/attendance/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/attendance/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -32,11 +26,7 @@ export const updateAttendance = async (id) => {
 
 export const createAttendance = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/attendance`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/attendance`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {

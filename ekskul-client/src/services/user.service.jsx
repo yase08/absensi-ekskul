@@ -1,10 +1,10 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
+const axiosPrivate = useAxiosPrivate();
 
 export const getAllUser = async () => {
   try {
-    const response = await axios.get(`${API}/${VERSION}/user`, config);
+    const response = await axiosPrivate.get(`/user`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -15,7 +15,7 @@ export const getAllUser = async () => {
 
 export const deleteUser = async (id) => {
   try {
-    const response = await axios.delete(`${API}/${VERSION}/user/${id}`, config);
+    const response = await axiosPrivate.delete(`/user/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -26,7 +26,7 @@ export const deleteUser = async (id) => {
 
 export const updateUser = async (id) => {
   try {
-    const response = await axios.delete(`${API}/${VERSION}/user/${id}`, config);
+    const response = await axiosPrivate.delete(`/user/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -37,11 +37,11 @@ export const updateUser = async (id) => {
 
 export const createUser = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/user`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/user`, requestData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   } catch (error) {
     if (error.response) {

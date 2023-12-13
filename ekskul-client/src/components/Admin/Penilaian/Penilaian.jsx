@@ -2,13 +2,11 @@ import Table from "./Table";
 import { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import Swal from "sweetalert2";
-import {
-  createAttendance,
-  updateAttendance,
-} from "../../../services/attendance.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const PenilaianComponent = () => {
   const [isOpen, setOpen] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
   const [formData, setFormData] = useState({
     activity: "",
     task: "",

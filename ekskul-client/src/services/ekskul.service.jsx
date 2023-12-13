@@ -1,13 +1,10 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
+const axiosPrivate = useAxiosPrivate();
 
 export const getAllEkskul = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/ekskul`,
-      config
-    );
+    const response = await axiosPrivate.get(`/ekskul`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -18,7 +15,7 @@ export const getAllEkskul = async () => {
 
 export const deleteEkskul = async (id) => {
   try {
-    const response = await axios.delete(`${API}/${VERSION}/ekskul/${id}`, config);
+    const response = await axiosPrivate.delete(`/ekskul/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -29,11 +26,7 @@ export const deleteEkskul = async (id) => {
 
 export const updateEkskul = async (id, requestData) => {
   try {
-    const response = await axios.put(
-      `${API}/${VERSION}/ekskul/${id}`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.put(`/ekskul/${id}`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -44,11 +37,7 @@ export const updateEkskul = async (id, requestData) => {
 
 export const createEkskul = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/ekskul`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/ekskul`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {

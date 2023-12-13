@@ -24,7 +24,7 @@ module.exports = {
       },
       image: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       password: {
         type: Sequelize.STRING,
@@ -38,6 +38,9 @@ module.exports = {
       isActive: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
+      },
+      refreshToken: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,

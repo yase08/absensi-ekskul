@@ -1,20 +1,20 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
-import { Request } from "express";
+import { Request, Response } from "express";
 import { comparePassword, hashPassword } from "../libs/bcrypt.lib";
 import jwt from "jsonwebtoken";
 import { createPasswordResetToken, hashToken } from "../libs/crypto.libs";
 import { sendMailer } from "../libs/nodemailer.lib";
 import { Op } from "sequelize";
 import { ISession } from "@/interfaces/user.interface";
+import fs from "fs";
 
 // Berfungsi untuk menghandle logic dari controler
 
 const db = require("../db/models");
-const jwtSecret = process.env.SECRET_KEY as string;
 
 export class AuthService {
-  async loginService(req: Request): Promise<any> {
+  async loginService(req: Request, res: Response): Promise<any> {
     try {
       const user = await db.user.findOne({ where: { email: req.body.email } });
 
@@ -31,28 +31,43 @@ export class AuthService {
           "Password salah atau email salah"
         );
 
-      await db.user.update({ isActive: true }, { where: { id: user.id } });
-
-      const userOnEkskul = await db.userOnEkskul.findAll({
-        where: { user_id: user.id },
-      });
-      const ekskulIds = userOnEkskul.map((userEkskul) => userEkskul.ekskul_id);
-
       const token = jwt.sign(
         {
           id: user.id,
-          email: req.body.email,
           name: user.name,
-          image: user.image,
-          role: user.role,
-          ekskul: ekskulIds,
+          role: user.role
         },
-        jwtSecret,
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      const refreshToken = jwt.sign(
+        {
+          id: user.id,
+          name: user.name,
+          role: user.role
+        },
+        process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: "1d" }
       );
 
+      await db.user.update(
+        { isActive: true, refreshToken: refreshToken },
+        { where: { id: user.id } }
+      );
+
+      res.cookie("jwt", refreshToken, {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
       return Promise.resolve(
-        apiResponse(status.OK, "Login berhasil", token, undefined)
+        apiResponse(status.OK, "Login berhasil", {
+          accessToken: token,
+          role: user.role,
+        })
       );
     } catch (error: any) {
       return Promise.reject(
@@ -65,15 +80,89 @@ export class AuthService {
     }
   }
 
-  async logoutService(req: Request): Promise<any> {
+  async refreshService(req: Request, res: Response): Promise<any> {
     try {
-      const user_Id = (req.session as ISession).user.id;
+      const refreshToken = req.cookies.jwt;
+      console.log(req.cookies);
+      
 
-      if (!user_Id) throw apiResponse(status.BAD_REQUEST, "Anda belum login");
+      if (!refreshToken) throw apiResponse(status.UNAUTHORIZED, "Unauthorized");
 
-      await db.user.update({ isActive: false }, { where: { id: user_Id } });
-      req.session["user"] = null;
+      const user = await db.user.findOne({
+        where: { refreshToken: refreshToken },
+      });
 
+      if (!user) throw apiResponse(status.FORBIDDEN, "Forbidden");
+
+      const decoded = await new Promise((resolve, reject) => {
+        jwt.verify(
+          refreshToken,
+          process.env.REFRESH_TOKEN_SECRET as string,
+          (err: any, decoded: any) => {
+            if (err || decoded.id !== user.id) {
+              reject(err || "Forbidden");
+            } else {
+              resolve(decoded);
+            }
+          }
+        );
+      });
+
+      const accessToken = jwt.sign(
+        {
+          id: user.id,
+          name: user.name,
+          role: user.role
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      return apiResponse(status.OK, "Refresh token", {
+        accessToken: accessToken,
+        role: user.role,
+      });
+    } catch (error: any) {
+      return apiResponse(
+        error.statusCode || status.INTERNAL_SERVER_ERROR,
+        error.statusMessage,
+        error.message
+      );
+    }
+  }
+
+  async logoutService(req: Request, res: Response): Promise<any> {
+    try {
+      const refreshToken = req.cookies.jwt;
+
+      if (!refreshToken) throw apiResponse(status.UNAUTHORIZED, "Unauthorized");
+
+      const user = await db.user.findOne({
+        where: { refreshToken: refreshToken },
+      });
+
+      if (!user) {
+        res.clearCookie("jwt", {
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+          maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        return Promise.resolve(apiResponse(status.OK, "Logout berhasil"));
+      }
+
+      await db.user.update(
+        { isActive: false, refreshToken: null },
+        { where: { id: user.id } }
+      );
+
+      res.clearCookie("jwt", {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
       return Promise.resolve(apiResponse(status.OK, "Logout berhasil"));
     } catch (error: any) {
       return Promise.reject(
@@ -287,6 +376,55 @@ export class AuthService {
 
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mendapatkan user", modifiedUser)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage || "Internal Server Error",
+          error.message || "Internal Server Error"
+        )
+      );
+    }
+  }
+
+  async updateProfileService(req: Request): Promise<any> {
+    try {
+      const user_id = (req.session as ISession).user.id;
+
+      const paramQuerySQL: any = {
+        where: {
+          id: user_id,
+        },
+      };
+
+      if (req.body.password) {
+        const hashedPassword = await hashPassword(req.body.password);
+        req.body.password = hashedPassword;
+      }
+
+      if (req.file) {
+        req.body.image = req.file.filename;
+      }
+
+      const user = await db.user.findOne(paramQuerySQL);
+
+      if (user.image) {
+        fs.unlinkSync(`../public/images/${user.image}`);
+      }
+
+      if (!user) {
+        return Promise.resolve(
+          apiResponse(status.NOT_FOUND, "User tidak ditemukan")
+        );
+      }
+
+      const updateProfile = await db.user.update({
+        ...req.body,
+      });
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil mengupdate profile", updateProfile)
       );
     } catch (error: any) {
       return Promise.reject(

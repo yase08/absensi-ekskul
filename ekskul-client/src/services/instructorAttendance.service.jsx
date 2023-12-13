@@ -1,13 +1,10 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
-export const getAllInstructorAttendance = async ({ filter, sort, size, number }) => {
+const axiosPrivate = useAxiosPrivate();
+
+export const getAllInstructorAttendance = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/instructorAttendance?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
-      config
-    );
+    const response = await axiosPrivate.get(`/instructorAttendance`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -18,7 +15,7 @@ export const getAllInstructorAttendance = async ({ filter, sort, size, number })
 
 export const deleteInstructorAttendance = async (id) => {
   try {
-    const response = await axios.delete(`${API}/${VERSION}/instructorAttendance/${id}`, config);
+    const response = await axiosPrivate.delete(`/instructorAttendance/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -29,10 +26,7 @@ export const deleteInstructorAttendance = async (id) => {
 
 export const updateInstructorAttendance = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/instructorAttendance/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/instructorAttendance/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -43,11 +37,7 @@ export const updateInstructorAttendance = async (id) => {
 
 export const createInstructorAttendance = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/instructorAttendance`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/instructorAttendance`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {
