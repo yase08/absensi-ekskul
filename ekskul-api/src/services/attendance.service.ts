@@ -1,6 +1,6 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
-import { Request } from "express";
+import { Request, Response } from "express";
 import { exportExcel } from "../libs/excel.lib";
 import {
   formatDate,
@@ -11,6 +11,9 @@ import { ISession } from "../interfaces/user.interface";
 import { Op } from "sequelize";
 import * as cron from "node-cron";
 import { getISOWeek } from "date-fns";
+import fs from "fs";
+import path from "path";
+
 
 const db = require("../db/models");
 
@@ -254,7 +257,7 @@ export class AttendanceService {
     }
   }
 
-  async exportAttendance(req: Request): Promise<any> {
+  async exportAttendance(req: Request, res: Response): Promise<any> {
     try {
       const date = Date.now();
       const options = { timeZone: "Asia/Jakarta" };
@@ -332,18 +335,39 @@ export class AttendanceService {
           { header: "Keterangan", key: "category", width: 15 },
           { header: "Tanggal", key: "date", width: 15 },
         ];
-        const file = `data-kehadiran-${ekskul.name}.xlsx`;
+        const file = `data-kehadiran-${ekskul.name}-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
           columns,
           modifiedAttendances,
-          file
+          file,
+          res
         );
 
-        if (!exportSuccess)
-          throw apiResponse(status.FORBIDDEN, "Export failed");
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
 
-        return Promise.resolve(apiResponse(status.OK, "Export Success"));
+        const exportDir = path.join(__dirname, "../public/export/");
+        const filePath = path.join(exportDir, file);
+        
+
+        // const fileStream = fs.createReadStream(filePath);
+        // fileStream.pipe(res);
+        // fileStream.on('end', () => {
+        //   // Clean up: Close the file stream after sending
+        //   fs.unlink(filePath, (err) => {
+        //     if (err) {
+        //       console.error('Error deleting file:', err);
+        //     }
+        //   });
+        // });
+        // res.sendFile(filePath)
+        console.log(exportSuccess);
+        
+        if (!exportSuccess) {
+          throw apiResponse(status.FORBIDDEN, "Export failed");
+        }
+        return Promise.resolve(apiResponse(status.OK, "Export Success", exportSuccess));
       } else {
         throw apiResponse(
           status.NOT_FOUND,

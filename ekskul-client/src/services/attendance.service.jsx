@@ -16,6 +16,20 @@ export const getAllAttendance = async (ekskul_id) => {
   }
 };
 
+export const exportAttendance = async (ekskul_id) => {
+  try {
+    const response = await axios.get(
+      `${API}/${VERSION}/attendance/export?ekskul_id=${ekskul_id}`,
+      {responseType: "arraybuffer", headers: {"Content-Type" : "blob"}},
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response.data.message;
+    }
+  }
+};
+
 export const getAllAttendanceDetail = async (ekskul_id, student_id) => {
   try {
     const response = await axios.get(

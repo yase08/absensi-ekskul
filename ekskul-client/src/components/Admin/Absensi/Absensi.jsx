@@ -3,10 +3,12 @@ import Table from "./Table";
 import { Link } from "react-router-dom";
 import { useProfile } from "../../../context/ProfileContext";
 import { useEffect, useState } from "react";
+import { exportAttendance } from "../../../services/attendance.service";
 
 const AbsensiComponent = () => {
   const [selectedEkskul, setSelectedEkskul] = useState(null);
   const { profile } = useProfile();
+  const ekskul_id = localStorage.getItem("ekskul_id")
   const handleInputChange = (value) => {
     if (localStorage.getItem("ekskul_id") !== null) {
       localStorage.removeItem("ekskul_id");
@@ -16,6 +18,37 @@ const AbsensiComponent = () => {
     }
 
   }
+
+  const handleExportExcel = async () => {
+    try {
+      const response = await exportAttendance(ekskul_id);
+      
+      // Log the response data to verify its content
+      console.log(response);
+  
+      if (response) {
+        // Create a Blob from the response data with the correct content type
+        const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  
+        // Create an object URL from the Blob
+        const url = window.URL.createObjectURL(blob);
+  
+        // Create an anchor element and trigger the download
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'data_export.xlsx');
+        document.body.appendChild(link);
+        link.click();
+  
+        // Clean up the URL object after the download is initiated
+        window.URL.revokeObjectURL(url);
+      } else {
+        console.error('Export failed: Empty response data');
+      }
+    } catch (error) {
+      console.error('Export failed:', error);
+    }
+  };
 
   useEffect(() => {
 
@@ -44,10 +77,12 @@ const AbsensiComponent = () => {
             })) : []}
             
           />
+          <button onClick={handleExportExcel} className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500">
+              Export
+          </button>
           <button
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            {/* Add Data */}
             <Link to="/admin/absensi/tambah">Tambah Data</Link>
           </button>
           </div>
