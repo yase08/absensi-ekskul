@@ -4,7 +4,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
-import { deleteAssessment, getAllAssessment } from "../../../../services/assessment.service";
+import { deleteAssessment, getAssessmentByTask } from "../../../../services/assessment.service";
 import { useParams } from "react-router-dom";
 
 const TableNilai = ({ setFormOld, setOpen }) => {
@@ -152,7 +152,7 @@ const TableNilai = ({ setFormOld, setOpen }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllAssessment(task_id);
+      const response = await getAssessmentByTask(task_id);
 
       if (response && response.data) {
         if (Array.isArray(response.data)) {

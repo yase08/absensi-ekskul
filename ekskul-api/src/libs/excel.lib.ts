@@ -68,7 +68,7 @@ export const exportExcel = async (
 
       // Write the workbook to the file
       // await workbook.xlsx.writeFile(filePath);
-      return workbook.xlsx.write(res);
+      return await workbook.xlsx.write(res);
       resolve(true);
     } catch (error) {
       reject(error);

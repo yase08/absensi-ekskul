@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useProfile } from "../../../context/ProfileContext";
 import { useEffect, useState } from "react";
 import { exportAttendance } from "../../../services/attendance.service";
+import fs from "fs"
 
 const AbsensiComponent = () => {
   const [selectedEkskul, setSelectedEkskul] = useState(null);
@@ -24,11 +25,11 @@ const AbsensiComponent = () => {
       const response = await exportAttendance(ekskul_id);
       
       // Log the response data to verify its content
-      console.log(response);
   
       if (response) {
         // Create a Blob from the response data with the correct content type
         const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const outputFileName = `${Date.now().xlsx}`
   
         // Create an object URL from the Blob
         const url = window.URL.createObjectURL(blob);
@@ -36,12 +37,13 @@ const AbsensiComponent = () => {
         // Create an anchor element and trigger the download
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'data_export.xlsx');
+        link.setAttribute('download', outputFileName);
         document.body.appendChild(link);
         link.click();
   
         // Clean up the URL object after the download is initiated
-        window.URL.revokeObjectURL(url);
+        // window.URL.revokeObjectURL(url);
+        fs.writeFileSync(outputFileName, response)
       } else {
         console.error('Export failed: Empty response data');
       }

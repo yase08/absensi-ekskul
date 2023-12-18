@@ -16,6 +16,20 @@ export const getAllAssessment = async ({ filter, sort, size, number }) => {
   }
 };
 
+export const getAssessmentByTask = async ({task_id}) => {
+  try {
+    const response = await axios.get(
+      `${API}/${VERSION}/assessment?task_id=${task_id}`,
+      config
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response.data.message;
+    }
+  }
+};
+
 export const deleteAssessment = async (id) => {
   try {
     const response = await axios.delete(

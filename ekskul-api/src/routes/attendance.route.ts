@@ -43,7 +43,7 @@ class AttendanceRoutes extends AttendanceController {
     );
     this.router.get(
       "/export",
-      // [authorization(), auth(), permission(["admin", "instructor"])],
+      [authorization(), auth(), permission(["admin", "instructor"])],
       this.exportToExcel
     );
     this.router.put(

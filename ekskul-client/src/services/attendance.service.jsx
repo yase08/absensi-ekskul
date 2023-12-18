@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API, VERSION } from "../utils/baseUrl";
 import { config } from "../utils/config";
+const getTokenFromSessionStorage = sessionStorage.getItem("token") || null;
 
 export const getAllAttendance = async (ekskul_id) => {
   try {
@@ -18,9 +19,16 @@ export const getAllAttendance = async (ekskul_id) => {
 
 export const exportAttendance = async (ekskul_id) => {
   try {
+    const headers = {'Content-Type': 'blob',
+        Authorization: getTokenFromSessionStorage
+        ? `Bearer ${getTokenFromSessionStorage}`
+        : "",
+        Accept: "application/json"};
+    const configHeader = {method: 'GET', url: URL, responseType: 'arraybuffer', headers};
+
     const response = await axios.get(
       `${API}/${VERSION}/attendance/export?ekskul_id=${ekskul_id}`,
-      {responseType: "arraybuffer", headers: {"Content-Type" : "blob"}},
+      configHeader
     );
     return response.data;
   } catch (error) {
