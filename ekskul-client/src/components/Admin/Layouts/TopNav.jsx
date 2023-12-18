@@ -33,6 +33,8 @@ const TopNav = ({
     const savedColor = localStorage.getItem("backgroundColor");
     if (savedColor) {
       setBackgroundColor(savedColor);
+    } else {
+      setBackgroundColor('#6777EF')
     }
   }, []);
 

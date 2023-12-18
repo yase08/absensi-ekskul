@@ -188,7 +188,7 @@ export class UserService {
         if (userExist.image) {
           fs.unlinkSync(`../public/images/${userExist.image}`);
         }
-        
+
         req.body.image = req.file.filename;
       }
 
@@ -234,17 +234,26 @@ export class UserService {
 
       if (userExist.image) {
         fs.unlinkSync(`../public/images/${userExist.image}`);
+        await db.userOnEkskul.destroy({
+          where: {
+            user_id: userExist.id,
+          },
+        });
+
+        await db.user.destroy({
+          where: { id: userExist.id },
+        });
+      } else {
+        await db.userOnEkskul.destroy({
+          where: {
+            user_id: userExist.id,
+          },
+        });
+
+        await db.user.destroy({
+          where: { id: userExist.id },
+        });
       }
-
-      await db.userOnEkskul.destroy({
-        where: {
-          user_id: userExist.id,
-        },
-      });
-
-      await db.user.destroy({
-        where: { id: userExist.id },
-      });
 
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil menghapus pengguna")

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import Tein from "../../../../components/Admin/magic/Tein";
-import ColorSettingForm from "../../../../components/Admin/Layouts/HiddenColor/Navbar";
-import SideNav from "../../../../components/Admin/Layouts/SideNav";
-import TopNav from "../../../../components/Admin/Layouts/TopNav";
-import DetailGalleryComponent from "../../../../components/Admin/Gallery/Detail/Detail.jsx";
+import Tein from "../../../components/Admin/magic/Tein";
+import ColorSettingForm from "../../../components/Admin/Layouts/HiddenColor/Navbar";
+import SideNav from "../../../components/Admin/Layouts/SideNav";
+import TopNav from "../../../components/Admin/Layouts/TopNav";
+import PenilaianPostComponent from "../../../components/Admin/Tugas/Nilai/PenilaianPost/PenilaianPost";
 // import Jumbotron from "../../../components/Admin/Jumbotron/Jumbotron";
 
-const DetailGallery = () => {
+const PenilaianPost = () => {
   const [expanded, setExpanded] = useState(false);
   // Inside your component's state declarations
   const [loading, setLoading] = useState(false);
@@ -39,6 +39,7 @@ const DetailGallery = () => {
 
   return (
     <>
+      {" "}
       <div className="flex overflow-hidden ">
         <SideNav
           expanded={expanded}
@@ -59,7 +60,7 @@ const DetailGallery = () => {
             expanded={expanded}
             toggleOpenProfile={toggleOpenProfile}
           />
-          <DetailGalleryComponent />
+          <PenilaianPostComponent />
         </div>
         {openHelpNav && (
           <Tein
@@ -83,4 +84,4 @@ const DetailGallery = () => {
   );
 };
 
-export default DetailGallery;
+export default PenilaianPost;

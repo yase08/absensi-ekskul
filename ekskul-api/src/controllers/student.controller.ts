@@ -22,14 +22,26 @@ export class StudentController extends StudentService {
     }
   };
 
+  getStudentOnAssessment = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.getStudentOnAssessmentService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
   getStudentByEkskul = async (
     req: Request,
     res: Response
   ): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getStudentByEkskulService(
-        req
-      );
+      const serviceResponse: APIResponse =
+        await this.getStudentByEkskulService(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);

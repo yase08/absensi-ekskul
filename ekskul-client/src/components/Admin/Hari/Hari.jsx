@@ -10,8 +10,7 @@ const HariComponent = () => {
   const axiosPrivate = useAxiosPrivate();
   const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
-    name: "",
-    ekskul_id: "",
+    day: "",
   });
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -139,7 +138,7 @@ const HariComponent = () => {
       <div className="w-full flex flex-col gap-2">
         <div className="flex justify-between">
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
-            Hari Siswa
+            Hari
           </h1>
           <button
             onClick={showModal}
@@ -164,12 +163,12 @@ const HariComponent = () => {
             Hari
           </label>
           <Input
-            value={formOld ? formOld.name : formData.name}
+            value={formOld ? formOld.day : formData.day}
             type="text"
-            name="name"
+            name="day"
             size="large"
             placeholder="Masukan nama hari"
-            onChange={(e) => handleInputChange(e, "name")}
+            onChange={(e) => handleInputChange(e, "day")}
           />
         </form>
       </Modal>

@@ -4,12 +4,15 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { BiDetail } from "react-icons/bi";
+import { useParams } from "react-router-dom";
+import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 
-const TableJadwal = ({ setFormOld, setOpen }) => {
+const TableNilai = ({ setFormOld, setOpen }) => {
+  const task_id = useParams();
   const [searchText, setSearchText] = useState("");
-  const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
+  const axiosPrivate = useAxiosPrivate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,8 +37,8 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
   };
 
   const handleSort = (dataIndex) => (a, b) => {
-    const valueA = String(a[dataIndex]).toLowerCase();
-    const valueB = String(b[dataIndex]).toLowerCase();
+    const valueA = a[dataIndex].toLowerCase();
+    const valueB = b[dataIndex].toLowerCase();
 
     return valueA.localeCompare(valueB);
   };
@@ -121,7 +124,7 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       />
     ),
     onFilter: (value, record) =>
-      String(record[dataIndex]).toLowerCase().includes(value.toLowerCase()),
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100);
@@ -151,12 +154,14 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await axiosPrivate.get(`/activity`);
+      const response = await axiosPrivate.get(
+        `/assessment/detail?task_id=${task_id.id}`
+      );
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
-          const activityData = response.data.data;
-          setData(activityData);
+          const taskData = response.data.data;
+          setData(taskData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -174,8 +179,8 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/schedule`, id);
-      const successMessage = response.statusMessage;
+      const response = await axiosPrivate.delete(`/assessment/${id}`);
+      const successMessage = response.data.data;
 
       Swal.fire({
         icon: "success",
@@ -220,58 +225,29 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       width: "10%",
     },
     {
-      title: "Hari",
-      dataIndex: "schedule",
-      sorter: handleSort("schedule"),
+      title: "Nama Siswa",
+      dataIndex: "student",
+      sorter: handleSort("student"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("schedule"),
-      render: (schedule) => (schedule.day ? schedule.day : "-"),
+      ...getColumnSearchProps("student"),
+      render: (student) => (student ? student.name : "-"),
     },
     {
-      title: "Ekstrakurikuler",
-      dataIndex: "ekskul",
-      sorter: handleSort("ekskul"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("ekskul"),
-      render: (ekskul) => (ekskul.name ? ekskul.name : "-"),
-    },
-    {
-      title: "Ruangan",
-      dataIndex: "room",
-      sorter: handleSort("room"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("room"),
-      render: (room) => (room.name ? room.name : "-"),
-    },
-    {
-      title: "Kelas",
+      title: "Nilai",
       dataIndex: "grade",
       sorter: handleSort("grade"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("grade"),
-      render: (grade) => (grade ? grade : "-"),
     },
     {
-      title: "Jam Mulai",
-      dataIndex: "startTime",
-      sorter: handleSort("startTime"),
+      title: "Tanggal",
+      dataIndex: "date",
+      sorter: handleSort("date"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("startTime"),
-      render: (startTime) => (startTime ? startTime : "-"),
-    },
-    {
-      title: "Jam Berakhir",
-      dataIndex: "endTime",
-      sorter: handleSort("endTime"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("endTime"),
-      render: (endTime) => (endTime ? endTime : "-"),
+      ...getColumnSearchProps("date"),
     },
     {
       title: "Aksi",
@@ -318,4 +294,4 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
   );
 };
 
-export default TableJadwal;
+export default TableNilai;

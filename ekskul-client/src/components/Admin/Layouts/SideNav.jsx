@@ -551,19 +551,19 @@ const SideNav = ({
                 className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
               >
                 <a
-                  href="/admin/absensi"
+                  href="/admin/absensi-siswa"
                   onMouseEnter={handleNavbarHomeMouseEnter2}
                   onMouseLeave={handleNavbarHomeMouseLeave2}
                   className={`relative flex items-center    ${
-                    currentPath === "/admin/absensi" ||
-                    currentPath === "/admin/absensi/"
+                    currentPath === "/admin/absensi-siswa" ||
+                    currentPath === "/admin/absensi-siswa/"
                       ? expanded
                         ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
                         : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
                       : "w-full h-[60px] "
                   } ${
-                    currentPath === "/admin/absensi" ||
-                    currentPath === "/admin/absensi/"
+                    currentPath === "/admin/absensi-siswa" ||
+                    currentPath === "/admin/absensi-siswa/"
                       ? expanded
                         ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
                         : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
@@ -602,72 +602,6 @@ const SideNav = ({
                     <div className="bg-black py-[4px] px-[5px] rounded-sm ">
                       <p className="font-semibold font-poppins text-sm z-50">
                         Absensi{" "}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
-              <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
-              >
-                <a
-                  href="/admin/penilaian"
-                  onMouseEnter={handleNavbarHomeMouseEnter2}
-                  onMouseLeave={handleNavbarHomeMouseLeave2}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/penilaian" ||
-                    currentPath === "/admin/penilaian/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/penilaian" ||
-                    currentPath === "/admin/penilaian/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
-                  }`}
-                >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <MdOutlineAssessment
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Penilaian
-                    </p>
-                  </div>
-                </a>
-                {infoHome2Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
-                    }`}
-                  >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
-                        Penilaian{" "}
                       </p>
                     </div>
                   </div>
@@ -1110,7 +1044,7 @@ const SideNav = ({
                         expanded ? "lg:hidden" : ""
                       } transition-opacity`}
                     >
-                      Gallery
+                      Galeri
                     </p>
                   </div>
                 </a>

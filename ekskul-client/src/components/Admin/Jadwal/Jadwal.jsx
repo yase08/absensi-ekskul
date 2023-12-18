@@ -10,12 +10,10 @@ const Jadwal = () => {
     ekskul_id: "",
     schedule_id: "",
     room_id: "",
-    rombel_id: "",
-    // startTime: "",
-    // endTime: "",
-    // time: "",
+    grade: "",
+    startTime: "",
+    endTime: "",
   });
-  const [rombel, setRombel] = useState([]);
   const axiosPrivate = useAxiosPrivate();
   const [hari, setHari] = useState([]);
   const [ekskul, setEkskul] = useState([]);
@@ -36,27 +34,6 @@ const Jadwal = () => {
         ...prevData,
         [inputName]: newValue,
       }));
-    }
-  };
-
-  const handleGetRombelRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/rombel`);
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const rombelData = response.data.data;
-          setRombel(rombelData);
-        } else {
-          console.log("Data is not an array");
-        }
-      } else {
-        console.log("Data retrieval failed");
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -83,7 +60,7 @@ const Jadwal = () => {
 
   const handleGetHariRequest = async () => {
     try {
-      const response = await axiosPrivate.get(`/schedule`);
+      const response = await axiosPrivate.get(`/schedule/day`);
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
@@ -121,11 +98,6 @@ const Jadwal = () => {
       setLoading(false);
     }
   };
-
-  const rombelOption = rombel.map((item) => ({
-    label: item.name,
-    value: item.id,
-  }));
 
   const hariOption = hari.map((item) => ({
     label: item.day,
@@ -215,7 +187,6 @@ const Jadwal = () => {
     handleGetEkskulRequest();
     handleGetHariRequest();
     handleGetRoomRequest();
-    handleGetRombelRequest();
   }, []);
 
   return (
@@ -256,15 +227,28 @@ const Jadwal = () => {
             placeholder="Pilih Hari"
           />
           <label htmlFor="" className="text-lg">
-            Rombel
+            Kelas
           </label>
           <Select
             size="large"
             className="w-full"
-            value={formOld ? formOld.rombel : formData.rombel}
-            onChange={(e) => handleInputChange(e, "rombel_id")}
-            options={rombelOption}
-            placeholder="Pilih Rombel"
+            value={formOld ? formOld.grade : formData.grade}
+            onChange={(e) => handleInputChange(e, "grade")}
+            options={[
+              {
+                label: "X",
+                value: "X",
+              },
+              {
+                label: "XI",
+                value: "XI",
+              },
+              {
+                label: "XII",
+                value: "XII",
+              },
+            ]}
+            placeholder="Pilih Kelas"
           />
           <label htmlFor="" className="text-lg">
             Ekstrakurikuler
@@ -291,17 +275,17 @@ const Jadwal = () => {
           <label htmlFor="" className="text-lg">
             Jam Mulai & Jam Berakhir
           </label>
-          {/* <TimePicker.RangePicker
+          <TimePicker.RangePicker
             size="large"
             format={"HH:mm"}
-            onChange={(e) => handleInputChange(e, "time")}
+            onChange={(e) => handleInputChange(e, "startTime", "endTime")}
             placeholder={["Jam Mulai", "Jam Berakhir"]}
             value={
               formOld
                 ? [formOld.startTime, formOld.endTime]
                 : [formData.startTime, formData.endTime]
             }
-          /> */}
+          />
         </form>
       </Modal>
     </div>

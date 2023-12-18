@@ -169,7 +169,7 @@ const TableRombel = ({ setFormOld }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/rombel`, id);
+      const response = await axiosPrivate.delete(`/rombel/${id}`);
       const successMessage = response.statusMessage;
 
       Swal.fire({

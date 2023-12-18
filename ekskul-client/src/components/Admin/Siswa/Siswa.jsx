@@ -268,6 +268,7 @@ const SiswaComponent = () => {
             Jenis Kelamin
           </label>
           <Select
+            size="large"
             className="w-full"
             placeholder="Pilih Jenis Kelamin"
             value={formOld ? formOld.gender : formData.gender}
@@ -287,6 +288,7 @@ const SiswaComponent = () => {
             Rombel
           </label>
           <Select
+            size="large"
             className="w-full"
             value={formOld ? formOld.rombel : formData.rombel}
             onChange={(e) => handleInputChange(e, "rombel_id")}
@@ -297,6 +299,7 @@ const SiswaComponent = () => {
             Rayon
           </label>
           <Select
+            size="large"
             className="w-full"
             value={formOld ? formOld.rayon : formData.rayon}
             onChange={(e) => handleInputChange(e, "rayon_id")}
@@ -307,6 +310,7 @@ const SiswaComponent = () => {
             Eksktrakurikuler
           </label>
           <Select
+            size="large"
             className="w-full"
             mode="multiple"
             placeholder="Pilih Ekstrakurikuler"

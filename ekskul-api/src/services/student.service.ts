@@ -18,7 +18,7 @@ export class StudentService {
         throw apiResponse(
           status.CONFLICT,
           `Siswa dengan nama ${req.body.name} sudah ada`
-        );
+        ); 
 
       const ekskuls = await db.ekskul.findAll({
         where: { id: req.body.ekskuls },
@@ -168,6 +168,64 @@ export class StudentService {
       );
     }
   }
+  async getStudentOnAssessmentService(req: Request): Promise<any> {
+    try {
+      const ekskul_id = req.query.ekskul_id as string;
+
+      const paramQuerySQL: any = {
+        attributes: ["id", "name"],
+        include: [
+          {
+            model: db.ekskul,
+            attributes: [],
+            where: { id: ekskul_id },
+          },
+        ],
+      };
+
+      const studentWithoutAssessment = await db.student.findAll({
+        ...paramQuerySQL,
+        where: {
+          id: {
+            [Op.notIn]: [
+              db.sequelize.literal(
+                `SELECT DISTINCT "student_id" FROM "assessment" WHERE "ekskul_id" = '${ekskul_id}'`
+              ),
+            ],
+          },
+        },
+      });
+
+      if (!studentWithoutAssessment || studentWithoutAssessment.length === 0) {
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+      }
+
+      const manipulatedStudent = studentWithoutAssessment.map(
+        (student: any) => {
+          return {
+            id: student.id,
+            name: student.name,
+          };
+        }
+      );
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan siswa berdasarkan ekskul",
+          manipulatedStudent
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
 
   async getStudentByEkskulService(req: Request): Promise<any> {
     try {
@@ -186,15 +244,18 @@ export class StudentService {
 
       const student = await db.student.findAll(paramQuerySQL);
 
-      if (!student || student.length === 0)
+      if (!student || student.length === 0) {
         throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+      }
 
-      const manipulatedStudent = student.map((student: any) => {
-        return {
-          id: student.id,
-          name: student.name,
-        };
-      });
+      const manipulatedStudent = student.map(
+        (student: any) => {
+          return {
+            id: student.id,
+            name: student.name,
+          };
+        }
+      );
 
       return Promise.resolve(
         apiResponse(

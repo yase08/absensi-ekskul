@@ -151,7 +151,7 @@ const TableHari = ({ setFormOld, setOpen }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await axiosPrivate.get(`/schedule`);
+      const response = await axiosPrivate.get(`/schedule/day`);
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {

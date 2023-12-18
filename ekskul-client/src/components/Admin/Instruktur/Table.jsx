@@ -1,14 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
-import { BsPencil } from "react-icons/bs";
-import { LuTrash } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableJadwal = ({ setFormOld, setOpen }) => {
+const TableInstruktur = () => {
   const [searchText, setSearchText] = useState("");
-  const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,8 +13,9 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const axiosPrivate = useAxiosPrivate();
 
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {[]
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
@@ -28,14 +25,9 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     setSearchText("");
   };
 
-  const handleEdit = async (item) => {
-    setFormOld(item);
-    setOpen(true);
-  };
-
   const handleSort = (dataIndex) => (a, b) => {
-    const valueA = String(a[dataIndex]).toLowerCase();
-    const valueB = String(b[dataIndex]).toLowerCase();
+    const valueA = a[dataIndex].toLowerCase();
+    const valueB = b[dataIndex].toLowerCase();
 
     return valueA.localeCompare(valueB);
   };
@@ -121,7 +113,7 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       />
     ),
     onFilter: (value, record) =>
-      String(record[dataIndex]).toLowerCase().includes(value.toLowerCase()),
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100);
@@ -151,12 +143,12 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await axiosPrivate.get(`/activity`);
+      const response = await axiosPrivate.get("/instructor-attendance");
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
-          const activityData = response.data.data;
-          setData(activityData);
+          const attendanceData = response.data.data;
+          setData(attendanceData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -170,48 +162,6 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     }
   };
 
-  const handleDeleteRequest = async (id) => {
-    setLoading(true);
-
-    try {
-      const response = await axiosPrivate.delete(`/schedule`, id);
-      const successMessage = response.statusMessage;
-
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: successMessage,
-      });
-
-      handleGetRequest();
-    } catch (error) {
-      console.error("Error:", error);
-
-      if (error.response) {
-        const errorMessage = error.response.statusMessage;
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: errorMessage,
-        });
-      } else if (error.request) {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "No response received from the server.",
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "An unexpected error occurred.",
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const columns = [
     {
       title: "No",
@@ -220,13 +170,21 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       width: "10%",
     },
     {
-      title: "Hari",
-      dataIndex: "schedule",
-      sorter: handleSort("schedule"),
+      title: "Nama",
+      dataIndex: "user",
+      sorter: handleSort("user"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("schedule"),
-      render: (schedule) => (schedule.day ? schedule.day : "-"),
+      ...getColumnSearchProps("name"),
+      render: (user) => (user ? user.name : "-"),
+    },
+    {
+      title: "Kategori",
+      dataIndex: "category",
+      sorter: handleSort("category"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("name"),
     },
     {
       title: "Ekstrakurikuler",
@@ -235,64 +193,18 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("ekskul"),
-      render: (ekskul) => (ekskul.name ? ekskul.name : "-"),
+      render: (ekskul) => (ekskul ? ekskul.name : "-"),
     },
     {
-      title: "Ruangan",
-      dataIndex: "room",
-      sorter: handleSort("room"),
+      title: "Date",
+      dataIndex: "date",
+      sorter: handleSort("date"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("room"),
-      render: (room) => (room.name ? room.name : "-"),
-    },
-    {
-      title: "Kelas",
-      dataIndex: "grade",
-      sorter: handleSort("grade"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("grade"),
-      render: (grade) => (grade ? grade : "-"),
-    },
-    {
-      title: "Jam Mulai",
-      dataIndex: "startTime",
-      sorter: handleSort("startTime"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("startTime"),
-      render: (startTime) => (startTime ? startTime : "-"),
-    },
-    {
-      title: "Jam Berakhir",
-      dataIndex: "endTime",
-      sorter: handleSort("endTime"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("endTime"),
-      render: (endTime) => (endTime ? endTime : "-"),
-    },
-    {
-      title: "Aksi",
-      dataIndex: "action",
-      width: "20%",
-      render: (_, record) => (
-        <Space
-          size={"middle"}
-          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
-        >
-          <a className="hover:text-blue-500" onClick={() => handleEdit(record)}>
-            <BsPencil size={20} />
-          </a>
-          <a
-            className="hover:text-red-500"
-            onClick={() => handleDeleteRequest(record.id)}
-          >
-            <LuTrash size={20} />
-          </a>
-        </Space>
-      ),
+      ...getColumnSearchProps("date"),
+      render: (text) => {
+        return new Intl.DateTimeFormat("en-US").format(new Date(text));
+      },
     },
   ];
 
@@ -318,4 +230,4 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
   );
 };
 
-export default TableJadwal;
+export default TableInstruktur;

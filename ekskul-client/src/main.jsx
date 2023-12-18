@@ -6,6 +6,7 @@ import router from "./routes/Route.jsx";
 import Helmet from "react-helmet";
 import { ProfileProvider } from "./context/ProfileContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import { EkskulProvider } from "./context/EkskulContext";
 // import { CustomCursorProvider } from 'react-custom-cursor';
 // import AnimatedCursor from 'react-custom-cursor/AnimatedCursor';
 
@@ -17,7 +18,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </Helmet>
     <AuthProvider>
       <ProfileProvider>
-        <RouterProvider router={router} />
+        <EkskulProvider>
+          <RouterProvider router={router} />
+        </EkskulProvider>
       </ProfileProvider>
     </AuthProvider>
   </>

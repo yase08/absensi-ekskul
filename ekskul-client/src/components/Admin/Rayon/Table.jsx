@@ -169,7 +169,7 @@ const TableRayon = ({ setFormOld }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/rayon`, id);
+      const response = await axiosPrivate.delete(`/rayon/${id}`);
       const successMessage = response.statusMessage;
 
       Swal.fire({

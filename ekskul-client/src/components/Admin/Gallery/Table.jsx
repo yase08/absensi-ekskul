@@ -5,6 +5,8 @@ import { Table, Input, Space, Button, Tag } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { BiDetail } from "react-icons/bi";
+import { Link } from "react-router-dom";
 
 const TableGallery = ({ setFormOld, setOpen }) => {
   const [searchText, setSearchText] = useState("");
@@ -175,7 +177,7 @@ const TableGallery = ({ setFormOld, setOpen }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/gallery`, id);
+      const response = await axiosPrivate.delete(`/gallery/${id}`);
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -246,7 +248,6 @@ const TableGallery = ({ setFormOld, setOpen }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("name"),
-      
     },
     {
       title: "Aksi",
@@ -266,6 +267,12 @@ const TableGallery = ({ setFormOld, setOpen }) => {
           >
             <LuTrash size={20} />
           </a>
+          <Link
+            className="hover:text-green-500"
+            to={`/admin/gallery/detail/${record.slug}`}
+          >
+            <BiDetail size={20} />
+          </Link>
         </Space>
       ),
     },

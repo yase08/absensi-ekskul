@@ -174,7 +174,7 @@ const TableUser = ({ setFormOld, setOpen, onDataUpdate }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/user`, id);
+      const response = await axiosPrivate.delete(`/user/${id}`);
       const successMessage = response.statusMessage;
 
       Swal.fire({

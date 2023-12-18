@@ -172,7 +172,7 @@ const TableEkskul = ({ setFormOld, setOpen }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/ekskul`, id);
+      const response = await axiosPrivate.delete(`/ekskul/${id}`);
       const successMessage = response.statusMessage;
 
       Swal.fire({

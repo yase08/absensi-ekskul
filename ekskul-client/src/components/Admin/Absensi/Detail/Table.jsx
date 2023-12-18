@@ -1,13 +1,20 @@
 import { useState, useEffect, useRef } from "react";
-import Swal from "sweetalert2";
+import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import { SearchOutlined } from "@ant-design/icons";
-import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
-import { LuTrash } from "react-icons/lu";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { Table, Input, Space, Button, Modal, Select, DatePicker } from "antd";
+import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
-const TableJadwal = ({ setFormOld, setOpen }) => {
+const TableAbsensi = () => {
+  const { id } = useParams();
   const [searchText, setSearchText] = useState("");
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    category: "",
+    date: "",
+  });
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
@@ -17,6 +24,9 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const ekskul = localStorage.getItem("ekskul_id");
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -28,14 +38,9 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     setSearchText("");
   };
 
-  const handleEdit = async (item) => {
-    setFormOld(item);
-    setOpen(true);
-  };
-
   const handleSort = (dataIndex) => (a, b) => {
-    const valueA = String(a[dataIndex]).toLowerCase();
-    const valueB = String(b[dataIndex]).toLowerCase();
+    const valueA = a[dataIndex].toLowerCase();
+    const valueB = b[dataIndex].toLowerCase();
 
     return valueA.localeCompare(valueB);
   };
@@ -121,7 +126,7 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       />
     ),
     onFilter: (value, record) =>
-      String(record[dataIndex]).toLowerCase().includes(value.toLowerCase()),
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100);
@@ -149,14 +154,51 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     onShowSizeChange: handleChangePageSize,
   });
 
+  const categoryOption = [
+    {
+      label: "Hadir",
+      value: "hadir",
+    },
+    {
+      label: "Sakit",
+      value: "sakit",
+    },
+    {
+      label: "Izin",
+      value: "izin",
+    },
+    {
+      label: "Alfa",
+      value: "alfa",
+    },
+  ];
+
+  const showModal = () => {
+    setOpen(true);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
+  const handleInputChange = (e, inputName) => {
+    const newValue = e.target ? e.target.value : e;
+    setFormData((prevData) => ({
+      ...prevData,
+      [inputName]: newValue,
+    }));
+  };
+
   const handleGetRequest = async () => {
     try {
-      const response = await axiosPrivate.get(`/activity`);
-
+      const response = await axiosPrivate.get(
+        `attendance/detail?ekskul_id=${ekskul}&student_id=${id}`
+      );
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
-          const activityData = response.data.data;
-          setData(activityData);
+          const attendanceData = response.data.data;
+          setData(attendanceData);
+          console.log(attendanceData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -170,11 +212,17 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     }
   };
 
-  const handleDeleteRequest = async (id) => {
+  const handleOk = async (event) => {
+    event.preventDefault();
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/schedule`, id);
+      const response = await axiosPrivate.put(
+        `/attendance`,
+        formData,
+        ekskul,
+        id
+      );
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -182,13 +230,11 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
         title: "Success!",
         text: successMessage,
       });
-
-      handleGetRequest();
     } catch (error) {
       console.error("Error:", error);
 
       if (error.response) {
-        const errorMessage = error.response.statusMessage;
+        const errorMessage = error.response.data.statusMessage;
         Swal.fire({
           icon: "error",
           title: "Error!",
@@ -209,6 +255,8 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       }
     } finally {
       setLoading(false);
+      setConfirmLoading(false);
+      setOpen(false);
     }
   };
 
@@ -220,76 +268,46 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       width: "10%",
     },
     {
-      title: "Hari",
-      dataIndex: "schedule",
-      sorter: handleSort("schedule"),
+      title: "Nama",
+      dataIndex: "student",
+      sorter: handleSort("student"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("schedule"),
-      render: (schedule) => (schedule.day ? schedule.day : "-"),
+      ...getColumnSearchProps("student"),
+      render: (student) => (student ? student.name : "-"),
     },
     {
-      title: "Ekstrakurikuler",
-      dataIndex: "ekskul",
-      sorter: handleSort("ekskul"),
+      title: "Kategori",
+      dataIndex: "category",
+      sorter: handleSort("category"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("ekskul"),
-      render: (ekskul) => (ekskul.name ? ekskul.name : "-"),
+      ...getColumnSearchProps("category"),
     },
     {
-      title: "Ruangan",
-      dataIndex: "room",
-      sorter: handleSort("room"),
+      title: "Tanggal",
+      dataIndex: "date",
+      sorter: handleSort("date"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("room"),
-      render: (room) => (room.name ? room.name : "-"),
-    },
-    {
-      title: "Kelas",
-      dataIndex: "grade",
-      sorter: handleSort("grade"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("grade"),
-      render: (grade) => (grade ? grade : "-"),
-    },
-    {
-      title: "Jam Mulai",
-      dataIndex: "startTime",
-      sorter: handleSort("startTime"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("startTime"),
-      render: (startTime) => (startTime ? startTime : "-"),
-    },
-    {
-      title: "Jam Berakhir",
-      dataIndex: "endTime",
-      sorter: handleSort("endTime"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("endTime"),
-      render: (endTime) => (endTime ? endTime : "-"),
+      ...getColumnSearchProps("date"),
+      render: (text) =>
+        text ? Intl.DateTimeFormat("en-US").format(new Date(text)) : "-",
     },
     {
       title: "Aksi",
       dataIndex: "action",
       width: "20%",
       render: (_, record) => (
-        <Space
-          size={"middle"}
-          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
-        >
-          <a className="hover:text-blue-500" onClick={() => handleEdit(record)}>
-            <BsPencil size={20} />
-          </a>
+        <Space size={"middle"}>
           <a
-            className="hover:text-red-500"
-            onClick={() => handleDeleteRequest(record.id)}
+            className="hover:text-blue-500"
+            onClick={() => {
+              setOpen(true);
+              setFormData(record);
+            }}
           >
-            <LuTrash size={20} />
+            <BsPencil size={20} />
           </a>
         </Space>
       ),
@@ -314,8 +332,41 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
           scroll={{ x: "max-content" }}
         />
       </div>
+      <Modal
+        title={"Edit Data"}
+        open={open}
+        onOk={handleOk}
+        confirmLoading={confirmLoading}
+        onCancel={handleCancel}
+      >
+        <form action="" className="flex flex-col p-5 gap-3">
+          <label htmlFor="" className="text-lg">
+            Kategori
+          </label>
+          <Select
+            size="large"
+            className="w-full"
+            value={formData.category}
+            onChange={(e) => handleInputChange(e, "category")}
+            options={categoryOption}
+            placeholder="Pilih Kategory"
+          />
+          <label htmlFor="" className="text-lg">
+            Tanggal
+          </label>
+          <DatePicker
+            name="date"
+            value={selectedDate ? selectedDate : formData.date}
+            onChange={(selectedDate, dateString) => {
+              setSelectedDate(selectedDate);
+              console.log(selectedDate);
+              handleInputChange(dateString, "date");
+            }}
+          />
+        </form>
+      </Modal>
     </div>
   );
 };
 
-export default TableJadwal;
+export default TableAbsensi;

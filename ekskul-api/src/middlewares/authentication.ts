@@ -32,29 +32,29 @@ export const auth = (): Handler => {
       const decoded: string | JwtPayload = (await verifyToken(
         token
       )) as JwtPayload;
-      // const user = await db.user.findOne({ where: { id: decoded.id } });
+      const user = await db.user.findOne({ where: { id: decoded.id } });
 
-      // if (!user) {
-      //   return res.status(status.UNAUTHORIZED).json({
-      //     message: "User not found.",
-      //   });
-      // }
+      if (!user) {
+        return res.status(status.UNAUTHORIZED).json({
+          message: "User not found.",
+        });
+      }
 
-      // const userOnEkskul = await db.userOnEkskul.findAll({
-      //   where: { user_id: user.id },
-      // });
+      const userOnEkskul = await db.userOnEkskul.findAll({
+        where: { user_id: user.id },
+      });
 
-      // const ekskulIds = userOnEkskul.map((userEkskul) => userEkskul.ekskul_id);
+      const ekskulIds = userOnEkskul.map((userEkskul) => userEkskul.ekskul_id);
 
-      // req.session["user"] = {
-      //   id: user.id,
-      //   email: user.email,
-      //   name: user.name,
-      //   image: user.image,
-      //   role: user.role,
-      //   ekskul: ekskulIds,
-      //   isActive: user.isActive,
-      // };
+      req.session["user"] = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        role: user.role,
+        ekskul: ekskulIds,
+        isActive: user.isActive,
+      };
 
       next();
     } catch (error: any) {

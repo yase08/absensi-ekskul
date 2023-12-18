@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
+import { BiDetail } from "react-icons/bi";
 import { LuTrash } from "react-icons/lu";
 
 const TableTugas = ({ setFormOld, setOpen }) => {
@@ -219,7 +220,7 @@ const TableTugas = ({ setFormOld, setOpen }) => {
       width: "10%",
     },
     {
-      title: "Nama",
+      title: "Tugas",
       dataIndex: "name",
       sorter: handleSort("name"),
       sortDirections: ["descend", "ascend"],
@@ -259,6 +260,12 @@ const TableTugas = ({ setFormOld, setOpen }) => {
             onClick={() => handleDeleteRequest(record.id)}
           >
             <LuTrash size={20} />
+          </a>
+          <a
+            className="hover:text-green-500"
+            href={`/admin/penugasan/nilai/${record.id}`}
+          >
+            <BiDetail size={20} />
           </a>
         </Space>
       ),

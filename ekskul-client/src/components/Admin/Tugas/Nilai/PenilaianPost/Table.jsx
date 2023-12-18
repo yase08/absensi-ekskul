@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
-import { BsPencil } from "react-icons/bs";
-import { LuTrash } from "react-icons/lu";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import Swal from "sweetalert2";
+import { useParams } from "react-router-dom";
+import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 
-const TableJadwal = ({ setFormOld, setOpen }) => {
+const TablePenilaianPost = ({ date }) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -17,6 +16,25 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const [formData, setformData] = useState([]);
+
+  const ekskul = localStorage.getItem("ekskul_id");
+  const task = useParams();
+
+  // Handler untuk checkbox
+  const handleInputChange = (studentId, grade) => {
+    const newAttendance = {
+      date: date,
+      student_id: studentId,
+      grade: grade,
+      task_id: task.id,
+    };
+    const updatedformData = formData.filter(
+      (attendance) => attendance.student_id !== studentId
+    );
+    setformData([...updatedformData, newAttendance]);
+    console.log(formData);
+  };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -28,14 +46,9 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     setSearchText("");
   };
 
-  const handleEdit = async (item) => {
-    setFormOld(item);
-    setOpen(true);
-  };
-
   const handleSort = (dataIndex) => (a, b) => {
-    const valueA = String(a[dataIndex]).toLowerCase();
-    const valueB = String(b[dataIndex]).toLowerCase();
+    const valueA = a[dataIndex].toLowerCase();
+    const valueB = b[dataIndex].toLowerCase();
 
     return valueA.localeCompare(valueB);
   };
@@ -121,7 +134,7 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       />
     ),
     onFilter: (value, record) =>
-      String(record[dataIndex]).toLowerCase().includes(value.toLowerCase()),
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100);
@@ -130,33 +143,17 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     render: (text) => (searchedColumn === dataIndex ? <div>{text}</div> : text),
   });
 
-  const handleChangePage = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleChangePageSize = (current, size) => {
-    setCurrentPage(1);
-    setPageSize(size);
-  };
-
-  const getPaginationConfig = () => ({
-    current: currentPage,
-    pageSize: pageSize,
-    total: data.length,
-    pageSizeOptions: pageSizeOptions,
-    showSizeChanger: true,
-    onChange: handleChangePage,
-    onShowSizeChange: handleChangePageSize,
-  });
-
-  const handleGetRequest = async () => {
+  const handleGetStudentRequest = async () => {
     try {
-      const response = await axiosPrivate.get(`/activity`);
+      const response = await axiosPrivate.get(
+        `/student/assessment?ekskul_id=${ekskul}`
+      );
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
-          const activityData = response.data.data;
-          setData(activityData);
+          const studentData = response.data.data;
+          setData(studentData);
+          console.log(studentData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -170,24 +167,22 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     }
   };
 
-  const handleDeleteRequest = async (id) => {
+  const handlePostRequest = async () => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/schedule`, id);
-      const successMessage = response.statusMessage;
+      const response = await axiosPrivate.post(`/assessment`, formData);
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",
         title: "Success!",
         text: successMessage,
       });
-
-      handleGetRequest();
     } catch (error) {
       console.error("Error:", error);
 
-      if (error.response) {
+      if (error) {
         const errorMessage = error.response.statusMessage;
         Swal.fire({
           icon: "error",
@@ -220,84 +215,35 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       width: "10%",
     },
     {
-      title: "Hari",
-      dataIndex: "schedule",
-      sorter: handleSort("schedule"),
+      title: "Nama",
+      dataIndex: "name",
+      sorter: handleSort("name"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("schedule"),
-      render: (schedule) => (schedule.day ? schedule.day : "-"),
+      ...getColumnSearchProps("name"),
     },
     {
-      title: "Ekstrakurikuler",
-      dataIndex: "ekskul",
-      sorter: handleSort("ekskul"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("ekskul"),
-      render: (ekskul) => (ekskul.name ? ekskul.name : "-"),
-    },
-    {
-      title: "Ruangan",
-      dataIndex: "room",
-      sorter: handleSort("room"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("room"),
-      render: (room) => (room.name ? room.name : "-"),
-    },
-    {
-      title: "Kelas",
+      title: "Nilai",
       dataIndex: "grade",
       sorter: handleSort("grade"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("grade"),
-      render: (grade) => (grade ? grade : "-"),
-    },
-    {
-      title: "Jam Mulai",
-      dataIndex: "startTime",
-      sorter: handleSort("startTime"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("startTime"),
-      render: (startTime) => (startTime ? startTime : "-"),
-    },
-    {
-      title: "Jam Berakhir",
-      dataIndex: "endTime",
-      sorter: handleSort("endTime"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("endTime"),
-      render: (endTime) => (endTime ? endTime : "-"),
-    },
-    {
-      title: "Aksi",
-      dataIndex: "action",
-      width: "20%",
       render: (_, record) => (
-        <Space
-          size={"middle"}
-          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
-        >
-          <a className="hover:text-blue-500" onClick={() => handleEdit(record)}>
-            <BsPencil size={20} />
-          </a>
-          <a
-            className="hover:text-red-500"
-            onClick={() => handleDeleteRequest(record.id)}
-          >
-            <LuTrash size={20} />
-          </a>
-        </Space>
+        <Input
+          value={formData.name}
+          type="number"
+          name="name"
+          size="large"
+          placeholder="Nilai"
+          onChange={(e) => handleInputChange(record.id, e.target.value)}
+        />
       ),
     },
   ];
 
   useEffect(() => {
-    handleGetRequest();
+    handleGetStudentRequest();
   }, []);
 
   return (
@@ -309,13 +255,21 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
             (currentPage - 1) * pageSize,
             currentPage * pageSize
           )}
-          pagination={getPaginationConfig()}
+          pagination={false}
           loading={loading}
           scroll={{ x: "max-content" }}
         />
+        <div className="flex justify-end">
+          <button
+            onClick={handlePostRequest}
+            className="my-5 bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
+          >
+            Submit
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default TableJadwal;
+export default TablePenilaianPost;

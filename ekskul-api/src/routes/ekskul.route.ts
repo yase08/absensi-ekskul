@@ -23,7 +23,7 @@ class EkskulRoutes extends EkskulController {
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin", "instructor"])],
       this.getAllEkskul
     );
     this.router.put(

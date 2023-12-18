@@ -24,7 +24,7 @@ class InstructorAttendanceRoutes extends InstructorAttendanceController {
       [
         authorization(),
         auth(),
-        permission(["instructor"]),
+        permission(["instructor", "admin"]),
         validator(DTOInstructorAttendance),
       ],
       this.createInstructorAttendance

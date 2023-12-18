@@ -1,10 +1,11 @@
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
-const axiosPrivate = useAxiosPrivate();
-
 export const getAllInstructorAttendance = async () => {
   try {
-    const response = await axiosPrivate.get(`/instructorAttendance`);
+    const response = await axios.get(
+      `${API}/${VERSION}/instructor-attendance`,
+      config
+    );
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -37,7 +38,11 @@ export const updateInstructorAttendance = async (id) => {
 
 export const createInstructorAttendance = async (requestData) => {
   try {
-    const response = await axiosPrivate.post(`/instructorAttendance`, requestData);
+    const response = await axios.post(
+      `${API}/${VERSION}/instructor-attendance`,
+      requestData,
+      config
+    );
     return response.data;
   } catch (error) {
     if (error.response) {

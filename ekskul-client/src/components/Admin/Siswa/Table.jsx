@@ -171,6 +171,7 @@ const TableSiswa = ({ setFormOld }) => {
     try {
       const response = await axiosPrivate.delete(`/student`, id);
       const successMessage = response.statusMessage;
+      handleGetRequest();
 
       Swal.fire({
         icon: "success",
@@ -178,7 +179,6 @@ const TableSiswa = ({ setFormOld }) => {
         text: successMessage,
       });
 
-      handleGetRequest();
     } catch (error) {
       console.error("Error:", error);
 

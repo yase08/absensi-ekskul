@@ -16,7 +16,6 @@ const UserComponent = () => {
     mobileNumber: "",
     password: "",
     role: "",
-    image: {},
     ekskuls: [
       {
         ekskul_id: "",
@@ -30,21 +29,8 @@ const UserComponent = () => {
   const { profile } = useProfile();
   const [onDataUpdate, setOnDataUpdate] = useState(false);
 
-  const handleFileChange = ({ fileList }) => {
+  const handleFileChange = ({fileList}) => {
     setFileList(fileList);
-
-    if (fileList.length > 0) {
-      const file = fileList[0].originFileObj;
-      setFormData((prevData) => ({
-        ...prevData,
-        image: file,
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        image: "",
-      }));
-    }
   };
 
   const handleInputChange = (e, inputName) => {
@@ -103,11 +89,21 @@ const UserComponent = () => {
     setLoading(true);
 
     try {
+      const formDataWithFile = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataWithFile.append(key, value);
+      });
+      console.log(fileList);
+
+      if (fileList.length > 0) {
+        formDataWithFile.append("image", fileList);
+      }
+
       if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
           `/user`,
           formOld.id,
-          formOld
+          formDataWithFile
         );
         const successMessage = response.data;
 
@@ -120,7 +116,7 @@ const UserComponent = () => {
         setOnDataUpdate((prev) => !prev);
         setFormOld({});
       } else {
-        const response = await createUser(formData);
+        const response = await axiosPrivate.post("/user", formDataWithFile)
         const successMessage = response.statusMessage;
         setOnDataUpdate((prev) => !prev);
 
@@ -243,7 +239,11 @@ const UserComponent = () => {
           <label htmlFor="" className="text-lg">
             Foto Profil
           </label>
-          <Upload onChange={handleFileChange}>
+          <Upload
+            onChange={handleFileChange}
+            showUploadList={true}
+            beforeUpload={() => false}
+          >
             <Button icon={<LuUpload />}>Tekan Untuk Upload</Button>
           </Upload>
           <label htmlFor="" className="text-lg">
@@ -252,6 +252,7 @@ const UserComponent = () => {
           <Select
             className="w-full"
             placeholder="Pilih Role"
+            size="large"
             value={formOld ? formOld.role : formData.role}
             onChange={(e) => handleInputChange(e, "role")}
             options={[
@@ -271,6 +272,7 @@ const UserComponent = () => {
           <Select
             className="w-full"
             mode="multiple"
+            size="large"
             placeholder="Pilih Ekstrakurikuler"
             value={formOld ? formOld.ekskuls : formData.ekskuls}
             onChange={(e) => handleInputChange(e, "ekskuls")}

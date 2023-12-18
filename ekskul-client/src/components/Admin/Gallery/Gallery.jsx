@@ -1,25 +1,30 @@
-import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { useProfile } from "../../../context/ProfileContext";
-import { Modal, Select, Upload, Button, DatePicker } from "antd";
+import {
+  Modal,
+  Select,
+  Upload,
+  Button,
+  DatePicker,
+  message,
+  Input,
+} from "antd";
 import { LuUpload } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import Table from "./Table";
 
 const GalleryComponent = () => {
   const [open, setOpen] = useState(false);
   const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
-    name: "",
-    date: "",
+    date: null,
     ekskul_id: "",
-    images: [],
+    name: "",
   });
   const [fileList, setFileList] = useState([]);
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { profile } = useProfile();
   const axiosPrivate = useAxiosPrivate();
 
   const handleFileChange = ({ fileList }) => {
@@ -74,6 +79,7 @@ const GalleryComponent = () => {
     setOpen(false);
     setFormOld({});
     setFormData({});
+    setFileList([]);
   };
 
   const handleOk = async (event) => {
@@ -92,27 +98,24 @@ const GalleryComponent = () => {
 
       if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
-          `/gallery`,
-          formOld.id,
+          `/gallery/${formOld.id}`,
           formDataWithFile
         );
-        const successMessage = response.data;
+        const successMessage = response.data.statusMessage; // Use the correct property
 
         message.success(successMessage);
         setFormOld({});
       } else {
-        console.log(formDataWithFile);
         const response = await axiosPrivate.post(`/gallery`, formDataWithFile);
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage; // Use the correct property
 
         message.success(successMessage);
-        event.preventDefault();
       }
     } catch (error) {
       console.error("Error:", error);
 
       if (error.response) {
-        const errorMessage = error.response.data.statusMessage;
+        const errorMessage = error.response.data.message; // Use the correct property
         Swal.fire({
           icon: "error",
           title: "Error!",
@@ -139,7 +142,6 @@ const GalleryComponent = () => {
   };
 
   useEffect(() => {
-    profile;
     handleGetEkskulRequest();
   }, []);
 
@@ -148,7 +150,7 @@ const GalleryComponent = () => {
       <div className="w-full flex flex-col gap-2">
         <div className="flex justify-between">
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
-            Gallery
+            Galeri
           </h1>
           <button
             onClick={showModal}
@@ -163,37 +165,51 @@ const GalleryComponent = () => {
       </div>
       <Modal
         title={formOld && formOld.id ? "Edit Data" : "Tambah Data"}
-        open={open}
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
       >
         <form action="" className="flex flex-col p-5 gap-2">
           <label htmlFor="" className="text-lg">
+            Nama
+          </label>
+          <Input
+            placeholder={"Masukan Nama Galeri"}
+            size="large"
+            name="name"
+            onChange={(value) => handleInputChange(value, "name")}
+            value={formOld ? formOld.name : formData.name}
+          />
+          <label htmlFor="" className="text-lg">
             Upload Gambar
           </label>
-          <Upload>
-            <Button onChange={handleFileChange} icon={<LuUpload />}>
-              Tekan Untuk Upload
-            </Button>
+          <Upload
+            showUploadList={true}
+            beforeUpload={() => false}
+            onChange={handleFileChange}
+          >
+            <Button icon={<LuUpload />}>Tekan Untuk Upload</Button>
           </Upload>
           <label htmlFor="" className="text-lg">
             Eksktrakurikuler
           </label>
           <Select
             className="w-full"
-            mode="multiple"
+            size="large"
             placeholder="Pilih Ekstrakurikuler"
-            value={formOld ? formOld.ekskuls : formData.ekskuls}
-            onChange={(e) => handleInputChange(e, "ekskuls")}
+            value={formOld ? formOld.ekskul_id : formData.ekskul_id} // Use plural form
+            onChange={(value) => handleInputChange(value, "ekskul_id")} // Use plural form
             options={ekskulOption}
           />
+          <label htmlFor="" className="text-lg">
+            Tanggal
+          </label>
           <DatePicker
             placeholder={"Pilih Tanggal"}
             size="large"
             name="date"
-            onChange={handleInputChange}
-            value={formOld ? formOld.date : formData.date}
+            onChange={(value) => handleInputChange(value, "date")} // Use the correct property
+            value={formOld ? formOld.date : formData.date} // Use the correct property
           />
         </form>
       </Modal>

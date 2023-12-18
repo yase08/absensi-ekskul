@@ -1,32 +1,24 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { useProfile } from "../../../context/ProfileContext";
-import { Modal, Select, Input, DatePicker } from "antd";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { Modal, Select, Input } from "antd";
+import { useProfile } from "../../../../context/ProfileContext";
+import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
+import { useParams } from "react-router-dom";
 
-const TugasComponent = () => {
-  const [open, setOpen] = useState(false);
+const NilaiComponent = () => {
+  const task = useParams();
   const axiosPrivate = useAxiosPrivate();
+  const [open, setOpen] = useState(false);
   const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     ekskul_id: "",
-    date: "",
   });
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [dateString, setDateString] = useState("");
-  const [error, setError] = useState(null);
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const { profile } = useProfile();
-
-  const handleChange = (date, dateString) => {
-    setSelectedDate(date);
-    setDateString(dateString);
-    setError(null);
-  };
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -46,6 +38,7 @@ const TugasComponent = () => {
   const handleGetEkskulRequest = async () => {
     try {
       const response = await axiosPrivate.get(`/ekskul`);
+
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
           const ekskulData = response.data.data;
@@ -84,8 +77,11 @@ const TugasComponent = () => {
 
     try {
       if (formOld && formOld.id) {
-        const response = await axiosPrivate.put(`/task`, formOld.id, formOld);
-        const successMessage = response.data;
+        const response = await axiosPrivate.put(
+          `/assessment/${formOld.id}`,
+          formOld
+        );
+        const successMessage = response.data.data;
 
         Swal.fire({
           icon: "success",
@@ -94,16 +90,6 @@ const TugasComponent = () => {
         });
         event.preventDefault();
         setFormOld({});
-      } else {
-        const response = await axiosPrivate.post(`/task`, formData);
-        const successMessage = response.statusMessage;
-
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: successMessage,
-        });
-        event.preventDefault();
       }
     } catch (error) {
       console.error("Error:", error);
@@ -145,14 +131,14 @@ const TugasComponent = () => {
       <div className="w-full flex flex-col gap-2">
         <div className="flex justify-between">
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
-            Tugas Siswa
+            Penilaian Siswa
           </h1>
-          <button
-            onClick={showModal}
+          <a
+            href={`/admin/penugasan/penilaian/${task.id}`}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            Add Data
-          </button>
+            Penilaian
+          </a>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
           <Table setFormOld={setFormOld} setOpen={setOpen} />
@@ -188,19 +174,10 @@ const TugasComponent = () => {
             onChange={(value) => handleInputChange(value, "ekskul_id")}
             options={ekskulOption}
           />
-          <label htmlFor="" className="text-lg">
-            Ekstrakurikuler
-          </label>
-          <DatePicker
-            size="large"
-            name="date"
-            value={selectedDate}
-            onChange={handleChange}
-          />
         </form>
       </Modal>
     </div>
   );
 };
 
-export default TugasComponent;
+export default NilaiComponent;
