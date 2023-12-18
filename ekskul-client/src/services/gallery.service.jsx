@@ -1,13 +1,23 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import axios from "../utils/config";
 
-export const getAllGallery = async ({ filter, sort, size, number }) => {
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
+const axiosPrivate = useAxiosPrivate();
+
+export const getAllGallery = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/gallery?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
-      config
-    );
+    const response = await axiosPrivate.get(`/gallery`);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response.data.message;
+    }
+  }
+};
+
+export const getDetailGallery = async (slug) => {
+  try {
+    const response = await axiosPrivate.get(`/gallery/detail/${slug}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -18,10 +28,7 @@ export const getAllGallery = async ({ filter, sort, size, number }) => {
 
 export const getGallery = async (slug) => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/gallery/${slug}`,
-      config
-    );
+    const response = await axios.get(`/gallery/${slug}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -32,10 +39,7 @@ export const getGallery = async (slug) => {
 
 export const deleteGallery = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/gallery/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/gallery/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -46,10 +50,7 @@ export const deleteGallery = async (id) => {
 
 export const updateGallery = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/gallery/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/gallery/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -60,11 +61,7 @@ export const updateGallery = async (id) => {
 
 export const createGallery = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/gallery`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/gallery`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {

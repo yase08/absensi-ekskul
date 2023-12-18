@@ -1,10 +1,12 @@
-const getTokenFromSessionStorage = sessionStorage.getItem("token") || null;
+import axios from "axios";
+import { API, VERSION } from "./baseUrl";
 
-export const config = {
-  headers: {
-    Authorization: getTokenFromSessionStorage
-      ? `Bearer ${getTokenFromSessionStorage}`
-      : "",
-    Accept: "application/json",
-  },
-};
+export default axios.create({
+  baseURL: `${API}/${VERSION}`,
+});
+
+export const axiosPrivate = axios.create({
+  baseURL: `${API}/${VERSION}`,
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true,
+});

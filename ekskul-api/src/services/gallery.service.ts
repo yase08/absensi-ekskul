@@ -4,6 +4,7 @@ import { Request } from "express";
 import slugify from "slugify";
 import { Op } from "sequelize";
 import path from "path";
+import fs from "fs";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -12,16 +13,6 @@ const db = require("../db/models");
 export class GalleryService {
   async createGalleryService(req: Request): Promise<any> {
     try {
-      const ekskulOnGallery = await db.gallery.findOne({
-        where: { ekskul_id: req.body.ekskul_id },
-      });
-
-      if (ekskulOnGallery)
-        throw apiResponse(
-          status.CONFLICT,
-          `Ekskul id ${req.body.ekskul_id} pada galeri sudah ada`
-        );
-
       if (req.body.name) {
         req.body.slug = slugify(req.body.name.toLowerCase());
       }
@@ -31,8 +22,8 @@ export class GalleryService {
 
       for (let i in files) {
         const file = files[i];
-        const pathName = file.path;
-        galleryImages.push(pathName);
+        const fileName = file.filename;
+        galleryImages.push(fileName);
       }
 
       const createGallery = await db.gallery.create({
@@ -81,7 +72,7 @@ export class GalleryService {
         {
           model: db.ekskul,
           as: "ekskul",
-          attributes: ["name"],
+          attributes: ["id", "name"],
         },
       ];
 
@@ -113,8 +104,13 @@ export class GalleryService {
           id: item.id,
           name: item.name,
           slug: item.slug,
-          ekskul: item.ekskul ? item.ekskul.name : null,
-          images: JSON.parse(item.images),
+          ekskul: item.ekskul
+            ? {
+                id: item.ekskul.id,
+                name: item.ekskul.name,
+              }
+            : null,
+          date: item.date,
           createdAt: item.createdAt,
           updatedAt: item.updatedAt,
         };
@@ -127,6 +123,29 @@ export class GalleryService {
           manipulatedGallery,
           totalRows
         )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getDetailGalleryService(req: Request): Promise<any> {
+    try {
+      const gallery = await db.gallery.findAll({
+        where: { slug: req.params.slug },
+      });
+
+      if (!gallery || gallery.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil mendapatkan semua galeri", gallery)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -247,6 +266,17 @@ export class GalleryService {
 
       if (!galleryExist)
         throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
+
+      const deleteImage = galleryExist.images.map((item) => {
+        return {
+          path: item,
+        };
+      });
+
+      for (let i in deleteImage) {
+        const file = deleteImage[i];
+        fs.unlinkSync(`../public/images/${file.path}`);
+      }
 
       await db.gallery.destroy({
         where: { id: galleryExist.id },

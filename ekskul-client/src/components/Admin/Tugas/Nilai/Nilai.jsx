@@ -1,16 +1,14 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-// import { createTask, updateTask } from "../../../services/task.service";
 import { Modal, Select, Input } from "antd";
 import { useProfile } from "../../../../context/ProfileContext";
-import { getAllEkskul } from "../../../../services/ekskul.service";
-import { updateAssessment } from "../../../../services/assessment.service";
+import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import { useParams } from "react-router-dom";
 
 const NilaiComponent = () => {
-  const task = useParams()
-  console.log(task.id);
+  const task = useParams();
+  const axiosPrivate = useAxiosPrivate();
   const [open, setOpen] = useState(false);
   const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
@@ -39,14 +37,11 @@ const NilaiComponent = () => {
 
   const handleGetEkskulRequest = async () => {
     try {
-      const response = await getAllEkskul();
+      const response = await axiosPrivate.get(`/ekskul`);
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const ekskulData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const ekskulData = response.data.data;
           setEkskul(ekskulData);
         } else {
           console.log("Data is not an array");
@@ -82,8 +77,11 @@ const NilaiComponent = () => {
 
     try {
       if (formOld && formOld.id) {
-        const response = await updateAssessment(formOld.id, formOld);
-        const successMessage = response.data;
+        const response = await axiosPrivate.put(
+          `/assessment/${formOld.id}`,
+          formOld
+        );
+        const successMessage = response.data.data;
 
         Swal.fire({
           icon: "success",

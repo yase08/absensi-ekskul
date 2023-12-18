@@ -2,13 +2,14 @@ import { useState } from "react";
 import TableEskul from "./Table";
 import Swal from "sweetalert2";
 import "./Rombel.css"; // Import a CSS file for styling (create this file if not already present)
-import { createRombel, updateRombel } from "../../../services/rombel.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const Rombel = () => {
   const [formData, setFormData] = useState({
     name: "",
   });
   const [formOld, setFormOld] = useState("");
+  const axiosPrivate = useAxiosPrivate();
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
@@ -32,7 +33,7 @@ const Rombel = () => {
     setLoading(true);
 
     try {
-      const response = await createRombel(formData);
+      const response = await axiosPrivate.post(`/rombel`, formData);
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -75,7 +76,7 @@ const Rombel = () => {
     console.log(formOld);
 
     try {
-      const response = await updateRombel(formOld.id, formOld);
+      const response = await axiosPrivate.put(`/rombel`, formOld.id, formOld);
       const successMessage = response.statusMessage;
 
       Swal.fire({

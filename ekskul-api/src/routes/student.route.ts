@@ -31,6 +31,16 @@ class StudentRoutes extends StudentController {
       [authorization(), auth(), permission(["admin", "instructor"])],
       this.getStudentByEkskul
     );
+    this.router.get(
+      "/assessment",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.getStudentOnAssessment
+    );
+    this.router.get(
+      "/export",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.exportToExcel
+    );
     this.router.put(
       "/:id",
       [

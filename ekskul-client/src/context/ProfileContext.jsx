@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getProfile } from "../services/auth.service";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 const ProfileContext = createContext();
 
@@ -9,16 +9,14 @@ export function useProfile() {
 
 export function ProfileProvider({ children }) {
   const [profile, setProfile] = useState  ({});
+  const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getProfile();
-        setProfile(response.data);
-      } catch (error) {
-        setError(error);
-      } finally {
-      }
+        const response = await axiosPrivate.get("/auth/profile");
+        setProfile(response.data.data);
+      } catch (error) {}
     };
 
     fetchData();

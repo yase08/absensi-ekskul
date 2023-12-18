@@ -27,11 +27,6 @@ class AssessmentRoutes extends AssessmentController {
       this.createAssessment
     );
     this.router.get(
-      "/",
-      [authorization(), auth(), permission(["instructor", "admin"])],
-      this.getTaskAssessment
-    );
-    this.router.get(
       "/detail",
       [authorization(), auth(), permission(["instructor", "admin"])],
       this.getAllAssessmentByTask
@@ -55,6 +50,11 @@ class AssessmentRoutes extends AssessmentController {
         validator(DTOAsessmentById),
       ],
       this.deleteAssessment
+    );
+    this.router.get(
+      "/export",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.exportToExcel
     );
 
     return this.router;

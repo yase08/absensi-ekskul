@@ -1,21 +1,16 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
 import Swal from "sweetalert2";
-import {
-  createSchedule,
-  updateSchedule,
-} from "../../../services/schedule.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { useProfile } from "../../../context/ProfileContext";
 import { Modal, Select, Input } from "antd";
-import { getAllEkskul } from "../../../services/ekskul.service";
 
 const HariComponent = () => {
   const [open, setOpen] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
   const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
-    name: "",
-    ekskul_id: "",
+    day: "",
   });
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -39,14 +34,10 @@ const HariComponent = () => {
 
   const handleGetEkskulRequest = async () => {
     try {
-      const response = await getAllEkskul();
-
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const ekskulData = response.data;
+      const response = await axiosPrivate.get(`/ekskul`);
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const ekskulData = response.data.data;
           setEkskul(ekskulData);
         } else {
           console.log("Data is not an array");
@@ -82,7 +73,11 @@ const HariComponent = () => {
 
     try {
       if (formOld && formOld.id) {
-        const response = await updateSchedule(formOld.id, formOld);
+        const response = await axiosPrivate.put(
+          `/schedule`,
+          formOld.id,
+          formOld
+        );
         const successMessage = response.data;
 
         Swal.fire({
@@ -93,7 +88,7 @@ const HariComponent = () => {
         event.preventDefault();
         setFormOld({});
       } else {
-        const response = await createSchedule(formData);
+        const response = await axiosPrivate.post(`/schedule`, formData);
         const successMessage = response.statusMessage;
 
         Swal.fire({
@@ -143,7 +138,7 @@ const HariComponent = () => {
       <div className="w-full flex flex-col gap-2">
         <div className="flex justify-between">
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
-            Hari Siswa
+            Hari
           </h1>
           <button
             onClick={showModal}
@@ -168,12 +163,12 @@ const HariComponent = () => {
             Hari
           </label>
           <Input
-            value={formOld ? formOld.name : formData.name}
+            value={formOld ? formOld.day : formData.day}
             type="text"
-            name="name"
+            name="day"
             size="large"
             placeholder="Masukan nama hari"
-            onChange={(e) => handleInputChange(e, "name")}
+            onChange={(e) => handleInputChange(e, "day")}
           />
         </form>
       </Modal>

@@ -1,6 +1,4 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 export const getAllInstructorAttendance = async () => {
   try {
@@ -18,7 +16,7 @@ export const getAllInstructorAttendance = async () => {
 
 export const deleteInstructorAttendance = async (id) => {
   try {
-    const response = await axios.delete(`${API}/${VERSION}/instructorAttendance/${id}`, config);
+    const response = await axiosPrivate.delete(`/instructorAttendance/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -29,10 +27,7 @@ export const deleteInstructorAttendance = async (id) => {
 
 export const updateInstructorAttendance = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/instructorAttendance/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/instructorAttendance/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {

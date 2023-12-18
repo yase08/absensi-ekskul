@@ -15,11 +15,12 @@ import DetailAbsensiDashboard from "../pages/Admin/Absensi/Detail";
 import Login from "../pages/Admin/Login/Login";
 import { createBrowserRouter } from "react-router-dom";
 import PenilaianDashboard from "../pages/Admin/Tugas/Nilai";
-// import PenilaianPostDashboard from "../pages/Admin/Tugas/PenilaianPost";
 import InstrukturDashboard from "../pages/Admin/Instruktur/Instruktur";
+import PenilaianPostDashboard from "../pages/Admin/Tugas/PenilaianPost";
 import TugasDashboard from "../pages/Admin/Tugas/Tugas";
 import HariDashboard from "../pages/Admin/Hari/Hari";
 import UserDashboard from "../pages/Admin/User/User";
+import DetailGalleryDashboard from "../pages/Admin/Gallery/Detail/Detail";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
   {
     path: "/admin/dashboard",
     element: <AdminDashboard />,
+  },
+  {
+    path: "/admin/penugasan/penilaian/:id",
+    element: <PenilaianPostDashboard />,
   },
   {
     path: "/admin/hari",
@@ -59,15 +64,15 @@ const router = createBrowserRouter([
     element: <RayonDashboard />,
   },
   {
-    path: "/admin/absensi",
+    path: "/admin/absensi-siswa",
     element: <AbsensiDashboard />,
   },
   {
-    path: "/admin/absensi/tambah",
+    path: "/admin/absensi-siswa/tambah",
     element: <AbsensiPostDashboard />,
   },
   {
-    path: "/admin/absensi/detail/:id",
+    path: "/admin/absensi-siswa/detail/:id",
     element: <DetailAbsensiDashboard />,
   },
   {
@@ -99,7 +104,11 @@ const router = createBrowserRouter([
     element: <GalleryDashboard />,
   },
   {
-    path: "/admin/instruktur",
+    path: "/admin/gallery/detail/:slug",
+    element: <DetailGalleryDashboard />,
+  },
+  {
+    path: "/admin/absensi-instruktur",
     element: <InstrukturDashboard />,
   },
 ]);

@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import Swal from "sweetalert2";
-import { getAllStudentByEkskul } from "../../../../../services/student.service";
 import { useParams } from "react-router-dom";
-import { createAssessment } from "../../../../../services/assessment.service";
+import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 
 const TablePenilaianPost = ({ date }) => {
   const [searchText, setSearchText] = useState("");
+  const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,15 +19,15 @@ const TablePenilaianPost = ({ date }) => {
   const [formData, setformData] = useState([]);
 
   const ekskul = localStorage.getItem("ekskul_id");
-  const task = useParams()
+  const task = useParams();
 
   // Handler untuk checkbox
   const handleInputChange = (studentId, grade) => {
     const newAttendance = {
-      date : date,
+      date: date,
       student_id: studentId,
       grade: grade,
-      task_id : task.id
+      task_id: task.id,
     };
     const updatedformData = formData.filter(
       (attendance) => attendance.student_id !== studentId
@@ -145,12 +145,13 @@ const TablePenilaianPost = ({ date }) => {
 
   const handleGetStudentRequest = async () => {
     try {
-      const response = await getAllStudentByEkskul(ekskul);
-      console.log(response);
+      const response = await axiosPrivate.get(
+        `/student/assessment?ekskul_id=${ekskul}`
+      );
 
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          const studentData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const studentData = response.data.data;
           setData(studentData);
           console.log(studentData);
         } else {
@@ -166,20 +167,18 @@ const TablePenilaianPost = ({ date }) => {
     }
   };
 
-  
   const handlePostRequest = async () => {
     setLoading(true);
 
     try {
-      const response = await createAssessment(formData);
-      const successMessage = response.statusMessage;
+      const response = await axiosPrivate.post(`/assessment`, formData);
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",
         title: "Success!",
         text: successMessage,
       });
-
     } catch (error) {
       console.error("Error:", error);
 
@@ -206,8 +205,7 @@ const TablePenilaianPost = ({ date }) => {
     } finally {
       setLoading(false);
     }
-  }
-
+  };
 
   const columns = [
     {
@@ -225,48 +223,28 @@ const TablePenilaianPost = ({ date }) => {
       ...getColumnSearchProps("name"),
     },
     {
-        title: "Nilai",
-        dataIndex: "grade",
-        sorter: handleSort("grade"),
-        sortDirections: ["descend", "ascend"],
-        width: "20%",
-        ...getColumnSearchProps("grade"),
-        render: (_, record) => (
-            <Input
-            value={formData.name}
-            type="number"
-            name="name"
-            size="large"
-            placeholder="Nilai"
-            onChange={(e) => handleInputChange(record.id, e.target.value)}
-          />
-        )
+      title: "Nilai",
+      dataIndex: "grade",
+      sorter: handleSort("grade"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("grade"),
+      render: (_, record) => (
+        <Input
+          value={formData.name}
+          type="number"
+          name="name"
+          size="large"
+          placeholder="Nilai"
+          onChange={(e) => handleInputChange(record.id, e.target.value)}
+        />
+      ),
     },
-        
   ];
 
   useEffect(() => {
     handleGetStudentRequest();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
@@ -282,11 +260,16 @@ const TablePenilaianPost = ({ date }) => {
           scroll={{ x: "max-content" }}
         />
         <div className="flex justify-end">
-        <button onClick={handlePostRequest} className="my-5 bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded">Submit</button>
+          <button
+            onClick={handlePostRequest}
+            className="my-5 bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
+          >
+            Submit
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default TablePenilaianPost
+export default TablePenilaianPost;

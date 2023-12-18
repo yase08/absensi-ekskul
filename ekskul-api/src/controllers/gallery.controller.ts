@@ -40,6 +40,15 @@ export class GalleryController extends GalleryService {
     }
   };
 
+  getDetailGallery = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getDetailGalleryService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
   getGallery = async (req: Request, res: Response): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.getGalleryService(req);

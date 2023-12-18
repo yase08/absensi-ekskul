@@ -3,7 +3,7 @@ import Jumbotron from "../../../components/Admin/Jumbotron/Jumbotron";
 import SideNav from "../../../components/Admin/Layouts/SideNav";
 import Table from "../../../components/Admin/Table/Table";
 import TopNav from "../../../components/Admin/Layouts/TopNav";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RiFacebookFill } from "react-icons/ri";
 import { AiOutlineTwitter } from "react-icons/ai";
 import { BsInstagram, BsWhatsapp } from "react-icons/bs";
@@ -12,6 +12,16 @@ import ColorSettingForm from "../../../components/Admin/Layouts/HiddenColor/Navb
 import Tein from "../../../components/Admin/magic/Tein";
 
 const Dashboard = () => {
+  useEffect(() => {
+    const savedColor = localStorage.getItem("footerBackgroundColor");
+    if (savedColor) {
+      setBackgroundColor(savedColor);
+    } else {
+      setBackgroundColor('#6777EF')
+    }
+  }, []);
+
+  const [backgroundColor, setBackgroundColor] = useState("bg-primary");
   const [expanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -68,7 +78,7 @@ const Dashboard = () => {
             openProfile={openProfile}
             toggleOpenProfile={toggleOpenProfile}
           />
-          <div className="mt-[80px] z-40 w-full px-10 bg-transparent bg-opacity-30 h-[100px] relative top-[50px]">
+          <div className="mt-[80px] z-40 w-full px-10  bg-opacity-30 h-[100px] relative top-[50px] bg-transparent">
             <div className="bg-white rounded-md w-full h-full relative flex items-center px-5 justify-between overflow-hidden">
               <div className="flex gap-3 items-center">
                 <img
@@ -107,7 +117,10 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="text-white bg-primary h-[120px] flex items-end relative px-[43px] justify-between pb-5  gap-2">
+          <div
+            className="text-white h-[120px] flex items-end relative px-[43px] justify-between pb-5  gap-2"
+            style={{ background: backgroundColor }}
+          >
             <div className="flex gap-x-5 capitalize">
               <p className="hover:text-yellow-300">@2023 Wikrama Student</p>
               <p className="hover:text-yellow-300">terms</p>

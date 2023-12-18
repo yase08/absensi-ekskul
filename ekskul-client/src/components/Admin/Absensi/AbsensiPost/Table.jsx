@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button, Checkbox } from "antd";
-import { getAllStudent, getAllStudentByEkskul } from "../../../../services/student.service";
-import { createAttendance } from "../../../../services/attendance.service";
 import Swal from "sweetalert2";
+import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 
 const TableAbsensiPost = ({ date }) => {
   const [searchText, setSearchText] = useState("");
@@ -16,13 +15,14 @@ const TableAbsensiPost = ({ date }) => {
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
   const [formData, setformData] = useState([]);
+  const axiosPrivate = useAxiosPrivate();
 
   const ekskul = localStorage.getItem("ekskul_id");
 
   // Handler untuk checkbox
   const handleCheckboxChange = (studentId, category) => {
     const newAttendance = {
-      date : date,
+      date: date,
       student_id: studentId,
       category: category,
     };
@@ -142,12 +142,14 @@ const TableAbsensiPost = ({ date }) => {
 
   const handleGetStudentRequest = async () => {
     try {
-      const response = await getAllStudentByEkskul(ekskul);
+      const response = await axiosPrivate.get(
+        `/student/ekskul?ekskul_id=${ekskul}`
+      );
       console.log(response);
 
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          const studentData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const studentData = response.data.data;
           setData(studentData);
           console.log(studentData);
         } else {
@@ -163,12 +165,14 @@ const TableAbsensiPost = ({ date }) => {
     }
   };
 
-  
   const handlePostRequest = async () => {
     setLoading(true);
 
     try {
-      const response = await createAttendance(formData, ekskul);
+      const response = await axiosPrivate.post(
+        `/attendance?ekskul_id=${ekskul}`,
+        formData
+      );
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -176,7 +180,6 @@ const TableAbsensiPost = ({ date }) => {
         title: "Success!",
         text: successMessage,
       });
-
     } catch (error) {
       console.error("Error:", error);
 
@@ -203,8 +206,7 @@ const TableAbsensiPost = ({ date }) => {
     } finally {
       setLoading(false);
     }
-  }
-
+  };
 
   const columns = [
     {
@@ -222,109 +224,80 @@ const TableAbsensiPost = ({ date }) => {
       ...getColumnSearchProps("name"),
     },
     {
-        title: "Category",
-        dataIndex: "category",
-        children: [
-            {
-                title: 'Hadir',
-                width: 150,
-                render: (_, record) => (
-                  <Space size={"middle"}>
-                    <Checkbox
+      title: "Kategori",
+      dataIndex: "category",
+      children: [
+        {
+          title: "Hadir",
+          width: 150,
+          render: (_, record) => (
+            <Space size={"middle"}>
+              <Checkbox
                 checked={formData.some(
-                    (attendance) =>
-                      attendance.student_id === record.id &&
-                      attendance.category === "hadir"
-                  )}
-                onChange={() =>
-                  handleCheckboxChange(record.id, "hadir")
-                }
+                  (attendance) =>
+                    attendance.student_id === record.id &&
+                    attendance.category === "hadir"
+                )}
+                onChange={() => handleCheckboxChange(record.id, "hadir")}
               />
-                  </Space>
-                ),
-            },
-            {
-                title: 'Sakit',
-                width: 150,
-                render: (_, record) => (
-                  <Space size={"middle"}>
-                    <Checkbox
+            </Space>
+          ),
+        },
+        {
+          title: "Sakit",
+          width: 150,
+          render: (_, record) => (
+            <Space size={"middle"}>
+              <Checkbox
                 checked={formData.some(
-                    (attendance) =>
-                      attendance.student_id === record.id &&
-                      attendance.category === "sakit"
-                  )}
-                onChange={() =>
-                  handleCheckboxChange(record.id, "sakit")
-                }
+                  (attendance) =>
+                    attendance.student_id === record.id &&
+                    attendance.category === "sakit"
+                )}
+                onChange={() => handleCheckboxChange(record.id, "sakit")}
               />
-                  </Space>
-                ),
-            },
-            {
-                title: 'Izin',
-                width: 150,
-                render: (_, record) => (
-                  <Space size={"middle"}>
-                    <Checkbox
+            </Space>
+          ),
+        },
+        {
+          title: "Izin",
+          width: 150,
+          render: (_, record) => (
+            <Space size={"middle"}>
+              <Checkbox
                 checked={formData.some(
-                    (attendance) =>
-                      attendance.student_id === record.id &&
-                      attendance.category === "izin"
-                  )}
-                onChange={() =>
-                  handleCheckboxChange(record.id, "izin")
-                }
+                  (attendance) =>
+                    attendance.student_id === record.id &&
+                    attendance.category === "izin"
+                )}
+                onChange={() => handleCheckboxChange(record.id, "izin")}
               />
-                  </Space>
-                ),
-            },
-            {
-                title: 'Alfa',
-                width: 150,
-                render: (_, record) => (
-                  <Space size={"middle"}>
-                    <Checkbox
+            </Space>
+          ),
+        },
+        {
+          title: "Alfa",
+          width: 150,
+          render: (_, record) => (
+            <Space size={"middle"}>
+              <Checkbox
                 checked={formData.some(
-                    (attendance) =>
-                      attendance.student_id === record.id &&
-                      attendance.category === "alfa"
-                    )}
-                onChange={() =>
-                  handleCheckboxChange(record.id, "alfa")
-                }
+                  (attendance) =>
+                    attendance.student_id === record.id &&
+                    attendance.category === "alfa"
+                )}
+                onChange={() => handleCheckboxChange(record.id, "alfa")}
               />
-                  </Space>
-                ),
-            },
-        ]
-        // dataIndex: "action",
-        // width: "20%",
-      },
+            </Space>
+          ),
+        },
+      ],
+    },
   ];
 
   useEffect(() => {
     handleGetStudentRequest();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
@@ -340,11 +313,16 @@ const TableAbsensiPost = ({ date }) => {
           scroll={{ x: "max-content" }}
         />
         <div className="flex justify-end">
-        <button onClick={handlePostRequest} className="my-5 bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded">Submit</button>
+          <button
+            onClick={handlePostRequest}
+            className="my-5 bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
+          >
+            Submit
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default TableAbsensiPost
+export default TableAbsensiPost;

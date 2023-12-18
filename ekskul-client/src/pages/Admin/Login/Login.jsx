@@ -7,17 +7,19 @@ import {
 import { useState } from "react";
 import "./Login.css";
 import logo from "../../../assets/Logo-Absensi.png";
-import { login } from "../../../services/auth.service";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const Login = () => {
   const [changeMethod, setChangeMethod] = useState(false);
   const [password, setPassword] = useState("");
+  const axiosWithAuth = useAxiosPrivate();
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
-
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
 
   const toggleChangeMethod = () => {
     setChangeMethod(!changeMethod);
@@ -39,11 +41,19 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await login({ email, password });
-      if (response.statusCode === 200) {
-        const data = response.data;
-        sessionStorage.setItem("token", data);
-        navigate("/admin/dashboard")
+      const response = await axiosWithAuth.post(
+        `/auth/login`,
+        { email, password },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+      if (response.data.statusCode === 200) {
+        const accessToken = response.data.data.accessToken;
+        const role = response.data.data.role;
+        setAuth({ accessToken, role });
+        navigate("/admin/dashboard");
       } else {
         console.error("Login failed:", response.data.message);
       }
@@ -53,8 +63,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
-
 
   return (
     <div className="w-full h-[100vh] bg-primary flex relative transition-all ">
@@ -162,7 +170,7 @@ const Login = () => {
                 className="w-full h-20 bg-[#FFDE59] text-white font-bold rounded-md polygon"
                 type="submit"
               >
-                {loading ? <div className="loader"></div> : 'Submit'}
+                {loading ? <div className="loader"></div> : "Submit"}
               </button>
             </form>
           </div>

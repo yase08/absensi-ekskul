@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-// import { getAllAttendance } from "../../../services/attendance.service";
+import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import { SearchOutlined } from "@ant-design/icons";
+import { BsPencil } from "react-icons/bs";
 import { Table, Input, Space, Button, Modal, Select, DatePicker } from "antd";
-import { getAllAttendanceDetail, updateAttendance } from "../../../../services/attendance.service";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -13,8 +13,9 @@ const TableAbsensi = () => {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     category: "",
-    date: ""
+    date: "",
   });
+  const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -155,22 +156,22 @@ const TableAbsensi = () => {
 
   const categoryOption = [
     {
-        label: "Hadir",
-        value: "hadir",
+      label: "Hadir",
+      value: "hadir",
     },
     {
-        label: "Sakit",
-        value: "sakit",
+      label: "Sakit",
+      value: "sakit",
     },
     {
-        label: "Izin",
-        value: "izin",
+      label: "Izin",
+      value: "izin",
     },
     {
-        label: "Alfa",
-        value: "alfa",
+      label: "Alfa",
+      value: "alfa",
     },
-  ]
+  ];
 
   const showModal = () => {
     setOpen(true);
@@ -182,19 +183,20 @@ const TableAbsensi = () => {
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-      setFormData((prevData) => ({
-        ...prevData,
-        [inputName]: newValue,
-      }));
-};
+    setFormData((prevData) => ({
+      ...prevData,
+      [inputName]: newValue,
+    }));
+  };
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllAttendanceDetail(ekskul, id);
-
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          const attendanceData = response.data;
+      const response = await axiosPrivate.get(
+        `attendance/detail?ekskul_id=${ekskul}&student_id=${id}`
+      );
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const attendanceData = response.data.data;
           setData(attendanceData);
           console.log(attendanceData);
         } else {
@@ -213,11 +215,16 @@ const TableAbsensi = () => {
   const handleOk = async (event) => {
     event.preventDefault();
     setLoading(true);
-  
+
     try {
-      const response = await updateAttendance(formData, ekskul, id);
+      const response = await axiosPrivate.put(
+        `/attendance`,
+        formData,
+        ekskul,
+        id
+      );
       const successMessage = response.statusMessage;
-  
+
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -225,7 +232,7 @@ const TableAbsensi = () => {
       });
     } catch (error) {
       console.error("Error:", error);
-  
+
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
         Swal.fire({
@@ -252,7 +259,6 @@ const TableAbsensi = () => {
       setOpen(false);
     }
   };
-  
 
   const columns = [
     {
@@ -268,7 +274,7 @@ const TableAbsensi = () => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("student"),
-      render: (student) => (student ? student.name : "-")
+      render: (student) => (student ? student.name : "-"),
     },
     {
       title: "Kategori",
@@ -279,71 +285,54 @@ const TableAbsensi = () => {
       ...getColumnSearchProps("category"),
     },
     {
-        title: "Tanggal",
-        dataIndex: "date",
-        sorter: handleSort("date"),
-        sortDirections: ["descend", "ascend"],
-        width: "20%",
-        ...getColumnSearchProps("date"),
-        render: (text) => (text ? Intl.DateTimeFormat("en-US").format(new Date(text)) : '-')
-      },
+      title: "Tanggal",
+      dataIndex: "date",
+      sorter: handleSort("date"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("date"),
+      render: (text) =>
+        text ? Intl.DateTimeFormat("en-US").format(new Date(text)) : "-",
+    },
     {
       title: "Aksi",
       dataIndex: "action",
       width: "20%",
       render: (_, record) => (
         <Space size={"middle"}>
-          <button onClick={() => {
-            setOpen(true);
-            setFormData(record)
-          }}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
+          <a
+            className="hover:text-blue-500"
+            onClick={() => {
+              setOpen(true);
+              setFormData(record);
+            }}
           >
-            Edit
-          </button>
+            <BsPencil size={20} />
+          </a>
         </Space>
       ),
     },
   ];
 
   useEffect(() => {
-      handleGetRequest();
+    handleGetRequest();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
-
   return (
-      <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
-        <div className="overflow-x-auto hidden-scroll w-full">
-          <Table
-            columns={columns}
-            dataSource={data.slice(
-              (currentPage - 1) * pageSize,
-              currentPage * pageSize
-            )}
-            pagination={getPaginationConfig()}
-            loading={loading}
-            scroll={{ x: "max-content" }}
-          />
-        </div>
-        <Modal
+    <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
+      <div className="overflow-x-auto hidden-scroll w-full">
+        <Table
+          columns={columns}
+          dataSource={data.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )}
+          pagination={getPaginationConfig()}
+          loading={loading}
+          scroll={{ x: "max-content" }}
+        />
+      </div>
+      <Modal
         title={"Edit Data"}
         open={open}
         onOk={handleOk}
@@ -366,18 +355,18 @@ const TableAbsensi = () => {
             Tanggal
           </label>
           <DatePicker
-          name="date"
-          value={selectedDate ? selectedDate : formData.date}
-          onChange={(selectedDate, dateString) => {
-            setSelectedDate(selectedDate);
-            console.log(selectedDate);
-            handleInputChange(dateString, "date");
-          }}
+            name="date"
+            value={selectedDate ? selectedDate : formData.date}
+            onChange={(selectedDate, dateString) => {
+              setSelectedDate(selectedDate);
+              console.log(selectedDate);
+              handleInputChange(dateString, "date");
+            }}
           />
         </form>
       </Modal>
-      </div>
+    </div>
   );
-}
+};
 
-export default TableAbsensi
+export default TableAbsensi;

@@ -1,15 +1,13 @@
 import { useState } from "react";
 import TableProgram from "./Table";
 import Swal from "sweetalert2";
-import {
-  createActivityProgram,
-  updateActivityProgram,
-} from "../../../services/activityProgram.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { Modal, DatePicker, Input } from "antd";
 const { RangePicker } = DatePicker;
 
 const Program = () => {
   const [open, setOpen] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
   const [formData, setFormData] = useState({
     activity: "",
     task: "",
@@ -49,9 +47,12 @@ const Program = () => {
 
     try {
       if (formOld && formOld.id) {
-        const response = await updateActivityProgram(formOld.id, formOld);
+        const response = await axiosPrivate.put(
+          `/activity-program`,
+          formOld.id,
+          formOld
+        );
         const successMessage = response.statusMessage;
-
         Swal.fire({
           icon: "success",
           title: "Success!",
@@ -59,7 +60,7 @@ const Program = () => {
         });
         setFormOld({});
       } else {
-        const response = await createActivityProgram(formData);
+        const response = await axiosPrivate.post(`/activity-program`, formData);
         const successMessage = response.statusMessage;
 
         Swal.fire({

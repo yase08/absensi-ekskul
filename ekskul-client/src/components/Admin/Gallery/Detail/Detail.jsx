@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
-import { Table, Input, Space, Button } from "antd";
+import { Table, Input, Space, Button, Tag } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { BiDetail } from "react-icons/bi";
+import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 
-const TableRuangan = ({ setFormOld }) => {
+const DetailGallery = ({ setFormOld, setOpen }) => {
+  const { slug } = useParams();
   const [searchText, setSearchText] = useState("");
-  const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +20,7 @@ const TableRuangan = ({ setFormOld }) => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const axiosPrivate = useAxiosPrivate();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -26,6 +30,11 @@ const TableRuangan = ({ setFormOld }) => {
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
+  };
+
+  const handleEdit = async (item) => {
+    setFormOld(item);
+    setOpen(true);
   };
 
   const handleSort = (dataIndex) => (a, b) => {
@@ -146,12 +155,13 @@ const TableRuangan = ({ setFormOld }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await axiosPrivate.get(`/room`);
+      const response = await axiosPrivate.get(`/gallery/detail/${slug}`);
+      console.log(response);
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
-          const roomData = response.data.data;
-          setData(roomData);
+          const galleryData = response.data.data;
+          setData(galleryData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -169,7 +179,7 @@ const TableRuangan = ({ setFormOld }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/room`, id);
+      const response = await axiosPrivate.delete(`/gallery/${id}`);
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -207,44 +217,6 @@ const TableRuangan = ({ setFormOld }) => {
     }
   };
 
-  const columns = [
-    {
-      title: "No",
-      dataIndex: "no",
-      render: (text, record, index) => index + 1,
-      width: "10%",
-    },
-    {
-      title: "Nama",
-      dataIndex: "name",
-      sorter: handleSort("name"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("name"),
-    },
-    {
-      title: "Aksi",
-      dataIndex: "action",
-      width: "20%",
-      render: (_, record) => (
-        <Space
-          size={"middle"}
-          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
-        >
-          <a className="hover:text-blue-500" onClick={() => setFormOld(record)}>
-            <BsPencil size={20} />
-          </a>
-          <a
-            className="hover:text-red-500"
-            onClick={() => handleDeleteRequest(record.id)}
-          >
-            <LuTrash size={20} />
-          </a>
-        </Space>
-      ),
-    },
-  ];
-
   useEffect(() => {
     handleGetRequest();
   }, []);
@@ -252,19 +224,12 @@ const TableRuangan = ({ setFormOld }) => {
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
       <div className="overflow-x-auto hidden-scroll w-full">
-        <Table
-          columns={columns}
-          dataSource={data.slice(
-            (currentPage - 1) * pageSize,
-            currentPage * pageSize
-          )}
-          pagination={getPaginationConfig()}
-          loading={loading}
-          scroll={{ x: "max-content" }}
-        />
+        {data.map((item, index) => (
+          <img key={index} src={item.image} alt={item.name} />
+        ))}
       </div>
     </div>
   );
 };
 
-export default TableRuangan;
+export default DetailGallery;

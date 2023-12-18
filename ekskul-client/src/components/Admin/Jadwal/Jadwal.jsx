@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
 import TableJadwal from "./Table";
 import Swal from "sweetalert2";
-import {
-  createActivity,
-  updateActivity,
-} from "../../../services/activity.service";
 import { Modal, Select, TimePicker } from "antd";
-import { getAllRombel } from "../../../services/rombel.service";
-import { getAllEkskul } from "../../../services/ekskul.service";
-import { getAllRoom } from "../../../services/room.service";
-import { getDay } from "../../../services/schedule.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const Jadwal = () => {
   const [open, setOpen] = useState(false);
@@ -17,12 +10,11 @@ const Jadwal = () => {
     ekskul_id: "",
     schedule_id: "",
     room_id: "",
-    rombel_id: "",
-    // startTime: "",
-    // endTime: "",
-    // time: "",
+    grade: "",
+    startTime: "",
+    endTime: "",
   });
-  const [rombel, setRombel] = useState([]);
+  const axiosPrivate = useAxiosPrivate();
   const [hari, setHari] = useState([]);
   const [ekskul, setEkskul] = useState([]);
   const [room, setRoom] = useState([]);
@@ -45,40 +37,13 @@ const Jadwal = () => {
     }
   };
 
-  const handleGetRombelRequest = async () => {
-    try {
-      const response = await getAllRombel();
-
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const rombelData = response.data;
-          setRombel(rombelData);
-        } else {
-          console.log("Data is not an array");
-        }
-      } else {
-        console.log("Data retrieval failed");
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleGetRoomRequest = async () => {
     try {
-      const response = await getAllRoom();
+      const response = await axiosPrivate.get(`/room`);
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const roomData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const roomData = response.data.data;
           setRoom(roomData);
         } else {
           console.log("Data is not an array");
@@ -95,14 +60,11 @@ const Jadwal = () => {
 
   const handleGetHariRequest = async () => {
     try {
-      const response = await getDay();
+      const response = await axiosPrivate.get(`/schedule/day`);
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const hariData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const hariData = response.data.data;
           setHari(hariData);
         } else {
           console.log("Data is not an array");
@@ -119,14 +81,10 @@ const Jadwal = () => {
 
   const handleGetEkskulRequest = async () => {
     try {
-      const response = await getAllEkskul();
-
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        if (Array.isArray(response.data)) {
-          const ekskulData = response.data;
+      const response = await axiosPrivate.get(`/ekskul`);
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const ekskulData = response.data.data;
           setEkskul(ekskulData);
         } else {
           console.log("Data is not an array");
@@ -140,11 +98,6 @@ const Jadwal = () => {
       setLoading(false);
     }
   };
-
-  const rombelOption = rombel.map((item) => ({
-    label: item.name,
-    value: item.id,
-  }));
 
   const hariOption = hari.map((item) => ({
     label: item.day,
@@ -177,7 +130,11 @@ const Jadwal = () => {
 
     try {
       if (formOld && formOld.id) {
-        const response = await updateActivity(formOld.id, formOld);
+        const response = await axiosPrivate.put(
+          `/activity`,
+          formOld.id,
+          formOld
+        );
         const successMessage = response.statusMessage;
 
         Swal.fire({
@@ -187,7 +144,7 @@ const Jadwal = () => {
         });
         setFormOld({});
       } else {
-        const response = await createActivity(formData);
+        const response = await axiosPrivate.post(`/activity`, formData);
         const successMessage = response.statusMessage;
 
         Swal.fire({
@@ -230,7 +187,6 @@ const Jadwal = () => {
     handleGetEkskulRequest();
     handleGetHariRequest();
     handleGetRoomRequest();
-    handleGetRombelRequest();
   }, []);
 
   return (
@@ -271,15 +227,28 @@ const Jadwal = () => {
             placeholder="Pilih Hari"
           />
           <label htmlFor="" className="text-lg">
-            Rombel
+            Kelas
           </label>
           <Select
             size="large"
             className="w-full"
-            value={formOld ? formOld.rombel : formData.rombel}
-            onChange={(e) => handleInputChange(e, "rombel_id")}
-            options={rombelOption}
-            placeholder="Pilih Rombel"
+            value={formOld ? formOld.grade : formData.grade}
+            onChange={(e) => handleInputChange(e, "grade")}
+            options={[
+              {
+                label: "X",
+                value: "X",
+              },
+              {
+                label: "XI",
+                value: "XI",
+              },
+              {
+                label: "XII",
+                value: "XII",
+              },
+            ]}
+            placeholder="Pilih Kelas"
           />
           <label htmlFor="" className="text-lg">
             Ekstrakurikuler
@@ -306,17 +275,17 @@ const Jadwal = () => {
           <label htmlFor="" className="text-lg">
             Jam Mulai & Jam Berakhir
           </label>
-          {/* <TimePicker.RangePicker
+          <TimePicker.RangePicker
             size="large"
             format={"HH:mm"}
-            onChange={(e) => handleInputChange(e, "time")}
+            onChange={(e) => handleInputChange(e, "startTime", "endTime")}
             placeholder={["Jam Mulai", "Jam Berakhir"]}
             value={
               formOld
                 ? [formOld.startTime, formOld.endTime]
                 : [formData.startTime, formData.endTime]
             }
-          /> */}
+          />
         </form>
       </Modal>
     </div>

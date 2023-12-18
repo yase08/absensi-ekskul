@@ -22,14 +22,26 @@ export class StudentController extends StudentService {
     }
   };
 
+  getStudentOnAssessment = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.getStudentOnAssessmentService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
   getStudentByEkskul = async (
     req: Request,
     res: Response
   ): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getStudentByEkskulService(
-        req
-      );
+      const serviceResponse: APIResponse =
+        await this.getStudentByEkskulService(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
@@ -48,6 +60,15 @@ export class StudentController extends StudentService {
   deleteStudent = async (req: Request, res: Response): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.deleteStudentService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  exportToExcel = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const serviceResponse: APIResponse = await this.exportStudent(req, res);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);

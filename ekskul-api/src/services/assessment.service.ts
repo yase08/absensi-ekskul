@@ -1,7 +1,9 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
-import { Request } from "express";
+import { Request, Response } from "express";
 import { Op } from "sequelize";
+import { exportExcel } from "../libs/excel.lib";
+import { ISession } from "../interfaces/user.interface";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -123,105 +125,10 @@ export class AssessmentService {
               name: item.student.name,
             }
           : null,
+        date: item.date,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
       }));
-
-      return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Berhasil mendapatkan data penilaian",
-          manipulatedResponse,
-          totalRows
-        )
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getTaskAssessmentService(req: Request): Promise<any> {
-    try {
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const filter: string =
-        typeof req.query.filter === "string" ? req.query.filter : "";
-      const page: any = req.query.page;
-
-      const paramQuerySQL: any = {};
-      let limit: number;
-      let offset: number;
-
-      const totalRows = await db.assessment.count();
-
-      if (filter) {
-        paramQuerySQL.where = {
-          student_id: {
-            [Op.like]: `%${filter}%`,
-          },
-        };
-      }
-
-      paramQuerySQL.attributes = ["id", "date", "createdAt", "updatedAt"];
-
-      paramQuerySQL.include = [
-        { model: db.task, as: "task", attributes: ["id", "name"] },
-      ];
-
-      if (sort) {
-        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-        const fieldName = sort.replace(/^-/, "");
-        paramQuerySQL.order = [[fieldName, sortOrder]];
-      }
-
-      if (page && page.size && page.number) {
-        limit = parseInt(page.size, 10);
-        offset = (parseInt(page.number, 10) - 1) * limit;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      } else {
-        limit = 10;
-        offset = 0;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      }
-
-      const assessment = await db.assessment.findAll(paramQuerySQL);
-      const task = await db.task.findAll({
-        include: [
-          {
-            model: db.ekskul,
-            as: "ekskul",
-            attributes: ["name"],
-          },
-        ],
-      });
-
-      if (!assessment || assessment.length === 0)
-        throw apiResponse(status.NOT_FOUND, "Penilaian tidak ditemukan");
-
-      const manipulatedResponse = task.map((item) => {
-        const taskId = item.id;
-        const taskAssessment = assessment.filter(
-          (assessment) => assessment.task.id === taskId
-        );
-
-        return {
-          id: item.id,
-          task: item.name,
-          ekskul: item.ekskul.name,
-          date: item.date,
-          totalAssessment: taskAssessment.length,
-          createdAt: item.createdAt,
-          updatedAt: item.updatedAt,
-        };
-      });
 
       return Promise.resolve(
         apiResponse(
@@ -290,6 +197,125 @@ export class AssessmentService {
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil menghapus penilaian")
       );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async exportAssessment(req: Request, res: Response): Promise<any> {
+    try {
+      const date = Date.now();
+      const options = { timeZone: "Asia/Jakarta" };
+      const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
+      const formattedDate = dateTimeFormat.format(date);
+
+      const ekskuls = (req.session as ISession).user.ekskul;
+      const selectedEkskulId = req.query.ekskul_id as string;
+      const ekskul = await db.ekskul.findOne({
+        where: { id: selectedEkskulId },
+      });
+
+      if (ekskuls.includes(selectedEkskulId)) {
+        const assessments = await db.assessment.findAll({
+          where: {
+            ekskul_id: selectedEkskulId,
+          },
+          include: [
+            {
+              model: db.student,
+              as: "student",
+              attributes: ["name","nis","gender"],
+              include : [
+                {
+                  model: db.rombel,
+                  as: "rombel",
+                  attributes: ["name"],
+                },
+                {
+                  model: db.rayon,
+                  as: "rayon",
+                  attributes: ["name"],
+                },
+              ]
+            },
+            {
+              model: db.task,
+              as: "task",
+              attributes: ["name"],
+            },
+            {
+              model: db.ekskul,
+              as: "ekskul",
+              attributes: ["name"],
+            },
+            ],
+          attributes: ["grade", "date"],
+        });
+
+        const modifiedassessments = assessments.map((assessment) => {
+          return {
+            no: assessments.indexOf(assessment) + 1,
+            student_name: assessment.student ? assessment.student.name : null,
+            student_nis: assessment.student ? assessment.student.nis : null,
+            student_gender: assessment.student
+              ? assessment.student.gender === "male"
+                ? "Laki-laki"
+                : "Perempuan"
+              : null,
+            student_rombel: assessment.student
+              ? assessment.student.rombel.name
+              : null,
+            student_rayon: assessment.student
+              ? assessment.student.rayon.name
+              : null,
+            ekskul_name: assessment.ekskul ? assessment.ekskul.name : null,
+            task_name: assessment.task ? assessment.task.name : null,
+            grade: assessment.grade ? assessment.grade : null,
+            date: assessment.date ? assessment.date : null,
+
+          };
+        });
+
+        const columns = [
+          { header: "No", key: "no", width: 15 },
+          { header: "Nama", key: "assessment_name", width: 15 },
+          { header: "Nis", key: "assessment_nis", width: 15 },
+          { header: "JK", key: "assessment_gender", width: 15 },
+          { header: "Rombel", key: "assessment_rombel", width: 15 },
+          { header: "Rayon", key: "assessment_rayon", width: 15 },
+          { header: "Ekstrakurikuler", key: "ekskul_name", width: 15 },
+          { header: "Tugas", key: "task_name", width: 15 },
+          { header: "Nilai", key: "grade", width: 15 },
+          { header: "Tanggal", key: "date", width: 15 },
+        ];
+        const file = `data-penilaian-${ekskul.name}-${date}.xlsx`;
+
+        const exportSuccess = await exportExcel(
+          columns,
+          modifiedassessments,
+          file,
+          res
+        );
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
+        
+        if (!exportSuccess) {
+          throw apiResponse(status.FORBIDDEN, "Export failed");
+        }
+        return Promise.resolve(apiResponse(status.OK, "Export Success", exportSuccess));
+      } else {
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Ekskul does not exist for the given id"
+        );
+      }
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

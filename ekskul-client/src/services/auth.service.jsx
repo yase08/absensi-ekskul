@@ -1,13 +1,11 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import axios, { axiosPrivate } from "../utils/config";
 
 export const login = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/auth/login`,
-      requestData
-    );
+    const response = await axios.post(`/auth/login`, requestData, {
+      headers: { "Content-Type": "application/json" },
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -19,7 +17,7 @@ export const login = async (requestData) => {
 
 export const getProfile = async () => {
   try {
-    const response = await axios.get(`${API}/${VERSION}/auth/profile`, config);
+    const response = await axiosPrivate.get(`/auth/profile`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -32,7 +30,7 @@ export const getProfile = async () => {
 export const forgotPassword = async (requestData) => {
   try {
     const response = await axios.post(
-      `${API}/${VERSION}/auth/forgot-password`,
+      `/auth/forgot-password`,
       requestData
     );
     return response.data;
@@ -46,7 +44,7 @@ export const forgotPassword = async (requestData) => {
 export const resetToken = async (token, requestData) => {
   try {
     const response = await axios.post(
-      `${API}/${VERSION}/auth/reset-token/${token}`,
+      `/auth/reset-token/${token}`,
       requestData
     );
     return response.data;
@@ -59,7 +57,7 @@ export const resetToken = async (token, requestData) => {
 
 export const logout = async () => {
   try {
-    const response = await axios.get(`${API}/${VERSION}/auth/logout`, config);
+    const response = await axiosPrivate.get(`/auth/logout`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -70,7 +68,7 @@ export const logout = async () => {
 
 export const getUsersCount = async () => {
   try {
-    const response = await axios.get(`${API}/${VERSION}/auth/count`, config);
+    const response = await axiosPrivate.get(`/auth/count`);
     return response.data;
   } catch (error) {
     if (error.response) {

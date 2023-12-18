@@ -6,8 +6,6 @@ import { StatusCodes as status } from "http-status-codes";
 
 const db = require("../db/models");
 
-// Middleware yang berfungsi handle autentikasi
-
 export const auth = (): Handler => {
   return async function (
     req: Request,
@@ -15,17 +13,39 @@ export const auth = (): Handler => {
     next: NextFunction
   ): Promise<OutgoingMessage> {
     try {
-      const accesstoken: string = (req.headers.authorization as string).split(
-        "Bearer "
-      )[1];
+      const authorizationHeader = req.headers.authorization;
+
+      if (!authorizationHeader) {
+        return res.status(status.UNAUTHORIZED).json({
+          message: "Authorization header is missing.",
+        });
+      }
+
+      const token = authorizationHeader.split("Bearer ")[1];
+
+      if (!token) {
+        return res.status(status.UNAUTHORIZED).json({
+          message: "Invalid token format.",
+        });
+      }
+
       const decoded: string | JwtPayload = (await verifyToken(
-        accesstoken
+        token
       )) as JwtPayload;
       const user = await db.user.findOne({ where: { id: decoded.id } });
+
+      if (!user) {
+        return res.status(status.UNAUTHORIZED).json({
+          message: "User not found.",
+        });
+      }
+
       const userOnEkskul = await db.userOnEkskul.findAll({
         where: { user_id: user.id },
       });
+
       const ekskulIds = userOnEkskul.map((userEkskul) => userEkskul.ekskul_id);
+
       req.session["user"] = {
         id: user.id,
         email: user.email,
@@ -35,6 +55,7 @@ export const auth = (): Handler => {
         ekskul: ekskulIds,
         isActive: user.isActive,
       };
+
       next();
     } catch (error: any) {
       return res.status(error.statusCode || status.UNAUTHORIZED).json({

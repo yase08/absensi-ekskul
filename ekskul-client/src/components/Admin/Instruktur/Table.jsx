@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { getAllAttendance } from "../../../services/attendance.service";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
-import { getAllInstructorAttendance } from "../../../services/instructorAttendance.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const TableInstruktur = () => {
   const [searchText, setSearchText] = useState("");
@@ -14,8 +13,9 @@ const TableInstruktur = () => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const axiosPrivate = useAxiosPrivate();
 
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {[]
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
@@ -143,13 +143,12 @@ const TableInstruktur = () => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllInstructorAttendance();
+      const response = await axiosPrivate.get("/instructor-attendance");
 
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          const attendanceData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const attendanceData = response.data.data;
           setData(attendanceData);
-          console.log(attendanceData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -178,19 +177,25 @@ const TableInstruktur = () => {
       width: "20%",
       ...getColumnSearchProps("name"),
       render: (user) => (user ? user.name : "-"),
-
     },
     {
-      title: "Ekskul",
+      title: "Kategori",
+      dataIndex: "category",
+      sorter: handleSort("category"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("name"),
+    },
+    {
+      title: "Ekstrakurikuler",
       dataIndex: "ekskul",
       sorter: handleSort("ekskul"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("ekskul"),
       render: (ekskul) => (ekskul ? ekskul.name : "-"),
-
     },
-    {   
+    {
       title: "Date",
       dataIndex: "date",
       sorter: handleSort("date"),
@@ -201,44 +206,11 @@ const TableInstruktur = () => {
         return new Intl.DateTimeFormat("en-US").format(new Date(text));
       },
     },
-    // {
-    //   title: "Aksi",
-    //   dataIndex: "action",
-    //   width: "20%",
-    //   render: () => (
-    //     <Space size={"middle"}>
-    //       <a
-    //         className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
-    //       >
-    //         Detail
-    //       </a>
-    //     </Space>
-    //   ),
-    // },
   ];
 
   useEffect(() => {
     handleGetRequest();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
@@ -256,6 +228,6 @@ const TableInstruktur = () => {
       </div>
     </div>
   );
-}
+};
 
-export default TableInstruktur
+export default TableInstruktur;

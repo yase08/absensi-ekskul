@@ -10,7 +10,7 @@ export const upload = multer({
     destination(_: Request, file: Express.Multer.File, done: any) {
       const folder: string = path.join(
         __dirname,
-        `../public/gallery`
+        `../public/images`
       );
   
       if (!file) {

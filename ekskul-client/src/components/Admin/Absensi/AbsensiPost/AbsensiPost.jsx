@@ -1,16 +1,25 @@
-import { DatePicker } from "antd/lib";
+import { DatePicker, Alert } from "antd/lib";
 import Table from "./Table";
 import { useState } from "react";
-// import { createAttendance } from "../../../../services/attendance.service";
 
 const AbsensiPostComponent = () => {
-  const [selectedDate, setSelectedDate] = useState("")
-  const [dateStirng, setDateString] = useState("")
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [dateString, setDateString] = useState("");
+  const [error, setError] = useState(null);
 
-  const handleChange = (selectedDate, dateStirng) => {
-      setSelectedDate(selectedDate)
-      setDateString(dateStirng)
-  }
+  const handleChange = (date, dateString) => {
+    setSelectedDate(date);
+    setDateString(dateString);
+    setError(null); // Clear error when a date is selected
+  };
+
+  const handleSubmit = () => {
+    if (!selectedDate) {
+      setError("Tanggal Harus Diisi.");
+      return;
+    }
+    setError(null);
+  };
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -20,13 +29,13 @@ const AbsensiPostComponent = () => {
             Absensi
           </h1>
           <DatePicker
-          name="date"
-          value={selectedDate}
-          onChange={(selectedDate, dateString) => handleChange(selectedDate, dateString)}
+            name="date"
+            value={selectedDate}
+            onChange={handleChange}
           />
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table date={dateStirng}/>
+          <Table date={dateString} />
         </div>
       </div>
     </div>

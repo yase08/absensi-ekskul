@@ -1,13 +1,10 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
+const axiosPrivate = useAxiosPrivate();
 
 export const getAllActivity = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/activity`,
-      config
-    );
+    const response = await axiosPrivate.get(`/activity`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -18,7 +15,7 @@ export const getAllActivity = async () => {
 
 export const deleteActivity = async (id) => {
   try {
-    const response = await axios.delete(`${API}/${VERSION}/activity/${id}`, config);
+    const response = await axiosPrivate.delete(`/activity/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -29,11 +26,7 @@ export const deleteActivity = async (id) => {
 
 export const updateActivity = async (id, requestData) => {
   try {
-    const response = await axios.put(
-      `${API}/${VERSION}/activity/${id}`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.put(`/activity/${id}`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -44,11 +37,7 @@ export const updateActivity = async (id, requestData) => {
 
 export const createActivity = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/activity`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/activity`, requestData);
     return response.data.statusMessage;
   } catch (error) {
     if (error.response) {

@@ -1,13 +1,9 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import { axiosPrivate } from "../utils/config";
 
-export const getAllAssessment = async ({ filter, sort, size, number }) => {
+
+export const getAllAssessment = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/assessment?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
-      config
-    );
+    const response = await axiosPrivate.get(`/assessment`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -32,10 +28,7 @@ export const getAssessmentByTask = async ({task_id}) => {
 
 export const deleteAssessment = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/assessment/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/assessment/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -46,10 +39,7 @@ export const deleteAssessment = async (id) => {
 
 export const updateAssessment = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/assessment/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/assessment/${id}`);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -60,11 +50,7 @@ export const updateAssessment = async (id) => {
 
 export const createAssessment = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/assessment`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/assessment`, requestData);
     return response.data;
   } catch (error) {
     if (error.response) {

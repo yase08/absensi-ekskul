@@ -4,13 +4,16 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
+import { BiDetail } from "react-icons/bi";
 import { deleteAssessment, getAssessmentByTask } from "../../../../services/assessment.service";
 import { useParams } from "react-router-dom";
+import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 
 const TableNilai = ({ setFormOld, setOpen }) => {
-  const task_id = useParams()
+  const task_id = useParams();
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const axiosPrivate = useAxiosPrivate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -152,11 +155,13 @@ const TableNilai = ({ setFormOld, setOpen }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAssessmentByTask(task_id);
+      const response = await axiosPrivate.get(
+        `/assessment/detail?task_id=${task_id.id}`
+      );
 
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          const taskData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const taskData = response.data.data;
           setData(taskData);
         } else {
           setError(new Error("Data is not an array"));
@@ -175,8 +180,8 @@ const TableNilai = ({ setFormOld, setOpen }) => {
     setLoading(true);
 
     try {
-      const response = await deleteAssessment(id);
-      const successMessage = response.statusMessage;
+      const response = await axiosPrivate.delete(`/assessment/${id}`);
+      const successMessage = response.data.data;
 
       Swal.fire({
         icon: "success",
@@ -221,20 +226,21 @@ const TableNilai = ({ setFormOld, setOpen }) => {
       width: "10%",
     },
     {
-      title: "Tugas",
-      dataIndex: "name",
-      sorter: handleSort("name"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("name"),
-    },
-    {
-      title: "Siswa",
+      title: "Nama Siswa",
       dataIndex: "student",
       sorter: handleSort("student"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("student"),
+      render: (student) => (student ? student.name : "-"),
+    },
+    {
+      title: "Nilai",
+      dataIndex: "grade",
+      sorter: handleSort("grade"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("grade"),
     },
     {
       title: "Tanggal",
@@ -244,14 +250,6 @@ const TableNilai = ({ setFormOld, setOpen }) => {
       width: "20%",
       ...getColumnSearchProps("date"),
     },
-    {
-        title: "Nilai",
-        dataIndex: "nilai",
-        sorter: handleSort("nilai"),
-        sortDirections: ["descend", "ascend"],
-        width: "20%",
-        ...getColumnSearchProps("nilai"),
-      },
     {
       title: "Aksi",
       dataIndex: "action",
@@ -270,13 +268,6 @@ const TableNilai = ({ setFormOld, setOpen }) => {
           >
             <LuTrash size={20} />
           </a>
-          <a
-            className="hover:text-red-500"
-            href="/admin/penugasan/nilai"
-            // onClick={() => handleDeleteRequest(record.id)}
-          >
-            <LuTrash size={20} />
-          </a>
         </Space>
       ),
     },
@@ -285,25 +276,6 @@ const TableNilai = ({ setFormOld, setOpen }) => {
   useEffect(() => {
     handleGetRequest();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

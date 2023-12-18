@@ -24,7 +24,7 @@ class InstructorAttendanceRoutes extends InstructorAttendanceController {
       [
         authorization(),
         auth(),
-        permission(["instructor"]),
+        permission(["instructor", "admin"]),
         validator(DTOInstructorAttendance),
       ],
       this.createInstructorAttendance
@@ -44,6 +44,11 @@ class InstructorAttendanceRoutes extends InstructorAttendanceController {
         validator(DTOInstructorAttendance),
       ],
       this.updateInstructorAttendance
+    );
+    this.router.get(
+      "/export",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.exportAttendance
     );
 
     return this.router;

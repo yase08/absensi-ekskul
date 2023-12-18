@@ -1,12 +1,13 @@
 import Table from "./Table";
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { createEkskul, updateEkskul } from "../../../services/ekskul.service";
 import { Modal, Select, Input } from "antd";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const EkstrakurikulerComponent = () => {
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -29,7 +30,7 @@ const EkstrakurikulerComponent = () => {
 
     try {
       if (formOld && formOld.id) {
-        const response = await updateEkskul(formOld.id, formOld);
+        const response = await axiosPrivate.put(`/ekskul`, formOld.id, formOld);
         const successMessage = response.statusMessage;
 
         Swal.fire({
@@ -39,7 +40,7 @@ const EkstrakurikulerComponent = () => {
         });
         setFormOld({});
       } else {
-        const response = await createEkskul(formData);
+        const response = await axiosPrivate.post(`/ekskul`, formData);
         const successMessage = response.statusMessage;
 
         Swal.fire({

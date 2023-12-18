@@ -1,16 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  deleteStudent,
-  getAllStudent,
-} from "../../../services/student.service";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button, Tag } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const TableSiswa = ({ setFormOld }) => {
   const [searchText, setSearchText] = useState("");
+  const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -148,11 +146,11 @@ const TableSiswa = ({ setFormOld }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllStudent();
+      const response = await axiosPrivate.get(`/student`);
 
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          const studentData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const studentData = response.data.data;
           setData(studentData);
         } else {
           setError(new Error("Data is not an array"));
@@ -171,7 +169,7 @@ const TableSiswa = ({ setFormOld }) => {
     setLoading(true);
 
     try {
-      const response = await deleteStudent(id);
+      const response = await axiosPrivate.delete(`/student`, id);
       const successMessage = response.statusMessage;
       handleGetRequest();
 
@@ -284,7 +282,15 @@ const TableSiswa = ({ setFormOld }) => {
       render: (ekskuls) =>
         ekskuls
           ? ekskuls.map((ekskul) => {
-              return <Tag key={ekskul.id} color="geekblue" style={{ marginRight: 5 }}>{ekskul.name}</Tag>;
+              return (
+                <Tag
+                  key={ekskul.id}
+                  color="geekblue"
+                  style={{ marginRight: 5 }}
+                >
+                  {ekskul.name}
+                </Tag>
+              );
             })
           : "-",
     },
@@ -314,26 +320,7 @@ const TableSiswa = ({ setFormOld }) => {
   useEffect(() => {
     handleGetRequest();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
-
+  
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
       <div className="overflow-x-auto hidden-scroll w-full">

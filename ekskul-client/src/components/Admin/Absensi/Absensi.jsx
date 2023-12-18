@@ -29,7 +29,7 @@ const AbsensiComponent = () => {
       if (response) {
         // Create a Blob from the response data with the correct content type
         const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const outputFileName = `${Date.now().xlsx}`
+        const outputFileName = `data-absensi-${Date.now()}.xlsx`
   
         // Create an object URL from the Blob
         const url = window.URL.createObjectURL(blob);
@@ -53,8 +53,17 @@ const AbsensiComponent = () => {
   };
 
   useEffect(() => {
+    // Retrieve the ekskul_id from local storage on component mount
+    const storedEkskulId = localStorage.getItem("ekskul_id");
+    if (storedEkskulId) {
+      setSelectedEkskul(storedEkskulId);
+    }
+  }, []);
 
-  }, [selectedEkskul])
+  // const handleInputChange = (value) => {
+  //   localStorage.setItem("ekskul_id", value);
+  //   setSelectedEkskul(value);
+  // };
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -85,12 +94,12 @@ const AbsensiComponent = () => {
           <button
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            <Link to="/admin/absensi/tambah">Tambah Data</Link>
+            <Link to="/admin/absensi-siswa/tambah">Tambah Data</Link>
           </button>
           </div>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table/>
+          <Table selectedEkskul={selectedEkskul} />
         </div>
       </div>
     </div>

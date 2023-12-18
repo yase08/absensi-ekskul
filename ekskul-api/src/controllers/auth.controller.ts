@@ -6,7 +6,16 @@ import { APIResponse } from "../helpers/apiResponse.helper";
 export class AuthController extends AuthService {
   login = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.loginService(req);
+      const serviceResponse: APIResponse = await this.loginService(req, res);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  refresh = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.refreshService(req, res);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
@@ -24,7 +33,7 @@ export class AuthController extends AuthService {
 
   logout = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.logoutService(req);
+      const serviceResponse: APIResponse = await this.logoutService(req, res);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
@@ -54,6 +63,15 @@ export class AuthController extends AuthService {
   getProfile = async (req: Request, res: Response): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.getProfileService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  updateProfile = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.updateProfileService(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);

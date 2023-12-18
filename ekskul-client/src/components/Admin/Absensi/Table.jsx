@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { getAllAttendance } from "../../../services/attendance.service";
 import { SearchOutlined } from "@ant-design/icons";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { Table, Input, Space, Button } from "antd";
 import { Link } from "react-router-dom";
+import { BiDetail } from "react-icons/bi";
 
-const TableAbsensi = () => {
+const TableAbsensi = ({ selectedEkskul }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
@@ -13,6 +14,7 @@ const TableAbsensi = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
+  const axiosPrivate = useAxiosPrivate();
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
 
   const ekskul = localStorage.getItem("ekskul_id");
@@ -145,13 +147,14 @@ const TableAbsensi = () => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllAttendance(ekskul);
+      const response = await axiosPrivate.get(
+        `/attendance?ekskul_id=${ekskul}`
+      );
 
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          const attendanceData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const attendanceData = response.data.data;
           setData(attendanceData);
-          console.log(attendanceData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -190,13 +193,13 @@ const TableAbsensi = () => {
       render: (ekskul) => (ekskul ? ekskul : "-"),
     },
     {
-      title: "%",
+      title: "Persentase Kehadiran",
       dataIndex: "percentage",
       sorter: handleSort("percentage"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("percentage"),
-      render: (percentage) => (percentage ? `${percentage}%` : "-" ),
+      render: (percentage) => (percentage ? `${percentage}%` : "-"),
     },
     {
       title: "Aksi",
@@ -204,10 +207,11 @@ const TableAbsensi = () => {
       width: "20%",
       render: (_, record) => (
         <Space size={"middle"}>
-          <Link to={`/admin/absensi/detail/${record.id}`}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-normal py-2 px-4 rounded"
+          <Link
+            to={`/admin/absensi-siswa/detail/${record.id}`}
+            className="hover:text-green-500"
           >
-            Detail
+            <BiDetail size={20} />
           </Link>
         </Space>
       ),
@@ -215,47 +219,25 @@ const TableAbsensi = () => {
   ];
 
   useEffect(() => {
-    if (ekskul) {
-      handleGetRequest();
-    }
-  }, [ekskul]);
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
+    handleGetRequest();
+  }, [selectedEkskul]);
 
   return (
-      <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
-        <div className="overflow-x-auto hidden-scroll w-full">
-          <Table
-            columns={columns}
-            dataSource={data.slice(
-              (currentPage - 1) * pageSize,
-              currentPage * pageSize
-            )}
-            pagination={getPaginationConfig()}
-            loading={loading}
-            scroll={{ x: "max-content" }}
-          />
-        </div>
-
+    <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
+      <div className="overflow-x-auto hidden-scroll w-full">
+        <Table
+          columns={columns}
+          dataSource={data.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )}
+          pagination={getPaginationConfig()}
+          loading={loading}
+          scroll={{ x: "max-content" }}
+        />
       </div>
+    </div>
   );
-}
+};
 
-export default TableAbsensi
+export default TableAbsensi;

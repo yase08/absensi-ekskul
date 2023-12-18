@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { deleteUser, getAllUser } from "../../../services/user.service";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button, Tag } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableUser = ({ setFormOld, setOpen }) => {
+const TableUser = ({ setFormOld, setOpen, onDataUpdate }) => {
   const [searchText, setSearchText] = useState("");
+  const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -150,11 +151,11 @@ const TableUser = ({ setFormOld, setOpen }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await getAllUser();
+      const response = await axiosPrivate.get(`/user`);
 
-      if (response && response.data) {
-        if (Array.isArray(response.data)) {
-          const userData = response.data;
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const userData = response.data.data;
           setData(userData);
         } else {
           setError(new Error("Data is not an array"));
@@ -173,7 +174,7 @@ const TableUser = ({ setFormOld, setOpen }) => {
     setLoading(true);
 
     try {
-      const response = await deleteUser(id);
+      const response = await axiosPrivate.delete(`/user/${id}`);
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -249,9 +250,16 @@ const TableUser = ({ setFormOld, setOpen }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("image"),
-      render: (image) => {
-        return <img className="w-10 h-10" src={`http://localhost:8000/images/${image}`} />;
-      },
+      render: (image) =>
+        image ? (
+          <img
+            className="w-12 h-12 object-cover rounded-full"
+            src={`http://localhost:8000/images/${image}`}
+            alt={`${ImageBitmap}`}
+          />
+        ) : (
+          "-"
+        ),
     },
     {
       title: "Role",
@@ -326,26 +334,7 @@ const TableUser = ({ setFormOld, setOpen }) => {
 
   useEffect(() => {
     handleGetRequest();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
+  }, [onDataUpdate]);
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

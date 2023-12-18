@@ -1,13 +1,11 @@
-import axios from "axios";
-import { API, VERSION } from "../utils/baseUrl";
-import { config } from "../utils/config";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import config from "../utils/config";
+
+const axiosPrivate = useAxiosPrivate();
 
 export const getAllActivityProgram = async () => {
   try {
-    const response = await axios.get(
-      `${API}/${VERSION}/activity-program`,
-      config
-    );
+    const response = await axiosPrivate.get(`/activity-program`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -18,10 +16,7 @@ export const getAllActivityProgram = async () => {
 
 export const deleteActivityProgram = async (id) => {
   try {
-    const response = await axios.delete(
-      `${API}/${VERSION}/activity-program/${id}`,
-      config
-    );
+    const response = await axiosPrivate.delete(`/activity-program/${id}`, config);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -32,8 +27,8 @@ export const deleteActivityProgram = async (id) => {
 
 export const updateActivityProgram = async (id, requestData) => {
   try {
-    const response = await axios.put(
-      `${API}/${VERSION}/activity-program/${id}`,
+    const response = await axiosPrivate.put(
+      `/activity-program/${id}`,
       requestData,
       config
     );
@@ -47,11 +42,7 @@ export const updateActivityProgram = async (id, requestData) => {
 
 export const createActivityProgram = async (requestData) => {
   try {
-    const response = await axios.post(
-      `${API}/${VERSION}/activity-program`,
-      requestData,
-      config
-    );
+    const response = await axiosPrivate.post(`/activity-program`, requestData, config);
     return response.data;
   } catch (error) {
     if (error.response) {

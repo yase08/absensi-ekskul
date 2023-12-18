@@ -1,8 +1,9 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
-import { Request } from "express";
+import { Request, Response } from "express";
 import { Op } from "sequelize";
 import { ISession } from "../interfaces/user.interface";
+import { exportExcel } from "../libs/excel.lib";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -206,6 +207,101 @@ export class InstructorAttendanceService {
       return Promise.resolve(
         apiResponse(status.OK, "Gagal menghapus instruktur")
       );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async exportAttendance(req: Request, res: Response): Promise<any> {
+    try {
+      const date = Date.now();
+      const options = { timeZone: "Asia/Jakarta" };
+      const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
+      const formattedDate = dateTimeFormat.format(date);
+
+      const ekskuls = (req.session as ISession).user.ekskul;
+      const selectedEkskulId = req.query.ekskul_id as string;
+      const ekskul = await db.ekskul.findOne({
+        where: { id: selectedEkskulId },
+      });
+
+      if (ekskuls.includes(selectedEkskulId)) {
+        const attendances = await db.instructorAttendance.findAll({
+          where: {
+            ekskul_id: selectedEkskulId,
+          },
+          include: [
+            {
+              model: db.user,
+              as: "user",
+              attributes: ["name"],
+              include: [
+                {
+                  model: db.rombel,
+                  as: "rombel",
+                  attributes: ["name"],
+                },
+                {
+                  model: db.rayon,
+                  as: "rayon",
+                  attributes: ["name"],
+                },
+              ],
+            },
+            {
+              model: db.ekskul,
+              as: "ekskul",
+              attributes: ["name"],
+            },
+          ],
+          attributes: ["category", "date"],
+        });
+
+        const modifiedAttendances = attendances.map((attendance) => {
+          return {
+            no: attendances.indexOf(attendance) + 1,
+            user_name: attendance.user ? attendance.user.name : null,
+            ekskul_name: attendance.ekskul ? attendance.ekskul.name : null,
+            category: attendance.category,
+            date: attendance.date,
+          };
+        });
+
+        const columns = [
+          { header: "No", key: "no", width: 15 },
+          { header: "Nama", key: "user_name", width: 15 },
+          { header: "Ekstrakurikuler", key: "ekskul_name", width: 15 },
+          { header: "Keterangan", key: "category", width: 15 },
+          { header: "Tanggal", key: "date", width: 15 },
+        ];
+        const file = `data-kehadiran-${ekskul.name}-${date}.xlsx`;
+
+        const exportSuccess = await exportExcel(
+          columns,
+          modifiedAttendances,
+          file,
+          res
+        );
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
+
+        if (!exportSuccess) {
+          throw apiResponse(status.FORBIDDEN, "Export failed");
+        }
+        return Promise.resolve(apiResponse(status.OK, "Export Success", exportSuccess));
+      } else {
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Ekskul does not exist for the given id"
+        );
+      }
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
