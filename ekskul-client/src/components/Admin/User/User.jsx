@@ -5,6 +5,7 @@ import { useProfile } from "../../../context/ProfileContext";
 import { Modal, Select, Input, Upload, Button, Space } from "antd";
 import { LuUpload } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { IoAddSharp } from "react-icons/io5";
 
 const UserComponent = () => {
   const [open, setOpen] = useState(false);
@@ -174,7 +175,7 @@ const UserComponent = () => {
             onClick={showModal}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            Add Data
+            <IoAddSharp size={20} />
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">

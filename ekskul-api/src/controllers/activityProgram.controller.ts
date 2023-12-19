@@ -55,4 +55,22 @@ export class ActivityProgramController extends ActivityProgramService {
       return res.status(error.statusCode).json(error);
     }
   };
+
+  exportAllToExcel = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const serviceResponse: APIResponse = await this.exportActivityAllService(req, res);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  exportToExcel = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const serviceResponse: APIResponse = await this.exportActivityService(req, res);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
 }

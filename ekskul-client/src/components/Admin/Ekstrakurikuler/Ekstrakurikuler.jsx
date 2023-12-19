@@ -3,6 +3,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import { Modal, Select, Input } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { IoAddSharp } from "react-icons/io5";
 
 const EkstrakurikulerComponent = () => {
   const [open, setOpen] = useState(false);
@@ -105,7 +106,7 @@ const EkstrakurikulerComponent = () => {
             onClick={showModal}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            Add Data
+            <IoAddSharp size={20} />
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">

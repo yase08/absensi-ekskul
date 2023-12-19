@@ -6,7 +6,7 @@ import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableSiswa = ({ setFormOld }) => {
+const TableSiswa = ({ setFormOld, setOpen }) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -275,10 +275,7 @@ const TableSiswa = ({ setFormOld }) => {
     {
       title: "Ekstrakurikuler",
       dataIndex: "ekskuls",
-      sorter: handleSort("ekskuls"),
-      sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("ekskuls"),
       render: (ekskuls) =>
         ekskuls
           ? ekskuls.map((ekskul) => {
@@ -303,7 +300,10 @@ const TableSiswa = ({ setFormOld }) => {
           size={"middle"}
           className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
         >
-          <a className="hover:text-blue-500" onClick={() => setFormOld(record)}>
+          <a className="hover:text-blue-500" onClick={() => {
+             setFormOld(record)
+             setOpen(true)
+             }}>
             <BsPencil size={20} />
           </a>
           <a

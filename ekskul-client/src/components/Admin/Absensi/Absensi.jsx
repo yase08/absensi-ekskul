@@ -3,11 +3,14 @@ import Table from "./Table";
 import { Link } from "react-router-dom";
 import { useProfile } from "../../../context/ProfileContext";
 import { useEffect, useState } from "react";
-import { exportAttendance } from "../../../services/attendance.service";
 import fs from "fs"
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { IoAddSharp } from "react-icons/io5";
+import { RiFileExcel2Line } from "react-icons/ri";
 
 const AbsensiComponent = () => {
   const [selectedEkskul, setSelectedEkskul] = useState(null);
+  const axiosPrivate = useAxiosPrivate();
   const { profile } = useProfile();
   const ekskul_id = localStorage.getItem("ekskul_id")
   const handleInputChange = (value) => {
@@ -22,13 +25,12 @@ const AbsensiComponent = () => {
 
   const handleExportExcel = async () => {
     try {
-      const response = await exportAttendance(ekskul_id);
-      
-      // Log the response data to verify its content
-  
-      if (response) {
-        // Create a Blob from the response data with the correct content type
-        const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const response = await axiosPrivate.get(`/attendance/export?ekskul_id=${ekskul_id}`, {
+        responseType: 'blob', // Set the response type to 'blob'
+      });
+        
+      if (response.data) {
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const outputFileName = `data-absensi-${Date.now()}.xlsx`
   
         // Create an object URL from the Blob
@@ -40,10 +42,8 @@ const AbsensiComponent = () => {
         link.setAttribute('download', outputFileName);
         document.body.appendChild(link);
         link.click();
-  
-        // Clean up the URL object after the download is initiated
-        // window.URL.revokeObjectURL(url);
-        fs.writeFileSync(outputFileName, response)
+
+        fs.writeFileSync(outputFileName, response.data)
       } else {
         console.error('Export failed: Empty response data');
       }
@@ -89,12 +89,13 @@ const AbsensiComponent = () => {
             
           />
           <button onClick={handleExportExcel} className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500">
-              Export
+          <RiFileExcel2Line size={20} />
           </button>
           <button
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            <Link to="/admin/absensi-siswa/tambah">Tambah Data</Link>
+            <Link to="/admin/absensi-siswa/tambah">            <IoAddSharp size={20} />
+</Link>
           </button>
           </div>
         </div>

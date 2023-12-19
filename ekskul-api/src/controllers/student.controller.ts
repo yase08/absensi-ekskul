@@ -66,9 +66,18 @@ export class StudentController extends StudentService {
     }
   };
 
-  exportToExcel = async (req: Request, res: Response): Promise<any> => {
+  exportStudent = async (req: Request, res: Response): Promise<any> => {
     try {
-      const serviceResponse: APIResponse = await this.exportStudent(req, res);
+      const serviceResponse: APIResponse = await this.exportStudentService(req, res);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  exportAllStudent = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const serviceResponse: APIResponse = await this.exportAllStudentService(req, res);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
