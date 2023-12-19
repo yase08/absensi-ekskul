@@ -209,6 +209,7 @@ const TableProgram = ({ setFormOld, setOpen }) => {
   const handleEdit = async (item) => {
     setFormOld(item);
     setOpen(true);
+    console.log(item);
   };
 
   const columns = [

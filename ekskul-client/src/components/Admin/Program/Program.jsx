@@ -19,19 +19,49 @@ const Program = () => {
   const [formOld, setFormOld] = useState("");
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [date, setDate] = useState()
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e, inputName) => {
+    const newValue = e.target ? e.target.value : e;
+    console.log(newValue)
     if (formOld) {
-      setFormOld({
-        ...formOld,
-      });
+      if (inputName === "date") {
+        const [startDate, endDate] = e; // Destructuring e into startDate and endDate
+        setFormOld((prevData) => ({
+          ...prevData,
+          startDate,
+          endDate,
+        }));
+      } else {
+        setFormOld((prevData) => ({
+          ...prevData,
+          [inputName]: newValue,
+        }));
+      }
     } else {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value,
+      setFormData((prevData) => {
+        if (inputName === "date") {
+          const [startDate, endDate] = e; // Destructuring e into startDate and endDate
+          return {
+            ...prevData,
+            startDate,
+            endDate,
+          };
+        } else {
+          return {
+            ...prevData,
+            [inputName]: newValue,
+          };
+        }
       });
     }
   };
+  
+
+  const selectedDate = (date, dateString) => {
+    setDate(date)
+    handleInputChange(dateString, "date")
+  }
 
   const showModal = () => {
     setOpen(true);
@@ -170,7 +200,7 @@ const Program = () => {
             name="activity"
             size="large"
             placeholder="Masukan nama"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, "activity")}
           />
           <label htmlFor="" className="text-lg">
             Tugas
@@ -181,7 +211,7 @@ const Program = () => {
             name="task"
             size="large"
             placeholder="Masukan Nama Tugas"
-            onChange={handleInputChange}
+            onChange={(e) => handleInputChange(e, "task")}
           />
           <label htmlFor="" className="text-lg">
             Tanggal Mulai & Tanggal Berakhir
@@ -190,12 +220,8 @@ const Program = () => {
             placeholder={["Tanggal Mulai", "Tanggal Berakhir"]}
             size="large"
             name="date"
-            onChange={handleInputChange}
-            value={
-              formOld
-                ? [formOld.startDate, formOld.endDate]
-                : [formData.startDate, formData.endDate]
-            }
+            onChange={(date, dateString) => selectedDate(date, dateString)}
+            value={date}
           />
         </form>
       </Modal>
