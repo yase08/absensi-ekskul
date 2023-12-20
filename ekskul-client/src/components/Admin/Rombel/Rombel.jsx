@@ -23,6 +23,8 @@ const Rombel = () => {
     setLoading(true);
 
     try {
+      const token = sessionStorage.getItem('token') 
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}` 
       const response = await axios.post('https://cxw30mfb-8000.asse.devtunnels.ms/api/v1/rombel', rombel);
       const successMessage = response.data.statusMessage;
 

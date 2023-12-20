@@ -16,6 +16,7 @@ const TableEskul = () => {
   const [error, setError] = useState(null);
   const [rayonOptions, setRayonOptions] = useState([]);
   const [getAllData, setGetAllData] = useState(0);
+  const [getAllDataFilter, setGetAllDataFilter] = useState(0);
   const [loadingOption, setLoadingOption] = useState(false);
 
 
@@ -35,18 +36,20 @@ const TableEskul = () => {
 
 
   const totalPages = Math.ceil(getAllData / size); // Calculate total pages
+  console.log('GetAllData',getAllData)
+  console.log('size',size)
 
-  const handlePrevPage = () => {
-    if (number > 1) {
-      setNumber(number - 1);
-    }
-  };
+const handlePrevPage = () => {
+  if (number > 1) {
+    setNumber(number - 1);
+  }
+};
 
-  const handleNextPage = () => {
-    if (number < totalPages) {
-      setNumber(number + 1);
-    }
-  };
+const handleNextPage = () => {
+  if (number < totalPages) {
+    setNumber(number + 1);
+  }
+};
 
   const generatePaginationButtons = () => {
     const paginationButtons = [];
@@ -72,15 +75,16 @@ const TableEskul = () => {
     setSort(sort === '-id' ? '' : '-id');
   };
 
-  const pageSizeOptions = [10, 25, 50];
+  const pageSizeOptions = [1,10, 25, 50];
 
   const handlePageSize = (e) => {
     const newSize = e.target.value;
-    setSize(newSize);
+  
     // Reset the current page to the first page when changing page size
     setNumber(1);
+  
+    setSize(newSize);
   };
-
   const handleGetRequest = async () => {
     try {
       const response = await getAllRayon({ filter, sort, size, number });
@@ -101,12 +105,15 @@ const TableEskul = () => {
               uniqueOptions[name] = true;
             }
           });
+
+          
   
           const filteredOptions = Object.keys(uniqueOptions);
-          setRayonOptions(['', ...filteredOptions]);
+          setRayonOptions(['Select', ...filteredOptions]);
   
           // Set the total data count
           setGetAllData(response.data.rayons.length);
+          setGetAllDataFilter(response.data.rayonFilter.length);
         } else {
           setError(new Error('Data is not an array'));
         }
@@ -126,7 +133,16 @@ const TableEskul = () => {
 
   const handleFilterChange = async (selectedOption) => {
     setLoadingOption(true); // Set loading state to true
-    setFilter(selectedOption);
+  
+    if (selectedOption === 'Select') {
+      // Set filter to '' if "Select" option is chosen
+      setFilter('');
+    } else {
+      setFilter(selectedOption);
+    }
+  
+    // Reset the current page to the first page when applying a filter
+    setNumber(1);
   
     try {
       // Perform data fetching here
@@ -194,10 +210,11 @@ const TableEskul = () => {
               value={filter}
               onChange={(e) => handleFilterChange(e.target.value)}
             >
+              
               {rayonOptions.map((option, index) => (
-                <option key={index} value={option}>
-                  {loadingOption ? 'Loading...' : option}
-                </option>
+                  <option key={index} value={option} >
+                    {loadingOption ? 'Loading...' : option}
+                  </option>
               ))}
             </select>
                 </div>
@@ -245,21 +262,21 @@ const TableEskul = () => {
                 <BiLeftArrow />
               </button>
               {totalPages > 1 && generatePaginationButtons()}
-              <button className="text-black" onClick={handleNextPage}>
-                <BiRightArrow />
-              </button>
-            </div>
-            <div className="flex items-center gap-2">
-              <select
-                className="border border-black py-1 rounded-md w-[55px]"
-                value={size}
-                onChange={handlePageSize}
-              >
-                {pageSizeOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
+            <button className="text-black" onClick={handleNextPage}>
+              <BiRightArrow />
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              className="border border-black py-1 rounded-md w-[55px]"
+              value={size}
+              onChange={handlePageSize}
+            >
+              {pageSizeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))} 
               </select>
               <p className="text-gray-500 text-xs">
                 Page {number} of {totalPages} | Total data: {getAllData}
