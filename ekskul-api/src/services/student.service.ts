@@ -60,11 +60,11 @@ export class StudentService {
 
   async getAllStudentService(req: Request): Promise<any> {
     try {
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const filter: string =
-        typeof req.query.filter === "string" ? req.query.filter : "";
-      const page: any = req.query.page;
+      // const sort: string =
+      //   typeof req.query.sort === "string" ? req.query.sort : "";
+      // const filter: string =
+      //   typeof req.query.filter === "string" ? req.query.filter : "";
+      // const page: any = req.query.page;
 
       const paramQuerySQL: any = {
         attributes: ["id", "name", "nis", "email", "mobileNumber", "gender"],
@@ -85,36 +85,36 @@ export class StudentService {
           },
         ],
       };
-      let limit: number;
-      let offset: number;
+      // let limit: number;
+      // let offset: number;
 
-      const totalRows = await db.student.count();
+      // const totalRows = await db.student.count();
 
-      if (filter) {
-        paramQuerySQL.where = {
-          name: {
-            [Op.like]: `%${filter}%`,
-          },
-        };
-      }
+      // if (filter) {
+      //   paramQuerySQL.where = {
+      //     name: {
+      //       [Op.like]: `%${filter}%`,
+      //     },
+      //   };
+      // }
 
-      if (sort) {
-        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-        const fieldName = sort.replace(/^-/, "");
-        paramQuerySQL.order = [[fieldName, sortOrder]];
-      }
+      // if (sort) {
+      //   const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
+      //   const fieldName = sort.replace(/^-/, "");
+      //   paramQuerySQL.order = [[fieldName, sortOrder]];
+      // }
 
-      if (page && page.size && page.number) {
-        limit = parseInt(page.size, 10);
-        offset = (parseInt(page.number, 10) - 1) * limit;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      } else {
-        limit = 10;
-        offset = 0;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      }
+      // if (page && page.size && page.number) {
+      //   limit = parseInt(page.size, 10);
+      //   offset = (parseInt(page.number, 10) - 1) * limit;
+      //   paramQuerySQL.limit = limit;
+      //   paramQuerySQL.offset = offset;
+      // } else {
+      //   limit = 10;
+      //   offset = 0;
+      //   paramQuerySQL.limit = limit;
+      //   paramQuerySQL.offset = offset;
+      // }
 
       const student = await db.student.findAll(paramQuerySQL);
 
@@ -157,7 +157,7 @@ export class StudentService {
           status.OK,
           "Berhasil mendapatkan siswa",
           manipulatedStudent,
-          totalRows
+          // totalRows
         )
       );
     } catch (error: any) {

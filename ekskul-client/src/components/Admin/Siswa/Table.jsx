@@ -134,6 +134,7 @@ const TableSiswa = ({ setFormOld, setOpen }) => {
     setPageSize(size);
   };
 
+
   const getPaginationConfig = () => ({
     current: currentPage,
     pageSize: pageSize,

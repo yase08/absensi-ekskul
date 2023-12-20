@@ -32,7 +32,7 @@ const SiswaComponent = () => {
       },
     ],
   });
-  const [formOld, setFormOld] = useState({});
+  const [formOld, setFormOld] = useState();
   const [loading, setLoading] = useState(false);
   const ekskul_id = localStorage.getItem("ekskul_id")
   const handleSelectChange = (value) => {
@@ -128,6 +128,8 @@ const SiswaComponent = () => {
 
   const handleCancel = () => {
     setOpen(false);
+    setFormOld({})
+    setFormData({})
   };
 
   const handleOk = async (event) => {
@@ -157,6 +159,7 @@ const SiswaComponent = () => {
           title: "Success!",
           text: successMessage,
         });
+        setFormData({});
       }
     } catch (error) {
       if (error.response) {
@@ -188,7 +191,6 @@ const SiswaComponent = () => {
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-    console.log(newValue);
     if (formOld) {
       setFormOld((prevData) => ({
         ...prevData,

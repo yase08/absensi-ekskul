@@ -18,7 +18,7 @@ class StudentRoutes extends StudentController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin"]), validator(DTOStudent)],
+      [authorization(), auth(), permission(["admin", "instructor"]), validator(DTOStudent)],
       this.createStudent
     );
     this.router.get(
