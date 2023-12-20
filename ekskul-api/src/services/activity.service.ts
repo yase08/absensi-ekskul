@@ -43,7 +43,6 @@ export class ActivityService {
       const totalRows = await db.activity.count();
 
       paramQuerySQL.include = [
-        { model: db.rombel, as: "rombel", attributes: ["id", "name"] },
         { model: db.room, as: "room", attributes: ["id", "name"] },
         { model: db.ekskul, as: "ekskul", attributes: ["id", "name"] },
         { model: db.schedule, as: "schedule", attributes: ["id", "day"] },
@@ -84,12 +83,7 @@ export class ActivityService {
           id: activity.id,
           startTime: activity.startTime,
           endTime: activity.endTime,
-          rombel: activity.rombel
-            ? {
-                id: activity.rombel.id,
-                name: activity.rombel.name,
-              }
-            : null,
+          grade: activity.grade,
           room: activity.room
             ? {
                 id: activity.room.id,

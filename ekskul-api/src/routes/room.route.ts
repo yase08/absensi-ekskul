@@ -24,7 +24,7 @@ class RoomRoutes extends RoomController {
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin", "instructor"])],
       this.getAllRoom
     );
     this.router.put(

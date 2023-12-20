@@ -301,7 +301,12 @@ const TableSiswa = ({ setFormOld, setOpen }) => {
           className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
         >
           <a className="hover:text-blue-500" onClick={() => {
-             setFormOld(record)
+              setFormOld({
+               ...record,
+               rombel_id: record.rombel.id,
+               rayon_id: record.rayon.id,
+               ekskuls: [record.ekskuls[0].id, record.ekskuls[1].id]
+              })
              setOpen(true)
              }}>
             <BsPencil size={20} />

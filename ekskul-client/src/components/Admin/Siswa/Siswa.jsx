@@ -137,8 +137,7 @@ const SiswaComponent = () => {
     try {
       if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
-          `/student`,
-          formOld.id,
+          `/student/${formOld.id}`,
           formOld
         );
         const successMessage = response.statusMessage;
@@ -191,8 +190,9 @@ const SiswaComponent = () => {
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
+    console.log(newValue);
     if (formOld) {
-      setFormData((prevData) => ({
+      setFormOld((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
@@ -381,7 +381,7 @@ const SiswaComponent = () => {
           <Select
             size="large"
             className="w-full"
-            value={formOld ?  formOld.rombel ? formOld.rombel.id : formData.rombel : formData.rombel}
+            value={formOld ? formOld.rombel_id : formData.rombel}
             onChange={(e) => handleInputChange(e, "rombel_id")}
             options={rombelOption}
             placeholder="Pilih Rombel"
@@ -392,7 +392,7 @@ const SiswaComponent = () => {
           <Select
             size="large"
             className="w-full"
-            value={formOld ? formOld.rayon ?  formOld.rayon.id : formData.rayon : formData.rayon}
+            value={formOld ?  formOld.rayon_id : formData.rayon}
             onChange={(e) => handleInputChange(e, "rayon_id")}
             options={rayonOption}
             placeholder="Pilih Rayon"

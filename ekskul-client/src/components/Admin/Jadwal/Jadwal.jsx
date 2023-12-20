@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { Modal, Select, TimePicker } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { IoAddSharp } from "react-icons/io5";
+import dayjs from "dayjs";
 
 const Jadwal = () => {
   const [open, setOpen] = useState(false);
@@ -22,21 +23,47 @@ const Jadwal = () => {
   const [formOld, setFormOld] = useState("");
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [date, setDate] = useState()
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormData((prevData) => ({
-        ...prevData,
-        [inputName]: newValue,
-      }));
+      if (inputName === "time") {
+        const [startTime, endTime] = e;
+        setFormOld((prevData) => ({
+          ...prevData,
+          startTime,
+          endTime,
+        }));
+      } else {
+        setFormOld((prevData) => ({
+          ...prevData,
+          [inputName]: newValue,
+        }));
+      }
     } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [inputName]: newValue,
-      }));
-    }
-  };
+      setFormData((prevData) => {
+        if (inputName === "time") {
+          const [startTime, endTime] = e;
+          return {
+            ...prevData,
+            startTime,
+            endTime,
+          };
+        } else {
+          return {
+            ...prevData,
+            [inputName]: newValue,
+          };
+        }
+      });
+    }}
+    
+
+  const selectedDate = (date, dateString) => {
+    setDate(date)
+    handleInputChange(dateString, "time")
+  }
 
   const handleGetRoomRequest = async () => {
     try {
@@ -128,12 +155,12 @@ const Jadwal = () => {
   const handleOk = async (event) => {
     event.preventDefault();
     setLoading(true);
+    console.log(formOld);
 
     try {
       if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
-          `/activity`,
-          formOld.id,
+          `/activity/${formOld.id}`,
           formOld
         );
         const successMessage = response.statusMessage;
@@ -185,10 +212,22 @@ const Jadwal = () => {
   };
 
   useEffect(() => {
+    if (formOld) {
+      const dayjsStartTime = dayjs(formOld.startTime, 'HH:mm:ss');
+      const dayjsEndTime = dayjs(formOld.endTime, 'HH:mm:ss');
+      console.log(formOld);
+
+      setDate([dayjsStartTime, dayjsEndTime]);
+    }
+  }, [formOld]);
+  
+  useEffect(() => {
     handleGetEkskulRequest();
     handleGetHariRequest();
     handleGetRoomRequest();
   }, []);
+  
+  
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -222,7 +261,7 @@ const Jadwal = () => {
           <Select
             size="large"
             className="w-full"
-            value={formOld ? formOld.schedule : formData.schedule}
+            value={formOld ? formOld.schedule_id : formData.schedule}
             onChange={(e) => handleInputChange(e, "schedule_id")}
             options={hariOption}
             placeholder="Pilih Hari"
@@ -258,7 +297,7 @@ const Jadwal = () => {
             size="large"
             className="w-full"
             placeholder="Pilih Ekstrakurikuler"
-            value={formOld ? formOld.ekskul : formData.ekskul}
+            value={formOld ? formOld.ekskul_id: formData.ekskul}
             onChange={(e) => handleInputChange(e, "ekskul_id")}
             options={ekskulOption}
           />
@@ -269,7 +308,7 @@ const Jadwal = () => {
             size="large"
             className="w-full"
             placeholder="Pilih Ruangan"
-            value={formOld ? formOld.room : formData.room}
+            value={formOld ? formOld.room_id : formData.room}
             onChange={(e) => handleInputChange(e, "room_id")}
             options={roomOption}
           />
@@ -279,13 +318,9 @@ const Jadwal = () => {
           <TimePicker.RangePicker
             size="large"
             format={"HH:mm"}
-            onChange={(e) => handleInputChange(e, "startTime", "endTime")}
+            onChange={(date, dateString) => selectedDate(date, dateString)}
             placeholder={["Jam Mulai", "Jam Berakhir"]}
-            value={
-              formOld
-                ? [formOld.startTime, formOld.endTime]
-                : [formData.startTime, formData.endTime]
-            }
+            value={date}
           />
         </form>
       </Modal>

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TableProgram from "./Table";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { Modal, DatePicker, Input } from "antd";
 import { IoAddSharp } from "react-icons/io5";
 import { RiFileExcel2Line } from "react-icons/ri";
+import dayjs from "dayjs";
 const { RangePicker } = DatePicker;
 
 const Program = () => {
@@ -23,7 +24,6 @@ const Program = () => {
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-    console.log(newValue)
     if (formOld) {
       if (inputName === "date") {
         const [startDate, endDate] = e; // Destructuring e into startDate and endDate
@@ -61,6 +61,7 @@ const Program = () => {
   const selectedDate = (date, dateString) => {
     setDate(date)
     handleInputChange(dateString, "date")
+    console.log(date);
   }
 
   const showModal = () => {
@@ -71,6 +72,7 @@ const Program = () => {
     setOpen(false);
     setFormOld({});
     setFormData({});
+    setDate([])
   };
 
   const handleOk = async (event) => {
@@ -80,8 +82,7 @@ const Program = () => {
     try {
       if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
-          `/activity-program`,
-          formOld.id,
+          `/activity-program/${formOld.id}`,
           formOld
         );
         const successMessage = response.statusMessage;
@@ -160,6 +161,16 @@ const Program = () => {
     }
   };
 
+  useEffect(() => {
+    if (formOld) {
+      const dayjsStartDate = dayjs(formOld.startDate);
+      const dayjsEndDate = dayjs(formOld.endDate);
+    
+      setDate([dayjsStartDate, dayjsEndDate]);
+    }
+  }, [formOld.startDate, formOld.endDate]);
+  
+
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
       <div className="w-full flex flex-col gap-2">
@@ -192,10 +203,10 @@ const Program = () => {
       >
         <form action="" className="flex flex-col p-5 gap-3">
           <label htmlFor="" className="text-lg">
-            Nama
+            Aktivitas
           </label>
           <Input
-            value={formOld ? formOld.name : formData.name}
+            value={formOld ? formOld.activity : formData.activity}
             type="text"
             name="activity"
             size="large"

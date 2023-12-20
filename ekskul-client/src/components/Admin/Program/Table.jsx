@@ -5,6 +5,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
+import dayjs from "dayjs";
 
 const TableProgram = ({ setFormOld, setOpen }) => {
   const [searchText, setSearchText] = useState("");
@@ -207,9 +208,17 @@ const TableProgram = ({ setFormOld, setOpen }) => {
   };
 
   const handleEdit = async (item) => {
-    setFormOld(item);
+    // const startDate = dayjs(item.startDate)
+    // const endDate = dayjs(item.endDate)
+
+    // setFormOld({
+    //   id: item.id,
+    //   activity: item.activity,
+    //   task: item.task,
+    //   date: [startDate, endDate]
+    // });
+    setFormOld(item)
     setOpen(true);
-    console.log(item);
   };
 
   const columns = [

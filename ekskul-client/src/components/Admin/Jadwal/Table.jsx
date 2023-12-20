@@ -29,7 +29,12 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
   };
 
   const handleEdit = async (item) => {
-    setFormOld(item);
+    setFormOld({
+      ...item,
+      schedule_id: item.schedule.id,
+      room_id: item.room.id,
+      ekskul_id: item.ekskul.id
+    });
     setOpen(true);
   };
 
