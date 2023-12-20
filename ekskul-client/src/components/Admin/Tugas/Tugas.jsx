@@ -10,7 +10,11 @@ const TugasComponent = () => {
   const [open, setOpen] = useState(false);
   const axiosPrivate = useAxiosPrivate();
   const [ekskul, setEkskul] = useState([]);
-  const [formData, setFormData] = useState();
+  const [formData, setFormData] = useState({
+    name: "",
+    ekskul_id: "",
+    date: "",
+  });
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,20 +24,10 @@ const TugasComponent = () => {
     const newValue = e.target ? e.target.value : e;
 
     if (formOld) {
-      if (inputName === "ekskul_id") {
-        setFormOld((prevData) => ({
-          ...prevData,
-          ekskul_id: newValue,
-          ekskul: {
-            id: newValue,
-          },
-        }));
-      } else if (inputName === "date") {
-        setFormOld((prevData) => ({
-          ...prevData,
-          date: newValue,
-        }));
-      }
+      setFormOld((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -181,8 +175,10 @@ const TugasComponent = () => {
             size="large"
             placeholder="Pilih Ekstrakurikuler"
             className="w-full"
-            value={formOld && formOld.ekskul ? formOld.ekskul.id : undefined}
-            onChange={(e) => handleInputChange(e, "ekskul_id")}
+            value={
+              formOld && formOld ? formOld.ekskul_id : formData.ekskuls
+            }
+            onChange={(e) => handleInputChange(e, "ekskuls")}
             options={ekskulOption}
           />
           <label htmlFor="" className="text-lg">
@@ -193,7 +189,9 @@ const TugasComponent = () => {
             format="DD-MM-YYYY"
             placeholder="Masukan tanggal"
             name="date"
-            value={formOld && formOld.date ? dayjs(formOld.date) : null}
+            value={
+              formOld && formOld.date ? dayjs(formOld.date) : formData.date
+            }
             onChange={(e) => handleInputChange(e, "date")}
           />
         </form>

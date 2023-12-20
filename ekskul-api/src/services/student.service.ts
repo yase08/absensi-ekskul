@@ -172,6 +172,8 @@ export class StudentService {
       const ekskul_id = req.query.ekskul_id as string;
       const task_id = req.query.task_id as string;
 
+      const assessmentSubquery = `(SELECT student_id FROM assessments WHERE task_id = '${task_id}')`;
+
       const paramQuerySQL: any = {
         attributes: ["id", "name"],
         include: [
@@ -181,32 +183,22 @@ export class StudentService {
             where: { id: ekskul_id },
           },
         ],
-      };
-
-      const studentWithoutAssessment = await db.student.findAll({
-        ...paramQuerySQL,
         where: {
           id: {
-            [Op.notIn]: [
-              db.sequelize.literal(
-                `(SELECT student_id FROM assessment WHERE ekskul_id = ${ekskul_id} AND task_id = ${task_id})`
-              ),
-            ],
+            [db.Sequelize.Op.notIn]: db.Sequelize.literal(assessmentSubquery),
           },
         },
+      };
+
+      const studentsWithoutAssessment = await db.student.findAll({
+        ...paramQuerySQL,
       });
 
-      if (!studentWithoutAssessment || studentWithoutAssessment.length === 0) {
-        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
-      }
-
-      const manipulatedStudent = studentWithoutAssessment.map(
-        (student: any) => {
-          return {
-            id: student.id,
-            name: student.name,
-          };
-        }
+      const manipulatedStudent = studentsWithoutAssessment.map(
+        (student: any) => ({
+          id: student.id,
+          name: student.name,
+        })
       );
 
       return Promise.resolve(
