@@ -89,29 +89,36 @@ const GalleryComponent = () => {
 
     try {
       const formDataWithFile = new FormData();
+
       Object.entries(formData).forEach(([key, value]) => {
         formDataWithFile.append(key, value);
       });
 
       if (fileList.length > 0) {
-        formDataWithFile.append("image", fileList[0].originFileObj);
+        fileList.forEach((file, index) => {
+          formDataWithFile.append("images", file.originFileObj); // Use "images" as the field name
+        });
       }
 
-      if (formOld && formOld.id) {
-        const response = await axiosPrivate.put(
-          `/gallery/${formOld.id}`,
-          formDataWithFile
-        );
-        const successMessage = response.data.statusMessage; // Use the correct property
+      const axiosConfig = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      const apiEndpoint =
+        formOld && formOld.id ? `/gallery/${formOld.id}` : "/gallery";
+      const axiosMethod =
+        formOld && formOld.id ? axiosPrivate.put : axiosPrivate.post;
 
-        message.success(successMessage);
-        setFormOld({});
-      } else {
-        const response = await axiosPrivate.post(`/gallery`, formDataWithFile);
-        const successMessage = response.data.statusMessage; // Use the correct property
+      const response = await axiosMethod(
+        apiEndpoint,
+        formDataWithFile,
+        axiosConfig
+      );
+      const successMessage = response.data.statusMessage;
 
-        message.success(successMessage);
-      }
+      message.success(successMessage);
+      setFormOld({});
     } catch (error) {
       console.error("Error:", error);
 
@@ -187,6 +194,7 @@ const GalleryComponent = () => {
           </label>
           <Upload
             showUploadList={true}
+            multiple={true}
             beforeUpload={() => false}
             onChange={handleFileChange}
           >

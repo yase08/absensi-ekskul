@@ -8,8 +8,9 @@ import { AiOutlineMail, AiOutlineBell, AiOutlineClose } from "react-icons/ai";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { logout } from "../../../services/auth.service";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { useProfile } from "../../../context/ProfileContext";
+import useAuth from "../../../hooks/useAuth";
 
 // eslint-disable-next-line react/prop-types
 const TopNav = ({
@@ -25,35 +26,36 @@ const TopNav = ({
   const [isButtonVisible, setIsButtonVisible] = useState(false);
   const [isButtonVisible1, setIsButtonVisible1] = useState(false);
   const [isButtonVisible2, setIsButtonVisible2] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
   const [backgroundColor, setBackgroundColor] = useState("bg-primary");
-  const navigate = useNavigate();
   const { profile } = useProfile();
+  const { setAuth, setPersist } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedColor = localStorage.getItem("backgroundColor");
     if (savedColor) {
       setBackgroundColor(savedColor);
     } else {
-      setBackgroundColor('#6777EF')
+      setBackgroundColor("#6777EF");
     }
   }, []);
 
   const handleLogout = async (event) => {
     event.preventDefault();
+    setPersist((prev) => !prev);
+    setAuth({});
 
     try {
-      const response = await logout();
-      console.log(response);
-      const successMessage = response.statusMessage;
+      const response = await axiosPrivate.get(`/auth/logout`);
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Sukses!",
         text: successMessage,
       });
       navigate("/login");
-      sessionStorage.removeItem("token");
-      console.log("Response:", response.data);
     } catch (error) {
       console.error("Error:", error);
 
@@ -77,8 +79,6 @@ const TopNav = ({
           text: "An unexpected error occurred.",
         });
       }
-    } finally {
-      //   setLoading(false);
     }
   };
 

@@ -147,9 +147,7 @@ const TableEkskul = ({ setFormOld, setOpen }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await axiosPrivate.get(
-        `/ekskul`
-      );
+      const response = await axiosPrivate.get(`/ekskul`);
 
       if (response.status === 200 && response.data.data) {
         if (Array.isArray(response.data.data)) {
@@ -172,21 +170,33 @@ const TableEkskul = ({ setFormOld, setOpen }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/ekskul/${id}`);
-      const successMessage = response.statusMessage;
-
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: successMessage,
+      const result = await Swal.fire({
+        title: "Apakah anda yakin?",
+        text: "Ekstrakurikuler ini terkait dengan data siswa, tugas, dan presensi",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Hapus",
+        cancelButtonText: "Batal",
       });
 
-      handleGetRequest();
-    } catch (error) {
-      console.error("Error:", error);
+      if (result.isConfirmed) {
+        const response = await axiosPrivate.delete(`/ekskul/${id}`);
+        const successMessage = response.data.statusMessage;
 
-      if (error) {
-        const errorMessage = error.response.statusMessage;
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil!",
+          text: successMessage,
+        });
+        handleGetRequest();
+      } else if (result.isDenied) {
+        Swal.fire("Ekstrakurikuler Tidak Jadi Dihapus", "", "info");
+      }
+    } catch (error) {
+      if (error.response) {
+        const errorMessage = error.response.data.statusMessage;
         Swal.fire({
           icon: "error",
           title: "Error!",

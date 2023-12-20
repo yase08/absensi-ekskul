@@ -101,7 +101,10 @@ export class TaskService {
         return {
           id: task.id,
           name: task.name,
-          ekskul: task.ekskul.name,
+          ekskul: {
+            id: task.ekskul.id,
+            name: task.ekskul.name,
+          },
           user: task.user.name,
           date: task.date,
           createdAt: task.createdAt,

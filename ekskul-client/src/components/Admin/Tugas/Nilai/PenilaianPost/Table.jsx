@@ -146,8 +146,9 @@ const TablePenilaianPost = ({ date }) => {
   const handleGetStudentRequest = async () => {
     try {
       const response = await axiosPrivate.get(
-        `/student/assessment?ekskul_id=${ekskul}`
+        `/student/assessment?ekskul_id=${ekskul}&task_id=${task.id}`
       );
+      console.log(response);
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {

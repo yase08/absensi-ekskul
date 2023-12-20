@@ -29,6 +29,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+      author: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,

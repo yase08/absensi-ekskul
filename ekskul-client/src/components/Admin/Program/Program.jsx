@@ -85,26 +85,24 @@ const Program = () => {
           `/activity-program/${formOld.id}`,
           formOld
         );
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
         Swal.fire({
           icon: "success",
-          title: "Success!",
+          title: "Berhasil!",
           text: successMessage,
         });
         setFormOld({});
       } else {
         const response = await axiosPrivate.post(`/activity-program`, formData);
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
-          title: "Success!",
+          title: "Berhasil!",
           text: successMessage,
         });
       }
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
         Swal.fire({

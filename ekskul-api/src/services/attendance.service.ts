@@ -60,6 +60,7 @@ function calculateTotalAttendance(attendance: any[]): Record<string, number> {
 
 const countAttendancePerWeekService = async () => {
   try {
+    let currentWeekNumber = 1;
     const ekskuls = await db.ekskul.findAll({
       attributes: ["id"],
     });
@@ -87,33 +88,84 @@ const countAttendancePerWeekService = async () => {
       throw apiResponse(status.NOT_FOUND, "No attendance found");
     }
 
-    const createHistoryAttendance = await Promise.all(
-      totalAttendance.map(async (ekskulCount, index) => {
-        try {
-          const historyAttendance = await db.historyAttendance.create({
-            ekskul_id: ekskuls[index].id,
-            totalAttendance: ekskulCount,
-            year: new Date().getFullYear(),
-            weekNumber: 1,
-          });
-          return historyAttendance;
-        } catch (error) {
-          console.error(
-            `Error creating history attendance for ekskul ${ekskuls[index].id}:`,
-            error
-          );
-          return null;
-        }
-      })
-    );
+    let createOrUpdateHistoryAttendance = [];
 
-    return createHistoryAttendance;
+    for (const ekskul of ekskuls) {
+      const historyAttendanceExist = await db.historyAttendance.findAll({
+        where: {
+          ekskul_id: ekskul.id,
+        },
+      });
+
+      if (historyAttendanceExist.length > 0) {
+        const updatedRecords = await Promise.all(
+          totalAttendance.map(async (ekskulCount, index) => {
+            try {
+              const existingRecord = historyAttendanceExist.find(
+                (record) => record.ekskul_id === ekskul.id
+              );
+
+              const updatedRecord = await db.historyAttendance.update(
+                {
+                  totalAttendance: ekskulCount,
+                  weekNumber: existingRecord.weekNumber + 1,
+                },
+                {
+                  where: {
+                    ekskul_id: ekskul.id,
+                  },
+                }
+              );
+
+              return updatedRecord;
+            } catch (error) {
+              console.error(
+                `Error updating history attendance for ekskul ${ekskul.id}:`,
+                error
+              );
+              return null;
+            }
+          })
+        );
+
+        createOrUpdateHistoryAttendance.push(...updatedRecords);
+      } else {
+        const createdRecords = await Promise.all(
+          totalAttendance.map(async (ekskulCount, index) => {
+            try {
+              const historyAttendance = await db.historyAttendance.create({
+                ekskul_id: ekskul.id,
+                totalAttendance: ekskulCount,
+                year: new Date().getFullYear(),
+                weekNumber: currentWeekNumber,
+              });
+
+              return historyAttendance;
+            } catch (error) {
+              console.error(
+                `Error creating history attendance for ekskul ${ekskul.id}:`,
+                error
+              );
+              return null;
+            }
+          })
+        );
+
+        createOrUpdateHistoryAttendance.push(...createdRecords);
+      }
+    }
+
+    currentWeekNumber++;
+
+    return createOrUpdateHistoryAttendance;
   } catch (error: any) {
-    console.error("Error in countAttendancePerWeekService:", error);
-    throw apiResponse(
-      error.statusCode || status.INTERNAL_SERVER_ERROR,
-      error.statusMessage || "Internal Server Error",
-      error.message || "An unexpected error occurred"
+    console.error("Unhandled promise rejection:", error);
+    return Promise.reject(
+      apiResponse(
+        error.statusCode || status.INTERNAL_SERVER_ERROR,
+        error.statusMessage,
+        error.message
+      )
     );
   }
 };
@@ -149,13 +201,11 @@ const countAttendancePerMonthService = async () => {
     const createHistoryAttendance = await Promise.all(
       totalAttendance.map(async (ekskulCount, index) => {
         try {
-          const monthName = new Date().getMonth();
           const historyAttendance = await db.historyAttendance.create({
             ekskul_id: ekskuls[index].id,
             totalAttendance: ekskulCount,
             type: "month",
             year: new Date().getFullYear(),
-            name: `${monthName}`,
           });
           return historyAttendance;
         } catch (error) {
@@ -180,7 +230,7 @@ const countAttendancePerMonthService = async () => {
   }
 };
 
-// cron.schedule("0 0 * * 0", () => {
+// cron.schedule("* * * * *", () => {
 //   countAttendancePerWeekService();
 // });
 
@@ -225,7 +275,7 @@ export class AttendanceService {
           } else {
             throw apiResponse(
               status.FORBIDDEN,
-              `Student with ID ${studentId} is not associated with the selected ekskul`
+              `Siswa dengan id ${studentId} tidak ada di ekskul ini`
             );
           }
         }
@@ -233,17 +283,14 @@ export class AttendanceService {
         const createdAttendances = await Promise.all(createAttendancePromises);
 
         if (!createdAttendances.length) {
-          throw apiResponse(status.FORBIDDEN, "Create new attendances failed");
+          throw apiResponse(status.FORBIDDEN, "Gagal menambahkan kehadiran");
         }
 
         return Promise.resolve(
-          apiResponse(status.OK, "Create new attendance success")
+          apiResponse(status.OK, "Berhasil menambahkan kehadiran")
         );
       } else {
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Ekskul does not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Ektrakurikuler tidak ditemukan");
       }
     } catch (error: any) {
       return Promise.reject(

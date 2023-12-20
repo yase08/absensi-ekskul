@@ -147,7 +147,7 @@ const TableProgram = ({ setFormOld, setOpen }) => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await axiosPrivate.get(`/activity-program`);
+      const response = await axiosPrivate.get(`/activity-program/author`);
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
           const activityProgramData = response.data.data;
@@ -170,18 +170,16 @@ const TableProgram = ({ setFormOld, setOpen }) => {
 
     try {
       const response = await axiosPrivate.delete(`/activity-program`, id);
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Berhasil!",
         text: successMessage,
       });
 
       handleGetRequest();
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.statusMessage;
         Swal.fire({
@@ -267,6 +265,14 @@ const TableProgram = ({ setFormOld, setOpen }) => {
       },
     },
     {
+      title: "Pembuat",
+      dataIndex: "author",
+      sorter: handleSort("author"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("author"),
+    },
+    {
       title: "Aksi",
       dataIndex: "action",
       width: "20%",
@@ -292,7 +298,7 @@ const TableProgram = ({ setFormOld, setOpen }) => {
   useEffect(() => {
     handleGetRequest();
   }, []);
-  
+
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
       <div className="overflow-x-auto hidden-scroll w-full">

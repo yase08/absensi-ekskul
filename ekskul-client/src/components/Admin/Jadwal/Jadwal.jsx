@@ -163,7 +163,7 @@ const Jadwal = () => {
           `/activity/${formOld.id}`,
           formOld
         );
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
@@ -173,7 +173,7 @@ const Jadwal = () => {
         setFormOld({});
       } else {
         const response = await axiosPrivate.post(`/activity`, formData);
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
@@ -182,8 +182,6 @@ const Jadwal = () => {
         });
       }
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
         Swal.fire({
@@ -315,7 +313,7 @@ const Jadwal = () => {
           <label htmlFor="" className="text-lg">
             Jam Mulai & Jam Berakhir
           </label>
-          <TimePicker.RangePicker
+           <TimePicker.RangePicker
             size="large"
             format={"HH:mm"}
             onChange={(date, dateString) => selectedDate(date, dateString)}
@@ -328,4 +326,4 @@ const Jadwal = () => {
   );
 };
 
-export default Jadwal;
+export default Jadwal

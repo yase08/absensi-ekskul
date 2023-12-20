@@ -169,21 +169,33 @@ const TableRayon = ({ setFormOld }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/rayon/${id}`);
-      const successMessage = response.statusMessage;
-
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: successMessage,
+      const result = await Swal.fire({
+        title: "Apakah anda yakin?",
+        text: "Rayon ini terkait dengan data siswa",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Hapus",
+        cancelButtonText: "Batal",
       });
 
-      handleGetRequest();
-    } catch (error) {
-      console.error("Error:", error);
+      if (result.isConfirmed) {
+        const response = await axiosPrivate.delete(`/rayon/${id}`);
+        const successMessage = response.data.statusMessage;
 
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil!",
+          text: successMessage,
+        });
+        handleGetRequest();
+      } else if (result.isDenied) {
+        Swal.fire("Rayon Tidak Jadi Dihapus", "", "info");
+      }
+    } catch (error) {
       if (error.response) {
-        const errorMessage = error.response.statusMessage;
+        const errorMessage = error.response.data.statusMessage;
         Swal.fire({
           icon: "error",
           title: "Error!",

@@ -178,18 +178,16 @@ const TableGallery = ({ setFormOld, setOpen }) => {
 
     try {
       const response = await axiosPrivate.delete(`/gallery/${id}`);
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Sukses!",
         text: successMessage,
       });
 
       handleGetRequest();
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.statusMessage;
         Swal.fire({

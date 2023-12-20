@@ -21,7 +21,6 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
       },
-      name: DataTypes.STRING,
       weekNumber: DataTypes.INTEGER,
       year: DataTypes.DATE,
       totalAttendance: DataTypes.INTEGER,

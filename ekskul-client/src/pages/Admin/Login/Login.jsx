@@ -4,11 +4,11 @@ import {
   AiOutlineEye,
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Login.css";
 import logo from "../../../assets/Logo-Absensi.png";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../context/AuthContext";
+import useAuth from "../../../hooks/useAuth";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const Login = () => {
@@ -18,7 +18,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setAuth } = useAuth();
+  const { setAuth, persist, setPersist } = useAuth();
   const navigate = useNavigate();
 
   const toggleChangeMethod = () => {
@@ -40,6 +40,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setPersist((prev) => !prev);
     try {
       const response = await axiosWithAuth.post(
         `/auth/login`,
@@ -53,7 +54,7 @@ const Login = () => {
         const accessToken = response.data.data.accessToken;
         const role = response.data.data.role;
         setAuth({ accessToken, role });
-        navigate("/admin/dashboard");
+        navigate("/admin/dashboard", { replace: true });
       } else {
         console.error("Login failed:", response.data.message);
       }
@@ -63,6 +64,10 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem("persist", persist);
+  }, [persist]);
 
   return (
     <div className="w-full h-[100vh] bg-primary flex relative transition-all ">
@@ -161,7 +166,7 @@ const Login = () => {
                 <span className="w-full h-[1px] bg-[#FFDE59]" />
               </div>
               <div className="w-full text-white flex justify-between">
-                <button className="capitalize" onClick={toggleChangeMethod}>
+                <button className="capitalize">
                   Not Have Account
                 </button>
                 <button className="capitalize">forgot password?</button>
@@ -201,7 +206,7 @@ const Login = () => {
               Welcome
             </h1>
             <h1 className="text-[#FEBD59] text- capitalize font-bold font-Gabarito text-center">
-              log in to your account
+              regis in to your account
             </h1>
             {/* <button className='w-full bg-white p-4 rounded-sm mt-5 relative'>
                 <FcGoogle className='absolute'/>

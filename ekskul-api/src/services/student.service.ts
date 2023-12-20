@@ -20,7 +20,7 @@ export class StudentService {
         throw apiResponse(
           status.CONFLICT,
           `Siswa dengan nama ${req.body.name} sudah ada`
-        ); 
+        );
 
       const ekskuls = await db.ekskul.findAll({
         where: { id: req.body.ekskuls },
@@ -173,6 +173,7 @@ export class StudentService {
   async getStudentOnAssessmentService(req: Request): Promise<any> {
     try {
       const ekskul_id = req.query.ekskul_id as string;
+      const task_id = req.query.task_id as string;
 
       const paramQuerySQL: any = {
         attributes: ["id", "name"],
@@ -191,7 +192,7 @@ export class StudentService {
           id: {
             [Op.notIn]: [
               db.sequelize.literal(
-                `SELECT DISTINCT "student_id" FROM "assessment" WHERE "ekskul_id" = '${ekskul_id}'`
+                `(SELECT student_id FROM assessment WHERE ekskul_id = ${ekskul_id} AND task_id = ${task_id})`
               ),
             ],
           },
@@ -250,14 +251,12 @@ export class StudentService {
         throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
       }
 
-      const manipulatedStudent = student.map(
-        (student: any) => {
-          return {
-            id: student.id,
-            name: student.name,
-          };
-        }
-      );
+      const manipulatedStudent = student.map((student: any) => {
+        return {
+          id: student.id,
+          name: student.name,
+        };
+      });
 
       return Promise.resolve(
         apiResponse(

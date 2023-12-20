@@ -139,6 +139,7 @@ export class GalleryService {
     try {
       const gallery = await db.gallery.findAll({
         where: { slug: req.params.slug },
+        attributes: ["images"],
       });
 
       if (!gallery || gallery.length === 0)
@@ -227,7 +228,7 @@ export class GalleryService {
 
       for (let i in files) {
         const file = files[i];
-        const pathName = file.path;
+        const pathName = file.filename;
         galleryImages.push(pathName);
       }
 
@@ -267,15 +268,27 @@ export class GalleryService {
       if (!galleryExist)
         throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
 
-      const deleteImage = galleryExist.images.map((item) => {
-        return {
-          path: item,
-        };
-      });
+      let deleteImages: string[] = [];
 
-      for (let i in deleteImage) {
-        const file = deleteImage[i];
-        fs.unlinkSync(`../public/images/${file.path}`);
+      if (typeof galleryExist.images === "string") {
+        // Jika galleryExist.images berupa string JSON, parse ke dalam bentuk array
+        deleteImages = JSON.parse(galleryExist.images);
+      } else if (Array.isArray(galleryExist.images)) {
+        // Jika galleryExist.images sudah berupa array
+        deleteImages = galleryExist.images;
+      }
+
+      for (let i in deleteImages) {
+        const filePath = path.join(
+          __dirname,
+          "..",
+          "public",
+          "images",
+          deleteImages[i]
+        );
+        console.log(filePath);
+
+        fs.unlinkSync(filePath);
       }
 
       await db.gallery.destroy({

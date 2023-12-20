@@ -223,10 +223,32 @@ const DetailGallery = ({ setFormOld, setOpen }) => {
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
-      <div className="overflow-x-auto hidden-scroll w-full">
-        {data.map((item, index) => (
-          <img key={index} src={item.image} alt={item.name} />
-        ))}
+      <div className="w-full flex flex-col gap-2 pb-5">
+        <div className="flex justify-between">
+          <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
+            Detail Galeri {slug}
+          </h1>
+        </div>
+      </div>
+      <div className="gap-5 w-full ">
+        {data.map((item, index) => {
+          const imageArray = JSON.parse(item.images);
+          return (
+            <div
+              className="w-full rounded-lg grid grid-cols-2 gap-5"
+              key={index}
+            >
+              {imageArray.map((imageName, imageIndex) => (
+                <img
+                  key={imageIndex}
+                  className="rounded-lg aspect-video"
+                  src={`http://localhost:8000/images/${imageName}`}
+                  alt={imageName}
+                />
+              ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

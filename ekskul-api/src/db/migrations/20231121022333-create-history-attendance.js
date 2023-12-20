@@ -14,6 +14,7 @@ module.exports = {
       },
       weekNumber: {
         type: Sequelize.INTEGER,
+        defaultValue: 0
       },
       year: {
         type: Sequelize.STRING,

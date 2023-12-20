@@ -20,10 +20,12 @@ const HariComponent = () => {
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormData((prevData) => ({
-        ...prevData,
-        [inputName]: newValue,
-      }));
+      if (inputName === "day") {
+        setFormOld((prevData) => ({
+          ...prevData,
+          [inputName]: newValue,
+        }));
+      }
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -52,11 +54,6 @@ const HariComponent = () => {
     }
   };
 
-  const ekskulOption = ekskul.map((item) => ({
-    label: item.name,
-    value: item.id,
-  }));
-
   const showModal = () => {
     setOpen(true);
   };
@@ -65,7 +62,6 @@ const HariComponent = () => {
     setOpen(false);
     setFormOld({});
     setFormData({});
-    console.log(formOld, formData);
   };
 
   const handleOk = async (event) => {
@@ -74,33 +70,30 @@ const HariComponent = () => {
     try {
       if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
-          `/schedule`,
-          formOld.id,
+          `/schedule/${formOld.id}`,
           formOld
         );
-        const successMessage = response.data;
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
-          title: "Success!",
+          title: "Berhasil!",
           text: successMessage,
         });
         event.preventDefault();
         setFormOld({});
       } else {
         const response = await axiosPrivate.post(`/schedule`, formData);
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
-          title: "Success!",
+          title: "Berhasil!",
           text: successMessage,
         });
         event.preventDefault();
       }
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
         Swal.fire({

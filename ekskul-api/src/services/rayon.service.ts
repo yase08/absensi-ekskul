@@ -23,9 +23,7 @@ export class RayonService {
       if (!createRayon)
         throw apiResponse(status.FORBIDDEN, "Gagal membuat rayon");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Rayon berhasil dibuat")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Rayon berhasil dibuat"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -79,7 +77,8 @@ export class RayonService {
 
       const rayon = await db.rayon.findAll(paramQuerySQL);
 
-      if (!rayon || rayon.length === 0) throw apiResponse(status.NOT_FOUND, "Rayon tidak ditemukan");
+      if (!rayon || rayon.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Rayon tidak ditemukan");
 
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mendapatkan rayon", rayon, totalRows)
@@ -151,6 +150,39 @@ export class RayonService {
           "Rayon dengan id tersebut tidak ditemukan"
         );
 
+        const studentByRayonId = await db.student.findAll({
+          where: { rayon_id: rayonExist.id },
+          attributes: ["id", "name"],
+        });
+
+        const deleteStudentAssessment = await db.assessment.destroy({
+          where: {
+            student_id: {
+              [Op.in]: studentByRayonId.map((student: any) => student.id),
+            },
+          },
+        });
+  
+        const deleteStudentAttendances = await db.attendance.destroy({
+          where: {
+            student_id: {
+              [Op.in]: studentByRayonId.map((student: any) => student.id),
+            },
+          },
+        });
+  
+        const deleteStudentOnEkskul = await db.studentOnEkskul.destroy({
+          where: {
+            student_id: {
+              [Op.in]: studentByRayonId.map((student: any) => student.id),
+            },
+          },
+        });
+
+      const deleteStudent = await db.student.destroy({
+        where: { rayon_id: rayonExist.id },
+      });
+
       const deleteRayon = await db.rayon.destroy({
         where: { id: rayonExist.id },
       });
@@ -158,7 +190,9 @@ export class RayonService {
       if (!deleteRayon)
         throw apiResponse(status.FORBIDDEN, "Gagal menghapus rayon");
 
-      return Promise.resolve(apiResponse(status.OK, "Berhasil menghapus rayon"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus rayon")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

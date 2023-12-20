@@ -1,16 +1,12 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
-import { RouterProvider } from "react-router-dom";
+import { createRoot } from "react-dom";
 import "./index.css";
-import router from "./routes/Route.jsx";
 import Helmet from "react-helmet";
-import { ProfileProvider } from "./context/ProfileContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
-import { EkskulProvider } from "./context/EkskulContext";
-// import { CustomCursorProvider } from 'react-custom-cursor';
-// import AnimatedCursor from 'react-custom-cursor/AnimatedCursor';
+import AppRouter from "./routes/Route.jsx";
+import { ProfileProvider } from "./context/ProfileContext.jsx";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+createRoot(document.getElementById("root")).render(
   <>
     <Helmet>
       <html className="h-full" />
@@ -18,9 +14,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </Helmet>
     <AuthProvider>
       <ProfileProvider>
-        <EkskulProvider>
-          <RouterProvider router={router} />
-        </EkskulProvider>
+        <AppRouter />
       </ProfileProvider>
     </AuthProvider>
   </>

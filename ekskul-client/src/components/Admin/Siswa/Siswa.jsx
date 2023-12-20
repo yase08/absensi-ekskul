@@ -140,17 +140,17 @@ const SiswaComponent = () => {
           `/student/${formOld.id}`,
           formOld
         );
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
-          title: "Success!",
+          title: "Berhasil!",
           text: successMessage,
         });
         setFormOld({});
       } else {
         const response = await axiosPrivate.post(`/student`, formData);
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
@@ -159,8 +159,6 @@ const SiswaComponent = () => {
         });
       }
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
         Swal.fire({
@@ -318,6 +316,7 @@ const SiswaComponent = () => {
             value={formOld ? formOld.name : formData.name}
             type="text"
             name="name"
+            rules={{ required: true, message: "Nama Siswa Harus Diisi!" }}
             size="large"
             placeholder="Masukan nama"
             onChange={(e) => handleInputChange(e, "name")}
@@ -329,6 +328,7 @@ const SiswaComponent = () => {
             value={formOld ? formOld.nis : formData.nis}
             type="number"
             name="nis"
+            rules={{ required: true, message: "Nis Siswa Harus Diisi!" }}
             size="large"
             placeholder="Masukan nis"
             onChange={(e) => handleInputChange(e, "nis")}
@@ -340,6 +340,7 @@ const SiswaComponent = () => {
             value={formOld ? formOld.email : formData.email}
             type="email"
             name="email"
+            rules={{ required: true, message: "Email Siswa Harus Diisi!" }}
             size="large"
             placeholder="Masukan email"
             onChange={(e) => handleInputChange(e, "email")}
@@ -350,6 +351,7 @@ const SiswaComponent = () => {
           <Input
             value={formOld ? formOld.mobileNumber : formData.mobileNumber}
             type="number"
+            rules={{ required: true, message: "Nomer Telpon Siswa Harus Diisi!" }}
             name="mobileNumber"
             size="large"
             placeholder="Masukan nomer telpon"
@@ -361,6 +363,7 @@ const SiswaComponent = () => {
           <Select
             size="large"
             className="w-full"
+            rules={{ required: true, message: "Jenis Kelamin Harus Diisi!" }}
             placeholder="Pilih Jenis Kelamin"
             value={formOld ? formOld.gender : formData.gender}
             onChange={(e) => handleInputChange(e, "gender")}
@@ -391,6 +394,7 @@ const SiswaComponent = () => {
           </label>
           <Select
             size="large"
+            rules={{ required: true, message: "Rayon Siswa Harus Diisi!" }}
             className="w-full"
             value={formOld ?  formOld.rayon_id : formData.rayon}
             onChange={(e) => handleInputChange(e, "rayon_id")}
@@ -404,6 +408,7 @@ const SiswaComponent = () => {
             size="large"
             className="w-full"
             mode="multiple"
+            rules={{ required: true, message: "Ekstrakurikuler Siswa Harus Diisi!" }}
             placeholder="Pilih Ekstrakurikuler"
             value={formOld ? formOld.ekskuls : formData.ekskuls}
             onChange={(e) => handleInputChange(e, "ekskuls")}

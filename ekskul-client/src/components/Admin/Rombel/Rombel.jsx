@@ -34,19 +34,16 @@ const Rombel = () => {
 
     try {
       const response = await axiosPrivate.post(`/rombel`, formData);
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",
         title: "Success!",
         text: successMessage,
       });
-      console.log("Response:", response.data);
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
-        const errorMessage = error.response.statusMessage;
+        const errorMessage = error.response.data.statusMessage;
         Swal.fire({
           icon: "error",
           title: "Error!",
@@ -76,19 +73,16 @@ const Rombel = () => {
     console.log(formOld);
 
     try {
-      const response = await axiosPrivate.put(`/rombel`, formOld.id, formOld);
-      const successMessage = response.statusMessage;
+      const response = await axiosPrivate.put(`/rombel/${formOld.id}`, formOld);
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Berhasil!",
         text: successMessage,
       });
       setFormOld("");
-      console.log("Response:", response.data);
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
         Swal.fire({

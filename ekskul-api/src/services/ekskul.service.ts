@@ -10,7 +10,9 @@ const db = require("../db/models/index.js");
 export class EkskulService {
   async createEkskulService(req: Request): Promise<any> {
     try {
-      const ekskul = await db.ekskul.findOne({ where: { name: req.body.name } });
+      const ekskul = await db.ekskul.findOne({
+        where: { name: req.body.name },
+      });
 
       if (ekskul)
         throw apiResponse(
@@ -23,9 +25,7 @@ export class EkskulService {
       if (!createEkskul)
         throw apiResponse(status.FORBIDDEN, "Gagal membuat ekskul");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Ekskul berhasil dibuat")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Ekskul berhasil dibuat"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -79,7 +79,8 @@ export class EkskulService {
 
       const ekskul = await db.ekskul.findAll(paramQuerySQL);
 
-      if (!ekskul || ekskul.length === 0) throw apiResponse(status.NOT_FOUND, "Ekskul tidak ditemukan");
+      if (!ekskul || ekskul.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Ekskul tidak ditemukan");
 
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mendapatkan ekskul", ekskul, totalRows)
@@ -151,6 +152,30 @@ export class EkskulService {
           "Ekskul dengan id tersebut tidak ditemukan"
         );
 
+      const deleteEkskulGallery = await db.gallery.destroy({
+        where: {
+          ekskul_id: ekskulExist.id,
+        },
+      });
+
+      const deleteEkskulTask = await db.task.destroy({
+        where: {
+          ekskul_id: ekskulExist.id,
+        },
+      });
+
+      const deleteUserOnEkskul = await db.userOnEkskul.destroy({
+        where: {
+          ekskul_id: ekskulExist.id,
+        },
+      });
+
+      const deleteInstructorAttendance = await db.instructorAttendance.destroy({
+        where: {
+          ekskul_id: ekskulExist.id,
+        },
+      });
+
       const deleteEkskul = await db.ekskul.destroy({
         where: { id: ekskulExist.id },
       });
@@ -158,7 +183,9 @@ export class EkskulService {
       if (!deleteEkskul)
         throw apiResponse(status.FORBIDDEN, "Gagal menghapus ekskul");
 
-      return Promise.resolve(apiResponse(status.OK, "Berhasil menghapus ekskul"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus ekskul")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

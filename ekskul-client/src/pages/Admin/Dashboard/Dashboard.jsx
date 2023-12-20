@@ -1,7 +1,5 @@
-import BarChart from "../../../components/Admin/Chart/BarChart";
 import Jumbotron from "../../../components/Admin/Jumbotron/Jumbotron";
 import SideNav from "../../../components/Admin/Layouts/SideNav";
-import Table from "../../../components/Admin/Table/Table";
 import TopNav from "../../../components/Admin/Layouts/TopNav";
 import { useEffect, useState } from "react";
 import { RiFacebookFill } from "react-icons/ri";
@@ -17,7 +15,7 @@ const Dashboard = () => {
     if (savedColor) {
       setBackgroundColor(savedColor);
     } else {
-      setBackgroundColor('#6777EF')
+      setBackgroundColor("#6777EF");
     }
   }, []);
 
@@ -72,12 +70,11 @@ const Dashboard = () => {
             toggleOpenProfile={toggleOpenProfile}
           />
           <Jumbotron expanded={expanded} />
-          <BarChart />
-          <Table />
           <Profile
             openProfile={openProfile}
             toggleOpenProfile={toggleOpenProfile}
           />
+          {/* Sidebar */}
           <div className="mt-[80px] z-40 w-full px-10  bg-opacity-30 h-[100px] relative top-[50px] bg-transparent">
             <div className="bg-white rounded-md w-full h-full relative flex items-center px-5 justify-between overflow-hidden">
               <div className="flex gap-3 items-center">

@@ -30,6 +30,19 @@ export class ActivityProgramController extends ActivityProgramService {
     }
   };
 
+  getAllActivityProgramByAuthor = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.getAllActivityProgramByAuthorService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
   updateActivityProgram = async (
     req: Request,
     res: Response
