@@ -4,37 +4,36 @@ import Swal from "sweetalert2";
 import { useProfile } from "../../../context/ProfileContext";
 import { Modal, Select, Input, DatePicker } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import dayjs from "dayjs";
 
 const TugasComponent = () => {
   const [open, setOpen] = useState(false);
   const axiosPrivate = useAxiosPrivate();
   const [ekskul, setEkskul] = useState([]);
-  const [formData, setFormData] = useState({
-    name: "",
-    ekskul_id: "",
-    date: "",
-  });
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [dateString, setDateString] = useState("");
-  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState();
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const { profile } = useProfile();
 
-  const handleChange = (date, dateString) => {
-    setSelectedDate(date);
-    setDateString(dateString);
-    setError(null);
-  };
-
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
+
     if (formOld) {
-      setFormData((prevData) => ({
-        ...prevData,
-        [inputName]: newValue,
-      }));
+      if (inputName === "ekskul_id") {
+        setFormOld((prevData) => ({
+          ...prevData,
+          ekskul_id: newValue,
+          ekskul: {
+            id: newValue,
+          },
+        }));
+      } else if (inputName === "date") {
+        setFormOld((prevData) => ({
+          ...prevData,
+          date: newValue,
+        }));
+      }
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -76,7 +75,6 @@ const TugasComponent = () => {
     setOpen(false);
     setFormOld({});
     setFormData({});
-    console.log(formOld, formData);
   };
 
   const handleOk = async (event) => {
@@ -84,8 +82,8 @@ const TugasComponent = () => {
 
     try {
       if (formOld && formOld.id) {
-        const response = await axiosPrivate.put(`/task`, formOld.id, formOld);
-        const successMessage = response.data;
+        const response = await axiosPrivate.put(`/task/${formOld.id}`, formOld);
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
@@ -95,8 +93,9 @@ const TugasComponent = () => {
         event.preventDefault();
         setFormOld({});
       } else {
+        console.log(formData);
         const response = await axiosPrivate.post(`/task`, formData);
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
@@ -106,8 +105,6 @@ const TugasComponent = () => {
         event.preventDefault();
       }
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
         Swal.fire({
@@ -184,18 +181,20 @@ const TugasComponent = () => {
             size="large"
             placeholder="Pilih Ekstrakurikuler"
             className="w-full"
-            value={formOld ? formOld.ekskul_id : formData.ekskul_id}
-            onChange={(value) => handleInputChange(value, "ekskul_id")}
+            value={formOld && formOld.ekskul ? formOld.ekskul.id : undefined}
+            onChange={(e) => handleInputChange(e, "ekskul_id")}
             options={ekskulOption}
           />
           <label htmlFor="" className="text-lg">
-            Ekstrakurikuler
+            Tanggal
           </label>
           <DatePicker
             size="large"
+            format="DD-MM-YYYY"
+            placeholder="Masukan tanggal"
             name="date"
-            value={selectedDate}
-            onChange={handleChange}
+            value={formOld && formOld.date ? dayjs(formOld.date) : null}
+            onChange={(e) => handleInputChange(e, "date")}
           />
         </form>
       </Modal>

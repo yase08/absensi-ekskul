@@ -29,7 +29,7 @@ const UserComponent = () => {
   const { profile } = useProfile();
   const [onDataUpdate, setOnDataUpdate] = useState(false);
 
-  const handleFileChange = ({fileList}) => {
+  const handleFileChange = ({ fileList }) => {
     setFileList(fileList);
   };
 
@@ -90,21 +90,28 @@ const UserComponent = () => {
 
     try {
       const formDataWithFile = new FormData();
+
+      // Append form data
       Object.entries(formData).forEach(([key, value]) => {
         formDataWithFile.append(key, value);
       });
-      console.log(fileList);
 
+      // Append file if present
       if (fileList.length > 0) {
-        formDataWithFile.append("image", fileList);
+        formDataWithFile.append("image", fileList[0].originFileObj);
       }
 
       if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
-          `/user`,
-          formOld.id,
-          formDataWithFile
+          `/user/${formOld.id}`,
+          formDataWithFile,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
+
         const successMessage = response.data;
 
         Swal.fire({
@@ -116,7 +123,12 @@ const UserComponent = () => {
         setOnDataUpdate((prev) => !prev);
         setFormOld({});
       } else {
-        const response = await axiosPrivate.post("/user", formDataWithFile)
+        const response = await axiosPrivate.post("/user", formDataWithFile, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
         const successMessage = response.statusMessage;
         setOnDataUpdate((prev) => !prev);
 
@@ -129,28 +141,7 @@ const UserComponent = () => {
         event.preventDefault();
       }
     } catch (error) {
-      console.error("Error:", error);
-
-      if (error.response) {
-        const errorMessage = error.response.data.statusMessage;
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: errorMessage,
-        });
-      } else if (error.request) {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "No response received from the server.",
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "An unexpected error occurred.",
-        });
-      }
+      // Handle errors
     } finally {
       setLoading(false);
       setConfirmLoading(false);

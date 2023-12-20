@@ -174,8 +174,8 @@ const TableTugas = ({ setFormOld, setOpen }) => {
   const handleDeleteRequest = async (id) => {
     setLoading(true);
     try {
-      const response = await axiosPrivate.delete(`/task`, id);
-      const successMessage = response.statusMessage;
+      const response = await axiosPrivate.delete(`/task/${id}`);
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",
@@ -185,8 +185,6 @@ const TableTugas = ({ setFormOld, setOpen }) => {
 
       handleGetRequest();
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.statusMessage;
         Swal.fire({
@@ -234,6 +232,7 @@ const TableTugas = ({ setFormOld, setOpen }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("ekskul"),
+      render: (text) => (text ? text.name : "-"),
     },
     {
       title: "Pembuat",
@@ -244,30 +243,45 @@ const TableTugas = ({ setFormOld, setOpen }) => {
       ...getColumnSearchProps("user"),
     },
     {
+      title: "Tanggal",
+      dataIndex: "date",
+      sorter: handleSort("date"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("date"),
+      render: (text) =>
+        text ? Intl.DateTimeFormat("en-US").format(new Date(text)) : "-",
+    },
+    {
       title: "Aksi",
       dataIndex: "action",
       width: "20%",
       render: (_, record) => (
-        <Space
-          size={"middle"}
-          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
-        >
-          <a className="hover:text-blue-500" onClick={() => handleEdit(record)}>
-            <BsPencil size={20} />
-          </a>
-          <a
-            className="hover:text-red-500"
-            onClick={() => handleDeleteRequest(record.id)}
+        <>
+          <Space
+            size={"middle"}
+            className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
           >
-            <LuTrash size={20} />
-          </a>
-          <a
-            className="hover:text-green-500"
-            href={`/admin/penugasan/nilai/${record.id}`}
-          >
-            <BiDetail size={20} />
-          </a>
-        </Space>
+            <a
+              className="hover:text-blue-500"
+              onClick={() => handleEdit(record)}
+            >
+              <BsPencil size={20} />
+            </a>
+            <a
+              className="hover:text-red-500"
+              onClick={() => handleDeleteRequest(record.id)}
+            >
+              <LuTrash size={20} />
+            </a>
+            <a
+              className="hover:text-green-500"
+              href={`/admin/penugasan/nilai/${record.id}`}
+            >
+              <BiDetail size={20} />
+            </a>
+          </Space>
+        </>
       ),
     },
   ];

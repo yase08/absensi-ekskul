@@ -20,11 +20,8 @@ const Jumbotron = ({ expanded }) => {
         withCredentials: true,
       });
 
-      if (response && response.data) {
-        console.log("API Response:", response.data);
-        console.log(response);
-
-        const responseData = response.data;
+      if (response && response.data.data) {
+        const responseData = response.data.data;
         setAdmin(responseData.adminCount);
         setInstructor(responseData.instructorCount);
         setStudent(responseData.studentCount);

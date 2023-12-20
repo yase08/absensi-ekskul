@@ -99,15 +99,24 @@ const GalleryComponent = () => {
       if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
           `/gallery/${formOld.id}`,
-          formDataWithFile
+          formDataWithFile,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
-        const successMessage = response.data.statusMessage; // Use the correct property
+        const successMessage = response.data.statusMessage;
 
         message.success(successMessage);
         setFormOld({});
       } else {
-        const response = await axiosPrivate.post(`/gallery`, formDataWithFile);
-        const successMessage = response.data.statusMessage; // Use the correct property
+        const response = await axiosPrivate.post(`/gallery`, formDataWithFile, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        const successMessage = response.data.statusMessage;
 
         message.success(successMessage);
       }

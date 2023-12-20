@@ -34,6 +34,11 @@ class ActivityProgramRoutes extends ActivityProgramController {
       [authorization(), auth(), permission(["instructor", "admin"])],
       this.getAllActivityProgram
     );
+    this.router.get(
+      "/author",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getAllActivityProgramByAuthor
+    );
     this.router.put(
       "/:id",
       [

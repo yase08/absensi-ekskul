@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import TableJadwal from "./Table";
 import Swal from "sweetalert2";
 import { Modal, Select, TimePicker } from "antd";
+import dayjs from "dayjs";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const Jadwal = () => {
@@ -25,7 +26,7 @@ const Jadwal = () => {
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormData((prevData) => ({
+      setFormOld((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
@@ -131,11 +132,10 @@ const Jadwal = () => {
     try {
       if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
-          `/activity`,
-          formOld.id,
+          `/activity/${formOld.id}`,
           formOld
         );
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
@@ -145,7 +145,7 @@ const Jadwal = () => {
         setFormOld({});
       } else {
         const response = await axiosPrivate.post(`/activity`, formData);
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
@@ -154,8 +154,6 @@ const Jadwal = () => {
         });
       }
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
         Swal.fire({
@@ -275,17 +273,15 @@ const Jadwal = () => {
           <label htmlFor="" className="text-lg">
             Jam Mulai & Jam Berakhir
           </label>
-          <TimePicker.RangePicker
+          {/* <TimePicker.RangePicker
             size="large"
             format={"HH:mm"}
-            onChange={(e) => handleInputChange(e, "startTime", "endTime")}
+            onChange={(value) => handleInputChange(value, "date")}
             placeholder={["Jam Mulai", "Jam Berakhir"]}
             value={
-              formOld
-                ? [formOld.startTime, formOld.endTime]
-                : [formData.startTime, formData.endTime]
+              formOld ? [formOld.start_time, formOld.end_time] : [null, null]
             }
-          />
+          /> */}
         </form>
       </Modal>
     </div>

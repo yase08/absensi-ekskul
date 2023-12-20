@@ -145,7 +145,6 @@ const TableAbsensiPost = ({ date }) => {
       const response = await axiosPrivate.get(
         `/student/ekskul?ekskul_id=${ekskul}`
       );
-      console.log(response);
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
@@ -173,16 +172,14 @@ const TableAbsensiPost = ({ date }) => {
         `/attendance?ekskul_id=${ekskul}`,
         formData
       );
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Berhasil!",
         text: successMessage,
       });
     } catch (error) {
-      console.error("Error:", error);
-
       if (error) {
         const errorMessage = error.response.statusMessage;
         Swal.fire({

@@ -4,13 +4,13 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-background-clip: text;
   -webkit-text-fill-color: #ffffff;
-    transition: background-color 5000s ease-in-out 0s;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .custom-background {
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  background-image: url("https://hariannusantara.com/wp-content/uploads/2019/06/gambar-pemandangan-pegunungan9.jpg");
+  background-image: url("../../../assets//bg.png");
   /* Properti background lainnya */
 }

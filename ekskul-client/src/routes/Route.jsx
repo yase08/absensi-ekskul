@@ -13,7 +13,7 @@ import AbsensiDashboard from "../pages/Admin/Absensi/Absensi";
 import AbsensiPostDashboard from "../pages/Admin/Absensi/AbsensiPost";
 import DetailAbsensiDashboard from "../pages/Admin/Absensi/Detail";
 import Login from "../pages/Admin/Login/Login";
-import { createBrowserRouter } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PenilaianDashboard from "../pages/Admin/Tugas/Nilai";
 import InstrukturDashboard from "../pages/Admin/Instruktur/Instruktur";
 import PenilaianPostDashboard from "../pages/Admin/Tugas/PenilaianPost";
@@ -21,96 +21,131 @@ import TugasDashboard from "../pages/Admin/Tugas/Tugas";
 import HariDashboard from "../pages/Admin/Hari/Hari";
 import UserDashboard from "../pages/Admin/User/User";
 import DetailGalleryDashboard from "../pages/Admin/Gallery/Detail/Detail";
+import PersistLogin from "../components/Admin/User/PersistLogin";
+import RequireAuth from "../components/Admin/User/RequireAuth";
+import NotFound from "../pages/Admin/NotFound/NotFound";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Dashboard />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/admin/dashboard",
-    element: <AdminDashboard />,
-  },
-  {
-    path: "/admin/penugasan/penilaian/:id",
-    element: <PenilaianPostDashboard />,
-  },
-  {
-    path: "/admin/hari",
-    element: <HariDashboard />,
-  },
-  {
-    path: "/admin/penugasan/nilai/:id",
-    element: <PenilaianDashboard />,
-  },
-  {
-    path: "/admin/user",
-    element: <UserDashboard />,
-  },
-  {
-    path: "/admin/penugasan",
-    element: <TugasDashboard />,
-  },
-  {
-    path: "/admin/rombel",
-    element: <RombelDashboard />,
-  },
-  {
-    path: "/admin/rayon",
-    element: <RayonDashboard />,
-  },
-  {
-    path: "/admin/absensi-siswa",
-    element: <AbsensiDashboard />,
-  },
-  {
-    path: "/admin/absensi-siswa/tambah",
-    element: <AbsensiPostDashboard />,
-  },
-  {
-    path: "/admin/absensi-siswa/detail/:id",
-    element: <DetailAbsensiDashboard />,
-  },
-  {
-    path: "/admin/ekstrakurikuler",
-    element: <EkstrakurikulerDashboard />,
-  },
-  {
-    path: "/admin/jadwal",
-    element: <JadwalDashboard />,
-  },
-  {
-    path: "/admin/program",
-    element: <ProgramDashboard />,
-  },
-  {
-    path: "/admin/siswa",
-    element: <SiswaDashboard />,
-  },
-  {
-    path: "/admin/ruangan",
-    element: <RuanganDashboard />,
-  },
-  {
-    path: "/admin/profile",
-    element: <ProfileDashboard />,
-  },
-  {
-    path: "/admin/gallery",
-    element: <GalleryDashboard />,
-  },
-  {
-    path: "/admin/gallery/detail/:slug",
-    element: <DetailGalleryDashboard />,
-  },
-  {
-    path: "/admin/absensi-instruktur",
-    element: <InstrukturDashboard />,
-  },
-]);
+const AppRouter = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/*" element={<NotFound />} />
+        <Route path="/" element={<Dashboard />} />
+        <Route element={<PersistLogin />}>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route
+              path="/admin/penugasan/penilaian/:id"
+              element={<PenilaianDashboard />}
+            />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route
+              path="/admin/penugasan/penilaian"
+              element={<PenilaianPostDashboard />}
+            />
+          </Route>
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+            <Route path="/admin/hari" element={<HariDashboard />} />
+          </Route>
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+            <Route path="/admin/user" element={<UserDashboard />} />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route path="/admin/penugasan" element={<TugasDashboard />} />
+          </Route>
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+            <Route path="/admin/rombel" element={<RombelDashboard />} />
+          </Route>
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+            <Route path="/admin/rayon" element={<RayonDashboard />} />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route path="/admin/absensi-siswa" element={<AbsensiDashboard />} />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route
+              path="/admin/absensi-siswa/tambah"
+              element={<AbsensiPostDashboard />}
+            />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route
+              path="/admin/absensi-siswa/detail/:id"
+              element={<DetailAbsensiDashboard />}
+            />
+          </Route>
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+            <Route
+              path="/admin/ekstrakurikuler"
+              element={<EkstrakurikulerDashboard />}
+            />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route path="/admin/jadwal" element={<JadwalDashboard />} />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route path="/admin/program" element={<ProgramDashboard />} />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route path="/admin/siswa" element={<SiswaDashboard />} />
+          </Route>
+          <Route element={<RequireAuth allowedRoles={["admin"]} />}>
+            <Route path="/admin/ruangan" element={<RuanganDashboard />} />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route path="/admin/profile" element={<ProfileDashboard />} />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route path="/admin/gallery" element={<GalleryDashboard />} />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route
+              path="/admin/gallery/detail/:slug"
+              element={<DetailGalleryDashboard />}
+            />
+          </Route>
+          <Route
+            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
+          >
+            <Route
+              path="/admin/absensi-instruktur"
+              element={<InstrukturDashboard />}
+            />
+          </Route>
+        </Route>
+      </Routes>
+    </Router>
+  );
+};
 
-export default router;
+export default AppRouter;

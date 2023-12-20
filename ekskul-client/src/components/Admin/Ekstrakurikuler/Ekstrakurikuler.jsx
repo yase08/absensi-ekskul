@@ -1,5 +1,5 @@
 import Table from "./Table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { Modal, Select, Input } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
@@ -13,7 +13,7 @@ const EkstrakurikulerComponent = () => {
     category: "",
   });
   const [formOld, setFormOld] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [editFormData, setEditFormData] = useState(null);
 
   const showModal = () => {
     setOpen(true);
@@ -26,22 +26,26 @@ const EkstrakurikulerComponent = () => {
 
   const handleOk = async (event) => {
     event.preventDefault();
-    setLoading(true);
+    setConfirmLoading(true);
 
     try {
-      if (formOld && formOld.id) {
-        const response = await axiosPrivate.put(`/ekskul`, formOld.id, formOld);
-        const successMessage = response.statusMessage;
+      if (editFormData && editFormData.id) {
+        const response = await axiosPrivate.put(
+          `/ekskul/${editFormData.id}`,
+          editFormData
+        );
+        const successMessage = response.data.statusMessage;
 
         Swal.fire({
           icon: "success",
           title: "Success!",
           text: successMessage,
         });
-        setFormOld({});
+        setEditFormData(null);
       } else {
         const response = await axiosPrivate.post(`/ekskul`, formData);
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
+        setOpen(false);
 
         Swal.fire({
           icon: "success",
@@ -50,8 +54,6 @@ const EkstrakurikulerComponent = () => {
         });
       }
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
         Swal.fire({
@@ -81,8 +83,8 @@ const EkstrakurikulerComponent = () => {
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-    if (formOld) {
-      setFormOld((prevData) => ({
+    if (editFormData) {
+      setEditFormData((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
