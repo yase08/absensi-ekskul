@@ -235,7 +235,7 @@ const DetailGallery = ({ setFormOld, setOpen }) => {
           const imageArray = JSON.parse(item.images);
           return (
             <div
-              className="w-full rounded-lg grid grid-cols-2 gap-5"
+              className="w-full rounded-lg grid grid-cols-2 max-md:grid-cols-1 gap-5"
               key={index}
             >
               {imageArray.map((imageName, imageIndex) => (
