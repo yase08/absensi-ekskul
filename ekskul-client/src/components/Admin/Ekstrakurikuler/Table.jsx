@@ -6,13 +6,11 @@ import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableEkskul = ({ setFormOld, setOpen }) => {
+const TableEkskul = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
@@ -144,27 +142,6 @@ const TableEkskul = ({ setFormOld, setOpen }) => {
     onChange: handleChangePage,
     onShowSizeChange: handleChangePageSize,
   });
-
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/ekskul`);
-
-      if (response.status === 200 && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const ekskulData = response.data.data;
-          setData(ekskulData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteRequest = async (id) => {
     setLoading(true);

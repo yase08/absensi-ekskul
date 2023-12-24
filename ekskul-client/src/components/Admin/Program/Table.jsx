@@ -7,13 +7,11 @@ import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
 import dayjs from "dayjs";
 
-const TableProgram = ({ setFormOld, setOpen }) => {
+const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
@@ -145,25 +143,6 @@ const TableProgram = ({ setFormOld, setOpen }) => {
     onShowSizeChange: handleChangePageSize,
   });
 
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/activity-program/author`);
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const activityProgramData = response.data.data;
-          setData(activityProgramData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteRequest = async (id) => {
     setLoading(true);
@@ -206,15 +185,6 @@ const TableProgram = ({ setFormOld, setOpen }) => {
   };
 
   const handleEdit = async (item) => {
-    // const startDate = dayjs(item.startDate)
-    // const endDate = dayjs(item.endDate)
-
-    // setFormOld({
-    //   id: item.id,
-    //   activity: item.activity,
-    //   task: item.task,
-    //   date: [startDate, endDate]
-    // });
     setFormOld(item)
     setOpen(true);
   };
@@ -294,10 +264,6 @@ const TableProgram = ({ setFormOld, setOpen }) => {
       ),
     },
   ];
-
-  useEffect(() => {
-    handleGetRequest();
-  }, []);
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

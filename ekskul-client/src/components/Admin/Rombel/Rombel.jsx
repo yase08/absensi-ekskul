@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TableEskul from "./Table";
 import Swal from "sweetalert2";
 import "./Rombel.css"; // Import a CSS file for styling (create this file if not already present)
@@ -11,6 +11,8 @@ const Rombel = () => {
   const [formOld, setFormOld] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
 
   const handleInputChange = (e) => {
     if (formOld) {
@@ -28,6 +30,27 @@ const Rombel = () => {
     }
   };
 
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/rombel`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const rombelData = response.data.data;
+          setData(rombelData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handlePostRequest = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -41,6 +64,7 @@ const Rombel = () => {
         title: "Success!",
         text: successMessage,
       });
+      handleGetRequest();
     } catch (error) {
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
@@ -70,7 +94,6 @@ const Rombel = () => {
   const handleUpdateRequest = async (event) => {
     event.preventDefault();
     setLoading(true);
-    console.log(formOld);
 
     try {
       const response = await axiosPrivate.put(`/rombel/${formOld.id}`, formOld);
@@ -82,6 +105,7 @@ const Rombel = () => {
         text: successMessage,
       });
       setFormOld("");
+      handleGetRequest();
     } catch (error) {
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
@@ -107,6 +131,10 @@ const Rombel = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    handleGetRequest();
+  }, []);
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -142,7 +170,7 @@ const Rombel = () => {
           </div>
         </div>
         <div className="w-full bg-white mt-5 mb-5">
-          <TableEskul setFormOld={setFormOld} />
+          <TableEskul setFormOld={setFormOld} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
     </div>

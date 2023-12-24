@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button, Tag } from "antd";
@@ -6,13 +6,11 @@ import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableSiswa = ({ setFormOld, setOpen }) => {
+const TableSiswa = ({ setFormOld, setOpen, handleGetRequest, data }) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
@@ -144,27 +142,6 @@ const TableSiswa = ({ setFormOld, setOpen }) => {
     onChange: handleChangePage,
     onShowSizeChange: handleChangePageSize,
   });
-
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/student`);
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const studentData = response.data.data;
-          setData(studentData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteRequest = async (id) => {
     setLoading(true);
@@ -323,10 +300,6 @@ const TableSiswa = ({ setFormOld, setOpen }) => {
     },
   ];
 
-  useEffect(() => {
-    handleGetRequest();
-  }, []);
-  
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
       <div className="overflow-x-auto hidden-scroll w-full">

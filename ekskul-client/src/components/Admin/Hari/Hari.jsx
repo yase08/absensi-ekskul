@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { useProfile } from "../../../context/ProfileContext";
-import { Modal, Select, Input } from "antd";
+import { Modal,  Input } from "antd";
 
 const HariComponent = () => {
   const [open, setOpen] = useState(false);
@@ -12,6 +12,8 @@ const HariComponent = () => {
   const [formData, setFormData] = useState({
     day: "",
   });
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -31,6 +33,27 @@ const HariComponent = () => {
         ...prevData,
         [inputName]: newValue,
       }));
+    }
+  };
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/schedule/day`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const scheduleData = response.data.data;
+          setData(scheduleData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,6 +105,7 @@ const HariComponent = () => {
         });
         event.preventDefault();
         setFormOld({});
+        handleGetRequest()
       } else {
         const response = await axiosPrivate.post(`/schedule`, formData);
         const successMessage = response.data.statusMessage;
@@ -92,6 +116,7 @@ const HariComponent = () => {
           text: successMessage,
         });
         event.preventDefault();
+        handleGetRequest()
       }
     } catch (error) {
       if (error.response) {
@@ -124,6 +149,7 @@ const HariComponent = () => {
   useEffect(() => {
     profile;
     handleGetEkskulRequest();
+    handleGetRequest();
   }, []);
 
   return (
@@ -141,7 +167,7 @@ const HariComponent = () => {
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal

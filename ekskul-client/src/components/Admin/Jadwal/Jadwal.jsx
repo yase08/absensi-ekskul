@@ -18,6 +18,8 @@ const Jadwal = () => {
   });
   const axiosPrivate = useAxiosPrivate();
   const [hari, setHari] = useState([]);
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [ekskul, setEkskul] = useState([]);
   const [room, setRoom] = useState([]);
   const [formOld, setFormOld] = useState("");
@@ -64,6 +66,27 @@ const Jadwal = () => {
     setDate(date)
     handleInputChange(dateString, "time")
   }
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/activity`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const activityData = response.data.data;
+          setData(activityData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGetRoomRequest = async () => {
     try {
@@ -171,6 +194,7 @@ const Jadwal = () => {
           text: successMessage,
         });
         setFormOld({});
+        handleGetRequest()
       } else {
         const response = await axiosPrivate.post(`/activity`, formData);
         const successMessage = response.data.statusMessage;
@@ -180,6 +204,7 @@ const Jadwal = () => {
           title: "Success!",
           text: successMessage,
         });
+        handleGetRequest()
       }
     } catch (error) {
       if (error.response) {
@@ -223,6 +248,7 @@ const Jadwal = () => {
     handleGetEkskulRequest();
     handleGetHariRequest();
     handleGetRoomRequest();
+    handleGetRequest();
   }, []);
   
   
@@ -242,7 +268,7 @@ const Jadwal = () => {
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <TableJadwal setFormOld={setFormOld} setOpen={setOpen} />
+          <TableJadwal setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal

@@ -1,19 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableInstruktur = () => {
+const TableInstruktur = ({ data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
-  const axiosPrivate = useAxiosPrivate();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {[]
     confirm();
@@ -141,27 +137,6 @@ const TableInstruktur = () => {
     onShowSizeChange: handleChangePageSize,
   });
 
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get("/instructor-attendance");
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const attendanceData = response.data.data;
-          setData(attendanceData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const columns = [
     {
       title: "No",
@@ -207,10 +182,6 @@ const TableInstruktur = () => {
       },
     },
   ];
-
-  useEffect(() => {
-    handleGetRequest();
-  }, []);
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

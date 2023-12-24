@@ -17,6 +17,8 @@ const SiswaComponent = () => {
   const [rombel, setRombel] = useState([]);
   const [rayon, setRayon] = useState([]);
   const [ekskul, setEkskul] = useState([]);
+  const [error, setError] = useState()
+  const [data, setData] = useState([])
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -35,6 +37,7 @@ const SiswaComponent = () => {
   const [formOld, setFormOld] = useState();
   const [loading, setLoading] = useState(false);
   const ekskul_id = localStorage.getItem("ekskul_id")
+
   const handleSelectChange = (value) => {
     if (localStorage.getItem("ekskul_id") !== null) {
       localStorage.removeItem("ekskul_id");
@@ -44,6 +47,28 @@ const SiswaComponent = () => {
     }
 
   }
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/student`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const studentData = response.data.data;
+          setData(studentData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGetRombelRequest = async () => {
     try {
       const response = await axiosPrivate.get(`/rombel`);
@@ -149,6 +174,7 @@ const SiswaComponent = () => {
           title: "Berhasil!",
           text: successMessage,
         });
+        handleGetRequest()
         setFormOld({});
       } else {
         const response = await axiosPrivate.post(`/student`, formData);
@@ -160,6 +186,7 @@ const SiswaComponent = () => {
           text: successMessage,
         });
         setFormData({});
+        handleGetRequest()
       }
     } catch (error) {
       if (error.response) {
@@ -260,6 +287,7 @@ const SiswaComponent = () => {
     handleGetRombelRequest();
     handleGetRayonRequest();
     handleGetEkskulRequest();
+    handleGetRequest()
   }, []);
 
   return (
@@ -300,7 +328,7 @@ const SiswaComponent = () => {
           </div>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal

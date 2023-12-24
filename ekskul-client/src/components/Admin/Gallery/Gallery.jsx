@@ -23,6 +23,8 @@ const GalleryComponent = () => {
     name: "",
   });
   const [fileList, setFileList] = useState([]);
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -81,6 +83,28 @@ const GalleryComponent = () => {
     setFormOld({});
     setFormData({});
     setFileList([]);
+  };
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/gallery`);
+      console.log(response);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const galleryData = response.data.data;
+          setData(galleryData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOk = async (event) => {
@@ -168,7 +192,7 @@ const GalleryComponent = () => {
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal

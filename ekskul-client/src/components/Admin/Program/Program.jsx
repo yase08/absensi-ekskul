@@ -17,6 +17,8 @@ const Program = () => {
     startDate: "",
     endDate: "",
   });
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [formOld, setFormOld] = useState("");
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -75,6 +77,26 @@ const Program = () => {
     setDate([])
   };
 
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/activity-program/author`);
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const activityProgramData = response.data.data;
+          setData(activityProgramData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOk = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -92,6 +114,7 @@ const Program = () => {
           text: successMessage,
         });
         setFormOld({});
+        handleGetRequest()
       } else {
         const response = await axiosPrivate.post(`/activity-program`, formData);
         const successMessage = response.data.statusMessage;
@@ -101,6 +124,7 @@ const Program = () => {
           title: "Berhasil!",
           text: successMessage,
         });
+        handleGetRequest()
       }
     } catch (error) {
       if (error.response) {
@@ -167,6 +191,10 @@ const Program = () => {
       setDate([dayjsStartDate, dayjsEndDate]);
     }
   }, [formOld.startDate, formOld.endDate]);
+
+  useEffect(() => {
+    handleGetRequest();
+  }, []);
   
 
   return (
@@ -189,7 +217,7 @@ const Program = () => {
           </div>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <TableProgram setFormOld={setFormOld} setOpen={setOpen} />
+          <TableProgram setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal

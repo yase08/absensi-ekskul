@@ -23,6 +23,8 @@ const UserComponent = () => {
       },
     ],
   });
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [fileList, setFileList] = useState([]);
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -83,6 +85,27 @@ const UserComponent = () => {
     setOpen(false);
     setFormOld({});
     setFormData({});
+  };
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/user`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const userData = response.data.data;
+          setData(userData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOk = async (event) => {
@@ -153,6 +176,7 @@ const UserComponent = () => {
   useEffect(() => {
     profile;
     handleGetEkskulRequest();
+    handleGetRequest()
   }, []);
 
   return (
@@ -174,6 +198,8 @@ const UserComponent = () => {
             setFormOld={setFormOld}
             setOpen={setOpen}
             onDataUpdate={setOnDataUpdate}
+            data={data}
+            handleGetRequest={handleGetRequest}
           />
         </div>
       </div>

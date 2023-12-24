@@ -11,30 +11,25 @@ const TugasComponent = () => {
   const [open, setOpen] = useState(false);
   const axiosPrivate = useAxiosPrivate();
   const [ekskul, setEkskul] = useState([]);
-  const [formData, setFormData] = useState();
-  const [formOld, setFormOld] = useState({});
+  const [formData, setFormData] = useState({
+    name: "",
+    ekskul_id: "",
+    date: ""
+  });
+  const [data, setData] = useState([]);
+  const [error, setError] =  useState()
+  const [formOld, setFormOld] = useState();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-
     if (formOld) {
-      if (inputName === "ekskul_id") {
-        setFormOld((prevData) => ({
-          ...prevData,
-          ekskul_id: newValue,
-          ekskul: {
-            id: newValue,
-          },
-        }));
-      } else if (inputName === "date") {
-        setFormOld((prevData) => ({
-          ...prevData,
-          date: newValue,
-        }));
-      }
+      setFormOld((prevData) => ({
+        ...prevData,
+        [inputName]: newValue,
+      }));
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -78,6 +73,27 @@ const TugasComponent = () => {
     setFormData({});
   };
 
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/task`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const taskData = response.data.data;
+          setData(taskData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOk = async (event) => {
     setLoading(true);
 
@@ -93,8 +109,8 @@ const TugasComponent = () => {
         });
         event.preventDefault();
         setFormOld({});
+        handleGetRequest()
       } else {
-        console.log(formData);
         const response = await axiosPrivate.post(`/task`, formData);
         const successMessage = response.data.statusMessage;
 
@@ -104,6 +120,7 @@ const TugasComponent = () => {
           text: successMessage,
         });
         event.preventDefault();
+        handleGetRequest()
       }
     } catch (error) {
       if (error.response) {
@@ -136,6 +153,7 @@ const TugasComponent = () => {
   useEffect(() => {
     profile;
     handleGetEkskulRequest();
+    handleGetRequest()
   }, []);
 
   return (
@@ -153,7 +171,7 @@ const TugasComponent = () => {
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal
@@ -182,7 +200,7 @@ const TugasComponent = () => {
             size="large"
             placeholder="Pilih Ekstrakurikuler"
             className="w-full"
-            value={formOld && formOld.ekskul ? formOld.ekskul.id : undefined}
+            value={formOld && formOld.ekskul ? formOld.ekskul_id : formData.ekskul}
             onChange={(e) => handleInputChange(e, "ekskul_id")}
             options={ekskulOption}
           />
@@ -194,7 +212,7 @@ const TugasComponent = () => {
             format="DD-MM-YYYY"
             placeholder="Masukan tanggal"
             name="date"
-            value={formOld && formOld.date ? dayjs(formOld.date) : null}
+            value={formOld && formOld.date ? dayjs(formOld.date) : formData.date}
             onChange={(e) => handleInputChange(e, "date")}
           />
         </form>

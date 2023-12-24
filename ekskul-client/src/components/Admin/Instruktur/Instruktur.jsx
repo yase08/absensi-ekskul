@@ -17,6 +17,8 @@ const InstrukturComponent = () => {
     category: "",
     date: "",
   });
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [selectedDate, setSelectedDate] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,6 +50,28 @@ const InstrukturComponent = () => {
     setOpen(false);
   };
 
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get("/instructor-attendance");
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const attendanceData = response.data.data;
+          setData(attendanceData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const handleOk = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -64,6 +88,7 @@ const InstrukturComponent = () => {
         title: "Success!",
         text: successMessage,
       });
+      handleGetRequest()
     } catch (error) {
       console.error("Error:", error);
 
@@ -143,7 +168,7 @@ const InstrukturComponent = () => {
           </div>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table />
+          <Table data={data} handleGetRequest={handleGetRequest} />
         </div>
         <Modal
           title={"Tambah Data"}

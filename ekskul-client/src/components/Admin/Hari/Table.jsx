@@ -1,18 +1,12 @@
-import { useState, useEffect, useRef } from "react";
-import Swal from "sweetalert2";
+import { useState, useRef } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
-import { LuTrash } from "react-icons/lu";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableHari = ({ setFormOld, setOpen }) => {
+const TableHari = ({ setFormOld, setOpen, data }) => {
   const [searchText, setSearchText] = useState("");
-  const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
@@ -149,27 +143,6 @@ const TableHari = ({ setFormOld, setOpen }) => {
     onShowSizeChange: handleChangePageSize,
   });
 
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/schedule/day`);
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const scheduleData = response.data.data;
-          setData(scheduleData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const columns = [
     {
       title: "No",
@@ -201,10 +174,6 @@ const TableHari = ({ setFormOld, setOpen }) => {
       ),
     },
   ];
-
-  useEffect(() => {
-    handleGetRequest();
-  }, []);
   
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

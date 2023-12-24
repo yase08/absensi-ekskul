@@ -13,6 +13,8 @@ const EkstrakurikulerComponent = () => {
     name: "",
     category: "",
   });
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [formOld, setFormOld] = useState("");
   const [editFormData, setEditFormData] = useState(null);
 
@@ -24,6 +26,28 @@ const EkstrakurikulerComponent = () => {
     setOpen(false);
     setFormOld({});
   };
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/ekskul`);
+
+      if (response.status === 200 && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const ekskulData = response.data.data;
+          setData(ekskulData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleOk = async (event) => {
     event.preventDefault();
@@ -42,12 +66,14 @@ const EkstrakurikulerComponent = () => {
           title: "Success!",
           text: successMessage,
         });
+        handleGetRequest()
         setEditFormData(null);
       } else {
         const response = await axiosPrivate.post(`/ekskul`, formData);
         const successMessage = response.data.statusMessage;
         setOpen(false);
 
+        handleGetRequest()
         Swal.fire({
           icon: "success",
           title: "Success!",
@@ -97,6 +123,11 @@ const EkstrakurikulerComponent = () => {
     }
   };
 
+  useEffect(() => {
+    handleGetRequest()
+  }
+  , []);
+
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
       <div className="w-full flex flex-col gap-2">
@@ -112,7 +143,7 @@ const EkstrakurikulerComponent = () => {
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal
