@@ -26,6 +26,7 @@ const Jadwal = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState()
+  const [selectedDate, setSelectedDate] = useState()
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -62,8 +63,8 @@ const Jadwal = () => {
     }}
     
 
-  const selectedDate = (date, dateString) => {
-    setDate(date)
+  const inputSelectedDate = (date, dateString) => {
+    setSelectedDate(date)
     handleInputChange(dateString, "time")
   }
 
@@ -234,15 +235,15 @@ const Jadwal = () => {
     }
   };
 
-  useEffect(() => {
-    if (formOld) {
-      const dayjsStartTime = dayjs(formOld.startTime, 'HH:mm:ss');
-      const dayjsEndTime = dayjs(formOld.endTime, 'HH:mm:ss');
-      console.log(formOld);
+ useEffect(() => {
+  if (formOld && !date.length) {
+    const dayjsStartTime = dayjs(formOld.startTime, 'HH:mm:ss');
+    const dayjsEndTime = dayjs(formOld.endTime, 'HH:mm:ss');
 
-      setDate([dayjsStartTime, dayjsEndTime]);
-    }
-  }, [formOld]);
+    setDate([dayjsStartTime, dayjsEndTime]);
+  }
+}, [formOld, date]);
+
   
   useEffect(() => {
     handleGetEkskulRequest();
@@ -342,9 +343,9 @@ const Jadwal = () => {
            <TimePicker.RangePicker
             size="large"
             format={"HH:mm"}
-            onChange={(date, dateString) => selectedDate(date, dateString)}
+            onChange={(date, dateString) => inputSelectedDate(date, dateString)}
             placeholder={["Jam Mulai", "Jam Berakhir"]}
-            value={date}
+            value={selectedDate ? selectedDate : date}
           />
         </form>
       </Modal>

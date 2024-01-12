@@ -210,12 +210,25 @@ const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     },
     {
       title: "Ekstrakurikuler",
-      dataIndex: "ekskul",
-      sorter: handleSort("ekskul"),
+      dataIndex: "ekskuls",
+      sorter: handleSort("ekskuls"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("ekskul"),
-      render: (text) => (text ? text.name : "-"),
+      ...getColumnSearchProps("ekskuls"),
+      render: (ekskuls) =>
+        ekskuls
+          ? ekskuls.map((ekskul) => {
+              return (
+                <Tag
+                  key={ekskul.id}
+                  color="geekblue"
+                  style={{ marginRight: 5 }}
+                >
+                  {ekskul.name}
+                </Tag>
+              );
+            })
+          : "-",
     },
     {
       title: "Pembuat",
@@ -259,7 +272,7 @@ const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
             </a>
             <a
               className="hover:text-green-500"
-              href={`/admin/penugasan/penilaian/${record.id}`}
+              href={`/admin/penugasan/nilai/${record.id}`}
             >
               <BiDetail size={20} />
             </a>

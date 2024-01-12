@@ -3,7 +3,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 
-const TableHari = ({ setFormOld, setOpen, data }) => {
+const TableHari = ({ data }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,11 +20,6 @@ const TableHari = ({ setFormOld, setOpen, data }) => {
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
-  };
-
-  const handleEdit = async (item) => {
-    setFormOld(item);
-    setOpen(true);
   };
 
   const handleSort = (dataIndex) => (a, b) => {
@@ -155,23 +150,8 @@ const TableHari = ({ setFormOld, setOpen, data }) => {
       dataIndex: "day",
       sorter: handleSort("day"),
       sortDirections: ["descend", "ascend"],
-      width: "20%",
+      width: "25%",
       ...getColumnSearchProps("day"),
-    },
-    {
-      title: "Aksi",
-      dataIndex: "action",
-      width: "20%",
-      render: (_, record) => (
-        <Space
-          size={"middle"}
-          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
-        >
-          <a className="hover:text-blue-500" onClick={() => handleEdit(record)}>
-            <BsPencil size={20} />
-          </a>
-        </Space>
-      ),
     },
   ];
   

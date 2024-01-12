@@ -60,12 +60,6 @@ export class StudentService {
 
   async getAllStudentService(req: Request): Promise<any> {
     try {
-      // const sort: string =
-      //   typeof req.query.sort === "string" ? req.query.sort : "";
-      // const filter: string =
-      //   typeof req.query.filter === "string" ? req.query.filter : "";
-      // const page: any = req.query.page;
-
       const paramQuerySQL: any = {
         attributes: ["id", "name", "nis", "email", "mobileNumber", "gender"],
         include: [
@@ -85,36 +79,6 @@ export class StudentService {
           },
         ],
       };
-      // let limit: number;
-      // let offset: number;
-
-      // const totalRows = await db.student.count();
-
-      // if (filter) {
-      //   paramQuerySQL.where = {
-      //     name: {
-      //       [Op.like]: `%${filter}%`,
-      //     },
-      //   };
-      // }
-
-      // if (sort) {
-      //   const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-      //   const fieldName = sort.replace(/^-/, "");
-      //   paramQuerySQL.order = [[fieldName, sortOrder]];
-      // }
-
-      // if (page && page.size && page.number) {
-      //   limit = parseInt(page.size, 10);
-      //   offset = (parseInt(page.number, 10) - 1) * limit;
-      //   paramQuerySQL.limit = limit;
-      //   paramQuerySQL.offset = offset;
-      // } else {
-      //   limit = 10;
-      //   offset = 0;
-      //   paramQuerySQL.limit = limit;
-      //   paramQuerySQL.offset = offset;
-      // }
 
       const student = await db.student.findAll(paramQuerySQL);
 
@@ -157,7 +121,6 @@ export class StudentService {
           status.OK,
           "Berhasil mendapatkan siswa",
           manipulatedStudent,
-          // totalRows
         )
       );
     } catch (error: any) {
@@ -175,6 +138,8 @@ export class StudentService {
       const ekskul_id = req.query.ekskul_id as string;
       const task_id = req.query.task_id as string;
 
+      const assessmentSubquery = `(SELECT student_id FROM assessments WHERE task_id = '${task_id}')`;
+
       const paramQuerySQL: any = {
         attributes: ["id", "name"],
         include: [
@@ -184,32 +149,22 @@ export class StudentService {
             where: { id: ekskul_id },
           },
         ],
-      };
-
-      const studentWithoutAssessment = await db.student.findAll({
-        ...paramQuerySQL,
         where: {
           id: {
-            [Op.notIn]: [
-              db.sequelize.literal(
-                `(SELECT student_id FROM assessment WHERE ekskul_id = ${ekskul_id} AND task_id = ${task_id})`
-              ),
-            ],
+            [db.Sequelize.Op.notIn]: db.Sequelize.literal(assessmentSubquery),
           },
         },
+      };
+
+      const studentsWithoutAssessment = await db.student.findAll({
+        ...paramQuerySQL,
       });
 
-      if (!studentWithoutAssessment || studentWithoutAssessment.length === 0) {
-        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
-      }
-
-      const manipulatedStudent = studentWithoutAssessment.map(
-        (student: any) => {
-          return {
-            id: student.id,
-            name: student.name,
-          };
-        }
+      const manipulatedStudent = studentsWithoutAssessment.map(
+        (student: any) => ({
+          id: student.id,
+          name: student.name,
+        })
       );
 
       return Promise.resolve(

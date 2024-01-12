@@ -14,26 +14,16 @@ const HariComponent = () => {
   });
   const [data, setData] = useState([]);
   const [error, setError] = useState();
-  const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-    if (formOld) {
-      if (inputName === "day") {
-        setFormOld((prevData) => ({
-          ...prevData,
-          [inputName]: newValue,
-        }));
-      }
-    } else {
       setFormData((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
-    }
   };
 
   const handleGetRequest = async () => {
@@ -83,7 +73,6 @@ const HariComponent = () => {
 
   const handleCancel = () => {
     setOpen(false);
-    setFormOld({});
     setFormData({});
   };
 
@@ -91,22 +80,6 @@ const HariComponent = () => {
     setLoading(true);
 
     try {
-      if (formOld && formOld.id) {
-        const response = await axiosPrivate.put(
-          `/schedule/${formOld.id}`,
-          formOld
-        );
-        const successMessage = response.data.statusMessage;
-
-        Swal.fire({
-          icon: "success",
-          title: "Berhasil!",
-          text: successMessage,
-        });
-        event.preventDefault();
-        setFormOld({});
-        handleGetRequest()
-      } else {
         const response = await axiosPrivate.post(`/schedule`, formData);
         const successMessage = response.data.statusMessage;
 
@@ -117,7 +90,6 @@ const HariComponent = () => {
         });
         event.preventDefault();
         handleGetRequest()
-      }
     } catch (error) {
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
@@ -167,11 +139,11 @@ const HariComponent = () => {
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
+          <Table data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal
-        title={formOld && formOld.id ? "Edit Data" : "Tambah Data"}
+        title={"Tambah Data"}
         open={open}
         onOk={handleOk}
         confirmLoading={confirmLoading}
@@ -182,7 +154,7 @@ const HariComponent = () => {
             Hari
           </label>
           <Input
-            value={formOld ? formOld.day : formData.day}
+            value={formData.day}
             type="text"
             name="day"
             size="large"
