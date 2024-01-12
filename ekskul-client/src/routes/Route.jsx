@@ -50,7 +50,7 @@ const AppRouter = () => {
             element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
           >
             <Route
-              path="/admin/penugasan/penilaian"
+              path="/admin/penugasan/nilai/:id"
               element={<PenilaianPostDashboard />}
             />
           </Route>

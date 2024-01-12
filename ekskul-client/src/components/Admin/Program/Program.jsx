@@ -13,6 +13,7 @@ const Program = () => {
   const axiosPrivate = useAxiosPrivate();
   const [formData, setFormData] = useState({
     activity: "",
+    author:"",
     task: "",
     startDate: "",
     endDate: "",

@@ -5,7 +5,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
-import dayjs from "dayjs";
+import { useProfile } from "../../../context/ProfileContext";
 
 const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");
@@ -16,6 +16,8 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const { profile } = useProfile();
+
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -185,7 +187,11 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   };
 
   const handleEdit = async (item) => {
-    setFormOld(item)
+    setFormOld({
+      activity: item.activity,
+      // author: User,
+      // item...
+    })
     setOpen(true);
   };
 

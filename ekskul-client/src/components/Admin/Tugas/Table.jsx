@@ -259,7 +259,7 @@ const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
             </a>
             <a
               className="hover:text-green-500"
-              href={`/admin/penugasan/nilai/${record.id}`}
+              href={`/admin/penugasan/penilaian/${record.id}`}
             >
               <BiDetail size={20} />
             </a>

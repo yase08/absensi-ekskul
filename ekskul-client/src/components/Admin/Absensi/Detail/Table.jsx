@@ -5,6 +5,7 @@ import { BsPencil } from "react-icons/bs";
 import { Table, Input, Space, Button, Modal, Select, DatePicker } from "antd";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import dayjs from "dayjs";
 
 const TableAbsensi = () => {
   const { id } = useParams();
@@ -12,8 +13,11 @@ const TableAbsensi = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
+    id: "",
     category: "",
     date: "",
+    student_id:"",
+    ekskul_id:""
   });
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -173,10 +177,6 @@ const TableAbsensi = () => {
     },
   ];
 
-  const showModal = () => {
-    setOpen(true);
-  };
-
   const handleCancel = () => {
     setOpen(false);
   };
@@ -218,12 +218,11 @@ const TableAbsensi = () => {
 
     try {
       const response = await axiosPrivate.put(
-        `/attendance`,
-        formData,
-        ekskul,
-        id
+        `/attendance/${formData.id}`,
+        formData
       );
       const successMessage = response.statusMessage;
+      handleGetRequest()
 
       Swal.fire({
         icon: "success",
@@ -304,7 +303,13 @@ const TableAbsensi = () => {
             className="hover:text-blue-500"
             onClick={() => {
               setOpen(true);
-              setFormData(record);
+              setFormData({
+                id: record.id,
+                student_id: record.student.id,
+                category: record.category,
+                date: record.date,
+                ekskul_id: record.ekskul.id
+              });
             }}
           >
             <BsPencil size={20} />
@@ -346,7 +351,7 @@ const TableAbsensi = () => {
           <Select
             size="large"
             className="w-full"
-            value={formData.category}
+            value={formData && formData.category}
             onChange={(e) => handleInputChange(e, "category")}
             options={categoryOption}
             placeholder="Pilih Kategory"
@@ -356,10 +361,9 @@ const TableAbsensi = () => {
           </label>
           <DatePicker
             name="date"
-            value={selectedDate ? selectedDate : formData.date}
+            value={formData && formData.date ? dayjs(formData.date) : selectedDate}
             onChange={(selectedDate, dateString) => {
               setSelectedDate(selectedDate);
-              console.log(selectedDate);
               handleInputChange(dateString, "date");
             }}
           />

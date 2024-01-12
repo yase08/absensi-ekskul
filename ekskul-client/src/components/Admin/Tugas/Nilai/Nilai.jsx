@@ -134,7 +134,7 @@ const NilaiComponent = () => {
             Penilaian Siswa
           </h1>
           <a
-            href={`/admin/penugasan/penilaian/${task.id}`}
+            href={`/admin/penugasan/nilai/${task.id}`}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
             Penilaian

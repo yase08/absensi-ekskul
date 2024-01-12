@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import Table from "./Table";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DatePicker, Modal, Select } from "antd/lib";
 import { useProfile } from "../../../context/ProfileContext";
 import { IoAddSharp } from "react-icons/io5";
@@ -147,6 +147,12 @@ const InstrukturComponent = () => {
       console.error('Export failed:', error);
     }
   };
+
+  useEffect(() => {
+    handleGetRequest()
+
+  },[])
+  
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">

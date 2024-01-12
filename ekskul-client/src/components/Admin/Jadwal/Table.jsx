@@ -288,7 +288,7 @@ const TableJadwal = ({ setFormOld, setOpen, data, handleGetRequest }) => {
             currentPage * pageSize
           )}
           pagination={getPaginationConfig()}
-          loading={loading}
+          loading={false}
           scroll={{ x: "max-content" }}
         />
       </div>
