@@ -54,21 +54,7 @@ export class InstructorAttendanceService {
   async getAllInstructorAttendanceService(req: Request): Promise<any> {
     const ekskulIds = (req.session as ISession).user.ekskul;
     try {
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const filter: string =
-        typeof req.query.filter === "string" ? req.query.filter : "";
-      const page: any = req.query.page;
-
       const paramQuerySQL: any = {};
-      let limit: number;
-      let offset: number;
-
-      if (filter) {
-        paramQuerySQL.where = {
-          name: { [Op.like]: `%${filter}%` },
-        };
-      }
 
       paramQuerySQL.include = [
         {
@@ -82,33 +68,6 @@ export class InstructorAttendanceService {
           attributes: ["id", "name"],
         },
       ];
-
-      if (sort) {
-        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-        const fieldName = sort.replace(/^-/, "");
-        paramQuerySQL.order = [[fieldName, sortOrder]];
-      }
-
-      if (page && page.size && page.number) {
-        limit = parseInt(page.size, 10);
-        offset = (parseInt(page.number, 10) - 1) * limit;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      } else {
-        limit = 10;
-        offset = 0;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-        if (ekskulIds.length > 1) {
-          paramQuerySQL.where = {
-            ekskul_id: ekskulIds,
-          };
-        } else if (ekskulIds.length === 1) {
-          paramQuerySQL.where = {
-            ekskul_id: ekskulIds[0],
-          };
-        }
-      }
 
       const instructorAttendance = await db.instructorAttendance.findAll(
         paramQuerySQL
@@ -137,14 +96,11 @@ export class InstructorAttendanceService {
         };
       });
 
-      const totalRows = instructorAttendance.length;
-
       return Promise.resolve(
         apiResponse(
           status.OK,
           "Berhasil mendapatkan absensi instruktur",
           manipulatedResponse,
-          totalRows
         )
       );
     } catch (error: any) {

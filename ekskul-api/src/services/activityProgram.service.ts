@@ -12,6 +12,7 @@ const db = require("../db/models");
 export class ActivityProgramService {
   async createActivityProgramService(req: Request): Promise<any> {
     try {
+      const instructor_Id = (req.session as ISession).user.id;
       const activityProgram = await db.activityProgram.findOne({
         where: { activity: req.body.activity },
       });
@@ -24,7 +25,7 @@ export class ActivityProgramService {
 
       const createActivityProgram = await db.activityProgram.create({
         ...req.body,
-        author: (req.session as any).user.id,
+        author: instructor_Id,
       });
 
       if (!createActivityProgram)
@@ -49,46 +50,30 @@ export class ActivityProgramService {
 
   async getAllActivityProgramByAuthorService(req: Request): Promise<any> {
     try {
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const filter: string =
-        typeof req.query.filter === "string" ? req.query.filter : "";
-      const page: any = req.query.page;
-
       const paramQuerySQL: any = {};
-      let limit: number;
-      let offset: number;
 
-      const totalRows = await db.activityProgram.count();
-
-      if (filter) {
-        paramQuerySQL.where = {
-          activity: {
-            [Op.like]: `%${filter}%`,
-          },
-          author: (req.session as any).user.id,
-        };
-      }
-
-      if (sort) {
-        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-        const fieldName = sort.replace(/^-/, "");
-        paramQuerySQL.order = [[fieldName, sortOrder]];
-      }
-
-      if (page && page.size && page.number) {
-        limit = parseInt(page.size, 10);
-        offset = (parseInt(page.number, 10) - 1) * limit;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      } else {
-        limit = 10;
-        offset = 0;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      }
+      // paramQuerySQL.include = [
+      //   {
+      //     model: db.user,
+      //     as: "user",
+      //     attributes: ["id", "name"],
+      //   },
+      // ];
 
       const activityProgram = await db.activityProgram.findAll(paramQuerySQL);
+
+      const modifiedProgram = activityProgram.map((activity) => {
+        return {
+          id: activity.id,
+          activity: activity.activity,
+          task: activity.task,
+          author: activity.author,
+          startDate: activity.startDate,
+          endDate: activity.endDate,
+          createdAt: activity.createdAt,
+          updatedAt: activity.updatedAt,
+        };
+      });
 
       if (!activityProgram || activityProgram.length === 0)
         throw apiResponse(
@@ -100,75 +85,7 @@ export class ActivityProgramService {
         apiResponse(
           status.OK,
           "Berhasil mendapatkan aktivitas program",
-          activityProgram,
-          totalRows
-        )
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getAllActivityProgramService(req: Request): Promise<any> {
-    try {
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const filter: string =
-        typeof req.query.filter === "string" ? req.query.filter : "";
-      const page: any = req.query.page;
-
-      const paramQuerySQL: any = {};
-      let limit: number;
-      let offset: number;
-
-      const totalRows = await db.activityProgram.count();
-
-      if (filter) {
-        paramQuerySQL.where = {
-          activity: {
-            [Op.like]: `%${filter}%`,
-          },
-        };
-      }
-
-      if (sort) {
-        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-        const fieldName = sort.replace(/^-/, "");
-        paramQuerySQL.order = [[fieldName, sortOrder]];
-      }
-
-      if (page && page.size && page.number) {
-        limit = parseInt(page.size, 10);
-        offset = (parseInt(page.number, 10) - 1) * limit;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      } else {
-        limit = 10;
-        offset = 0;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      }
-
-      const activityProgram = await db.activityProgram.findAll(paramQuerySQL);
-
-      if (!activityProgram || activityProgram.length === 0)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Aktivitas program tidak ditemukan"
-        );
-
-      return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Berhasil mendapatkan aktivitas program",
-          activityProgram,
-          totalRows
+          modifiedProgram,
         )
       );
     } catch (error: any) {

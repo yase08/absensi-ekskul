@@ -99,11 +99,12 @@ const Ruangan = () => {
   const handleUpdateRequest = async (event) => {
     event.preventDefault();
     setLoading(true);
-    console.log(formOld);
 
     try {
-      const response = await axiosPrivate.put(`/room`, formOld.id, formOld);
+      const response = await axiosPrivate.put(`/room/${formOld.id}`, formOld);
       const successMessage = response.statusMessage;
+
+      handleGetRequest()
 
       Swal.fire({
         icon: "success",

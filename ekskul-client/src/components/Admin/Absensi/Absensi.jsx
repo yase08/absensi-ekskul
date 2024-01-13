@@ -57,17 +57,11 @@ const AbsensiComponent = () => {
   };
 
   useEffect(() => {
-    // Retrieve the ekskul_id from local storage on component mount
     const storedEkskulId = localStorage.getItem("ekskul_id");
     if (storedEkskulId) {
       setSelectedEkskul(storedEkskulId);
     }
   }, []);
-
-  // const handleInputChange = (value) => {
-  //   localStorage.setItem("ekskul_id", value);
-  //   setSelectedEkskul(value);
-  // };
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">

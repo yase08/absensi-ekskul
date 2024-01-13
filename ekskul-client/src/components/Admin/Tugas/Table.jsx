@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
-import { Table, Input, Space, Button } from "antd";
+import { Table, Input, Space, Button, Tag } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { BiDetail } from "react-icons/bi";
 import { LuTrash } from "react-icons/lu";
@@ -32,7 +32,7 @@ const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const handleEdit = async (item) => {
     setFormOld({
       ...item,
-      ekskul_id: item.ekskul.id
+      ekskul_id: item.ekskul.id,
     });
     setOpen(true);
   };
@@ -153,7 +153,6 @@ const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     onShowSizeChange: handleChangePageSize,
   });
 
-
   const handleDeleteRequest = async (id) => {
     setLoading(true);
     try {
@@ -210,25 +209,19 @@ const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     },
     {
       title: "Ekstrakurikuler",
-      dataIndex: "ekskuls",
-      sorter: handleSort("ekskuls"),
+      dataIndex: "ekskul",
+      sorter: handleSort("ekskul"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("ekskuls"),
-      render: (ekskuls) =>
-        ekskuls
-          ? ekskuls.map((ekskul) => {
-              return (
-                <Tag
-                  key={ekskul.id}
-                  color="geekblue"
-                  style={{ marginRight: 5 }}
-                >
-                  {ekskul.name}
-                </Tag>
-              );
-            })
-          : "-",
+      ...getColumnSearchProps("ekskul"),
+      render: (ekskul) =>
+        ekskul ? (
+          <Tag key={ekskul.id} color="geekblue" style={{ marginRight: 5 }}>
+            {ekskul.name}
+          </Tag>
+        ) : (
+          "-"
+        ),
     },
     {
       title: "Pembuat",

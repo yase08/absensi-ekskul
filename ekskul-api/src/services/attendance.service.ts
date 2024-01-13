@@ -394,22 +394,9 @@ export class AttendanceService {
         res.setHeader('Content-Disposition', `attachment; filename=${file}`);
 
         const exportDir = path.join(__dirname, "../public/export/");
-        const filePath = path.join(exportDir, file);
+        // const filePath = path.join(exportDir, file);
         
 
-        // const fileStream = fs.createReadStream(filePath);
-        // fileStream.pipe(res);
-        // fileStream.on('end', () => {
-        //   // Clean up: Close the file stream after sending
-        //   fs.unlink(filePath, (err) => {
-        //     if (err) {
-        //       console.error('Error deleting file:', err);
-        //     }
-        //   });
-        // });
-        // res.sendFile(filePath)
-        console.log(exportSuccess);
-        
         if (!exportSuccess) {
           throw apiResponse(status.FORBIDDEN, "Export failed");
         }
@@ -437,38 +424,12 @@ export class AttendanceService {
       const ekskuls = (req.session as ISession).user.ekskul;
       const selectedEkskulId = req.query.ekskul_id as string;
 
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const page: any = req.query.page;
-
       // Checking if the selected ekskul is in the user's ekskul list
       if (ekskuls.includes(selectedEkskulId)) {
         const paramQuerySQL: any = {
           where: { ekskul_id: selectedEkskulId },
         };
-        let limit: number;
-        let offset: number;
-
-        // Sorting logic based on the provided sort parameter
-        if (sort) {
-          const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-          const fieldName = sort.replace(/^-/, "");
-          paramQuerySQL.order = [[fieldName, sortOrder]];
-        }
-
-        // Pagination logic
-        if (page && page.size && page.number) {
-          limit = parseInt(page.size, 10);
-          offset = (parseInt(page.number, 10) - 1) * limit;
-          paramQuerySQL.limit = limit;
-          paramQuerySQL.offset = offset;
-        } else {
-          limit = 10;
-          offset = 0;
-          paramQuerySQL.limit = limit;
-          paramQuerySQL.offset = offset;
-        }
-
+      
         // Include associations (ekskul and student) in the query
         paramQuerySQL.include = [
           {

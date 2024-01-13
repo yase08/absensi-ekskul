@@ -25,8 +25,8 @@ const Jadwal = () => {
   const [formOld, setFormOld] = useState("");
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [date, setDate] = useState()
-  const [selectedDate, setSelectedDate] = useState()
+  const [date, setDate] = useState([])
+  // const [selectedDate, setSelectedDate] = useState()
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -64,7 +64,7 @@ const Jadwal = () => {
     
 
   const inputSelectedDate = (date, dateString) => {
-    setSelectedDate(date)
+    setDate(date)
     handleInputChange(dateString, "time")
   }
 
@@ -179,7 +179,6 @@ const Jadwal = () => {
   const handleOk = async (event) => {
     event.preventDefault();
     setLoading(true);
-    console.log(formOld);
 
     try {
       if (formOld && formOld.id) {
@@ -345,7 +344,7 @@ const Jadwal = () => {
             format={"HH:mm"}
             onChange={(date, dateString) => inputSelectedDate(date, dateString)}
             placeholder={["Jam Mulai", "Jam Berakhir"]}
-            value={selectedDate ? selectedDate : date}
+            value={date}
           />
         </form>
       </Modal>

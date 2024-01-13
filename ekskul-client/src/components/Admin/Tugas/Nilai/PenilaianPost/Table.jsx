@@ -21,7 +21,6 @@ const TablePenilaianPost = ({ date }) => {
   const ekskul = localStorage.getItem("ekskul_id");
   const task = useParams();
 
-  console.log(date);
   const handleInputChange = (studentId, grade) => {
     const newAttendance = {
       date: date,
@@ -33,7 +32,6 @@ const TablePenilaianPost = ({ date }) => {
       (attendance) => attendance.student_id !== studentId
     );
     setformData([...updatedformData, newAttendance]);
-    console.log(formData);
   };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {

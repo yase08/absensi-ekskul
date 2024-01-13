@@ -255,7 +255,7 @@ const TableSiswa = ({ setFormOld, setOpen, handleGetRequest, data }) => {
       dataIndex: "ekskuls",
       width: "20%",
       render: (ekskuls) =>
-        ekskuls
+        ekskuls.length > 0
           ? ekskuls.map((ekskul) => {
               return (
                 <Tag
@@ -279,13 +279,23 @@ const TableSiswa = ({ setFormOld, setOpen, handleGetRequest, data }) => {
           className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
         >
           <a className="hover:text-blue-500" onClick={() => {
+            console.log(record);
+            if (record.ekskuls.length > 0) {
               setFormOld({
-               ...record,
-               rombel_id: record.rombel.id,
-               rayon_id: record.rayon.id,
-               ekskuls: [record.ekskuls[0].id, record.ekskuls[1].id]
+                ...record,
+                rombel_id: record.rombel.id,
+                rayon_id: record.rayon.id,
+                ekskuls: [record.ekskuls[0].id, record.ekskuls[1].id]
               })
-             setOpen(true)
+            } else {
+              setFormOld({
+                ...record,
+                rombel_id: record.rombel.id,
+                rayon_id: record.rayon.id,
+                ekskuls: []
+              })
+            }
+            setOpen(true)
              }}>
             <BsPencil size={20} />
           </a>

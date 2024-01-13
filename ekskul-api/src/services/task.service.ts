@@ -44,25 +44,7 @@ export class TaskService {
 
   async getAllTaskService(req: Request): Promise<any> {
     try {
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const filter: string =
-        typeof req.query.filter === "string" ? req.query.filter : "";
-      const page: any = req.query.page;
-
       const paramQuerySQL: any = {};
-      let limit: number;
-      let offset: number;
-
-      const totalRows = await db.task.count();
-
-      if (filter) {
-        paramQuerySQL.where = {
-          name: {
-            [Op.like]: `%${filter}%`,
-          },
-        };
-      }
 
       paramQuerySQL.include = [
         {
@@ -76,24 +58,6 @@ export class TaskService {
           attributes: ["id", "name"],
         },
       ];
-
-      if (sort) {
-        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-        const fieldName = sort.replace(/^-/, "");
-        paramQuerySQL.order = [[fieldName, sortOrder]];
-      }
-
-      if (page && page.size && page.number) {
-        limit = parseInt(page.size, 10);
-        offset = (parseInt(page.number, 10) - 1) * limit;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      } else {
-        limit = 10;
-        offset = 0;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      }
 
       const task = await db.task.findAll(paramQuerySQL);
 
@@ -116,7 +80,7 @@ export class TaskService {
         throw apiResponse(status.NOT_FOUND, "Tugas tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Berhasil mendapatkan tugas", modifiedTask, totalRows)
+        apiResponse(status.OK, "Berhasil mendapatkan tugas", modifiedTask)
       );
     } catch (error: any) {
       return Promise.reject(

@@ -13,7 +13,6 @@ const Program = () => {
   const axiosPrivate = useAxiosPrivate();
   const [formData, setFormData] = useState({
     activity: "",
-    author:"",
     task: "",
     startDate: "",
     endDate: "",
@@ -85,6 +84,7 @@ const Program = () => {
         if (Array.isArray(response.data.data)) {
           const activityProgramData = response.data.data;
           setData(activityProgramData);
+          console.log(data);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -185,13 +185,13 @@ const Program = () => {
   };
 
   useEffect(() => {
-    if (formOld) {
+    if (formOld && !date.length) {
       const dayjsStartDate = dayjs(formOld.startDate);
       const dayjsEndDate = dayjs(formOld.endDate);
     
       setDate([dayjsStartDate, dayjsEndDate]);
     }
-  }, [formOld.startDate, formOld.endDate]);
+  }, [formOld, date]);
 
   useEffect(() => {
     handleGetRequest();

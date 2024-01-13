@@ -13,12 +13,13 @@ import { LuUpload } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import Table from "./Table";
 import { IoAddSharp } from "react-icons/io5";
+import dayjs from "dayjs";
 
 const GalleryComponent = () => {
   const [open, setOpen] = useState(false);
   const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
-    date: null,
+    date: "",
     ekskul_id: "",
     name: "",
   });
@@ -28,6 +29,7 @@ const GalleryComponent = () => {
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState()
   const axiosPrivate = useAxiosPrivate();
 
   const handleFileChange = ({ fileList }) => {
@@ -37,7 +39,7 @@ const GalleryComponent = () => {
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormData((prevData) => ({
+      setFormOld((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
@@ -142,6 +144,7 @@ const GalleryComponent = () => {
       const successMessage = response.data.statusMessage;
 
       message.success(successMessage);
+      handleGetRequest()
       setFormOld({});
     } catch (error) {
       console.error("Error:", error);
@@ -175,6 +178,7 @@ const GalleryComponent = () => {
 
   useEffect(() => {
     handleGetEkskulRequest();
+    handleGetRequest();
   }, []);
 
   return (
@@ -192,7 +196,12 @@ const GalleryComponent = () => {
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
+          <Table
+            setFormOld={setFormOld}
+            setOpen={setOpen}
+            data={data}
+            handleGetRequest={handleGetRequest}
+          />
         </div>
       </div>
       <Modal
@@ -211,7 +220,7 @@ const GalleryComponent = () => {
             size="large"
             name="name"
             onChange={(value) => handleInputChange(value, "name")}
-            value={formOld ? formOld.name : formData.name}
+            value={formOld && formOld.name ? formOld.name : formData.name}
           />
           <label htmlFor="" className="text-lg">
             Upload Gambar
@@ -231,8 +240,8 @@ const GalleryComponent = () => {
             className="w-full"
             size="large"
             placeholder="Pilih Ekstrakurikuler"
-            value={formOld ? formOld.ekskul_id : formData.ekskul_id} // Use plural form
-            onChange={(value) => handleInputChange(value, "ekskul_id")} // Use plural form
+            value={formOld && formOld.ekskul_id ? formOld.ekskul_id : formData.ekskul_id} 
+            onChange={(value) => handleInputChange(value, "ekskul_id")} 
             options={ekskulOption}
           />
           <label htmlFor="" className="text-lg">
@@ -242,8 +251,11 @@ const GalleryComponent = () => {
             placeholder={"Pilih Tanggal"}
             size="large"
             name="date"
-            onChange={(value) => handleInputChange(value, "date")} // Use the correct property
-            value={formOld ? formOld.date : formData.date} // Use the correct property
+            onChange={(selectedDate, dateString) => {
+              setSelectedDate(selectedDate);
+              handleInputChange(dateString, "date");
+            }}
+            value={formOld && formOld.date ? dayjs(formOld.date) : selectedDate}
           />
         </form>
       </Modal>

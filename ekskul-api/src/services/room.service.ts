@@ -39,7 +39,6 @@ export class RoomService {
 
   async getAllRoomService(req: Request): Promise<any> {
     try {
-
       const paramQuerySQL: any = {};
       const room = await db.room.findAll(paramQuerySQL);
 

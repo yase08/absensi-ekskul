@@ -163,6 +163,7 @@ const SiswaComponent = () => {
 
     try {
       if (formOld && formOld.id) {
+        console.log(formOld);
         const response = await axiosPrivate.put(
           `/student/${formOld.id}`,
           formOld
@@ -426,7 +427,7 @@ const SiswaComponent = () => {
             size="large"
             rules={{ required: true, message: "Rayon Siswa Harus Diisi!" }}
             className="w-full"
-            value={formOld ?  formOld.rayon_id : formData.rayon}
+            value={formOld ? formOld.rayon_id : formData.rayon}
             onChange={(e) => handleInputChange(e, "rayon_id")}
             options={rayonOption}
             placeholder="Pilih Rayon"

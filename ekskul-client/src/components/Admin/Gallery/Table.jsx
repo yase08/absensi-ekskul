@@ -29,7 +29,10 @@ const TableGallery = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   };
 
   const handleEdit = async (item) => {
-    setFormOld(item);
+    setFormOld({
+      ...item,
+      ekskul_id : item.ekskul.id,
+    });
     setOpen(true);
   };
 
@@ -217,11 +220,12 @@ const TableGallery = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     },
     {
       title: "Ekstrakurikuler",
-      dataIndex: "name",
-      sorter: handleSort("name"),
+      dataIndex: "ekskul",
+      sorter: handleSort("ekskul"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("name"),
+      ...getColumnSearchProps("ekskul"),
+      render: (ekskul) => (ekskul ? ekskul.name : "-")
     },
     {
       title: "Aksi",

@@ -5,7 +5,6 @@ import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
 import { BiDetail } from "react-icons/bi";
-import { deleteAssessment, getAssessmentByTask } from "../../../../services/assessment.service";
 import { useParams } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 

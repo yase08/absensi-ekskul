@@ -211,13 +211,13 @@ const TableAbsensi = ({ selectedEkskul }) => {
           >
             <BiDetail size={20} />
           </Link>
-        </Space>
+      </Space>
       ),
     },
   ];
 
   useEffect(() => {
-    handleGetRequest();
+      handleGetRequest();
   }, [selectedEkskul]);
 
   return (

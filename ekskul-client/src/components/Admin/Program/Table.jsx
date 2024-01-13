@@ -187,11 +187,7 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   };
 
   const handleEdit = async (item) => {
-    setFormOld({
-      activity: item.activity,
-      // author: User,
-      // item...
-    })
+    setFormOld(item)
     setOpen(true);
   };
 

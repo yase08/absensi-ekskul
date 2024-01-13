@@ -1,38 +1,29 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { Modal, Select, Input } from "antd";
+import { Modal, Select, Input, DatePicker } from "antd";
 import { useProfile } from "../../../../context/ProfileContext";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import { useParams } from "react-router-dom";
+import dayjs from "dayjs";
 
 const NilaiComponent = () => {
   const task = useParams();
   const axiosPrivate = useAxiosPrivate();
   const [open, setOpen] = useState(false);
   const [ekskul, setEkskul] = useState([]);
-  const [formData, setFormData] = useState({
-    name: "",
-    ekskul_id: "",
-  });
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState()
   const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-    if (formOld) {
-      setFormData((prevData) => ({
+      setFormOld((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [inputName]: newValue,
-      }));
-    }
   };
 
   const handleGetEkskulRequest = async () => {
@@ -56,20 +47,10 @@ const NilaiComponent = () => {
     }
   };
 
-  const ekskulOption = ekskul.map((item) => ({
-    label: item.name,
-    value: item.id,
-  }));
-
-  const showModal = () => {
-    setOpen(true);
-  };
-
   const handleCancel = () => {
     setOpen(false);
     setFormOld({});
-    setFormData({});
-    console.log(formOld, formData);
+    console.log(formOld);
   };
 
   const handleOk = async (event) => {
@@ -153,26 +134,26 @@ const NilaiComponent = () => {
       >
         <form action="" className="flex flex-col p-5 gap-2">
           <label htmlFor="" className="text-lg">
-            Tugas Siswa
+            Nilai
           </label>
           <Input
-            value={formOld ? formOld.name : formData.name}
+            value={formOld ? formOld.grade : formData.grade}
             type="text"
             name="name"
             size="large"
-            placeholder="Masukan nama tugas"
-            onChange={(e) => handleInputChange(e, "name")}
+            placeholder="Nilai"
+            onChange={(e) => handleInputChange(e, "grade")}
           />
           <label htmlFor="" className="text-lg">
-            Ekstrakurikuler
+            Tanggal
           </label>
-          <Select
-            size="large"
-            placeholder="Pilih Ekstrakurikuler"
-            className="w-full"
-            value={formOld ? formOld.ekskul_id : formData.ekskul_id}
-            onChange={(value) => handleInputChange(value, "ekskul_id")}
-            options={ekskulOption}
+          <DatePicker
+            name="date"
+            value={formOld && formOld.date ? dayjs(formData.date) : selectedDate}
+            onChange={(selectedDate, dateString) => {
+              setSelectedDate(selectedDate);
+              handleInputChange(dateString, "date");
+            }}
           />
         </form>
       </Modal>
