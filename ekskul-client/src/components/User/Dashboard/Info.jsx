@@ -23,187 +23,257 @@ const Info = () => {
           </div>
           <div className='grid grid-cols-7 w-full gap-[5px]'>
             <div className='h-auto gap-[5px] bg-transparent grid grid-cols-1'>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
+              
             </div>
+           
             <div className='h-auto gap-[5px] bg-transparent grid grid-cols-1'>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
+              
             </div>
+           
             <div className='h-auto gap-[5px] bg-transparent grid grid-cols-1'>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
+              
             </div>
+           
             <div className='h-auto gap-[5px] bg-transparent grid grid-cols-1'>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
+              
             </div>
+           
             <div className='h-auto gap-[5px] bg-transparent grid grid-cols-1'>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
+              
             </div>
+           
             <div className='h-auto gap-[5px] bg-transparent grid grid-cols-1'>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
+              
             </div>
+           
             <div className='h-auto gap-[5px] bg-transparent grid grid-cols-1'>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
+              <div className='h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative'>
+                <p className='absolute text-[14px] bg-blue-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]'>11</p>
+                <p className='text-white capitalize text-[18px] font-bold tracking-wide mb-[10px] mr-[10px] text-shadow-md'>basket</p>
+                <div className='bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] '>
+                  <p className='font-Gabarito'>R.206</p>
+                  <p className='font-Gabarito'>16.30 - 17.00</p>
+                </div>
               </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
-              <div className='h-[210px] bg-black flex items-end justify-end p-[15px] '>
-                <p className='text-white'>basket</p>
-              </div>
+              
             </div>
+           
           </div>
         </div>
       </div>
