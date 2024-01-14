@@ -237,6 +237,10 @@ export class StudentService {
         where: { id: req.params.id },
       });
 
+      const ekskuls = await db.ekskul.findAll({
+        where: { id: req.body.ekskuls },
+      });
+
       if (!studentExist)
         throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
 
@@ -248,6 +252,20 @@ export class StudentService {
 
       if (!updateStudent)
         throw apiResponse(status.FORBIDDEN, "Update siswa gagal");
+
+      Promise.all(
+        ekskuls.map(async (ekskul) => {
+          try {
+            const updateStudentEkskuls = await db.studentOnEkskul.update({
+              student_id: updateStudent.id,
+              ekskul_id: ekskul.id,
+            });
+            return updateStudentEkskuls;
+          } catch (error) {
+            console.error(error);
+          }
+        })
+      );
 
       return Promise.resolve(apiResponse(status.OK, "Update siswa berhasil"));
     } catch (error: any) {

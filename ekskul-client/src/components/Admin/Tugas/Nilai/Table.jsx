@@ -248,6 +248,7 @@ const TableNilai = ({ setFormOld, setOpen }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("date"),
+      render: (text) => (text ? Intl.DateTimeFormat("en-US").format(new Date(text)) : "-")
     },
     {
       title: "Aksi",
