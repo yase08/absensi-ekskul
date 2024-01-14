@@ -16,7 +16,16 @@ const db = require("../db/models");
 export class AuthService {
   async loginService(req: Request, res: Response): Promise<any> {
     try {
-      const user = await db.user.findOne({ where: { email: req.body.email } });
+      const user = await db.user.findOne({
+        where: { email: req.body.email },
+        include: [
+          {
+            model: db.ekskul,
+            attributes: ["id", "name"],
+            as: "ekskuls",
+          },
+        ],
+      });
 
       if (!user) throw apiResponse(status.BAD_REQUEST, "Email tidak terdaftar");
 
@@ -35,7 +44,8 @@ export class AuthService {
         {
           id: user.id,
           name: user.name,
-          role: user.role
+          role: user.role,
+          ekskuls: user.ekskuls,
         },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: "1h" }
@@ -45,7 +55,7 @@ export class AuthService {
         {
           id: user.id,
           name: user.name,
-          role: user.role
+          role: user.role,
         },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: "1d" }
@@ -66,7 +76,6 @@ export class AuthService {
       return Promise.resolve(
         apiResponse(status.OK, "Login berhasil", {
           accessToken: token,
-          role: user.role,
         })
       );
     } catch (error: any) {
@@ -84,7 +93,6 @@ export class AuthService {
     try {
       const refreshToken = req.cookies.jwt;
       console.log(req.cookies);
-      
 
       if (!refreshToken) throw apiResponse(status.UNAUTHORIZED, "Unauthorized");
 
@@ -112,7 +120,7 @@ export class AuthService {
         {
           id: user.id,
           name: user.name,
-          role: user.role
+          role: user.role,
         },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: "1d" }
@@ -120,7 +128,6 @@ export class AuthService {
 
       return apiResponse(status.OK, "Refresh token", {
         accessToken: accessToken,
-        role: user.role,
       });
     } catch (error: any) {
       return apiResponse(

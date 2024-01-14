@@ -9,8 +9,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
-import { useProfile } from "../../../context/ProfileContext";
 import useAuth from "../../../hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
 
 // eslint-disable-next-line react/prop-types
 const TopNav = ({
@@ -28,8 +28,8 @@ const TopNav = ({
   const [isButtonVisible2, setIsButtonVisible2] = useState(false);
   const axiosPrivate = useAxiosPrivate();
   const [backgroundColor, setBackgroundColor] = useState("bg-primary");
-  const { profile } = useProfile();
-  const { setAuth, setPersist } = useAuth();
+  const { setAuth, setPersist, auth } = useAuth();
+  const {name} = jwtDecode(auth.accessToken)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -202,7 +202,7 @@ const TopNav = ({
               >
                 <div className="w-[30px] h-[30px]">{/* <AdminPicture/> */}</div>
                 <p className="text-white text-sm capitalize">
-                  {truncateName(`Hi, ${profile.name}`)}
+                  {truncateName(`Hi, ${name}`)}
                 </p>
               </button>
             </div>

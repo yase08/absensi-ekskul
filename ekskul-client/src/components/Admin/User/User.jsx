@@ -1,7 +1,6 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { useProfile } from "../../../context/ProfileContext";
 import { Modal, Select, Input, Upload, Button, Space } from "antd";
 import { LuUpload } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";

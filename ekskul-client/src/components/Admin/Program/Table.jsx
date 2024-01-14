@@ -5,7 +5,6 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
-import { useProfile } from "../../../context/ProfileContext";
 
 const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");

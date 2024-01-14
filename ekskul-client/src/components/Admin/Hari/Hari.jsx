@@ -2,7 +2,6 @@ import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
-import { useProfile } from "../../../context/ProfileContext";
 import { Modal,  Input } from "antd";
 
 const HariComponent = () => {

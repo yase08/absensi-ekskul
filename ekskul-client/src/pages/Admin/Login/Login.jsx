@@ -40,8 +40,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setPersist((prev) => !prev);
-    try {
+    setPersist(true);
+    try { 
       const response = await axiosWithAuth.post(
         `/auth/login`,
         { email, password },
@@ -52,8 +52,7 @@ const Login = () => {
       );
       if (response.data.statusCode === 200) {
         const accessToken = response.data.data.accessToken;
-        const role = response.data.data.role;
-        setAuth({ accessToken, role });
+        setAuth({ accessToken });
         navigate("/admin/dashboard", { replace: true });
       } else {
         console.error("Login failed:", response.data.message);
