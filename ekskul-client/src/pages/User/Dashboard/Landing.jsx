@@ -5,6 +5,7 @@ import Info from "../../../components/User/Dashboard/Info"
 import TopLay from "../../../components/User/Layouts/TopLay"
 import Jumbotron from "../../../components/User/Dashboard/Jumbotron"
 import Nextinfo from "../../../components/User/Dashboard/nextinfo"
+import List from "../../../components/User/Dashboard/List"
 
 const Dashboard = () => {
   return (
@@ -12,8 +13,8 @@ const Dashboard = () => {
     <div className="relative h-auto bg-[#ECF4FF]">
       <TopLay/>
       <Jumbotron/>
+      <List/>
       <Info/>
-      <Nextinfo/>
       {/* <TopNavbar/>
       <Navbar/>
       <div className="bg-transparent w-full mt-[100px] relative">
