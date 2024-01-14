@@ -5,6 +5,7 @@ import { useProfile } from "../../../context/ProfileContext";
 import { Modal, Select, Input, Upload, Button, Space } from "antd";
 import { LuUpload } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { IoAddSharp } from "react-icons/io5";
 
 const UserComponent = () => {
   const [open, setOpen] = useState(false);
@@ -22,6 +23,8 @@ const UserComponent = () => {
       },
     ],
   });
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [fileList, setFileList] = useState([]);
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -82,6 +85,27 @@ const UserComponent = () => {
     setOpen(false);
     setFormOld({});
     setFormData({});
+  };
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/user`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const userData = response.data.data;
+          setData(userData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOk = async (event) => {
@@ -152,6 +176,7 @@ const UserComponent = () => {
   useEffect(() => {
     profile;
     handleGetEkskulRequest();
+    handleGetRequest()
   }, []);
 
   return (
@@ -165,7 +190,7 @@ const UserComponent = () => {
             onClick={showModal}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            Add Data
+            <IoAddSharp size={20} />
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
@@ -173,6 +198,8 @@ const UserComponent = () => {
             setFormOld={setFormOld}
             setOpen={setOpen}
             onDataUpdate={setOnDataUpdate}
+            data={data}
+            handleGetRequest={handleGetRequest}
           />
         </div>
       </div>

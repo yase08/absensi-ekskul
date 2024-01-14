@@ -59,6 +59,16 @@ class ActivityProgramRoutes extends ActivityProgramController {
       ],
       this.deleteActivityProgram
     );
+    this.router.get(
+      "/export",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.exportToExcel
+    );
+    this.router.get(
+      "/export",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.exportAllToExcel
+    );
 
     return this.router;
   }

@@ -6,13 +6,11 @@ import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableRombel = ({ setFormOld }) => {
+const TableRombel = ({ setFormOld, data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
@@ -143,27 +141,6 @@ const TableRombel = ({ setFormOld }) => {
     onChange: handleChangePage,
     onShowSizeChange: handleChangePageSize,
   });
-
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/rombel`);
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const rombelData = response.data.data;
-          setData(rombelData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteRequest = async (id) => {
     setLoading(true);

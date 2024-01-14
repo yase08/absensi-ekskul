@@ -19,7 +19,16 @@ const useAxiosPrivate = () => {
     );
 
     const responseIntercept = axiosPrivate.interceptors.response.use(
-      (response) => response,
+      (response) => {
+         // Jika Anda ingin menangani blob untuk rute tertentu
+         if (response.config.url.includes('export')) {
+          // Handle response sebagai blob
+          // Misalnya, ubah responseType menjadi 'blob'
+          return { ...response, responseType: 'arraybuffer', method: 'GET', url: URL};
+        }
+        // Jika tidak, biarkan respons sesuai default
+        return response;
+      },
       async (error) => {
         const prevRequest = error?.config;
         if (error?.response?.status === 401 && !prevRequest?.sent) {

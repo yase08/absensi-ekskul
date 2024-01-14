@@ -1,4 +1,4 @@
-import axios from "../utils/config";
+import axios, { axiosPrivate } from "../utils/config";
 
 export const login = async (requestData) => {
   try {

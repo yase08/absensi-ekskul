@@ -2,17 +2,17 @@ import { useState, useEffect, useRef } from "react";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
-import { Table, Input, Space, Button } from "antd";
+import { Table, Input, Space, Button, Tag } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { BiDetail } from "react-icons/bi";
 import { LuTrash } from "react-icons/lu";
 
-const TableTugas = ({ setFormOld, setOpen }) => {
+// eslint-disable-next-line react/prop-types
+const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
@@ -30,7 +30,10 @@ const TableTugas = ({ setFormOld, setOpen }) => {
   };
 
   const handleEdit = async (item) => {
-    setFormOld(item);
+    setFormOld({
+      ...item,
+      ekskul_id: item.ekskul.id,
+    });
     setOpen(true);
   };
 
@@ -150,27 +153,6 @@ const TableTugas = ({ setFormOld, setOpen }) => {
     onShowSizeChange: handleChangePageSize,
   });
 
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/task`);
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const taskData = response.data.data;
-          setData(taskData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDeleteRequest = async (id) => {
     setLoading(true);
     try {
@@ -227,25 +209,19 @@ const TableTugas = ({ setFormOld, setOpen }) => {
     },
     {
       title: "Ekstrakurikuler",
-      dataIndex: "ekskuls",
-      sorter: handleSort("ekskuls"),
+      dataIndex: "ekskul",
+      sorter: handleSort("ekskul"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("ekskuls"),
-      render: (ekskuls) =>
-        ekskuls
-          ? ekskuls.map((ekskul) => {
-              return (
-                <Tag
-                  key={ekskul.id}
-                  color="geekblue"
-                  style={{ marginRight: 5 }}
-                >
-                  {ekskul.name}
-                </Tag>
-              );
-            })
-          : "-",
+      ...getColumnSearchProps("ekskul"),
+      render: (ekskul) =>
+        ekskul ? (
+          <Tag key={ekskul.id} color="geekblue" style={{ marginRight: 5 }}>
+            {ekskul.name}
+          </Tag>
+        ) : (
+          "-"
+        ),
     },
     {
       title: "Pembuat",
@@ -298,10 +274,6 @@ const TableTugas = ({ setFormOld, setOpen }) => {
       ),
     },
   ];
-
-  useEffect(() => {
-    handleGetRequest();
-  }, []);
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

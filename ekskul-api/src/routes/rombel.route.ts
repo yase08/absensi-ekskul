@@ -24,7 +24,7 @@ class RombelRoutes extends RombelController {
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin","instructor"])],
       this.getAllRombel
     );
     this.router.put(

@@ -1,11 +1,13 @@
 import path from "path";
 import fs from "fs/promises";
 import ExcelJS from "exceljs";
+import { Response } from "express";
 
 export const exportExcel = async (
   columns: any[],
   rows: any[],
-  filename: string
+  filename: string,
+  res: Response
 ): Promise<any> => {
   return new Promise(async (resolve, reject) => {
     const workbook = new ExcelJS.Workbook();
@@ -21,18 +23,14 @@ export const exportExcel = async (
       },
     });
 
+    const titleRow = worksheet.addRow(["Absensi SMK Wikrama Bogor"]);
+    titleRow.font = { bold: true };
+    titleRow.alignment = { vertical: "middle", horizontal: "center" };
+    titleRow.height = 50;
+    worksheet.mergeCells(`A1:${String.fromCharCode(65 + columns.length - 1)}1`);
+
     // Add custom header row
-    const customHeaderRow = worksheet.addRow([
-      "No",
-      "Nama",
-      "Nis",
-      "JK",
-      "Rombel",
-      "Rayon",
-      "Ekstrakurikuler",
-      "Keterangan",
-      "Tanggal",
-    ]);
+    const customHeaderRow = worksheet.addRow(columns.map(column => column.header));
     customHeaderRow.eachCell((cell, colNumber) => {
       cell.font = { bold: true };
       cell.border = {
@@ -41,7 +39,10 @@ export const exportExcel = async (
         bottom: { style: "thin", color: { argb: "000000" } },
         right: { style: "thin", color: { argb: "000000" } },
       };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
     });
+
+    customHeaderRow.height = 30
 
     worksheet.columns = columns;
     worksheet.addRows(rows);
@@ -54,6 +55,7 @@ export const exportExcel = async (
           bottom: { style: "thin", color: { argb: "000000" } },
           right: { style: "thin", color: { argb: "000000" } },
         };
+        cell.alignment = { vertical: "middle", horizontal: "center" };
       });
     });
 
@@ -65,7 +67,8 @@ export const exportExcel = async (
       await fs.mkdir(exportDir, { recursive: true });
 
       // Write the workbook to the file
-      await workbook.xlsx.writeFile(filePath);
+      // await workbook.xlsx.writeFile(filePath);
+      return await workbook.xlsx.write(res);
       resolve(true);
     } catch (error) {
       reject(error);

@@ -18,7 +18,7 @@ class StudentRoutes extends StudentController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin"]), validator(DTOStudent)],
+      [authorization(), auth(), permission(["admin", "instructor"]), validator(DTOStudent)],
       this.createStudent
     );
     this.router.get(
@@ -35,6 +35,16 @@ class StudentRoutes extends StudentController {
       "/assessment",
       [authorization(), auth(), permission(["admin", "instructor"])],
       this.getStudentOnAssessment
+    );
+    this.router.get(
+      "/export",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.exportStudent
+    );
+    this.router.get(
+      "/export-all",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.exportAllStudent
     );
     this.router.put(
       "/:id",

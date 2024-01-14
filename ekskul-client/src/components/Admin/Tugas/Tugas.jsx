@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { useProfile } from "../../../context/ProfileContext";
 import { Modal, Select, Input, DatePicker } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { IoAddSharp } from "react-icons/io5";
 import dayjs from "dayjs";
 
 const TugasComponent = () => {
@@ -13,16 +14,17 @@ const TugasComponent = () => {
   const [formData, setFormData] = useState({
     name: "",
     ekskul_id: "",
-    date: "",
+    date: ""
   });
-  const [formOld, setFormOld] = useState({});
+  const [data, setData] = useState([]);
+  const [error, setError] =  useState()
+  const [formOld, setFormOld] = useState();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-
     if (formOld) {
       setFormOld((prevData) => ({
         ...prevData,
@@ -71,6 +73,27 @@ const TugasComponent = () => {
     setFormData({});
   };
 
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/task`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const taskData = response.data.data;
+          setData(taskData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOk = async (event) => {
     setLoading(true);
 
@@ -86,8 +109,8 @@ const TugasComponent = () => {
         });
         event.preventDefault();
         setFormOld({});
+        handleGetRequest()
       } else {
-        console.log(formData);
         const response = await axiosPrivate.post(`/task`, formData);
         const successMessage = response.data.statusMessage;
 
@@ -97,6 +120,7 @@ const TugasComponent = () => {
           text: successMessage,
         });
         event.preventDefault();
+        handleGetRequest()
       }
     } catch (error) {
       if (error.response) {
@@ -129,6 +153,7 @@ const TugasComponent = () => {
   useEffect(() => {
     profile;
     handleGetEkskulRequest();
+    handleGetRequest()
   }, []);
 
   return (
@@ -142,11 +167,11 @@ const TugasComponent = () => {
             onClick={showModal}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            Add Data
+            <IoAddSharp size={20} />
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal
@@ -175,10 +200,8 @@ const TugasComponent = () => {
             size="large"
             placeholder="Pilih Ekstrakurikuler"
             className="w-full"
-            value={
-              formOld && formOld ? formOld.ekskul_id : formData.ekskuls
-            }
-            onChange={(e) => handleInputChange(e, "ekskuls")}
+            value={formOld && formOld.ekskul ? formOld.ekskul_id : formData.ekskul}
+            onChange={(e) => handleInputChange(e, "ekskul_id")}
             options={ekskulOption}
           />
           <label htmlFor="" className="text-lg">
@@ -189,9 +212,7 @@ const TugasComponent = () => {
             format="DD-MM-YYYY"
             placeholder="Masukan tanggal"
             name="date"
-            value={
-              formOld && formOld.date ? dayjs(formOld.date) : formData.date
-            }
+            value={formOld && formOld.date ? dayjs(formOld.date) : formData.date}
             onChange={(e) => handleInputChange(e, "date")}
           />
         </form>

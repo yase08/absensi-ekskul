@@ -3,13 +3,22 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { Modal, Select, Input } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import fs from "fs"
+import { useProfile } from "../../../context/ProfileContext";
+import { RiFileExcel2Line } from "react-icons/ri";
+import { IoAddSharp } from "react-icons/io5";
+import { AiOutlineFileExcel } from "react-icons/ai";
 
 const SiswaComponent = () => {
+  const [selectedEkskul, setSelectedEkskul] = useState(null);
+  const { profile } = useProfile();
   const [open, setOpen] = useState(false);
   const axiosPrivate = useAxiosPrivate();
   const [rombel, setRombel] = useState([]);
   const [rayon, setRayon] = useState([]);
   const [ekskul, setEkskul] = useState([]);
+  const [error, setError] = useState()
+  const [data, setData] = useState([])
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -25,8 +34,40 @@ const SiswaComponent = () => {
       },
     ],
   });
-  const [formOld, setFormOld] = useState({});
+  const [formOld, setFormOld] = useState();
   const [loading, setLoading] = useState(false);
+  const ekskul_id = localStorage.getItem("ekskul_id")
+
+  const handleSelectChange = (value) => {
+    if (localStorage.getItem("ekskul_id") !== null) {
+      localStorage.removeItem("ekskul_id");
+      localStorage.setItem("ekskul_id", value)
+    } else {
+      localStorage.setItem("ekskul_id", value)
+    }
+
+  }
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/student`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const studentData = response.data.data;
+          setData(studentData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGetRombelRequest = async () => {
     try {
@@ -112,6 +153,8 @@ const SiswaComponent = () => {
 
   const handleCancel = () => {
     setOpen(false);
+    setFormOld({})
+    setFormData({})
   };
 
   const handleOk = async (event) => {
@@ -120,9 +163,9 @@ const SiswaComponent = () => {
 
     try {
       if (formOld && formOld.id) {
+        console.log(formOld);
         const response = await axiosPrivate.put(
-          `/student`,
-          formOld.id,
+          `/student/${formOld.id}`,
           formOld
         );
         const successMessage = response.data.statusMessage;
@@ -132,6 +175,7 @@ const SiswaComponent = () => {
           title: "Berhasil!",
           text: successMessage,
         });
+        handleGetRequest()
         setFormOld({});
       } else {
         const response = await axiosPrivate.post(`/student`, formData);
@@ -142,6 +186,8 @@ const SiswaComponent = () => {
           title: "Success!",
           text: successMessage,
         });
+        setFormData({});
+        handleGetRequest()
       }
     } catch (error) {
       if (error.response) {
@@ -174,7 +220,7 @@ const SiswaComponent = () => {
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormData((prevData) => ({
+      setFormOld((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
@@ -186,10 +232,63 @@ const SiswaComponent = () => {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      const response = await axiosPrivate.get(`/student/export?ekskul_id=${ekskul_id}`, {
+        responseType: 'blob', // Set the response type to 'blob'
+      });
+  
+      if (response.data) {
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const outputFileName = `data-siswa-${Date.now()}.xlsx`;
+  
+        const url = window.URL.createObjectURL(blob);
+  
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', outputFileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error('Export failed: Empty response data');
+      }
+    } catch (error) {
+      console.error('Export failed:', error);
+    }
+  };
+  
+  const handleAllExportExcel = async () => {
+    try {
+      const response = await axiosPrivate.get(`/student/export-all`, {
+        responseType: 'blob', // Set the response type to 'blob'
+      });
+  
+      if (response.data) {
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const outputFileName = `data-siswa-${Date.now()}.xlsx`;
+  
+        const url = window.URL.createObjectURL(blob);
+  
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', outputFileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error('Export failed: Empty response data');
+      }
+    } catch (error) {
+      console.error('Export failed:', error);
+    }
+  };
+  
   useEffect(() => {
     handleGetRombelRequest();
     handleGetRayonRequest();
     handleGetEkskulRequest();
+    handleGetRequest()
   }, []);
 
   return (
@@ -199,15 +298,38 @@ const SiswaComponent = () => {
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
             Siswa
           </h1>
+          <div className="flex gap-3">
+          <Select
+            size="medium"
+            placeholder="Pilih kategori"
+            className=""
+            value={selectedEkskul}
+            onChange={(value) => {
+              setSelectedEkskul(value)
+              handleInputChange(value)
+            }}
+            options={profile.ekskul ? profile.ekskul.map((item) => ({
+              value: item.id,
+              label: item.name,
+            })) : []}
+          
+          />
+          <button onClick={handleExportExcel} className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500">
+            <RiFileExcel2Line size={20} />
+          </button>
+          <button onClick={handleAllExportExcel} className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500">
+            <AiOutlineFileExcel size={20} />
+          </button>
           <button
             onClick={showModal}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            Add Data
+            <IoAddSharp size={20} />
           </button>
+          </div>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal
@@ -293,8 +415,7 @@ const SiswaComponent = () => {
           <Select
             size="large"
             className="w-full"
-            rules={{ required: true, message: "Rombel Siswa Harus Diisi!" }}
-            value={formOld ? formOld.rombel : formData.rombel}
+            value={formOld ? formOld.rombel_id : formData.rombel}
             onChange={(e) => handleInputChange(e, "rombel_id")}
             options={rombelOption}
             placeholder="Pilih Rombel"
@@ -306,7 +427,7 @@ const SiswaComponent = () => {
             size="large"
             rules={{ required: true, message: "Rayon Siswa Harus Diisi!" }}
             className="w-full"
-            value={formOld ? formOld.rayon : formData.rayon}
+            value={formOld ? formOld.rayon_id : formData.rayon}
             onChange={(e) => handleInputChange(e, "rayon_id")}
             options={rayonOption}
             placeholder="Pilih Rayon"

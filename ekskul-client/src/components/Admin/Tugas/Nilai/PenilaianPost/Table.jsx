@@ -21,7 +21,6 @@ const TablePenilaianPost = ({ date }) => {
   const ekskul = localStorage.getItem("ekskul_id");
   const task = useParams();
 
-  // Handler untuk checkbox
   const handleInputChange = (studentId, grade) => {
     const newAttendance = {
       date: date,
@@ -33,7 +32,6 @@ const TablePenilaianPost = ({ date }) => {
       (attendance) => attendance.student_id !== studentId
     );
     setformData([...updatedformData, newAttendance]);
-    console.log(formData);
   };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -41,6 +39,7 @@ const TablePenilaianPost = ({ date }) => {
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
+
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
@@ -148,7 +147,6 @@ const TablePenilaianPost = ({ date }) => {
       const response = await axiosPrivate.get(
         `/student/assessment?ekskul_id=${ekskul}&task_id=${task.id}`
       );
-      console.log(response);
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {

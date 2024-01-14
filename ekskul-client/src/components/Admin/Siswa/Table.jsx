@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import Swal from "sweetalert2";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button, Tag } from "antd";
@@ -6,13 +6,11 @@ import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableSiswa = ({ setFormOld }) => {
+const TableSiswa = ({ setFormOld, setOpen, handleGetRequest, data }) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
@@ -134,6 +132,7 @@ const TableSiswa = ({ setFormOld }) => {
     setPageSize(size);
   };
 
+
   const getPaginationConfig = () => ({
     current: currentPage,
     pageSize: pageSize,
@@ -143,27 +142,6 @@ const TableSiswa = ({ setFormOld }) => {
     onChange: handleChangePage,
     onShowSizeChange: handleChangePageSize,
   });
-
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/student`);
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const studentData = response.data.data;
-          setData(studentData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteRequest = async (id) => {
     setLoading(true);
@@ -275,12 +253,9 @@ const TableSiswa = ({ setFormOld }) => {
     {
       title: "Ekstrakurikuler",
       dataIndex: "ekskuls",
-      sorter: handleSort("ekskuls"),
-      sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("ekskuls"),
       render: (ekskuls) =>
-        ekskuls
+        ekskuls.length > 0
           ? ekskuls.map((ekskul) => {
               return (
                 <Tag
@@ -303,7 +278,25 @@ const TableSiswa = ({ setFormOld }) => {
           size={"middle"}
           className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
         >
-          <a className="hover:text-blue-500" onClick={() => setFormOld(record)}>
+          <a className="hover:text-blue-500" onClick={() => {
+            console.log(record);
+            if (record.ekskuls.length > 0) {
+              setFormOld({
+                ...record,
+                rombel_id: record.rombel.id,
+                rayon_id: record.rayon.id,
+                ekskuls: [record.ekskuls[0].id, record.ekskuls[1].id]
+              })
+            } else {
+              setFormOld({
+                ...record,
+                rombel_id: record.rombel.id,
+                rayon_id: record.rayon.id,
+                ekskuls: []
+              })
+            }
+            setOpen(true)
+             }}>
             <BsPencil size={20} />
           </a>
           <a
@@ -317,10 +310,6 @@ const TableSiswa = ({ setFormOld }) => {
     },
   ];
 
-  useEffect(() => {
-    handleGetRequest();
-  }, []);
-  
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
       <div className="overflow-x-auto hidden-scroll w-full">

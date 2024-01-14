@@ -6,13 +6,11 @@ import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableJadwal = ({ setFormOld, setOpen }) => {
+const TableJadwal = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
@@ -29,7 +27,12 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
   };
 
   const handleEdit = async (item) => {
-    setFormOld(item);
+    setFormOld({
+      ...item,
+      schedule_id: item.schedule.id,
+      room_id: item.room.id,
+      ekskul_id: item.ekskul.id
+    });
     setOpen(true);
   };
 
@@ -148,27 +151,6 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
     onChange: handleChangePage,
     onShowSizeChange: handleChangePageSize,
   });
-
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/activity`);
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const activityData = response.data.data;
-          setData(activityData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteRequest = async (id) => {
     setLoading(true);
@@ -295,11 +277,7 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
       ),
     },
   ];
-
-  useEffect(() => {
-    handleGetRequest();
-  }, []);
-
+  
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
       <div className="overflow-x-auto hidden-scroll w-full">
@@ -310,7 +288,7 @@ const TableJadwal = ({ setFormOld, setOpen }) => {
             currentPage * pageSize
           )}
           pagination={getPaginationConfig()}
-          loading={loading}
+          loading={false}
           scroll={{ x: "max-content" }}
         />
       </div>

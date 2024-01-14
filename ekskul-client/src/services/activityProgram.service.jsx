@@ -1,4 +1,5 @@
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import config from "../utils/config";
 
 const axiosPrivate = useAxiosPrivate();
 

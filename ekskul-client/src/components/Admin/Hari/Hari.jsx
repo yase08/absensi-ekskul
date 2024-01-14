@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { useProfile } from "../../../context/ProfileContext";
-import { Modal, Select, Input } from "antd";
+import { Modal,  Input } from "antd";
 
 const HariComponent = () => {
   const [open, setOpen] = useState(false);
@@ -12,25 +12,38 @@ const HariComponent = () => {
   const [formData, setFormData] = useState({
     day: "",
   });
-  const [formOld, setFormOld] = useState({});
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-    if (formOld) {
-      if (inputName === "day") {
-        setFormOld((prevData) => ({
-          ...prevData,
-          [inputName]: newValue,
-        }));
-      }
-    } else {
       setFormData((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
+  };
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/schedule/day`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const scheduleData = response.data.data;
+          setData(scheduleData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,7 +73,6 @@ const HariComponent = () => {
 
   const handleCancel = () => {
     setOpen(false);
-    setFormOld({});
     setFormData({});
   };
 
@@ -68,21 +80,6 @@ const HariComponent = () => {
     setLoading(true);
 
     try {
-      if (formOld && formOld.id) {
-        const response = await axiosPrivate.put(
-          `/schedule/${formOld.id}`,
-          formOld
-        );
-        const successMessage = response.data.statusMessage;
-
-        Swal.fire({
-          icon: "success",
-          title: "Berhasil!",
-          text: successMessage,
-        });
-        event.preventDefault();
-        setFormOld({});
-      } else {
         const response = await axiosPrivate.post(`/schedule`, formData);
         const successMessage = response.data.statusMessage;
 
@@ -92,7 +89,7 @@ const HariComponent = () => {
           text: successMessage,
         });
         event.preventDefault();
-      }
+        handleGetRequest()
     } catch (error) {
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
@@ -124,6 +121,7 @@ const HariComponent = () => {
   useEffect(() => {
     profile;
     handleGetEkskulRequest();
+    handleGetRequest();
   }, []);
 
   return (
@@ -141,11 +139,11 @@ const HariComponent = () => {
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal
-        title={formOld && formOld.id ? "Edit Data" : "Tambah Data"}
+        title={"Tambah Data"}
         open={open}
         onOk={handleOk}
         confirmLoading={confirmLoading}
@@ -156,7 +154,7 @@ const HariComponent = () => {
             Hari
           </label>
           <Input
-            value={formOld ? formOld.day : formData.day}
+            value={formData.day}
             type="text"
             name="day"
             size="large"

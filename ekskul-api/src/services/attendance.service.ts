@@ -1,6 +1,6 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
-import { Request } from "express";
+import { Request, Response } from "express";
 import { exportExcel } from "../libs/excel.lib";
 import {
   formatDate,
@@ -10,6 +10,9 @@ import {
 import { ISession } from "../interfaces/user.interface";
 import { Op } from "sequelize";
 import * as cron from "node-cron";
+import fs from "fs";
+import path from "path";
+
 
 const db = require("../db/models");
 
@@ -300,7 +303,7 @@ export class AttendanceService {
     }
   }
 
-  async exportAttendance(req: Request): Promise<any> {
+  async exportAttendance(req: Request, res: Response): Promise<any> {
     try {
       const date = Date.now();
       const options = { timeZone: "Asia/Jakarta" };
@@ -378,18 +381,26 @@ export class AttendanceService {
           { header: "Keterangan", key: "category", width: 15 },
           { header: "Tanggal", key: "date", width: 15 },
         ];
-        const file = `data-kehadiran-${ekskul.name}.xlsx`;
+        const file = `data-kehadiran-${ekskul.name}-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
           columns,
           modifiedAttendances,
-          file
+          file,
+          res
         );
 
-        if (!exportSuccess)
-          throw apiResponse(status.FORBIDDEN, "Export failed");
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
 
-        return Promise.resolve(apiResponse(status.OK, "Export Success"));
+        const exportDir = path.join(__dirname, "../public/export/");
+        // const filePath = path.join(exportDir, file);
+        
+
+        if (!exportSuccess) {
+          throw apiResponse(status.FORBIDDEN, "Export failed");
+        }
+        return Promise.resolve(apiResponse(status.OK, "Export Success", exportSuccess));
       } else {
         throw apiResponse(
           status.NOT_FOUND,
@@ -413,38 +424,12 @@ export class AttendanceService {
       const ekskuls = (req.session as ISession).user.ekskul;
       const selectedEkskulId = req.query.ekskul_id as string;
 
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const page: any = req.query.page;
-
       // Checking if the selected ekskul is in the user's ekskul list
       if (ekskuls.includes(selectedEkskulId)) {
         const paramQuerySQL: any = {
           where: { ekskul_id: selectedEkskulId },
         };
-        let limit: number;
-        let offset: number;
-
-        // Sorting logic based on the provided sort parameter
-        if (sort) {
-          const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-          const fieldName = sort.replace(/^-/, "");
-          paramQuerySQL.order = [[fieldName, sortOrder]];
-        }
-
-        // Pagination logic
-        if (page && page.size && page.number) {
-          limit = parseInt(page.size, 10);
-          offset = (parseInt(page.number, 10) - 1) * limit;
-          paramQuerySQL.limit = limit;
-          paramQuerySQL.offset = offset;
-        } else {
-          limit = 10;
-          offset = 0;
-          paramQuerySQL.limit = limit;
-          paramQuerySQL.offset = offset;
-        }
-
+      
         // Include associations (ekskul and student) in the query
         paramQuerySQL.include = [
           {

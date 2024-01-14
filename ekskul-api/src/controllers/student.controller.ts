@@ -65,4 +65,22 @@ export class StudentController extends StudentService {
       return res.status(error.statusCode).json(error);
     }
   };
+
+  exportStudent = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const serviceResponse: APIResponse = await this.exportStudentService(req, res);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  exportAllStudent = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const serviceResponse: APIResponse = await this.exportAllStudentService(req, res);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
 }

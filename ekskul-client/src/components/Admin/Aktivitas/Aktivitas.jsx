@@ -2,9 +2,11 @@ import Table from './Table'
 import { useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import Swal from 'sweetalert2';
-import { createActivity, updateActivity } from '../../../services/activity.service';
+import useAxiosPrivate from '../../../hooks/useAxiosPrivate';
+import { IoAddSharp } from 'react-icons/io5';
 
 const AktivitasComponent = () => {
+  const axiosPrivate = useAxiosPrivate()
   const [isOpen, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     activity: '',
@@ -38,7 +40,7 @@ const AktivitasComponent = () => {
     setLoading(true);
 
     try {
-      const response = await createAttendance(formData);
+      const response = await  axiosPrivate.post('/activity-program', formData);
       console.log(formData);
       const successMessage = response.statusMessage;
 
@@ -83,7 +85,7 @@ const AktivitasComponent = () => {
     console.log(formOld);
 
     try {
-      const response = await updateAttendance(formOld.id, formOld);
+      const response = await axiosPrivate.put(`/activity-program/${formOld.id}`, formOld);
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -135,7 +137,7 @@ const AktivitasComponent = () => {
     <div className="w-full flex flex-col gap-2">
       <div className='flex justify-between'>
       <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">AktivitasComponent Siswa</h1>
-      <button onClick={toggleExpansion} className='bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500'>Add Data</button>
+      <button onClick={toggleExpansion} className='bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500'><IoAddSharp size={20} /></button>
       </div>
       <div className="w-full bg-white mt-3 mb-5">
         <Table setFormOld={setFormOld} setOpen={setOpen} />

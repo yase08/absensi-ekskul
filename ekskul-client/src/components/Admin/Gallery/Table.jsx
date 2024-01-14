@@ -8,12 +8,10 @@ import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { BiDetail } from "react-icons/bi";
 import { Link } from "react-router-dom";
 
-const TableGallery = ({ setFormOld, setOpen }) => {
+const TableGallery = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
@@ -31,7 +29,10 @@ const TableGallery = ({ setFormOld, setOpen }) => {
   };
 
   const handleEdit = async (item) => {
-    setFormOld(item);
+    setFormOld({
+      ...item,
+      ekskul_id : item.ekskul.id,
+    });
     setOpen(true);
   };
 
@@ -151,45 +152,21 @@ const TableGallery = ({ setFormOld, setOpen }) => {
     onShowSizeChange: handleChangePageSize,
   });
 
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/gallery`);
-      console.log(response);
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const galleryData = response.data.data;
-          setData(galleryData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDeleteRequest = async (id) => {
     setLoading(true);
 
     try {
       const response = await axiosPrivate.delete(`/gallery/${id}`);
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",
-        title: "Success!",
+        title: "Sukses!",
         text: successMessage,
       });
 
       handleGetRequest();
     } catch (error) {
-      console.error("Error:", error);
-
       if (error.response) {
         const errorMessage = error.response.statusMessage;
         Swal.fire({
@@ -243,11 +220,12 @@ const TableGallery = ({ setFormOld, setOpen }) => {
     },
     {
       title: "Ekstrakurikuler",
-      dataIndex: "name",
-      sorter: handleSort("name"),
+      dataIndex: "ekskul",
+      sorter: handleSort("ekskul"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("name"),
+      ...getColumnSearchProps("ekskul"),
+      render: (ekskul) => (ekskul ? ekskul.name : "-")
     },
     {
       title: "Aksi",
@@ -277,10 +255,6 @@ const TableGallery = ({ setFormOld, setOpen }) => {
       ),
     },
   ];
-
-  useEffect(() => {
-    handleGetRequest();
-  }, []);
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

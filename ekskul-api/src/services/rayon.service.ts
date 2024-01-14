@@ -37,51 +37,14 @@ export class RayonService {
 
   async getAllRayonService(req: Request): Promise<any> {
     try {
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const filter: string =
-        typeof req.query.filter === "string" ? req.query.filter : "";
-      const page: any = req.query.page;
-
       const paramQuerySQL: any = {};
-      let limit: number;
-      let offset: number;
-
-      const totalRows = await db.rayon.count();
-
-      if (filter) {
-        paramQuerySQL.where = {
-          name: {
-            [Op.like]: `%${filter}%`,
-          },
-        };
-      }
-
-      if (sort) {
-        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-        const fieldName = sort.replace(/^-/, "");
-        paramQuerySQL.order = [[fieldName, sortOrder]];
-      }
-
-      if (page && page.size && page.number) {
-        limit = parseInt(page.size, 10);
-        offset = (parseInt(page.number, 10) - 1) * limit;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      } else {
-        limit = 10;
-        offset = 0;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      }
-
       const rayon = await db.rayon.findAll(paramQuerySQL);
 
       if (!rayon || rayon.length === 0)
         throw apiResponse(status.NOT_FOUND, "Rayon tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Berhasil mendapatkan rayon", rayon, totalRows)
+        apiResponse(status.OK, "Berhasil mendapatkan rayon", rayon)
       );
     } catch (error: any) {
       return Promise.reject(

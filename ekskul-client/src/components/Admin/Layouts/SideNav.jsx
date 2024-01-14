@@ -440,7 +440,7 @@ const SideNav = ({
                       href="/admin/rombel"
                       className={` py-[15px] flex gap-x-[24.5px] items-center before:absolute ${
                         expanded
-                          ? "items-center justify-center animate-fade-in-out"
+                          ? "items-center justify-center max-lg:justify-start max-lg:pl-[35px] animate-fade-in-out"
                           : "px-[30px]"
                       }`}
                     >
@@ -458,7 +458,7 @@ const SideNav = ({
                       href="/admin/rayon"
                       className={`flex gap-x-[24.5px] items-center before:absolute py-[15px] ${
                         expanded
-                          ? "items-center justify-center animate-fade-in-out"
+                          ? "items-center justify-center max-lg:justify-start max-lg:pl-[35px] animate-fade-in-out"
                           : "px-[30px]"
                       }`}
                     >

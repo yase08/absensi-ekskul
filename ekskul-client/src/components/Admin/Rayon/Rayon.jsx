@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TableEskul from "./Table";
 import Swal from "sweetalert2";
 import "./Rayon.css";
@@ -9,6 +9,8 @@ const Rayon = () => {
   const [formData, setFormData] = useState({
     name: "",
   });
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [formOld, setFormOld] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,6 +30,28 @@ const Rayon = () => {
     }
   };
 
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/rayon`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const rayonData = response.data.data;
+          setData(rayonData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const handlePostRequest = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -35,6 +59,7 @@ const Rayon = () => {
     try {
       const response = await axiosPrivate.post(`/rayon`, formData);
       const successMessage = response.data.statusMessage;
+      handleGetRequest()
 
       Swal.fire({
         icon: "success",
@@ -73,6 +98,7 @@ const Rayon = () => {
         text: successMessage,
       });
       setFormOld("");
+      handleGetRequest()
     } catch (error) {
       if (error.response) {
         const errorMessage = error.response.data.statusMessage;
@@ -98,6 +124,10 @@ const Rayon = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    handleGetRequest();
+  }, []);
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -133,7 +163,7 @@ const Rayon = () => {
           </div>
         </div>
         <div className="w-full bg-white mt-5 mb-5">
-          <TableEskul setFormOld={setFormOld} />
+          <TableEskul setFormOld={setFormOld} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
     </div>

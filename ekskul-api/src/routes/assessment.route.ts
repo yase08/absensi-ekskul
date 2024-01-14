@@ -51,6 +51,11 @@ class AssessmentRoutes extends AssessmentController {
       ],
       this.deleteAssessment
     );
+    this.router.get(
+      "/export",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.exportToExcel
+    );
 
     return this.router;
   }

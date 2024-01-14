@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import TableJadwal from "./Table";
 import Swal from "sweetalert2";
 import { Modal, Select, TimePicker } from "antd";
-import dayjs from "dayjs";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { IoAddSharp } from "react-icons/io5";
+import dayjs from "dayjs";
 
 const Jadwal = () => {
   const [open, setOpen] = useState(false);
@@ -17,24 +18,74 @@ const Jadwal = () => {
   });
   const axiosPrivate = useAxiosPrivate();
   const [hari, setHari] = useState([]);
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [ekskul, setEkskul] = useState([]);
   const [room, setRoom] = useState([]);
   const [formOld, setFormOld] = useState("");
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [date, setDate] = useState([])
+  // const [selectedDate, setSelectedDate] = useState()
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormOld((prevData) => ({
-        ...prevData,
-        [inputName]: newValue,
-      }));
+      if (inputName === "time") {
+        const [startTime, endTime] = e;
+        setFormOld((prevData) => ({
+          ...prevData,
+          startTime,
+          endTime,
+        }));
+      } else {
+        setFormOld((prevData) => ({
+          ...prevData,
+          [inputName]: newValue,
+        }));
+      }
     } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [inputName]: newValue,
-      }));
+      setFormData((prevData) => {
+        if (inputName === "time") {
+          const [startTime, endTime] = e;
+          return {
+            ...prevData,
+            startTime,
+            endTime,
+          };
+        } else {
+          return {
+            ...prevData,
+            [inputName]: newValue,
+          };
+        }
+      });
+    }}
+    
+
+  const inputSelectedDate = (date, dateString) => {
+    setDate(date)
+    handleInputChange(dateString, "time")
+  }
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/activity`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const activityData = response.data.data;
+          setData(activityData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -143,6 +194,7 @@ const Jadwal = () => {
           text: successMessage,
         });
         setFormOld({});
+        handleGetRequest()
       } else {
         const response = await axiosPrivate.post(`/activity`, formData);
         const successMessage = response.data.statusMessage;
@@ -152,6 +204,7 @@ const Jadwal = () => {
           title: "Success!",
           text: successMessage,
         });
+        handleGetRequest()
       }
     } catch (error) {
       if (error.response) {
@@ -181,11 +234,24 @@ const Jadwal = () => {
     }
   };
 
+ useEffect(() => {
+  if (formOld && !date.length) {
+    const dayjsStartTime = dayjs(formOld.startTime, 'HH:mm:ss');
+    const dayjsEndTime = dayjs(formOld.endTime, 'HH:mm:ss');
+
+    setDate([dayjsStartTime, dayjsEndTime]);
+  }
+}, [formOld, date]);
+
+  
   useEffect(() => {
     handleGetEkskulRequest();
     handleGetHariRequest();
     handleGetRoomRequest();
+    handleGetRequest();
   }, []);
+  
+  
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -198,11 +264,11 @@ const Jadwal = () => {
             onClick={showModal}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            Add Data
+            <IoAddSharp size={20} />
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <TableJadwal setFormOld={setFormOld} setOpen={setOpen} />
+          <TableJadwal setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal
@@ -219,7 +285,7 @@ const Jadwal = () => {
           <Select
             size="large"
             className="w-full"
-            value={formOld ? formOld.schedule : formData.schedule}
+            value={formOld ? formOld.schedule_id : formData.schedule}
             onChange={(e) => handleInputChange(e, "schedule_id")}
             options={hariOption}
             placeholder="Pilih Hari"
@@ -255,7 +321,7 @@ const Jadwal = () => {
             size="large"
             className="w-full"
             placeholder="Pilih Ekstrakurikuler"
-            value={formOld ? formOld.ekskul : formData.ekskul}
+            value={formOld ? formOld.ekskul_id: formData.ekskul}
             onChange={(e) => handleInputChange(e, "ekskul_id")}
             options={ekskulOption}
           />
@@ -266,26 +332,24 @@ const Jadwal = () => {
             size="large"
             className="w-full"
             placeholder="Pilih Ruangan"
-            value={formOld ? formOld.room : formData.room}
+            value={formOld ? formOld.room_id : formData.room}
             onChange={(e) => handleInputChange(e, "room_id")}
             options={roomOption}
           />
           <label htmlFor="" className="text-lg">
             Jam Mulai & Jam Berakhir
           </label>
-          {/* <TimePicker.RangePicker
+           <TimePicker.RangePicker
             size="large"
             format={"HH:mm"}
-            onChange={(value) => handleInputChange(value, "date")}
+            onChange={(date, dateString) => inputSelectedDate(date, dateString)}
             placeholder={["Jam Mulai", "Jam Berakhir"]}
-            value={
-              formOld ? [formOld.start_time, formOld.end_time] : [null, null]
-            }
-          /> */}
+            value={date}
+          />
         </form>
       </Modal>
     </div>
   );
 };
 
-export default Jadwal;
+export default Jadwal

@@ -55,4 +55,13 @@ export class InstructorAttendanceController extends InstructorAttendanceService 
       return res.status(error.statusCode).json(error);
     }
   };
+
+  exportToExcel = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const serviceResponse: APIResponse = await this.exportAttendanceService(req, res);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
 }

@@ -12,19 +12,24 @@ import {
 import { LuUpload } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import Table from "./Table";
+import { IoAddSharp } from "react-icons/io5";
+import dayjs from "dayjs";
 
 const GalleryComponent = () => {
   const [open, setOpen] = useState(false);
   const [ekskul, setEkskul] = useState([]);
   const [formData, setFormData] = useState({
-    date: null,
+    date: "",
     ekskul_id: "",
     name: "",
   });
   const [fileList, setFileList] = useState([]);
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState()
   const axiosPrivate = useAxiosPrivate();
 
   const handleFileChange = ({ fileList }) => {
@@ -34,7 +39,7 @@ const GalleryComponent = () => {
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
     if (formOld) {
-      setFormData((prevData) => ({
+      setFormOld((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
@@ -82,44 +87,65 @@ const GalleryComponent = () => {
     setFileList([]);
   };
 
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/gallery`);
+      console.log(response);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const galleryData = response.data.data;
+          setData(galleryData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOk = async (event) => {
     event.preventDefault();
     setLoading(true);
 
     try {
       const formDataWithFile = new FormData();
+
       Object.entries(formData).forEach(([key, value]) => {
         formDataWithFile.append(key, value);
       });
 
       if (fileList.length > 0) {
-        formDataWithFile.append("image", fileList[0].originFileObj);
-      }
-
-      if (formOld && formOld.id) {
-        const response = await axiosPrivate.put(
-          `/gallery/${formOld.id}`,
-          formDataWithFile,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        const successMessage = response.data.statusMessage;
-
-        message.success(successMessage);
-        setFormOld({});
-      } else {
-        const response = await axiosPrivate.post(`/gallery`, formDataWithFile, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+        fileList.forEach((file, index) => {
+          formDataWithFile.append("images", file.originFileObj); // Use "images" as the field name
         });
-        const successMessage = response.data.statusMessage;
-
-        message.success(successMessage);
       }
+
+      const axiosConfig = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      const apiEndpoint =
+        formOld && formOld.id ? `/gallery/${formOld.id}` : "/gallery";
+      const axiosMethod =
+        formOld && formOld.id ? axiosPrivate.put : axiosPrivate.post;
+
+      const response = await axiosMethod(
+        apiEndpoint,
+        formDataWithFile,
+        axiosConfig
+      );
+      const successMessage = response.data.statusMessage;
+
+      message.success(successMessage);
+      handleGetRequest()
+      setFormOld({});
     } catch (error) {
       console.error("Error:", error);
 
@@ -152,6 +178,7 @@ const GalleryComponent = () => {
 
   useEffect(() => {
     handleGetEkskulRequest();
+    handleGetRequest();
   }, []);
 
   return (
@@ -165,14 +192,20 @@ const GalleryComponent = () => {
             onClick={showModal}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
-            Add Data
+            <IoAddSharp size={20} />
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table
+            setFormOld={setFormOld}
+            setOpen={setOpen}
+            data={data}
+            handleGetRequest={handleGetRequest}
+          />
         </div>
       </div>
       <Modal
+        open={open}
         title={formOld && formOld.id ? "Edit Data" : "Tambah Data"}
         onOk={handleOk}
         confirmLoading={confirmLoading}
@@ -187,13 +220,14 @@ const GalleryComponent = () => {
             size="large"
             name="name"
             onChange={(value) => handleInputChange(value, "name")}
-            value={formOld ? formOld.name : formData.name}
+            value={formOld && formOld.name ? formOld.name : formData.name}
           />
           <label htmlFor="" className="text-lg">
             Upload Gambar
           </label>
           <Upload
             showUploadList={true}
+            multiple={true}
             beforeUpload={() => false}
             onChange={handleFileChange}
           >
@@ -206,8 +240,8 @@ const GalleryComponent = () => {
             className="w-full"
             size="large"
             placeholder="Pilih Ekstrakurikuler"
-            value={formOld ? formOld.ekskul_id : formData.ekskul_id} // Use plural form
-            onChange={(value) => handleInputChange(value, "ekskul_id")} // Use plural form
+            value={formOld && formOld.ekskul_id ? formOld.ekskul_id : formData.ekskul_id} 
+            onChange={(value) => handleInputChange(value, "ekskul_id")} 
             options={ekskulOption}
           />
           <label htmlFor="" className="text-lg">
@@ -217,8 +251,11 @@ const GalleryComponent = () => {
             placeholder={"Pilih Tanggal"}
             size="large"
             name="date"
-            onChange={(value) => handleInputChange(value, "date")} // Use the correct property
-            value={formOld ? formOld.date : formData.date} // Use the correct property
+            onChange={(selectedDate, dateString) => {
+              setSelectedDate(selectedDate);
+              handleInputChange(dateString, "date");
+            }}
+            value={formOld && formOld.date ? dayjs(formOld.date) : selectedDate}
           />
         </form>
       </Modal>

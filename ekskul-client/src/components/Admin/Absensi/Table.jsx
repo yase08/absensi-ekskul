@@ -195,8 +195,6 @@ const TableAbsensi = ({ selectedEkskul }) => {
     {
       title: "Persentase Kehadiran",
       dataIndex: "percentage",
-      sorter: handleSort("percentage"),
-      sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("percentage"),
       render: (percentage) => (percentage ? `${percentage}%` : "-"),
@@ -213,13 +211,13 @@ const TableAbsensi = ({ selectedEkskul }) => {
           >
             <BiDetail size={20} />
           </Link>
-        </Space>
+      </Space>
       ),
     },
   ];
 
   useEffect(() => {
-    handleGetRequest();
+      handleGetRequest();
   }, [selectedEkskul]);
 
   return (

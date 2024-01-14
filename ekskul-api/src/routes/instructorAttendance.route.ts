@@ -45,6 +45,11 @@ class InstructorAttendanceRoutes extends InstructorAttendanceController {
       ],
       this.updateInstructorAttendance
     );
+    this.router.get(  
+      "/export",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.exportToExcel
+    );
 
     return this.router;
   }
