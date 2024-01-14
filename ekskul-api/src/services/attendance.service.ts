@@ -10,7 +10,6 @@ import {
 import { ISession } from "../interfaces/user.interface";
 import { Op } from "sequelize";
 import * as cron from "node-cron";
-import { getISOWeek } from "date-fns";
 
 const db = require("../db/models");
 
