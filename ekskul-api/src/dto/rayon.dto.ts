@@ -1,19 +1,15 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class DTORayon {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Nama rayon tidak boleh kosong" })
+  @IsString({ message: "Nama rayon harus berupa string" })
   name: string;
 }
 
 export class DTORayonById {
-  @IsNotEmpty()
-  @IsString()
-  name: string;
-
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "ID rayon tidak boleh kosong" })
+  @IsUUID()
   id: string;
 }

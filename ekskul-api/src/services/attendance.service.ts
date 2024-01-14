@@ -1,27 +1,215 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { verifyToken } from "../libs/jwt.lib";
 import { exportExcel } from "../libs/excel.lib";
+import {
+  formatDate,
+  getWeekNumberAndYear,
+  getMonthAndYear,
+} from "../libs/date.lib";
 import { ISession } from "../interfaces/user.interface";
-
-// Berfungsi untuk menghandle logic dari controler
+import { Op } from "sequelize";
+import * as cron from "node-cron";
+import { getISOWeek } from "date-fns";
 
 const db = require("../db/models");
+
+function calculateAttendanceValueBasedOnCategory(category: string): number {
+  const result = category === "hadir" ? 1 : 0;
+
+  return result;
+}
+
+function calculateTotalAttendanceByCategory(
+  attendance: any[]
+): Record<string, number> {
+  const totalAttendanceByStudent: Record<string, number> = {};
+
+  attendance.forEach((attendance) => {
+    const studentId = attendance.student.id;
+    const category = attendance.category;
+
+    if (!totalAttendanceByStudent[studentId]) {
+      totalAttendanceByStudent[studentId] = 0;
+    }
+
+    totalAttendanceByStudent[studentId] +=
+      calculateAttendanceValueBasedOnCategory(category);
+  });
+
+  return totalAttendanceByStudent;
+}
+
+function calculateTotalAttendance(attendance: any[]): Record<string, number> {
+  const totalAttendanceByStudent: Record<string, number> = {};
+
+  attendance.forEach((attendance) => {
+    const studentId = attendance.student.id;
+
+    if (!totalAttendanceByStudent[studentId]) {
+      totalAttendanceByStudent[studentId] = 0;
+    }
+
+    totalAttendanceByStudent[studentId] += 1;
+  });
+
+  return totalAttendanceByStudent;
+}
+
+const countAttendancePerWeekService = async () => {
+  try {
+    const ekskuls = await db.ekskul.findAll({
+      attributes: ["id"],
+    });
+
+    const totalAttendance = await Promise.all(
+      ekskuls.map(async (ekskul) => {
+        try {
+          const attendance = await db.attendance.count({
+            where: {
+              ekskul_id: ekskul.id,
+            },
+          });
+          return attendance;
+        } catch (error) {
+          console.error(
+            `Error counting attendance for ekskul ${ekskul.id}:`,
+            error
+          );
+          return 0;
+        }
+      })
+    );
+
+    if (!totalAttendance) {
+      throw apiResponse(status.NOT_FOUND, "No attendance found");
+    }
+
+    const createHistoryAttendance = await Promise.all(
+      totalAttendance.map(async (ekskulCount, index) => {
+        try {
+          const historyAttendance = await db.historyAttendance.create({
+            ekskul_id: ekskuls[index].id,
+            totalAttendance: ekskulCount,
+            year: new Date().getFullYear(),
+            weekNumber: 1,
+          });
+          return historyAttendance;
+        } catch (error) {
+          console.error(
+            `Error creating history attendance for ekskul ${ekskuls[index].id}:`,
+            error
+          );
+          return null;
+        }
+      })
+    );
+
+    return createHistoryAttendance;
+  } catch (error: any) {
+    console.error("Error in countAttendancePerWeekService:", error);
+    throw apiResponse(
+      error.statusCode || status.INTERNAL_SERVER_ERROR,
+      error.statusMessage || "Internal Server Error",
+      error.message || "An unexpected error occurred"
+    );
+  }
+};
+
+const countAttendancePerMonthService = async () => {
+  try {
+    const ekskuls = await db.ekskul.findAll({
+      attributes: ["id"],
+    });
+
+    const totalAttendance = await Promise.all(
+      ekskuls.map(async (ekskul) => {
+        try {
+          const attendance = await db.attendance.count({
+            where: {
+              ekskul_id: ekskul.id,
+            },
+          });
+          return attendance;
+        } catch (error) {
+          console.error(
+            `Error counting attendance for ekskul ${ekskul.id}:`,
+            error
+          );
+          return 0;
+        }
+      })
+    );
+
+    if (!totalAttendance)
+      throw apiResponse(status.NOT_FOUND, "No attendance found");
+
+    const createHistoryAttendance = await Promise.all(
+      totalAttendance.map(async (ekskulCount, index) => {
+        try {
+          const monthName = new Date().getMonth();
+          const historyAttendance = await db.historyAttendance.create({
+            ekskul_id: ekskuls[index].id,
+            totalAttendance: ekskulCount,
+            type: "month",
+            year: new Date().getFullYear(),
+            name: `${monthName}`,
+          });
+          return historyAttendance;
+        } catch (error) {
+          console.error(
+            `Error creating history attendance for ekskul ${ekskuls[index].id}:`,
+            error
+          );
+          return null;
+        }
+      })
+    );
+
+    return createHistoryAttendance;
+  } catch (error: any) {
+    return Promise.reject(
+      apiResponse(
+        error.statusCode || status.INTERNAL_SERVER_ERROR,
+        error.statusMessage,
+        error.message
+      )
+    );
+  }
+};
+
+// cron.schedule("0 0 * * 0", () => {
+//   countAttendancePerWeekService();
+// });
+
+// cron.schedule("0 0 1 * *", () => {
+//   countAttendancePerMonthService();
+// });
+
+// cron.schedule("* * * * *", async () => {
+//   try {
+//     await countAttendancePerWeekService();
+//     console.log("Attendance per week count completed successfully.");
+//   } catch (error) {
+//     console.error("Error in cron job:", error);
+//   }
+// });
+
+// cron.schedule("* * * * *", () => {
+//   countAttendancePerMonthService();
+// });
 
 export class AttendanceService {
   async createAttendanceService(req: Request): Promise<any> {
     try {
       const ekskuls = (req.session as ISession).user.ekskul;
-      const selectedEkskulId = Number(req.query.ekskul_id);
-      console.log(ekskuls);
+      const selectedEkskulId = req.query.ekskul_id as string;
 
       if (ekskuls.includes(selectedEkskulId)) {
         const createAttendancePromises = [];
 
         for (const attendance of req.body) {
           const studentId = attendance.student_id;
-
           const studentOnEkskul = await db.studentOnEkskul.findOne({
             where: { student_id: studentId, ekskul_id: selectedEkskulId },
           });
@@ -68,29 +256,100 @@ export class AttendanceService {
 
   async exportAttendance(req: Request): Promise<any> {
     try {
-      // const attendanceData = await db.attendance.findAll();
-      const attendanceData = [{
-        "siswa_id":1,
-        "category":"hadir",
-        "date":"2021-10-01"
-      }]
+      const date = Date.now();
+      const options = { timeZone: "Asia/Jakarta" };
+      const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
+      const formattedDate = dateTimeFormat.format(date);
 
-      const columns = [
-        { header: 'Student', key: 'siswa_id', width: 15 },
-        { header: 'Category', key: 'category', width: 15 },
-        { header: 'Date', key: 'date', width: 15 },
-      ];
-      const file = 'ajdoad.xlsx'; // Use 'filename' here
+      const ekskuls = (req.session as ISession).user.ekskul;
+      const selectedEkskulId = req.query.ekskul_id as string;
+      const ekskul = await db.ekskul.findOne({
+        where: { id: selectedEkskulId },
+      });
 
-      const exportSuccess = await exportExcel(columns, attendanceData, file);      
+      if (ekskuls.includes(selectedEkskulId)) {
+        const attendances = await db.attendance.findAll({
+          where: {
+            ekskul_id: selectedEkskulId,
+          },
+          include: [
+            {
+              model: db.student,
+              as: "student",
+              attributes: ["name", "nis", "gender"],
+              include: [
+                {
+                  model: db.rombel,
+                  as: "rombel",
+                  attributes: ["name"],
+                },
+                {
+                  model: db.rayon,
+                  as: "rayon",
+                  attributes: ["name"],
+                },
+              ],
+            },
+            {
+              model: db.ekskul,
+              as: "ekskul",
+              attributes: ["name"],
+            },
+          ],
+          attributes: ["category", "date"],
+        });
 
+        const modifiedAttendances = attendances.map((attendance) => {
+          return {
+            no: attendances.indexOf(attendance) + 1,
+            student_name: attendance.student ? attendance.student.name : null,
+            student_nis: attendance.student ? attendance.student.nis : null,
+            student_gender: attendance.student
+              ? attendance.student.gender === "male"
+                ? "Laki-laki"
+                : "Perempuan"
+              : null,
+            student_rombel: attendance.student
+              ? attendance.student.rombel.name
+              : null,
+            student_rayon: attendance.student
+              ? attendance.student.rayon.name
+              : null,
+            ekskul_name: attendance.ekskul ? attendance.ekskul.name : null,
+            category: attendance.category,
+            date: attendance.date,
+          };
+        });
 
-      if (!exportSuccess)
-        throw apiResponse(status.FORBIDDEN, "Export failed");
+        const columns = [
+          { header: "No", key: "no", width: 15 },
+          { header: "Nama", key: "student_name", width: 15 },
+          { header: "Nis", key: "student_nis", width: 15 },
+          { header: "JK", key: "student_gender", width: 15 },
+          { header: "Rombel", key: "student_rombel", width: 15 },
+          { header: "Rayon", key: "student_rayon", width: 15 },
+          { header: "Ekstrakurikuler", key: "ekskul_name", width: 15 },
+          { header: "Keterangan", key: "category", width: 15 },
+          { header: "Tanggal", key: "date", width: 15 },
+        ];
+        const file = `data-kehadiran-${ekskul.name}.xlsx`;
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Export Success")
-      );
+        const exportSuccess = await exportExcel(
+          columns,
+          modifiedAttendances,
+          file
+        );
+
+        if (!exportSuccess)
+          throw apiResponse(status.FORBIDDEN, "Export failed");
+
+        return Promise.resolve(apiResponse(status.OK, "Export Success"));
+      } else {
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Ekskul does not exist for the given id"
+        );
+      }
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -102,22 +361,180 @@ export class AttendanceService {
     }
   }
 
-
-  async getAllAttendanceService(req: Request): Promise<any> {
+  async getStudentAttendanceService(req: Request): Promise<any> {
     try {
+      // Extracting ekskul information from the user session
       const ekskuls = (req.session as ISession).user.ekskul;
-      const selectedEkskulId = req.query.ekskul_id;
+      const selectedEkskulId = req.query.ekskul_id as string;
 
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
       const page: any = req.query.page;
 
-      if (ekskuls.includes(Number(selectedEkskulId))) {
+      // Checking if the selected ekskul is in the user's ekskul list
+      if (ekskuls.includes(selectedEkskulId)) {
         const paramQuerySQL: any = {
           where: { ekskul_id: selectedEkskulId },
         };
         let limit: number;
         let offset: number;
+
+        // Sorting logic based on the provided sort parameter
+        if (sort) {
+          const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
+          const fieldName = sort.replace(/^-/, "");
+          paramQuerySQL.order = [[fieldName, sortOrder]];
+        }
+
+        // Pagination logic
+        if (page && page.size && page.number) {
+          limit = parseInt(page.size, 10);
+          offset = (parseInt(page.number, 10) - 1) * limit;
+          paramQuerySQL.limit = limit;
+          paramQuerySQL.offset = offset;
+        } else {
+          limit = 10;
+          offset = 0;
+          paramQuerySQL.limit = limit;
+          paramQuerySQL.offset = offset;
+        }
+
+        // Include associations (ekskul and student) in the query
+        paramQuerySQL.include = [
+          {
+            model: db.ekskul,
+            attributes: ["id", "name"],
+            as: "ekskul",
+          },
+          {
+            model: db.student,
+            attributes: ["id", "name"],
+            as: "student",
+          },
+        ];
+
+        // Fetch attendance data based on the query parameters
+        const attendance = await db.attendance.findAll(paramQuerySQL);
+
+        // Handle case where no attendance records are found
+        if (!attendance || attendance.length === 0) {
+          return Promise.resolve(
+            apiResponse(
+              status.NOT_FOUND,
+              "No attendances found with the specified filter"
+            )
+          );
+        }
+
+        // Calculate total attendance for each student based on the "category" column
+        const totalAttendanceStudentByPresentCategory =
+          calculateTotalAttendanceByCategory(attendance);
+
+        // Calculate total attendance for each student by all category
+        const totalAttendanceStudent = calculateTotalAttendance(attendance);
+
+        const result: Record<string, number> = {};
+
+        // Iterate through each student
+        Object.keys(totalAttendanceStudentByPresentCategory).forEach(
+          (studentId) => {
+            // Calculate the percentage and store it in the result object
+            result[studentId] =
+              (totalAttendanceStudentByPresentCategory[studentId] /
+                totalAttendanceStudent[studentId]) *
+              100;
+          }
+        );
+        // Fetch all students
+        const students = await db.student.findAll();
+
+        const modifiedAttendances = students.map((student) => {
+          const studentId = student.id;
+          const studentAttendance = attendance.find(
+            (a) => a.student.id === studentId
+          );
+
+          // Filter out entries where both ekskul and name are null
+          if (
+            !studentAttendance ||
+            (!studentAttendance.ekskul && !studentAttendance.student.name)
+          ) {
+            return null; // Skip this entry
+          }
+
+          return {
+            id: studentId,
+            name: studentAttendance?.student
+              ? studentAttendance.student.name
+              : null,
+            ekskul: studentAttendance?.ekskul
+              ? studentAttendance.ekskul.name
+              : null,
+            percentage: Math.round(result[studentId]) || 0,
+          };
+        });
+
+        // Remove null entries from the array
+        const filteredAttendances = modifiedAttendances.filter(
+          (entry) => entry !== null
+        );
+
+        // Count total number of rows in the attendance table
+        const totalRows = filteredAttendances.length;
+
+        return Promise.resolve(
+          apiResponse(
+            status.OK,
+            "Fetched all attendances successfully",
+            filteredAttendances,
+            totalRows
+          )
+        );
+      } else {
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Ekskul does not exist for the given id"
+        );
+      }
+    } catch (error: any) {
+      // Handle errors and return an appropriate API response
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getDetailAttendanceService(req: Request): Promise<any> {
+    try {
+      const ekskuls = (req.session as ISession).user.ekskul;
+      const selectedEkskulId = req.query.ekskul_id as string;
+      const selectedStudentId = req.query.student_id as string;
+
+      const sort: string =
+        typeof req.query.sort === "string" ? req.query.sort : "";
+      const page: any = req.query.page;
+
+      if (!selectedStudentId) {
+        return Promise.resolve(
+          apiResponse(
+            status.BAD_REQUEST,
+            "Missing required parameter: student_id"
+          )
+        );
+      }
+
+      if (ekskuls.includes(selectedEkskulId)) {
+        const paramQuerySQL: any = {
+          where: { ekskul_id: selectedEkskulId, student_id: selectedStudentId },
+        };
+        let limit: number;
+        let offset: number;
+
+        const totalRows = await db.attendance.count();
 
         if (sort) {
           const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
@@ -140,19 +557,19 @@ export class AttendanceService {
         paramQuerySQL.include = [
           {
             model: db.ekskul,
-            attributes: ["name"],
+            attributes: ["id", "name"],
             as: "ekskul",
           },
           {
             model: db.student,
-            attributes: ["name"],
+            attributes: ["id", "name"],
             as: "student",
           },
         ];
 
-        const attendances = await db.attendance.findAll(paramQuerySQL);
+        const attendance = await db.attendance.findAll(paramQuerySQL);
 
-        if (!attendances || attendances.length === 0) {
+        if (!attendance || attendance.length === 0) {
           return Promise.resolve(
             apiResponse(
               status.NOT_FOUND,
@@ -161,15 +578,23 @@ export class AttendanceService {
           );
         }
 
-        const modifiedAttendances = attendances.map((attendance) => {
+        const modifiedAttendances = attendance.map((attendance) => {
           return {
             id: attendance.id,
-            ekskul_id: attendance.ekskul.name,
-            student_id: attendance.student.name,
+            ekskul: attendance.ekskul
+              ? {
+                  id: attendance.ekskul.id,
+                  name: attendance.ekskul.name,
+                }
+              : null,
+            student: attendance.student
+              ? {
+                  id: attendance.student.id,
+                  name: attendance.student.name,
+                }
+              : null,
             category: attendance.category,
             date: attendance.date,
-            createdAt: attendance.createdAt,
-            updatedAt: attendance.updatedAt,
           };
         });
 
@@ -177,7 +602,8 @@ export class AttendanceService {
           apiResponse(
             status.OK,
             "Fetched all attendances success",
-            modifiedAttendances
+            modifiedAttendances,
+            totalRows
           )
         );
       } else {
@@ -195,6 +621,99 @@ export class AttendanceService {
         )
       );
     }
+  }
+
+  async getChartAttendanceService(req: Request): Promise<any> {
+    try {
+      const weeklyAttendance = {};
+      const monthlyAttendance = {};
+      const dailyAttendance = {};
+      // const ekskuls = (req.session as ISession).user.ekskul;
+      const selectedType = req.query.type;
+
+      const sort: string =
+        typeof req.query.sort === "string" ? req.query.sort : "";
+      const page: any = req.query.page;
+
+      // if (ekskuls.includes(Number(selectedEkskulId))) {
+      const paramQuerySQL: any = {
+        where: { category: selectedType },
+      };
+      let limit: number;
+      let offset: number;
+
+      if (sort) {
+        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
+        const fieldName = sort.replace(/^-/, "");
+        paramQuerySQL.order = [[fieldName, sortOrder]];
+      }
+
+      if (page && page.size && page.number) {
+        limit = parseInt(page.size, 10);
+        offset = (parseInt(page.number, 10) - 1) * limit;
+        paramQuerySQL.limit = limit;
+        paramQuerySQL.offset = offset;
+      } else {
+        limit = 10;
+        offset = 0;
+        paramQuerySQL.limit = limit;
+        paramQuerySQL.offset = offset;
+      }
+
+      const attendanceFilter = await db.attendance.findAll(paramQuerySQL);
+
+      if (!attendanceFilter || attendanceFilter.length === 0) {
+        return Promise.resolve(
+          apiResponse(
+            status.NOT_FOUND,
+            "No attendances found with the specified filter"
+          )
+        );
+      }
+
+      attendanceFilter.forEach((attendance) => {
+        const formattedDate = formatDate(attendance.date);
+
+        if (!dailyAttendance[formattedDate]) {
+          dailyAttendance[formattedDate] = [];
+        }
+        dailyAttendance[formattedDate].push(attendance);
+
+        const { weekNumber, year } = getWeekNumberAndYear(attendance.date);
+
+        const weekKey = `${year}-W${weekNumber}`;
+        if (!weeklyAttendance[weekKey]) {
+          weeklyAttendance[weekKey] = [];
+        }
+        weeklyAttendance[weekKey].push(attendance);
+
+        const { month, formattedYear } = getMonthAndYear(attendance.date);
+
+        const monthKey = `${formattedYear}-${month}`;
+        if (!monthlyAttendance[monthKey]) {
+          monthlyAttendance[monthKey] = [];
+        }
+        monthlyAttendance[monthKey].push(attendance);
+      });
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Fetched all attendances success", {
+          weeklyAttendance,
+          monthlyAttendance,
+          dailyAttendance,
+          // attendances,
+        })
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+    ``;
   }
 
   async updateAttendanceService(req: Request): Promise<any> {
@@ -232,28 +751,52 @@ export class AttendanceService {
     }
   }
 
-  async getTotalAttendanceService(req: Request): Promise<any> {
+  async getHistoryWeeklyAttendanceService(req: Request): Promise<any> {
     try {
-        const attendances = await db.attendance.findAll({where: {createdAt: new Date()}}).length;
-  
-        if (!attendances || attendances.length === 0) {
-          return Promise.resolve(
-            apiResponse(
-              status.NOT_FOUND,
-              "No attendances found with the specified filter"
-            )
-          );
+      const weeklyAttendanceData = await db.historyAttendance.findAll({
+        where: {
+          type: "week",
+        },
+        attributes: ["totalAttendance", "type", "name", "year"],
+        include: [
+          {
+            model: db.ekskul,
+            as: "ekskul",
+            attributes: ["name"],
+          },
+        ],
+      });
+
+      const formattedData = {};
+
+      weeklyAttendanceData.forEach((attendance) => {
+        const weekName = `week ${attendance.name}`;
+        if (!formattedData[weekName]) {
+          formattedData[weekName] = [];
         }
-  
-        return Promise.resolve(
-          apiResponse(
-            status.OK,
-            "Fetched all attendances success",
-            attendances
-          )
-        );
-      } 
-     catch (error: any) {
+
+        formattedData[weekName].push({
+          ekskulName: attendance.ekskul.name,
+          year: attendance.year,
+          totalAttendance: attendance.totalAttendance,
+        });
+      });
+
+      const sortedWeeks = Object.keys(formattedData).sort();
+
+      const sortedFormattedData = {};
+      sortedWeeks.forEach((week) => {
+        sortedFormattedData[week] = formattedData[week];
+      });
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Fetched weekly attendance success",
+          sortedFormattedData
+        )
+      );
+    } catch (error: any) {
       return Promise.reject(
         apiResponse(
           error.statusCode || status.INTERNAL_SERVER_ERROR,

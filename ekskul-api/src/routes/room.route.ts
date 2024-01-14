@@ -27,19 +27,14 @@ class RoomRoutes extends RoomController {
       [authorization(), auth(), permission(["admin"])],
       this.getAllRoom
     );
-    this.router.get(
-      "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
-      this.getRoom
-    );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"]), validator(DTORoomById)],
+      [authorization(), auth(), permission(["admin"]), validator(DTORoom)],
       this.updateRoom
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin"]), validator(DTORoomById)],
       this.deleteRoom
     );
 

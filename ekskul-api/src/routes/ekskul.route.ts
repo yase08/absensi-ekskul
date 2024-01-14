@@ -23,22 +23,22 @@ class EkskulRoutes extends EkskulController {
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin", "instructor"])],
       this.getAllEkskul
-    );
-    this.router.get(
-      "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
-      this.getEkskul
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"]), validator(DTOEkskulById)],
+      [authorization(), auth(), permission(["admin"]), validator(DTOEkskul)],
       this.updateEkskul
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["admin"])],
+      [
+        authorization(),
+        auth(),
+        permission(["admin"]),
+        validator(DTOEkskulById),
+      ],
       this.deleteEkskul
     );
 

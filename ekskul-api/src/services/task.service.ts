@@ -2,6 +2,7 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
+import { ISession } from "../interfaces/user.interface";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -10,6 +11,7 @@ const db = require("../db/models");
 export class TaskService {
   async createTaskService(req: Request): Promise<any> {
     try {
+      const instructor_Id = (req.session as ISession).user.id;
       const task = await db.task.findOne({
         where: { name: req.body.name },
       });
@@ -17,15 +19,18 @@ export class TaskService {
       if (task)
         throw apiResponse(
           status.CONFLICT,
-          `Task ${req.body.name} already exist`
+          `Tugas dengan nama ${req.body.name} sudah ada`
         );
 
-      const createTask = await db.task.create(req.body);
+      const createTask = await db.task.create({
+        author_id: instructor_Id,
+        ...req.body,
+      });
 
       if (!createTask)
-        throw apiResponse(status.FORBIDDEN, "Create new task failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat tugas");
 
-      return Promise.resolve(apiResponse(status.OK, "Create new task success"));
+      return Promise.resolve(apiResponse(status.OK, "Berhasil membuat tugas"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -49,11 +54,28 @@ export class TaskService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.task.count();
+
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
+
+      paramQuerySQL.include = [
+        {
+          model: db.ekskul,
+          as: "ekskul",
+          attributes: ["id", "name"],
+        },
+        {
+          model: db.user,
+          as: "user",
+          attributes: ["id", "name"],
+        },
+      ];
 
       if (sort) {
         const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
@@ -67,40 +89,31 @@ export class TaskService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       }
 
-      paramQuerySQL.include = [{ model: db.ekskul }, { model: db.user }];
+      const task = await db.task.findAll(paramQuerySQL);
 
-      const tasks = await db.task.findAll(paramQuerySQL);
+      const modifiedTask = task.map((task) => {
+        return {
+          id: task.id,
+          name: task.name,
+          ekskul: task.ekskul.name,
+          user: task.user.name,
+          date: task.date,
+          createdAt: task.createdAt,
+          updatedAt: task.updatedAt,
+        };
+      });
 
-      if (!tasks) throw apiResponse(status.NOT_FOUND, "Tasks do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched all tasks success", tasks)
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getTaskService(req: Request): Promise<any> {
-    try {
-      const task = await db.task.findOne({ where: { id: req.params.id } });
-
-      if (!task) throw apiResponse(status.NOT_FOUND, "Task do not exist");
+      if (!task || task.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Tugas tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched task success", task)
+        apiResponse(status.OK, "Berhasil mendapatkan tugas", modifiedTask, totalRows)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -122,15 +135,30 @@ export class TaskService {
       if (!taskExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Tasks do not exist for the given member_id"
+          "Tugas dengan id tersebut tidak ditemukan"
         );
 
-      const updateTask = await db.task.update(req.body);
+      const taskSame = await db.task.findOne({
+        where: { name: req.body.name },
+      });
+
+      if (taskSame && taskSame.id !== taskExist.id) {
+        throw apiResponse(
+          status.CONFLICT,
+          `Tugas dengan nama ${req.body.name} sudah ada`
+        );
+      }
+
+      const updateTask = await db.task.update(req.body, {
+        where: {
+          id: taskExist.id,
+        },
+      });
 
       if (!updateTask)
-        throw apiResponse(status.FORBIDDEN, "Update task failed");
+        throw apiResponse(status.FORBIDDEN, "Update tugas gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update task success"));
+      return Promise.resolve(apiResponse(status.OK, "Update tugas berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -151,17 +179,19 @@ export class TaskService {
       if (!taskExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Tasks do not exist for the given member_id"
+          "Tugas dengan id tersebut tidak ditemukan"
         );
 
-      const deleteTask = await db.task.delete({
+      const deleteTask = await db.task.destroy({
         where: { id: taskExist.id },
       });
 
       if (!deleteTask)
-        throw apiResponse(status.FORBIDDEN, "Delete task failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal menghapus tugas");
 
-      return Promise.resolve(apiResponse(status.OK, "Delete task success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus tugas")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

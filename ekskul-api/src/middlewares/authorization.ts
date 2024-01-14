@@ -14,10 +14,6 @@ export const authorization = (): Handler => {
       if (!Object.keys(headers).includes("authorization"))
         throw apiResponse(status.UNAUTHORIZED, "Authorization is required");
 
-      const authorization: boolean | undefined = (
-        headers.authorization as string
-      ).includes("Bearer");
-
       const accessToken: string = (headers.authorization as string).split(
         "Bearer "
       )[1];
@@ -31,8 +27,6 @@ export const authorization = (): Handler => {
           "Access Token format is not valid"
         );
 
-        console.log("Authorization middleware passed.");
-        
       next();
     } catch (error) {
       return res.status(status.UNAUTHORIZED).json(error);

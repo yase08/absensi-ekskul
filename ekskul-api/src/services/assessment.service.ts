@@ -9,37 +9,38 @@ const db = require("../db/models");
 
 export class AssessmentService {
   async createAssessmentService(req: Request): Promise<any> {
-    try {      
-      
-      const createAssessmentPromises =[];
+    try {
+      const createAssessmentPromises = [];
 
-      for (const assessment of req.body) {     
-          const existingAssessment = await db.assessment.findOne({
-            where: {
-              student_id: assessment.student_id,
-              task_id: assessment.task_id
-            }
-          });
-          if (existingAssessment) {
-            throw apiResponse(
-              status.CONFLICT,
-              `Assessment for student ${assessment.student_id} and task ${assessment.task_id} already exists`
-            );
-          }
-          await db.assessment.create({
+      for (const assessment of req.body) {
+        const existingAssessment = await db.assessment.findOne({
+          where: {
             student_id: assessment.student_id,
             task_id: assessment.task_id,
-            grade: assessment.grade
-          });
+          },
+        });
+        if (existingAssessment) {
+          throw apiResponse(
+            status.CONFLICT,
+            `Penilaian untuk siswa ${assessment.student_id} dan tugas ${assessment.task_id} sudah ada`
+          );
         }
+        const createAssessment = await db.assessment.create({
+          student_id: assessment.student_id,
+          task_id: assessment.task_id,
+          date: assessment.date,
+          grade: assessment.grade,
+        });
+
+        console.log(createAssessment);
+      }
       const createAttendances = await Promise.all(createAssessmentPromises);
 
       if (!createAttendances)
-      throw apiResponse(status.FORBIDDEN, "Create new attendances failed");
-
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat penilaian");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new assessment success")
+        apiResponse(status.OK, "Berhasil membuat penilaian")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -52,23 +53,43 @@ export class AssessmentService {
     }
   }
 
-  async getAllAssessmentService(req: Request): Promise<any> {
+  async getAllAssessmentByTaskService(req: Request): Promise<any> {
     try {
       const sort: string =
         typeof req.query.sort === "string" ? req.query.sort : "";
       const filter: string =
         typeof req.query.filter === "string" ? req.query.filter : "";
       const page: any = req.query.page;
+      const task_id = req.query.task_id as string;
 
-      const paramQuerySQL: any = {};
+      const paramQuerySQL: any = {
+        where: {
+          task_id: task_id,
+        },
+      };
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.assessment.count({
+        where: {
+          task_id: task_id,
+        },
+      });
+
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          student_id: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
+
+      paramQuerySQL.attributes = ["id", "grade", "createdAt", "updatedAt"];
+
+      paramQuerySQL.include = [
+        { model: db.student, as: "student", attributes: ["id", "name"] },
+        { model: db.task, as: "task", attributes: ["id", "name"] },
+      ];
 
       if (sort) {
         const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
@@ -82,48 +103,38 @@ export class AssessmentService {
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       } else {
-        limit = 5;
+        limit = 10;
         offset = 0;
         paramQuerySQL.limit = limit;
         paramQuerySQL.offset = offset;
       }
 
-      paramQuerySQL.where = {
-        ...(paramQuerySQL.where || {}), // Preserve existing filters
-        task_id: req.params.id, // Add the task_id filter
-      };
+      const assessment = await db.assessment.findAll(paramQuerySQL);
 
-      paramQuerySQL.include = [
-        { model: db.task },
-        { model: db.student },
-      ];
+      if (!assessment || assessment.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Penilaian tidak ditemukan");
 
-      const assessments = await db.assessment.findAll(paramQuerySQL);
-
-      if (!assessments) throw apiResponse(status.NOT_FOUND, "Assessments do not exist");
+      const manipulatedResponse = assessment.map((item) => ({
+        id: item.id,
+        grade: item.grade,
+        student: item.student
+          ? {
+              id: item.student.id,
+              name: item.student.name,
+            }
+          : null,
+        date: item.date,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      }));
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all assessments success", assessments)
-      );
-    } catch (error: any) {
-      return Promise.reject(
         apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
+          status.OK,
+          "Berhasil mendapatkan data penilaian",
+          manipulatedResponse,
+          totalRows
         )
-      );
-    }
-  }
-
-  async getOneAssessmentService(req: Request): Promise<any> {
-    try {
-      const assessment = await db.assessment.findOne({where: {id: req.params.id}});
-
-      if (!assessment) throw apiResponse(status.NOT_FOUND, "Assessment do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched all asesssment success", assessment)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -143,17 +154,20 @@ export class AssessmentService {
       });
 
       if (!assessmentExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Assessments do not exist for the given member_id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Penilaian tidak ditemukan");
 
-      const updateAssessment = await db.assessment.update(req.body);
+      const updateAssessment = await db.assessment.update(req.body, {
+        where: {
+          id: assessmentExist.id,
+        },
+      });
 
       if (!updateAssessment)
-        throw apiResponse(status.FORBIDDEN, "Update assessment failed");
+        throw apiResponse(status.FORBIDDEN, "Update penilaian gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update assessment success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Update penilaian berhasil")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -172,19 +186,15 @@ export class AssessmentService {
       });
 
       if (!assessmentExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Assessments do not exist for the given member_id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Penilaian tidak ditemukan");
 
-      const deleteAssessment = await db.assessment.delete({
+      await db.assessment.destroy({
         where: { id: assessmentExist.id },
       });
 
-      if (!deleteAssessment)
-        throw apiResponse(status.FORBIDDEN, "Delete assessment failed");
-
-      return Promise.resolve(apiResponse(status.OK, "Delete assessment success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus penilaian")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

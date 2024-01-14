@@ -1,88 +1,321 @@
-import React from 'react'
-// import {LuPercent} from 'react-icons/lu'
-import {SiPhpmyadmin} from 'react-icons/si'
-import {AiOutlineUser} from 'react-icons/ai'
-import {BsClockHistory} from 'react-icons/bs'
-import {HiOutlineStatusOnline} from 'react-icons/hi'
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import { useState, useEffect, useRef } from "react";
+import Swal from "sweetalert2";
+import { SearchOutlined } from "@ant-design/icons";
+import { Table, Input, Space, Button } from "antd";
+import { BsPencil } from "react-icons/bs";
+import { LuTrash } from "react-icons/lu";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const Table = ({expanded}) => {
-    const dates = [
-        {
-            id: 1,
-            date: '1',
-            month: 'Jan'
-        }, {
-            id: 2,
-            date: '2',
-            month: 'Jan'
-        }, {
-            id: 2,
-            date: '2',
-            month: 'Jan'
-        }, {
-            id: 2,
-            date: '2',
-            month: 'Jan'
-        }, {
-            id: 2,
-            date: '2',
-            month: 'Jan'
-        }, {
-            id: 2,
-            date: '2',
-            month: 'Jan'
-        }, {
-            id: 2,
-            date: '2',
-            month: 'Jan'
-        }, {
-            id: 3,
-            date: '3',
-            month: 'Jan'
-        },
-        // tambahkan data tanggal sesuai kebutuhan
-    ];
-    return (
-        <div className="w-full bg-transparent ">
-            <div
-                className={`bg-transition transition-all bg-transition duration-[700ms] relative bg-transparent text-white h-screen flex justify-between items-start ${expanded
-                    ? 'w-[100%]'
-                    : 'w-[100%]'} `}>
-                <div className="w-full h-full -top-[42px] absolute px-7 ">
-                    <div
-                        className="rounded-lg overflow-hidden w-full items-start h-full text-black max-md:py-5 bg-white flex-col flex gap-2">
-                        <div
-                            className='items-center flex justify-between w-full p-5 capitalize font-bold text-[17px]'>
-                            <h1>today&apos;s Schedule</h1>
-                            <h1>2 mar, 2020</h1>
-                        </div>
-                        <div className='w-full h-auto bg-transparent px-5 py-2'>
-                            <Slider
-                                dots={false}
-                                arrows={true}
-                                infinite={true}
-                                slidesToShow={6}
-                                slidesToScroll={2}>
-                                {
-                                    dates.map(date => (
-                                        <div key={date.id} className='px-5 py-2'>
-                                            <div className='bg-red-500 rounded-lg shadow-lg p-5 h-full'>
-                                                <h3 className='font-bold text-lg mb-2'>{date.date}</h3>
-                                                <p className='text-gray-700 text-base'>{date.month}</p>
-                                            </div>
-                                        </div>
-                                    ))
-                                }
-                            </Slider>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
+const TableJadwal = ({ setFormOld, setOpen }) => {
+  const [searchText, setSearchText] = useState("");
+  const axiosPrivate = useAxiosPrivate();
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const searchInput = useRef(null);
+  const pageSizeOptions = [10, 20, 50];
+  const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
 
-export default Table
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
+
+  const handleEdit = async (item) => {
+    setFormOld(item);
+    setOpen(true);
+  };
+
+  const handleSort = (dataIndex) => (a, b) => {
+    const valueA = String(a[dataIndex]).toLowerCase();
+    const valueB = String(b[dataIndex]).toLowerCase();
+
+    return valueA.localeCompare(valueB);
+  };
+
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: "block",
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: false,
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            close
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1677ff" : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      String(record[dataIndex]).toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) => (searchedColumn === dataIndex ? <div>{text}</div> : text),
+  });
+
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleChangePageSize = (current, size) => {
+    setCurrentPage(1);
+    setPageSize(size);
+  };
+
+  const getPaginationConfig = () => ({
+    current: currentPage,
+    pageSize: pageSize,
+    total: data.length,
+    pageSizeOptions: pageSizeOptions,
+    showSizeChanger: true,
+    onChange: handleChangePage,
+    onShowSizeChange: handleChangePageSize,
+  });
+
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(`/activity`);
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const activityData = response.data.data;
+          setData(activityData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteRequest = async (id) => {
+    setLoading(true);
+
+    try {
+      const response = await axiosPrivate.delete(`/schedule`, id);
+      const successMessage = response.statusMessage;
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: successMessage,
+      });
+
+      handleGetRequest();
+    } catch (error) {
+      console.error("Error:", error);
+
+      if (error.response) {
+        const errorMessage = error.response.statusMessage;
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "No response received from the server.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An unexpected error occurred.",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const columns = [
+    {
+      title: "No",
+      dataIndex: "no",
+      render: (text, record, index) => index + 1,
+      width: "10%",
+    },
+    {
+      title: "Hari",
+      dataIndex: "schedule",
+      sorter: handleSort("schedule"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("schedule"),
+      render: (schedule) => (schedule.day ? schedule.day : "-"),
+    },
+    {
+      title: "Ekstrakurikuler",
+      dataIndex: "ekskul",
+      sorter: handleSort("ekskul"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("ekskul"),
+      render: (ekskul) => (ekskul.name ? ekskul.name : "-"),
+    },
+    {
+      title: "Ruangan",
+      dataIndex: "room",
+      sorter: handleSort("room"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("room"),
+      render: (room) => (room.name ? room.name : "-"),
+    },
+    {
+      title: "Kelas",
+      dataIndex: "grade",
+      sorter: handleSort("grade"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("grade"),
+      render: (grade) => (grade ? grade : "-"),
+    },
+    {
+      title: "Jam Mulai",
+      dataIndex: "startTime",
+      sorter: handleSort("startTime"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("startTime"),
+      render: (startTime) => (startTime ? startTime : "-"),
+    },
+    {
+      title: "Jam Berakhir",
+      dataIndex: "endTime",
+      sorter: handleSort("endTime"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("endTime"),
+      render: (endTime) => (endTime ? endTime : "-"),
+    },
+    {
+      title: "Aksi",
+      dataIndex: "action",
+      width: "20%",
+      render: (_, record) => (
+        <Space
+          size={"middle"}
+          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
+        >
+          <a className="hover:text-blue-500" onClick={() => handleEdit(record)}>
+            <BsPencil size={20} />
+          </a>
+          <a
+            className="hover:text-red-500"
+            onClick={() => handleDeleteRequest(record.id)}
+          >
+            <LuTrash size={20} />
+          </a>
+        </Space>
+      ),
+    },
+  ];
+
+  useEffect(() => {
+    handleGetRequest();
+  }, []);
+
+  return (
+    <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
+      <div className="overflow-x-auto hidden-scroll w-full">
+        <Table
+          columns={columns}
+          dataSource={data.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )}
+          pagination={getPaginationConfig()}
+          loading={loading}
+          scroll={{ x: "max-content" }}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default TableJadwal;

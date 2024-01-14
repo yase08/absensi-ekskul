@@ -5,19 +5,19 @@ module.exports = {
     await queryInterface.createTable("attendances", {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
       ekskul_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         references: {
           model: "ekskuls",
           key: "id",
         },
       },
       student_id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         references: {
           model: "students",
           key: "id",
@@ -25,9 +25,11 @@ module.exports = {
       },
       category: {
         type: Sequelize.ENUM("hadir", "sakit", "izin", "alpa"),
+        allowNull: false,
       },
       date: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

@@ -15,17 +15,19 @@ export class AttendanceController extends AttendanceService {
     }
   };
 
-  getTotalAttendance = async (req: Request, res: Response): Promise<Response> => {
+  getWeeklyAttendanceChart = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getTotalAttendanceService(
-        req
-      );
+      const serviceResponse: APIResponse =
+        await this.getHistoryWeeklyAttendanceService(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
     }
   };
-  
+
   exportToExcel = async (req: Request, res: Response): Promise<any> => {
     try {
       const serviceResponse: APIResponse = await this.exportAttendance(req);
@@ -37,7 +39,33 @@ export class AttendanceController extends AttendanceService {
 
   getAllAttendance = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getAllAttendanceService(
+      const serviceResponse: APIResponse =
+        await this.getStudentAttendanceService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  getDetailAttendance = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.getDetailAttendanceService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  getChartAttendance = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getChartAttendanceService(
         req
       );
       return res.status(serviceResponse.statusCode).json(serviceResponse);

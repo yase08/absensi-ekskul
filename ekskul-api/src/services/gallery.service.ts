@@ -3,6 +3,8 @@ import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import slugify from "slugify";
 import { Op } from "sequelize";
+import path from "path";
+import fs from "fs";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -11,16 +13,6 @@ const db = require("../db/models");
 export class GalleryService {
   async createGalleryService(req: Request): Promise<any> {
     try {
-      const ekskulOnGallery = await db.gallery.findOne({
-        where: { ekskul_id: req.body.ekskul_id },
-      });
-
-      if (ekskulOnGallery)
-        throw apiResponse(
-          status.CONFLICT,
-          `Ekskul id ${req.body.ekskul_id} on gallery images already exist`
-        );
-
       if (req.body.name) {
         req.body.slug = slugify(req.body.name.toLowerCase());
       }
@@ -40,11 +32,9 @@ export class GalleryService {
       });
 
       if (!createGallery)
-        throw apiResponse(status.FORBIDDEN, "Create new gallery failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat galeri");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new gallery success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Galeri berhasil dibuat"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -68,11 +58,23 @@ export class GalleryService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.gallery.count();
+
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
+
+      paramQuerySQL.include = [
+        {
+          model: db.ekskul,
+          as: "ekskul",
+          attributes: ["id", "name"],
+        },
+      ];
 
       if (sort) {
         const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
@@ -92,13 +94,58 @@ export class GalleryService {
         paramQuerySQL.offset = offset;
       }
 
-      const galleries = await db.gallery.findAll(paramQuerySQL);
+      const gallery = await db.gallery.findAll(paramQuerySQL);
 
-      if (!galleries)
-        throw apiResponse(status.NOT_FOUND, "Galleries do not exist");
+      if (!gallery || gallery.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
+
+      const manipulatedGallery = gallery.map((item) => {
+        return {
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          ekskul: item.ekskul
+            ? {
+                id: item.ekskul.id,
+                name: item.ekskul.name,
+              }
+            : null,
+          date: item.date,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+        };
+      });
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all galleries success", galleries)
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan semua galeri",
+          manipulatedGallery,
+          totalRows
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getDetailGalleryService(req: Request): Promise<any> {
+    try {
+      const gallery = await db.gallery.findAll({
+        where: { slug: req.params.slug },
+      });
+
+      if (!gallery || gallery.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil mendapatkan semua galeri", gallery)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -115,13 +162,41 @@ export class GalleryService {
     try {
       const galleries = await db.gallery.findAll({
         where: { slug: req.params.slug },
+        include: [
+          {
+            model: db.ekskul,
+            as: "ekskul",
+            attributes: ["id", "name"],
+          },
+        ],
+      });
+
+      const manipulatedGallery = galleries.map((item) => {
+        return {
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          ekskul: item.ekskul
+            ? {
+                id: item.ekskul.id,
+                name: item.ekskul.name,
+              }
+            : null,
+          images: JSON.parse(item.images),
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+        };
       });
 
       if (!galleries)
-        throw apiResponse(status.NOT_FOUND, "Galleries do not exist");
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all galleries success", galleries)
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan galeri",
+          manipulatedGallery
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -140,21 +215,20 @@ export class GalleryService {
         where: { id: req.params.id },
       });
 
+      if (req.body.name) {
+        req.body.slug = slugify(req.body.name.toLowerCase());
+      }
+
       if (!galleryExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Gallery do not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
 
-      const previousImages = galleryExist.images;
+      let files: Express.Multer.File[] = req.files as Express.Multer.File[];
+      let galleryImages: string[] = [...galleryExist.images];
 
-      let galleryImages: string[] = previousImages.slice();
-
-      if (Array.isArray(req.files) && req.files.length > 0) {
-        const newImages = req.files.map(
-          (file: Express.Multer.File) => file.filename
-        );
-        galleryImages = galleryImages.concat(newImages);
+      for (let i in files) {
+        const file = files[i];
+        const pathName = file.path;
+        galleryImages.push(pathName);
       }
 
       const updateGallery = await db.gallery.update(
@@ -170,9 +244,9 @@ export class GalleryService {
       );
 
       if (!updateGallery)
-        throw apiResponse(status.FORBIDDEN, "Update gallery failed");
+        throw apiResponse(status.FORBIDDEN, "Update galeri gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update gallery success"));
+      return Promise.resolve(apiResponse(status.OK, "Update galeri berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -191,19 +265,26 @@ export class GalleryService {
       });
 
       if (!galleryExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Gallery do not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
 
-      const deleteGallery = await db.gallery.destroy({
+      const deleteImage = galleryExist.images.map((item) => {
+        return {
+          path: item,
+        };
+      });
+
+      for (let i in deleteImage) {
+        const file = deleteImage[i];
+        fs.unlinkSync(`../public/images/${file.path}`);
+      }
+
+      await db.gallery.destroy({
         where: { id: galleryExist.id },
       });
 
-      if (!deleteGallery)
-        throw apiResponse(status.FORBIDDEN, "Delete gallery failed");
-
-      return Promise.resolve(apiResponse(status.OK, "Delete gallery success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus galeri")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

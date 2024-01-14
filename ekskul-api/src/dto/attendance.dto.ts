@@ -1,45 +1,35 @@
-// Berfungsi untuk memvalidasi req.body / req.params / req.query
-
-import { IsNotEmpty, IsString, IsInt, IsEmail, MaxLength, MinLength } from "class-validator";
+import { Type } from "class-transformer";
+import {
+  IsArray,
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  ValidateNested,
+} from "class-validator";
 
 export class DTOAttendance {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Kategori absensi tidak boleh kosong" })
+  @IsString({ message: "Kategori absensi harus berupa string" })
   category: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Tanggal absensi tidak boleh kosong" })
+  @IsString({ message: "Tanggal absensi harus berupa string" })
   date: string;
 
-  @IsNotEmpty()
-  @IsInt()
-  instructor_id: number;
+  @IsNotEmpty({ message: "ID student tidak boleh kosong" })
+  @IsUUID()
+  student_id: string;
+}
 
-  @IsNotEmpty()
-  @IsInt()
-  ekskul_id: number;
-
+export class DTOAttendanceArray {
+  // @IsArray({ message: "Array data absensi tidak valid" })
+  @ValidateNested({ each: true })
+  @Type(() => DTOAttendance)
+  attendanceArray: DTOAttendance[];
 }
 
 export class DTOAttendanceById {
-  @IsNotEmpty()
-  @IsString()
-  category: string;
-
-  @IsNotEmpty()
-  @IsString()
-  date: string;
-
-  @IsNotEmpty()
-  @IsInt()
-  instructor_id: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  ekskul_id: number;
-
-  @IsNotEmpty()
-  @IsString()
-  id: string;
-
+  @IsNotEmpty({ message: "ID absensi tidak boleh kosong" })
+  @IsUUID()
+  id: number;
 }

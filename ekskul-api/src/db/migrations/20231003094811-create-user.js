@@ -5,16 +5,18 @@ module.exports = {
     await queryInterface.createTable("users", {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
       name: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
         unique: true,
+        allowNull: false,
       },
       mobileNumber: {
         type: Sequelize.STRING,
@@ -22,13 +24,23 @@ module.exports = {
       },
       image: {
         type: Sequelize.STRING,
-        required: false,
+        allowNull: true,
       },
       password: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       role: {
         type: Sequelize.ENUM("admin", "instructor"),
+        defaultValue: "instructor",
+        allowNull: false,
+      },
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      refreshToken: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,

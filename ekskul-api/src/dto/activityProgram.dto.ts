@@ -1,61 +1,27 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { IsNotEmpty, IsString, IsInt, IsEmail, MaxLength, MinLength } from "class-validator";
+import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class DTOActivityProgram {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Nama aktivitas program tidak boleh kosong" })
+  @IsString({ message: "Ekskul harus berupa string" })
   activity: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Tugas aktivitas program tidak boleh kosong" })
+  @IsString({ message: "Tugas harus berupa string" })
   task: string;
 
-  @IsNotEmpty()
-  @IsString()
-  startDate: string;
+  @IsNotEmpty({ message: "Tanggal mulai tidak boleh kosong" })
+  @IsString({ message: "Tanggal mulai harus berupa tanggal" })
+  startDate: Date;
 
-  @IsNotEmpty()
-  @IsString()
-  endDate: string;
-
-  @IsNotEmpty()
-  @IsInt()
-  instructor_id: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  ekskul_id: number;
-
+  @IsNotEmpty({ message: "Tanggal selesai tidak boleh kosong" })
+  @IsString({ message: "Tanggal akhir harus berupa tanggal" })
+  endDate: Date;
 }
 
 export class DTOActivityProgramById {
-  @IsNotEmpty()
-  @IsString()
-  activity: string;
-
-  @IsNotEmpty()
-  @IsString()
-  task: string;
-
-  @IsNotEmpty()
-  @IsString()
-  startDate: string;
-
-  @IsNotEmpty()
-  @IsString()
-  endDate: string;
-
-  @IsNotEmpty()
-  @IsInt()
-  instructor_id: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  ekskul_id: number;
-
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "ID aktivitas program tidak boleh kosong" })
+  @IsUUID()
   id: string;
-
 }

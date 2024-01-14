@@ -1,31 +1,31 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
-import { Op, where } from "sequelize";
+import { Op } from "sequelize";
 
 // Berfungsi untuk menghandle logic dari controler
 
-const db = require("../db/models");
+const db = require("../db/models/index.js");
 
 export class RoomService {
   async createRoomService(req: Request): Promise<any> {
     try {
-      const room = await db.room.findOne({
-        where: { name: req.body.name },
-      });
+      const room = await db.room.findOne({ where: { name: req.body.name } });
 
       if (room)
         throw apiResponse(
           status.CONFLICT,
-          `Room ${req.body.name} already exist`
+          `Room dengan nama ${req.body.name} sudah ada`
         );
 
       const createRoom = await db.room.create(req.body);
 
       if (!createRoom)
-        throw apiResponse(status.FORBIDDEN, "Create new room failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat room");
 
-      return Promise.resolve(apiResponse(status.OK, "Create new room success"));
+      return Promise.resolve(
+        apiResponse(status.OK, "Room berhasil dibuat")
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -49,9 +49,13 @@ export class RoomService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.room.count();
+
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -73,32 +77,12 @@ export class RoomService {
         paramQuerySQL.offset = offset;
       }
 
-      const rooms = await db.room.findAll(paramQuerySQL);
+      const room = await db.room.findAll(paramQuerySQL);
 
-      if (!rooms) throw apiResponse(status.NOT_FOUND, "Room do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched all rooms success", rooms)
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getRoomService(req: Request): Promise<any> {
-    try {
-      const room = await db.room.findOne({ where: { id: req.params.id } });
-
-      if (!room) throw apiResponse(status.NOT_FOUND, "Room do not exist");
+      if (!room || room.length === 0) throw apiResponse(status.NOT_FOUND, "Room tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched room success", room)
+        apiResponse(status.OK, "Berhasil mendapatkan room", room, totalRows)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -120,17 +104,30 @@ export class RoomService {
       if (!roomExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Room do not exist for the given id"
+          "Room dengan id tersebut tidak ditemukan"
         );
 
-      const updateRoom = await db.room.update(req.body, {where: {
-        id: roomExist.id,
-      }});
+      const roomSame = await db.room.findOne({
+        where: { name: req.body.name },
+      });
+
+      if (roomSame && roomSame.id !== roomExist.id) {
+        throw apiResponse(
+          status.CONFLICT,
+          `Room dengan nama ${req.body.name} sudah ada`
+        );
+      }
+
+      const updateRoom = await db.room.update(req.body, {
+        where: {
+          id: roomExist.id,
+        },
+      });
 
       if (!updateRoom)
-        throw apiResponse(status.FORBIDDEN, "Update room failed");
+        throw apiResponse(status.FORBIDDEN, "Update room gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update room success"));
+      return Promise.resolve(apiResponse(status.OK, "Update room berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -151,7 +148,7 @@ export class RoomService {
       if (!roomExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Room do not exist for the given id"
+          "Room dengan id tersebut tidak ditemukan"
         );
 
       const deleteRoom = await db.room.destroy({
@@ -159,9 +156,9 @@ export class RoomService {
       });
 
       if (!deleteRoom)
-        throw apiResponse(status.FORBIDDEN, "Delete room failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal menghapus room");
 
-      return Promise.resolve(apiResponse(status.OK, "Delete room success"));
+      return Promise.resolve(apiResponse(status.OK, "Berhasil menghapus room"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

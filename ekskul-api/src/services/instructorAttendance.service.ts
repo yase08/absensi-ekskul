@@ -2,12 +2,7 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
-import { Session } from "express-session";
-import { verifyToken } from "../libs/jwt.lib";
-
-interface ISession extends Session {
-  user: any;
-}
+import { ISession } from "../interfaces/user.interface";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -19,38 +14,30 @@ export class InstructorAttendanceService {
       const instructor_Id = (req.session as ISession).user.id;
       const ekskulIds = (req.session as ISession).user.ekskul;
 
-      const selectedEkskulId = Number(req.query.ekskul_id);
-
-      if (ekskulIds.includes(selectedEkskulId)) {
+      if (ekskulIds.includes(req.body.ekskul_id)) {
         const userOnEkskul = await db.userOnEkskul.findOne({
-          where: { user_id: instructor_Id, ekskul_id: selectedEkskulId },
+          where: { user_id: instructor_Id, ekskul_id: req.body.ekskul_id },
         });
 
         if (userOnEkskul) {
-          // Jika terkait, buat data kehadiran
           const createInstructorAttendance = db.instructorAttendance.create({
             ...req.body,
-            ekskul_id: selectedEkskulId,
             instructor_id: instructor_Id,
           });
           if (!createInstructorAttendance)
-            throw apiResponse(status.FORBIDDEN, "Create new instructor failed");
+            throw apiResponse(status.FORBIDDEN, "Absensi gagal ditambahkan");
 
           return Promise.resolve(
-            apiResponse(status.OK, "Create new instructor success")
+            apiResponse(status.OK, "Absensi berhasil ditambahkan")
           );
         } else {
-          // Jika tidak terkait, lewati data kehadiran ini dan beri respons error
           throw apiResponse(
             status.FORBIDDEN,
-            `Instructor with ID ${instructor_Id} is not associated with the selected ekskul`
+            `Instruktur dengan id ${instructor_Id} tidak terdaftar di ekskul ini`
           );
         }
       } else {
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Ekskul does not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Ekskul tidak ditemukan");
       }
     } catch (error: any) {
       return Promise.reject(
@@ -78,9 +65,22 @@ export class InstructorAttendanceService {
 
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: { [Op.like]: `%${filter}%` },
         };
       }
+
+      paramQuerySQL.include = [
+        {
+          model: db.user,
+          as: "user",
+          attributes: ["id", "name"],
+        },
+        {
+          model: db.ekskul,
+          as: "ekskul",
+          attributes: ["id", "name"],
+        },
+      ];
 
       if (sort) {
         const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
@@ -100,53 +100,50 @@ export class InstructorAttendanceService {
         paramQuerySQL.offset = offset;
         if (ekskulIds.length > 1) {
           paramQuerySQL.where = {
-            ekskul_id: ekskulIds, // Filter by multiple ekskul IDs
+            ekskul_id: ekskulIds,
           };
         } else if (ekskulIds.length === 1) {
           paramQuerySQL.where = {
-            ekskul_id: ekskulIds[0], // Filter by a single ekskul ID
+            ekskul_id: ekskulIds[0],
           };
         }
       }
 
-      console.log((req.session as ISession).user.ekskul);
-
-      const instructors = await db.instructorAttendance.findAll(paramQuerySQL);
-
-      if (!instructors)
-        throw apiResponse(status.NOT_FOUND, "Instructors do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched all instructors success", instructors)
+      const instructorAttendance = await db.instructorAttendance.findAll(
+        paramQuerySQL
       );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
 
-  async getInstructorAttendanceService(req: Request): Promise<any> {
-    try {
-      const instructorAttendance = await db.instructorAttendance.findOne({
-        where: { id: req.params.id },
+      if (!instructorAttendance || instructorAttendance.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Instruktur tidak ditemukan");
+
+      const manipulatedResponse = instructorAttendance.map((item) => {
+        return {
+          id: item.id,
+          category: item.category,
+          user: item.user
+            ? {
+                id: item.user.id,
+                name: item.user.name,
+              }
+            : null,
+          ekskul: item.ekskul
+            ? {
+                id: item.ekskul.id,
+                name: item.ekskul.name,
+              }
+            : null,
+          date: item.date,
+        };
       });
 
-      if (!instructorAttendance)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Instructor attendance do not exist"
-        );
+      const totalRows = instructorAttendance.length;
 
       return Promise.resolve(
         apiResponse(
           status.OK,
-          "Fetched instructor attendance success",
-          instructorAttendance
+          "Berhasil mendapatkan absensi instruktur",
+          manipulatedResponse,
+          totalRows
         )
       );
     } catch (error: any) {
@@ -167,18 +164,17 @@ export class InstructorAttendanceService {
       });
 
       if (!instructorExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Instructors do not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Instruktur tidak ditemukan");
 
-      const updateInstructor = await db.instructorAttendance.update(req.body);
+      const updateInstructor = await db.instructorAttendance.update(req.body, {
+        where: { id: instructorExist.id },
+      });
 
       if (!updateInstructor)
-        throw apiResponse(status.FORBIDDEN, "Update instructor failed");
+        throw apiResponse(status.FORBIDDEN, "Update instruktur berhasil");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Update instructor success")
+        apiResponse(status.OK, "Update instruktur berhasil")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -198,20 +194,17 @@ export class InstructorAttendanceService {
       });
 
       if (!instructorExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Instructors do not exist for the given member_id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Instruktur tidak ditemukan");
 
       const deleteInstructor = await db.instructorAttendance.destroy({
         where: { id: instructorExist.id },
       });
 
       if (!deleteInstructor)
-        throw apiResponse(status.FORBIDDEN, "Delete instructor failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal menghapus instruktur");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Delete instructor success")
+        apiResponse(status.OK, "Gagal menghapus instruktur")
       );
     } catch (error: any) {
       return Promise.reject(

@@ -11,9 +11,6 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.schedule, {
         foreignKey: "schedule_id",
       });
-      this.belongsTo(models.rombel, {
-        foreignKey: "rombel_id",
-      });
       this.belongsTo(models.room, {
         foreignKey: "room_id",
       });
@@ -24,12 +21,36 @@ module.exports = (sequelize, DataTypes) => {
   }
   activity.init(
     {
-      schedule_id: DataTypes.INTEGER,
-      rombel_id: DataTypes.INTEGER,
-      room_id: DataTypes.INTEGER,
-      ekskul_id: DataTypes.INTEGER,
-      startTime: DataTypes.STRING,
-      endTime: DataTypes.STRING,
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
+      schedule_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      grade: {
+        type: DataTypes.ENUM("X", "XI", "XII"),
+        allowNull: false,
+      },
+      room_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      ekskul_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      startTime: {
+        type: DataTypes.TIME,
+        allowNull: false,
+      },
+      endTime: {
+        type: DataTypes.TIME,
+        allowNull: false,
+      },
     },
     {
       sequelize,

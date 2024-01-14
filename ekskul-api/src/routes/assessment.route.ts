@@ -4,8 +4,7 @@ import { permission } from "../middlewares/permission";
 import { auth } from "../middlewares/authentication";
 import { authorization } from "../middlewares/authorization";
 import { validator } from "../middlewares/validator.middleware";
-import { DTOAssessment, DTOAssessmentById } from "../dto/assessment.dto";
-
+import { DTOAsessmentById, DTOAssessmentArray } from "../dto/assessment.dto";
 
 // class RouteUsers mengextends dari AssessmentController agar bisa memakai semua property dan method dari rayon controller
 class AssessmentRoutes extends AssessmentController {
@@ -19,27 +18,37 @@ class AssessmentRoutes extends AssessmentController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["instructor"]), validator(DTOAssessment)],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        // validator(DTOAssessmentArray),
+      ],
       this.createAssessment
     );
     this.router.get(
-      "/",
+      "/detail",
       [authorization(), auth(), permission(["instructor", "admin"])],
-      this.getAllAssessment
-    );
-    this.router.get(
-      "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
-      this.getAssessment
+      this.getAllAssessmentByTask
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOAssessmentById)],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        validator(DTOAsessmentById),
+      ],
       this.updateAssessment
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        validator(DTOAsessmentById),
+      ],
       this.deleteAssessment
     );
 

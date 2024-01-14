@@ -10,7 +10,7 @@ export const upload = multer({
     destination(_: Request, file: Express.Multer.File, done: any) {
       const folder: string = path.join(
         __dirname,
-        `../public/gallery`
+        `../public/images`
       );
   
       if (!file) {
@@ -25,7 +25,7 @@ export const upload = multer({
     },
     filename(_req: Request, file: Express.Multer.File, done: any) {
       if (!file) done(new ExpressError('Get file upload failed'), null)
-      done(null, `${Date.now()}_${file.originalname}`)
+      done(null, `${Date.now()}-${file.originalname}`)
     }
   }),
   fileFilter(_req: Request, file: Express.Multer.File, done: FileFilterCallback) {

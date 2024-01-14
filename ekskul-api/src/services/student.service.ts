@@ -2,6 +2,7 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request } from "express";
 import { Op } from "sequelize";
+import { v4 as uuidv4 } from "uuid";
 
 // Berfungsi untuk menghandle logic dari controler
 const db = require("../db/models/index.js");
@@ -16,23 +17,35 @@ export class StudentService {
       if (student)
         throw apiResponse(
           status.CONFLICT,
-          `Student ${req.body.name} already exist`
-        );
+          `Siswa dengan nama ${req.body.name} sudah ada`
+        ); 
 
       const ekskuls = await db.ekskul.findAll({
         where: { id: req.body.ekskuls },
       });
 
       const createStudent = await db.student.create(req.body);
-      await createStudent.addEkskul(ekskuls);
+
+      Promise.all(
+        ekskuls.map(async (ekskul) => {
+          try {
+            const createStudentEkskuls = await db.studentOnEkskul.create({
+              student_id: createStudent.id,
+              ekskul_id: ekskul.id,
+            });
+            return createStudentEkskuls;
+          } catch (error) {
+            console.error(error);
+          }
+        })
+      );
 
       if (!createStudent)
-        throw apiResponse(status.FORBIDDEN, "Create new student failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat siswa");
 
-      return Promise.resolve(
-        apiResponse(status.OK, "Create new student success")
-      );
+      return Promise.resolve(apiResponse(status.OK, "Berhasil membuat siswa"));
     } catch (error: any) {
+      console.log(error);
       return Promise.reject(
         apiResponse(
           error.statusCode || status.INTERNAL_SERVER_ERROR,
@@ -52,33 +65,34 @@ export class StudentService {
       const page: any = req.query.page;
 
       const paramQuerySQL: any = {
-        attributes: ["id", "name", "nis", "email", "mobileNumber"],
+        attributes: ["id", "name", "nis", "email", "mobileNumber", "gender"],
         include: [
           {
             model: db.rombel,
-            attributes: ["name"],
+            attributes: ["id", "name"],
             as: "rombel",
           },
           {
             model: db.rayon,
-            attributes: ["name"],
+            attributes: ["id", "name"],
             as: "rayon",
           },
           {
             model: db.ekskul,
-            attributes: ["name"],
-            through: {
-              attributes: [],
-            },
+            attributes: ["id", "name"],
           },
         ],
       };
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.student.count();
+
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -100,13 +114,155 @@ export class StudentService {
         paramQuerySQL.offset = offset;
       }
 
-      const students = await db.student.findAll(paramQuerySQL);
+      const student = await db.student.findAll(paramQuerySQL);
 
-      if (!students)
-        throw apiResponse(status.NOT_FOUND, "Students do not exist");
+      if (!student || student.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+
+      const manipulatedStudent = student.map((student: any) => {
+        return {
+          id: student.id,
+          name: student.name,
+          nis: student.nis,
+          email: student.email,
+          mobileNumber: student.mobileNumber,
+          gender: student.gender,
+          rombel: student.rombel
+            ? {
+                id: student.rombel.id,
+                name: student.rombel.name,
+              }
+            : null,
+          rayon: student.rayon
+            ? {
+                id: student.rayon.id,
+                name: student.rayon.name,
+              }
+            : null,
+          ekskuls: student.ekskuls
+            ? student.ekskuls.map((ekskul) => {
+                return {
+                  id: ekskul.id,
+                  name: ekskul.name,
+                };
+              })
+            : null,
+        };
+      });
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched all students success", students)
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan siswa",
+          manipulatedStudent,
+          totalRows
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+  async getStudentOnAssessmentService(req: Request): Promise<any> {
+    try {
+      const ekskul_id = req.query.ekskul_id as string;
+
+      const paramQuerySQL: any = {
+        attributes: ["id", "name"],
+        include: [
+          {
+            model: db.ekskul,
+            attributes: [],
+            where: { id: ekskul_id },
+          },
+        ],
+      };
+
+      const studentWithoutAssessment = await db.student.findAll({
+        ...paramQuerySQL,
+        where: {
+          id: {
+            [Op.notIn]: [
+              db.sequelize.literal(
+                `SELECT DISTINCT "student_id" FROM "assessment" WHERE "ekskul_id" = '${ekskul_id}'`
+              ),
+            ],
+          },
+        },
+      });
+
+      if (!studentWithoutAssessment || studentWithoutAssessment.length === 0) {
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+      }
+
+      const manipulatedStudent = studentWithoutAssessment.map(
+        (student: any) => {
+          return {
+            id: student.id,
+            name: student.name,
+          };
+        }
+      );
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan siswa berdasarkan ekskul",
+          manipulatedStudent
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getStudentByEkskulService(req: Request): Promise<any> {
+    try {
+      const ekskul_id = req.query.ekskul_id as string;
+
+      const paramQuerySQL: any = {
+        attributes: ["id", "name"],
+        include: [
+          {
+            model: db.ekskul,
+            attributes: [],
+            where: { id: ekskul_id },
+          },
+        ],
+      };
+
+      const student = await db.student.findAll(paramQuerySQL);
+
+      if (!student || student.length === 0) {
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+      }
+
+      const manipulatedStudent = student.map(
+        (student: any) => {
+          return {
+            id: student.id,
+            name: student.name,
+          };
+        }
+      );
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan siswa berdasarkan ekskul",
+          manipulatedStudent
+        )
       );
     } catch (error: any) {
       return Promise.reject(
@@ -126,10 +282,7 @@ export class StudentService {
       });
 
       if (!studentExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Student do not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
 
       const updateStudent = await db.student.update(req.body, {
         where: {
@@ -138,9 +291,9 @@ export class StudentService {
       });
 
       if (!updateStudent)
-        throw apiResponse(status.FORBIDDEN, "Update student failed");
+        throw apiResponse(status.FORBIDDEN, "Update siswa gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update student success"));
+      return Promise.resolve(apiResponse(status.OK, "Update siswa berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -159,38 +312,21 @@ export class StudentService {
       });
 
       if (!studentExist)
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Student do not exist for the given id"
-        );
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+
+      await db.studentOnEkskul.destroy({
+        where: { student_id: studentExist.id },
+      });
 
       const deleteStudent = await db.student.destroy({
         where: { id: studentExist.id },
       });
 
       if (!deleteStudent)
-        throw apiResponse(status.FORBIDDEN, "Delete student failed");
-
-      return Promise.resolve(apiResponse(status.OK, "Delete student success"));
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getStudentService(req: Request): Promise<any> {
-    try {
-      const student = await db.student.findOne({ where: { id: req.params.id } });
-
-      if (!student) throw apiResponse(status.NOT_FOUND, "Student do not exist");
+        throw apiResponse(status.FORBIDDEN, "Gagal menghapus siswa");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched student success", student)
+        apiResponse(status.OK, "Berhasil menghapus siswa")
       );
     } catch (error: any) {
       return Promise.reject(

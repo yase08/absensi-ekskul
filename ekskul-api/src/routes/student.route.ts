@@ -6,7 +6,6 @@ import { authorization } from "../middlewares/authorization";
 import { validator } from "../middlewares/validator.middleware";
 import { DTOStudent, DTOStudentById } from "../dto/student.dto";
 
-
 // class RouteUsers mengextends dari StudentController agar bisa memakai semua property dan method dari student controller
 class StudentRoutes extends StudentController {
   private router: Router;
@@ -23,23 +22,38 @@ class StudentRoutes extends StudentController {
       this.createStudent
     );
     this.router.get(
-      "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
-      this.getStudent
+      "/",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.getAllStudent
     );
     this.router.get(
-      "/",
-      [authorization(), auth(), permission(["admin"])],
-      this.getAllStudent
+      "/ekskul",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.getStudentByEkskul
+    );
+    this.router.get(
+      "/assessment",
+      [authorization(), auth(), permission(["admin", "instructor"])],
+      this.getStudentOnAssessment
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"]), validator(DTOStudentById)],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        validator(DTOStudent),
+      ],
       this.updateStudent
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
+      [
+        authorization(),
+        auth(),
+        permission(["instructor", "admin"]),
+        validator(DTOStudentById),
+      ],
       this.deleteStudent
     );
 

@@ -1,124 +1,162 @@
-import { useState, useEffect } from 'react';
-import { getAllRayon } from '../../../services/rayon.service';
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineSearch, AiOutlineFileSearch } from 'react-icons/ai';
-import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import { IoIosOptions } from 'react-icons/io';
+import { useState, useEffect, useRef } from "react";
+import Swal from "sweetalert2";
+import { SearchOutlined } from "@ant-design/icons";
+import { Table, Input, Space, Button } from "antd";
+import { BsPencil } from "react-icons/bs";
+import { LuTrash } from "react-icons/lu";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableEskul = () => {
+const TableRayon = ({ setFormOld }) => {
+  const [searchText, setSearchText] = useState("");
+  const axiosPrivate = useAxiosPrivate();
+  const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
-  const [filter, setFilter] = useState('');
-  const [sort, setSort] = useState('');
-  const [search, setSearch] = useState('');
-  const [changeFitur, setChangeFitur] = useState('');
-  const [size, setSize] = useState('10');
-  const [number, setNumber] = useState('1');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [rayonOptions, setRayonOptions] = useState([]);
-  const [getAllData, setGetAllData] = useState(0);
-  const [getAllDataFilter, setGetAllDataFilter] = useState(0);
-  const [loadingOption, setLoadingOption] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const searchInput = useRef(null);
+  const pageSizeOptions = [10, 20, 50];
+  const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
 
-
-  const ToggleHandleSearch = () => {
-    setSearch(!search)
-  }
-  const ToggleHandleChange = () => {
-    setChangeFitur(!changeFitur)
-    setSearch(false)
-  }
-
-  const handleInputChange = (event) => {
-    // Menggunakan event.target.value untuk mendapatkan nilai input yang baru
-    const newFilterValue = event.target.value;
-    setFilter(newFilterValue);
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
   };
 
+  const handleSort = (dataIndex) => (a, b) => {
+    const valueA = a[dataIndex].toLowerCase();
+    const valueB = b[dataIndex].toLowerCase();
 
-  const totalPages = Math.ceil(getAllData / size); // Calculate total pages
-  console.log('GetAllData',getAllData)
-  console.log('size',size)
-
-const handlePrevPage = () => {
-  if (number > 1) {
-    setNumber(number - 1);
-  }
-};
-
-const handleNextPage = () => {
-  if (number < totalPages) {
-    setNumber(number + 1);
-  }
-};
-
-  const generatePaginationButtons = () => {
-    const paginationButtons = [];
-
-    for (let i = 1; i <= totalPages; i++) {
-      paginationButtons.push(
-        <button
-          key={i}
-          className={`w-[40px] h-[40px] bg-primary rounded-md ${
-            i === number ? 'bg-blue-600' : 'hover:bg-blue-400'
-          }`}
-          onClick={() => setNumber(i)}
-        >
-          {i}
-        </button>
-      );
-    }
-
-    return paginationButtons;
+    return valueA.localeCompare(valueB);
   };
 
-  const DescAndAsc = () => {
-    setSort(sort === '-id' ? '' : '-id');
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: "block",
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: false,
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            close
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1677ff" : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) => (searchedColumn === dataIndex ? <div>{text}</div> : text),
+  });
+
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
   };
 
-  const pageSizeOptions = [1,10, 25, 50];
-
-  const handlePageSize = (e) => {
-    const newSize = e.target.value;
-  
-    // Reset the current page to the first page when changing page size
-    setNumber(1);
-  
-    setSize(newSize);
+  const handleChangePageSize = (current, size) => {
+    setCurrentPage(1);
+    setPageSize(size);
   };
+
+  const getPaginationConfig = () => ({
+    current: currentPage,
+    pageSize: pageSize,
+    total: data.length,
+    pageSizeOptions: pageSizeOptions,
+    showSizeChanger: true,
+    onChange: handleChangePage,
+    onShowSizeChange: handleChangePageSize,
+  });
+
   const handleGetRequest = async () => {
     try {
-      const response = await getAllRayon({ filter, sort, size, number });
-  
-      if (response && response.data) {
-        console.log('API Response:', response.data);
-  
-        if (Array.isArray(response.data.rayonFilter)) {
-          const rayonData = response.data.rayonFilter;
-          const rayons = response.data.rayons;
-          setData(rayonData);
-  
-          // Filter the rayon options based on your criteria
-          const uniqueOptions = {};
-          rayons.forEach((item) => {
-            const name = item.name.replace(/\d+/g, '').trim(); // Remove numbers and trim
-            if (name.length > 2 && !/\d/.test(name)) {
-              uniqueOptions[name] = true;
-            }
-          });
+      const response = await axiosPrivate.get(`/rayon`);
 
-          
-  
-          const filteredOptions = Object.keys(uniqueOptions);
-          setRayonOptions(['Select', ...filteredOptions]);
-  
-          // Set the total data count
-          setGetAllData(response.data.rayons.length);
-          setGetAllDataFilter(response.data.rayonFilter.length);
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const rayonData = response.data.data;
+          setData(rayonData);
         } else {
-          setError(new Error('Data is not an array'));
+          setError(new Error("Data is not an array"));
         }
       } else {
-        setError(new Error('Data retrieval failed'));
+        setError(new Error("Data retrieval failed"));
       }
     } catch (error) {
       setError(error);
@@ -126,167 +164,107 @@ const handleNextPage = () => {
       setLoading(false);
     }
   };
-  
-  
-  
-  
 
-  const handleFilterChange = async (selectedOption) => {
-    setLoadingOption(true); // Set loading state to true
-  
-    if (selectedOption === 'Select') {
-      // Set filter to '' if "Select" option is chosen
-      setFilter('');
-    } else {
-      setFilter(selectedOption);
-    }
-  
-    // Reset the current page to the first page when applying a filter
-    setNumber(1);
-  
+  const handleDeleteRequest = async (id) => {
+    setLoading(true);
+
     try {
-      // Perform data fetching here
-      // Once the data is ready, set loadingOption to false
-      setLoadingOption(false);
+      const response = await axiosPrivate.delete(`/rayon/${id}`);
+      const successMessage = response.statusMessage;
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: successMessage,
+      });
+
+      handleGetRequest();
     } catch (error) {
-      // Handle errors if data fetching fails
-      setLoadingOption(false); // Ensure that loading is set to false in case of an error
-      console.error('Error fetching data:', error);
+      console.error("Error:", error);
+
+      if (error.response) {
+        const errorMessage = error.response.statusMessage;
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "No response received from the server.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An unexpected error occurred.",
+        });
+      }
+    } finally {
+      setLoading(false);
     }
   };
-  
-  
+
+  const columns = [
+    {
+      title: "No",
+      dataIndex: "no",
+      render: (text, record, index) => index + 1,
+      width: "10%",
+    },
+    {
+      title: "Nama",
+      dataIndex: "name",
+      sorter: handleSort("name"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("name"),
+    },
+    {
+      title: "Aksi",
+      dataIndex: "action",
+      width: "20%",
+      render: (_, record) => (
+        <Space
+          size={"middle"}
+          className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
+        >
+          <a className="hover:text-blue-500" onClick={() => setFormOld(record)}>
+            <BsPencil size={20} />
+          </a>
+          <a
+            className="hover:text-red-500"
+            onClick={() => handleDeleteRequest(record.id)}
+          >
+            <LuTrash size={20} />
+          </a>
+        </Space>
+      ),
+    },
+  ];
 
   useEffect(() => {
     handleGetRequest();
-  }, [filter, sort, size, number]);
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        <div className="relative bg-transparent flex gap-1 justify-center items-end">
-          <p className="text-animation font-Gabarito text-xl">Loading</p>
-          <section className="dots-container">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </section>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return <p>{error.message}</p>;
-  }
+  }, []);
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
       <div className="overflow-x-auto hidden-scroll w-full">
-        <table className="min-w-full border-collapse w-full bg-transparent">
-          <thead>
-            <tr>
-              <th className="w-1/6 flex items-center gap-1 px-6 py-3 white text-left text-base leading-4 text-gray-600 uppercase tracking-wider">
-                Rayon
-                <button onClick={DescAndAsc}>
-                  {sort ? <AiOutlineArrowUp /> : <AiOutlineArrowDown />}
-                </button>
-              </th>
-              <th></th>
-              <th></th>
-              <th className="text-right pr-6 flex bg-transparent justify-end ">
-                <input type="text" placeholder='Search Here...' className={`bg-transparent border-b border-black outline-none transition-all duration-500 ${search ? 'w-[150px]':'w-0'}`} value={filter} onChange={handleInputChange} />
-                <button className={`mx-3 p-2 border  rounded-full border-black hover:bg-black hover:text-white ${changeFitur ? '':'hidden'}`} onClick={ToggleHandleSearch}>
-                  <AiOutlineSearch/>
-                </button>
-                <div className='flex'>
-                <button onClick={ToggleHandleChange} className={`p-2 flex justify-center items-center  border-black ${changeFitur ? 'border rounded-md':'border-y border-l rounded-l-md'}`}>
-              <AiOutlineFileSearch className={` ${changeFitur ? '':'mr-2'}`}/>
-            </button>
-             <select
-              name=""
-              id=""
-              className={` border-black outline-none py-1 rounded-r-md w-[85px] ${changeFitur ? 'hidden ':'border-r border-y'}`}
-              value={filter}
-              onChange={(e) => handleFilterChange(e.target.value)}
-            >
-              
-              {rayonOptions.map((option, index) => (
-                  <option key={index} value={option} >
-                    {loadingOption ? 'Loading...' : option}
-                  </option>
-              ))}
-            </select>
-                </div>
-
-              </th>
-            </tr>
-          </thead>
-          <tbody className="w-full">
-            {data.length > 0 ? (
-              data.map((item, index) => (
-                <tr key={index} className="border-b hover:bg-gray-200">
-                  <td className="px-6 py-4 whitespace-no-wrap relative uppercase">
-                    {item.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap"></td>
-                  <td className="px-6 py-4 whitespace-no-wrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      {/* Customize content here */}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                    <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                      Edit
-                    </a>
-                    <span className="px-2">|</span>
-                    <button className="text-red-600 hover:text-red-900 cursor-pointer">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="px-6 py-4 text-center">
-                  No Data Available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        <div className="bg-transparent w-full h-full mt-5 px-5">
-          <div className="bg-transparent flex justify-end items-center gap-4">
-            <div className="flex gap-2 text-white">
-              <button className="text-black" onClick={handlePrevPage}>
-                <BiLeftArrow />
-              </button>
-              {totalPages > 1 && generatePaginationButtons()}
-            <button className="text-black" onClick={handleNextPage}>
-              <BiRightArrow />
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <select
-              className="border border-black py-1 rounded-md w-[55px]"
-              value={size}
-              onChange={handlePageSize}
-            >
-              {pageSizeOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))} 
-              </select>
-              <p className="text-gray-500 text-xs">
-                Page {number} of {totalPages} | Total data: {getAllData}
-              </p>
-            </div>
-          </div>
-        </div>
+        <Table
+          columns={columns}
+          dataSource={data.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )}
+          pagination={getPaginationConfig()}
+          loading={loading}
+          scroll={{ x: "max-content" }}
+        />
       </div>
     </div>
   );
 };
 
-export default TableEskul;
+export default TableRayon;

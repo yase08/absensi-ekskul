@@ -7,7 +7,6 @@ import { upload } from "../libs/multer.lib";
 import { validator } from "../middlewares/validator.middleware";
 import { DTOGallery, DTOGalleryById } from "../dto/gallery.dto";
 
-
 // class RouteUsers mengextends dari GalleryController agar bisa memakai semua property dan method dari gallery controller
 class GalleryRoutes extends GalleryController {
   private router: Router;
@@ -20,18 +19,23 @@ class GalleryRoutes extends GalleryController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin"]), validator(DTOGallery), upload.array("images")],
+      [authorization(), auth(), permission(["admin"]), upload.array("images")],
       this.createGallery
     );
     this.router.get(
       "/",
       [authorization(), auth(), permission(["admin"])],
-      this.getAllGalleryService
+      this.getAllGallery
     );
-    this.router.get("/:slug", this.getGalleryService);
+    this.router.get(
+      "/detail/:slug",
+      [authorization(), auth(), permission(["admin"])],
+      this.getDetailGallery
+    );
+    this.router.get("/:slug", this.getGallery);
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"]), validator(DTOGalleryById), upload.array("images")],
+      [authorization(), auth(), permission(["admin"]), upload.array("images")],
       this.updateGallery
     );
     this.router.delete(

@@ -11,13 +11,13 @@ export class ActivityProgramService {
   async createActivityProgramService(req: Request): Promise<any> {
     try {
       const activityProgram = await db.activityProgram.findOne({
-        where: { name: req.body.name },
+        where: { activity: req.body.activity },
       });
 
       if (activityProgram)
         throw apiResponse(
           status.CONFLICT,
-          `Activity program ${req.body.name} already exist`
+          `Aktivitas program ${req.body.activity} sudah ada`
         );
 
       const createActivityProgram = await db.activityProgram.create(req.body);
@@ -25,17 +25,17 @@ export class ActivityProgramService {
       if (!createActivityProgram)
         throw apiResponse(
           status.FORBIDDEN,
-          "Create new activity program failed"
+          "Gagal membuat aktivitas program baru"
         );
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new activity program success")
+        apiResponse(status.OK, "Aktivitas program berhasil dibuat")
       );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
           error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
+        error.statusMessage,
           error.message
         )
       );
@@ -54,9 +54,13 @@ export class ActivityProgramService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.activityProgram.count();
+
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          activity: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -78,43 +82,17 @@ export class ActivityProgramService {
         paramQuerySQL.offset = offset;
       }
 
-      const activityPrograms = await db.activityProgram.findAll(paramQuerySQL);
+      const activityProgram = await db.activityProgram.findAll(
+        paramQuerySQL
+      );
 
-      if (!activityPrograms)
-        throw apiResponse(status.NOT_FOUND, "Activity programs do not exist");
+      if (!activityProgram || activityProgram.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Aktivitas program tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Fetched all activity programs success",
-          activityPrograms
-        )
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getActivityProgramService(req: Request): Promise<any> {
-    try {
-      const activityProgram = await db.activityProgram.findOne({
-        where: { id: req.params.id },
-      });
-
-      if (!activityProgram)
-        throw apiResponse(status.NOT_FOUND, "Activity program do not exist");
-
-      return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Fetched activity program success",
-          activityProgram
+        apiResponse(status.OK, "Berhasil mendapatkan aktivitas program", 
+          activityProgram,
+          totalRows
         )
       );
     } catch (error: any) {
@@ -137,7 +115,7 @@ export class ActivityProgramService {
       if (!activityProgramExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Activity program do not exist for the given id"
+          "Aktivitas program dengan id tersebut tidak ditemukan"
         );
 
       const updateActivityProgram = await db.activityProgram.update(req.body, {
@@ -147,10 +125,10 @@ export class ActivityProgramService {
       });
 
       if (!updateActivityProgram)
-        throw apiResponse(status.FORBIDDEN, "Update activity program failed");
+        throw apiResponse(status.FORBIDDEN, "Update aktivitas program gagal");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Update activity program success")
+        apiResponse(status.OK, "Update aktivitas program sukses")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -172,18 +150,15 @@ export class ActivityProgramService {
       if (!activityProgramExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Activity program do not exist for the given id"
+          "Aktivitas program dengan id tersebut tidak ditemukan"
         );
 
-      const deleteActivityProgram = await db.activityProgram.destroy({
+      await db.activityProgram.destroy({
         where: { id: activityProgramExist.id },
       });
 
-      if (!deleteActivityProgram)
-        throw apiResponse(status.FORBIDDEN, "Delete activity program failed");
-
       return Promise.resolve(
-        apiResponse(status.OK, "Delete activity progam success")
+        apiResponse(status.OK, "Delete aktivitas program sukses")
       );
     } catch (error: any) {
       return Promise.reject(

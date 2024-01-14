@@ -5,15 +5,18 @@ module.exports = {
     await queryInterface.createTable("ekskuls", {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
       name: {
         type: Sequelize.STRING,
+        unique: true,
+        allowNull: false,
       },
       category: {
         type: Sequelize.ENUM("produktif", "umum", "senbud"),
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

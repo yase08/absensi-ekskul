@@ -11,12 +11,31 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.ekskul, {
         foreignKey: "ekskul_id",
       });
+      this.belongsTo(models.user, {
+        foreignKey: "instructor_id",
+      });
     }
   }
   instructorAttendance.init(
     {
-      instructor_id: DataTypes.INTEGER,
-      category: DataTypes.ENUM("hadir", "sakit", "izin", "alpa"),
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
+      instructor_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      category: {
+        type: DataTypes.ENUM("hadir", "sakit", "izin", "alpa"),
+        allowNull: false,
+      },
     },
     {
       sequelize,

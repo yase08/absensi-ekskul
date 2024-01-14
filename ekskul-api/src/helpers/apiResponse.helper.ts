@@ -4,14 +4,14 @@ export interface APIResponse {
   statusCode: number;
   statusMessage: string;
   data?: any;
-  pagination?: Record<string, any>;
+  option?: any;
 }
 
 export const apiResponse = (
   code: number,
   message: string,
   data?: any,
-  pagination?: Record<string, any>
+  option?: any
 ) => {
   if ((data as any) === null) {
     return {
@@ -23,7 +23,7 @@ export const apiResponse = (
       statusCode: code,
       statusMessage: message,
       data: data,
-      pagination: pagination,
+      option: option,
     };
   }
 };

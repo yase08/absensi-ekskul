@@ -7,12 +7,14 @@ import compression from "compression";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import http, { Server } from "http";
+import cookieParser from "cookie-parser";
 import consola from "consola";
 import nocache from "nocache";
 import SlowDown from "express-slow-down";
 import hpp from "hpp";
 import session from "express-session";
 import { swaggerClient, swaggerServe } from "./libs/swagger.lib";
+import "reflect-metadata";
 import AuthRoutes from "./routes/auth.route";
 import AttendanceRoutes from "./routes/attendance.route";
 import RayonRoutes from "./routes/rayon.route";
@@ -26,7 +28,9 @@ import ActivityProgramRoutes from "./routes/activityProgram.route";
 import AssessmentRoutes from "./routes/assessment.route";
 import UserRoutes from "./routes/user.route";
 import TaskRoute from "./routes/task.route";
-import instructorAttendanceRoute from "./routes/instructorAttendance.route";
+import ActivityRoute from "./routes/activity.route";
+import InstructorAttendanceRoute from "./routes/instructorAttendance.route";
+import path from "path";
 
 // Membuat class App yang yang berfungsi sebagai server express
 export class App {
@@ -41,7 +45,7 @@ export class App {
     this.version = "/api/v1";
     this.env = process.env.NODE_ENV!;
     this.server = http.createServer(this.app);
-    this.port = +process.env.PORT!;
+    this.port = 8000;
     this.plugins();
     this.route();
   }
@@ -53,34 +57,45 @@ export class App {
     this.app.use(compression());
     this.app.use(morgan("dev"));
     this.app.use(nocache());
-    this.app.use(hpp({ checkBody: true, checkQuery: true }));
+    this.app.use(
+      "/images",
+      express.static(path.join(__dirname, "public/images"))
+    );
     this.app.use(helmet({ contentSecurityPolicy: false }));
+    this.app.use(hpp({ checkBody: true, checkQuery: true }));
     if (!["production", "test"].includes(this.env)) {
       this.app.use(`${this.version}/docs`, swaggerServe, swaggerClient());
     }
     this.app.use(
       session({
+        name: "session",
         resave: false,
         saveUninitialized: false,
         secret: process.env.SESSION_SECRET_KEY as string,
-        cookie: { httpOnly: true, sameSite: "strict" },
+        cookie: {
+          maxAge: 24 * 60 * 60 * 1000,
+          secure: false,
+          httpOnly: true,
+          sameSite: "strict",
+        },
       })
     );
+    this.app.use(cookieParser());
     this.app.use(
       cors({
-        origin: "*",
+        origin: "http://localhost:5173",
         methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization", "Accept"],
         credentials: true,
       })
     );
-    this.app.use(
-      rateLimit({
-        windowMs: 24 * 60 * 3,
-        max: 1000,
-        message: "Too many request, send back request after 3 minute",
-      })
-    );
+    // this.app.use(
+    //   rateLimit({
+    //     windowMs: 24 * 60 * 3,
+    //     max: 1000,
+    //     message: "Too many request, send back request after 3 minute",
+    //   })
+    // );
     this.app.use(
       SlowDown({
         windowMs: 24 * 60 * 1,
@@ -99,14 +114,17 @@ export class App {
     this.app.use(`${this.version}/ekskul`, EkskulRoutes);
     this.app.use(`${this.version}/student`, StudentRoutes);
     this.app.use(`${this.version}/user`, UserRoutes);
-    this.app.use(`${this.version}/activityProgram`, ActivityProgramRoutes);
+    this.app.use(`${this.version}/activity-program`, ActivityProgramRoutes);
     this.app.use(`${this.version}/schedule`, ScheduleRoutes);
     this.app.use(`${this.version}/gallery`, GalleryRoutes);
     this.app.use(`${this.version}/room`, RoomRoutes);
     this.app.use(`${this.version}/assessment`, AssessmentRoutes);
     this.app.use(`${this.version}/task`, TaskRoute);
-    this.app.use(`${this.version}/instructorAttendance`, instructorAttendanceRoute);
-
+    this.app.use(`${this.version}/activity`, ActivityRoute);
+    this.app.use(
+      `${this.version}/instructor-attendance`,
+      InstructorAttendanceRoute
+    );
   }
 
   // Digunakan untuk menjalankan server express

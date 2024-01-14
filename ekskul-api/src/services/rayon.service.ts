@@ -15,16 +15,16 @@ export class RayonService {
       if (rayon)
         throw apiResponse(
           status.CONFLICT,
-          `Rayon ${req.body.name} already exist`
+          `Rayon dengan nama ${req.body.name} sudah ada`
         );
 
       const createRayon = await db.rayon.create(req.body);
 
       if (!createRayon)
-        throw apiResponse(status.FORBIDDEN, "Create new rayon failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal membuat rayon");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Create new rayon success")
+        apiResponse(status.OK, "Rayon berhasil dibuat")
       );
     } catch (error: any) {
       return Promise.reject(
@@ -49,9 +49,13 @@ export class RayonService {
       let limit: number;
       let offset: number;
 
+      const totalRows = await db.rayon.count();
+
       if (filter) {
         paramQuerySQL.where = {
-          name: { [Op.iLike]: `%${filter}%` },
+          name: {
+            [Op.like]: `%${filter}%`,
+          },
         };
       }
 
@@ -73,32 +77,12 @@ export class RayonService {
         paramQuerySQL.offset = offset;
       }
 
-      const rayons = await db.rayon.findAll(paramQuerySQL);
+      const rayon = await db.rayon.findAll(paramQuerySQL);
 
-      if (!rayons) throw apiResponse(status.NOT_FOUND, "Rayons do not exist");
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched all rayons success", rayons)
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async getRayonService(req: Request): Promise<any> {
-    try {
-      const rayon = await db.rayon.findOne({ where: { id: req.params.id } });
-
-      if (!rayon) throw apiResponse(status.NOT_FOUND, "Rayon do not exist");
+      if (!rayon || rayon.length === 0) throw apiResponse(status.NOT_FOUND, "Rayon tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(status.OK, "Fetched rayon success", rayon)
+        apiResponse(status.OK, "Berhasil mendapatkan rayon", rayon, totalRows)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -120,7 +104,7 @@ export class RayonService {
       if (!rayonExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rayon do not exist for the given id"
+          "Rayon dengan id tersebut tidak ditemukan"
         );
 
       const rayonSame = await db.rayon.findOne({
@@ -130,7 +114,7 @@ export class RayonService {
       if (rayonSame && rayonSame.id !== rayonExist.id) {
         throw apiResponse(
           status.CONFLICT,
-          `Rayon with the name ${req.body.name} already exists`
+          `Rayon dengan nama ${req.body.name} sudah ada`
         );
       }
 
@@ -141,9 +125,9 @@ export class RayonService {
       });
 
       if (!updateRayon)
-        throw apiResponse(status.FORBIDDEN, "Update rayon failed");
+        throw apiResponse(status.FORBIDDEN, "Update rayon gagal");
 
-      return Promise.resolve(apiResponse(status.OK, "Update rayon success"));
+      return Promise.resolve(apiResponse(status.OK, "Update rayon berhasil"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -164,7 +148,7 @@ export class RayonService {
       if (!rayonExist)
         throw apiResponse(
           status.NOT_FOUND,
-          "Rayon do not exist for the given id"
+          "Rayon dengan id tersebut tidak ditemukan"
         );
 
       const deleteRayon = await db.rayon.destroy({
@@ -172,9 +156,9 @@ export class RayonService {
       });
 
       if (!deleteRayon)
-        throw apiResponse(status.FORBIDDEN, "Delete rayon failed");
+        throw apiResponse(status.FORBIDDEN, "Gagal menghapus rayon");
 
-      return Promise.resolve(apiResponse(status.OK, "Delete rayon success"));
+      return Promise.resolve(apiResponse(status.OK, "Berhasil menghapus rayon"));
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

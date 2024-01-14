@@ -15,11 +15,20 @@ module.exports = (sequelize, DataTypes) => {
   }
   gallery.init(
     {
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
       name: DataTypes.STRING,
       date: DataTypes.STRING,
-      images: DataTypes.JSONB,
+      images: DataTypes.JSON,
       slug: DataTypes.STRING,
-      ekskul_id: DataTypes.INTEGER,
+      ekskul_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
     },
     {
       sequelize,

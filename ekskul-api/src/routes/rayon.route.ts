@@ -6,7 +6,6 @@ import { authorization } from "../middlewares/authorization";
 import { validator } from "../middlewares/validator.middleware";
 import { DTORayon, DTORayonById } from "../dto/rayon.dto";
 
-
 // class RouteUsers mengextends dari RayonController agar bisa memakai semua property dan method dari rayon controller
 class RayonRoutes extends RayonController {
   private router: Router;
@@ -27,19 +26,19 @@ class RayonRoutes extends RayonController {
       [authorization(), auth(), permission(["admin"])],
       this.getAllRayon
     );
-    this.router.get(
-      "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
-      this.getRayon
-    );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"]), validator(DTORayonById)],
+      [authorization(), auth(), permission(["admin"]), validator(DTORayon)],
       this.updateRayon
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["admin"])],
+      [
+        authorization(),
+        auth(),
+        permission(["admin"]),
+        validator(DTORayonById),
+      ],
       this.deleteRayon
     );
 

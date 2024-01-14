@@ -20,15 +20,30 @@ export default {
         'lightbad' : '#E3E4E8',
         'lightsun' : '#F4F6F9'
       },
+      
       fontFamily:{
         'Gabarito': ['Gabarito', 'sans-serif'],
         'Nunito': ['Nunito', 'sans-serif'],
       },
+      textShadow: {
+        'md': '2px 2px 4px rgba(0, 0, 0, 0.5)',
+      },
       boxShadow: {
         'top': '0 0 5px 5px rgba(0, 0, 0, 0.2)',
       }
+      
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      const newUtilities = {
+        '.text-shadow-md': {
+          textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+        },
+      };
+
+      addUtilities(newUtilities, ['responsive', 'hover']);
+    },
+  ],
 }
 

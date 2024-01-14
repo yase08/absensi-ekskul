@@ -20,8 +20,21 @@ module.exports = (sequelize, DataTypes) => {
   }
   ekskul.init(
     {
-      name: DataTypes.STRING,
-      category: DataTypes.ENUM("produktif", "umum", "senbud"),
+      id: {
+        type: DataTypes.UUID,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+      },
+      name: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+      },
+      category: {
+        type: DataTypes.ENUM("produktif", "umum", "senbud"),
+        allowNull: false,
+      },
     },
     {
       sequelize,

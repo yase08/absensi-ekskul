@@ -11,5 +11,6 @@ type TypeUser = {
   password: string;
   image: string;
   role: string;
-  ekskul: number[];
+  isActive: string;
+  ekskul: string[];
 };

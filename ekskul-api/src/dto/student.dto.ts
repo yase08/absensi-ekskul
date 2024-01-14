@@ -1,84 +1,47 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { IsNotEmpty, IsString, IsInt, IsEmail, MaxLength, MinLength } from "class-validator";
+import {
+  IsNotEmpty,
+  IsString,
+  IsEmail,
+  MaxLength,
+  IsUUID,
+} from "class-validator";
 
 export class DTOStudent {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Nama tidak boleh kosong" })
+  @IsString({ message: "Nama harus berupa string" })
   name: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(8)
+  @IsNotEmpty({ message: "NIS tidak boleh kosong" })
+  @IsString({ message: "NIS harus berupa string" })
+  @MaxLength(8, { message: "NIS tidak boleh lebih dari 8 karakter" })
   nis: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @IsEmail()
+  @IsNotEmpty({ message: "Email tidak boleh kosong" })
+  @IsString({ message: "Email harus berupa string" })
+  @IsEmail({}, { message: "Email tidak valid" })
   email: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(13)
+  @IsNotEmpty({ message: "No. HP tidak boleh kosong" })
+  @IsString({ message: "No. HP harus berupa string" })
+  @MaxLength(13, { message: "No. HP tidak valid" })
   mobileNumber: string;
 
-  @IsNotEmpty()
-  @IsInt()
-  rombel_id: number;
+  @IsNotEmpty({ message: "Password tidak boleh kosong" })
+  @IsUUID()
+  rombel_id: string;
 
-  @IsNotEmpty()
-  @IsInt()
-  rayon_id: number;
+  @IsNotEmpty({ message: "Password tidak boleh kosong" })
+  @IsUUID()
+  rayon_id: string;
 
-  @IsNotEmpty()
-  @IsString()
-  image: string;
-
-  @IsString()
-  @IsNotEmpty({ message: "password is not empty" })
-  @MinLength(8)
-  password: string;
-  
+  @IsNotEmpty({ message: "Gender tidak boleh kosong" })
+  gender: string;
 }
 
 export class DTOStudentById {
-  @IsNotEmpty()
-  @IsString()
-  name: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(8)
-  nis: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @IsEmail()
-  email: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(13)
-  mobileNumber: string;
-
-  @IsNotEmpty()
-  @IsInt()
-  rombel_id: number;
-
-  @IsNotEmpty()
-  @IsInt()
-  rayon_id: number;
-
-  @IsNotEmpty()
-  @IsString()
-  image: string;
-
-  @IsString()
-  @IsNotEmpty({ message: "password is not empty" })
-  @MinLength(8)
-  password: string;
-  
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Id tidak boleh kosong" })
+  @IsUUID()
   id: string;
 }

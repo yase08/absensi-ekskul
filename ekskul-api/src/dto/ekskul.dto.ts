@@ -1,27 +1,19 @@
 // Berfungsi untuk memvalidasi req.body / req.params / req.query
 
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class DTOEkskul {
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Nama tidak boleh kosong" })
+  @IsString({ message: "Nama harus berupa string" })
   name: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "Kategori ekskul tidak boleh kosong" })
+  @IsString({ message: "Kategori harus berupa string" })
   category: string;
 }
 
 export class DTOEkskulById {
-  @IsNotEmpty()
-  @IsString()
-  name: string;
-
-  @IsNotEmpty()
-  @IsString()
-  category: string;
-
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: "ID ekskul tidak boleh kosong" })
+  @IsUUID()
   id: string;
 }
