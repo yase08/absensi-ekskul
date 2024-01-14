@@ -24,12 +24,16 @@ import DetailGalleryDashboard from "../pages/Admin/Gallery/Detail/Detail";
 import PersistLogin from "../components/Admin/User/PersistLogin";
 import RequireAuth from "../components/Admin/User/RequireAuth";
 import NotFound from "../pages/Admin/NotFound/NotFound";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
+import ResetToken from "../pages/ResetToken/ResetToken";
 
 const AppRouter = () => {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-token/:token" element={<ResetToken />} />
         <Route path="/*" element={<NotFound />} />
         <Route path="/" element={<Dashboard />} />
         <Route element={<PersistLogin />}>
