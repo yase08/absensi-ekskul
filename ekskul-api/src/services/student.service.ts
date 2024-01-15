@@ -228,43 +228,50 @@ export class StudentService {
   }
 
   async updateStudentService(req: Request): Promise<any> {
+    const transaction = await db.sequelize.transaction();
+
     try {
       const studentExist = await db.student.findOne({
         where: { id: req.params.id },
       });
 
+      if (!studentExist)
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+
       const ekskuls = await db.ekskul.findAll({
         where: { id: req.body.ekskuls },
       });
 
-      if (!studentExist)
-        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
-
+      // Update data siswa
       const updateStudent = await db.student.update(req.body, {
-        where: {
-          id: studentExist.id,
-        },
+        where: { id: studentExist.id },
+        transaction,
       });
 
       if (!updateStudent)
         throw apiResponse(status.FORBIDDEN, "Update siswa gagal");
 
-      Promise.all(
-        ekskuls.map(async (ekskul) => {
-          try {
-            const updateStudentEkskuls = await db.studentOnEkskul.update({
-              student_id: updateStudent.id,
-              ekskul_id: ekskul.id,
-            });
-            return updateStudentEkskuls;
-          } catch (error) {
-            console.error(error);
-          }
-        })
+      // Hapus ekskul sebelumnya siswa pada transaksi ini
+      await db.studentOnEkskul.destroy({
+        where: { student_id: studentExist.id },
+        transaction,
+      });
+
+      // Tambahkan ekskul baru pada transaksi ini
+      await db.studentOnEkskul.bulkCreate(
+        ekskuls.map((ekskul) => ({
+          student_id: studentExist.id,
+          ekskul_id: ekskul.id,
+        })),
+        { transaction }
       );
+
+      await transaction.commit();
 
       return Promise.resolve(apiResponse(status.OK, "Update siswa berhasil"));
     } catch (error: any) {
+      await transaction.rollback();
+
       return Promise.reject(
         apiResponse(
           error.statusCode || status.INTERNAL_SERVER_ERROR,

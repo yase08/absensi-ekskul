@@ -136,6 +136,8 @@ export class UserService {
   }
 
   async updateUserService(req: Request): Promise<any> {
+    const transaction = await db.sequelize.transaction();
+
     try {
       const userExist = await db.user.findOne({
         where: { id: req.params.id },
@@ -163,31 +165,31 @@ export class UserService {
         req.body.password = hashedPassword;
       }
 
-      const updateUser = await db.user.update(
-        { ...req.body },
-        {
-          where: {
-            id: userExist.id,
-          },
-        }
-      );
+      const updateUser = await db.user.update(req.body, {
+        where: {
+          id: userExist.id,
+        },
+        transaction,
+      });
 
       if (!updateUser)
         throw apiResponse(status.FORBIDDEN, "Gagal mengupdate pengguna");
 
-      Promise.all(
-        ekskuls.map(async (ekskul) => {
-          try {
-            const updateUserEkskuls = await db.userOnEkskul.update({
-              user_id: updateUser.id,
-              ekskul_id: ekskul.id,
-            });
-            return updateUserEkskuls;
-          } catch (error) {
-            console.error(error);
-          }
-        })
+      // Hapus ekskul sebelumnya siswa pada transaksi ini
+      await db.userOnEkskul.destroy({
+        where: { user_id: userExist.id },
+        transaction,
+      });
+
+      await db.userOnEkskul.bulkCreate(
+        ekskuls.map((ekskul) => ({
+          user_id: userExist.id,
+          ekskul_id: ekskul.id,
+        })),
+        { transaction }
       );
+
+      await transaction.commit();
 
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mengupdate pengguna")

@@ -1,13 +1,15 @@
 
 import TopLay from "../../../components/User/Layouts/TopLay"
 import Jumbotron from "../../../components/User/Gallery/Jumbotron"
+import Jumbo from "../../../components/User/Gallery/Jumbo"
 
 const Gallery = () => {
   return (
     <>
-    <div className="relative h-auto bg-[#ECF4FF]">
+    <div className="relative h-auto ]">
       <TopLay/>
-      <Jumbotron/>
+      {/* <Jumbotron/> */}
+      <Jumbo/>
       {/* <TopNavbar/>
       <Navbar/>
       <div className="bg-transparent w-full mt-[100px] relative">

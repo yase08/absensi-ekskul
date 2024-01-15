@@ -6,6 +6,8 @@ import { FaLocationArrow, FaLocationPin } from 'react-icons/fa6'
 import { GiLoveLetter } from 'react-icons/gi'
 import { MdEmail } from 'react-icons/md'
 import { RiCustomerService2Fill } from 'react-icons/ri'
+import logo from '../../../assets/logoeskul.png'
+import { Link } from 'react-router-dom'
 
 const TopLay = () => {
   return (
@@ -13,33 +15,33 @@ const TopLay = () => {
       <div className='bg-[#3F85EC] w-full py-[10px] px-[15px] flex justify-center '>
         <div className='max-w-[1000px] bg-transparent w-full flex justify-between'>
           <div className='flex items-center gap-[15px] text-white text-[15px]'>
-            <div className='flex items-center gap-[5px]'>
+            <div className='flex items-center gap-[5px] group'>
               <FaLocationArrow/>
-             <p className='capitalize'>cikaret, gg kasadaran</p>
+             <p className='capitalize truncate w-64 overflow-hidden group-hover:w-full'>Jl. Raya Wangun, RT.01/RW.06, Sindangsari, Kec. Bogor Tim., Kota Bogor, Jawa Barat 16146</p>
             </div>
             <div className='flex items-center gap-[5px]'>
               <MdEmail/> 
-            <p>babakan176@gmail.com</p>
+            <p>prohumasi@smkwikrama.sch.id</p>
             </div>
           </div>
-          <div className='flex gap-[5px] text-white items-center text-[15px]'>
+          <Link to="/login" className='flex gap-[5px] text-white items-center text-[15px]'>
             <BiLockOpen/>
-            <p className='capitalize'>login</p>
-          </div>
+            <button className='capitalize'>login</button>
+          </Link>
         </div>
       </div>
       <div className='w-full py-[10px] border-b border-black border-opacity-20 bg-white px-[15px] flex justify-center'>
       <div className='max-w-[1000px] bg-transparent w-full flex justify-between'>
         <div className='flex items-center gap-[5px]'>
-          <FaGraduationCap className='text-blue-500 text-[25px]'/>
-          <p className='text-[22px] uppercase font-semibold'>eskul</p>
+          <img src={logo} alt="" className='w-[20px] mr-1'/>
+          <p className='text-[22px] capitalize font-normal'>Ekstrakurikuler</p>
         </div>
         <div className='flex gap-[30px] items-center'>
           <div className='flex items-center gap-[10px]'>
             <RiCustomerService2Fill className='text-[18px]'/>
             <div>
               <p className='text-[14px] font-light capitalize'>need any help?</p>
-              <p className='text-[14px] font-semibold'>+62 8560743 6610</p>
+              <p className='text-[14px] font-semibold'>(0251) 8242411</p>
             </div>
           </div>
             <button className='p-[5px] capitalize text-[12px] rounded-sm text-white bg-blue-500'>email now</button>
@@ -50,16 +52,16 @@ const TopLay = () => {
       <div className='max-w-[1000px] bg-transparent w-full flex justify-between'>
         <ul className='flex gap-[10px] uppercase text-[14px] font-semibold'>
           <li>
-            <a href="#home">home</a>
+            <a href="#home" className='hover:text-blue-500 transition duration-300 ease-in-out'>home</a>
+          </li> 
+          <li>
+            <a href="" className='hover:text-blue-500 transition duration-300 ease-in-out'>jadwal</a>
           </li>
           <li>
-            <a href="">jadwal</a>
+            <a href="" className='hover:text-blue-500 transition duration-300 ease-in-out'>gallery</a>
           </li>
           <li>
-            <a href="">gallery</a>
-          </li>
-          <li>
-            <a href="">contact us</a>
+            <a href="" className='hover:text-blue-500 transition duration-300 ease-in-out'>contact us</a>
           </li>
         </ul>
         <ul className='flex items-center gap-[10px] '>
