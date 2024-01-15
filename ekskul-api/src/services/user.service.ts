@@ -4,6 +4,7 @@ import { Request } from "express";
 import { Op } from "sequelize";
 import { hashPassword } from "../libs/bcrypt.lib";
 import fs from "fs";
+import path from "path";
 
 // Berfungsi untuk menghandle logic dari controler
 
@@ -136,10 +137,12 @@ export class UserService {
 
   async updateUserService(req: Request): Promise<any> {
     try {
-      console.log(req.body);
-
       const userExist = await db.user.findOne({
         where: { id: req.params.id },
+      });
+
+      const ekskuls = await db.ekskul.findAll({
+        where: { id: req.body.ekskuls },
       });
 
       if (!userExist)
@@ -147,7 +150,9 @@ export class UserService {
 
       if (req.file) {
         if (userExist.image) {
-          fs.unlinkSync(`../public/images/${userExist.image}`);
+          fs.unlinkSync(
+            path.join(__dirname, "..", "public", "images", userExist.image)
+          );
         }
 
         req.body.image = req.file.filename;
@@ -169,6 +174,20 @@ export class UserService {
 
       if (!updateUser)
         throw apiResponse(status.FORBIDDEN, "Gagal mengupdate pengguna");
+
+      Promise.all(
+        ekskuls.map(async (ekskul) => {
+          try {
+            const updateUserEkskuls = await db.userOnEkskul.update({
+              user_id: updateUser.id,
+              ekskul_id: ekskul.id,
+            });
+            return updateUserEkskuls;
+          } catch (error) {
+            console.error(error);
+          }
+        })
+      );
 
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mengupdate pengguna")
