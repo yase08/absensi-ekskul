@@ -91,7 +91,7 @@ export class UserService {
           },
         ],
       };
-  
+
       const user = await db.user.findAll(paramQuerySQL);
 
       if (!user || user.length === 0)
@@ -121,11 +121,7 @@ export class UserService {
         throw apiResponse(status.NOT_FOUND, "Pengguna tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Berhasil mendapatkan pengguna",
-          manipulatedUser,
-        )
+        apiResponse(status.OK, "Berhasil mendapatkan pengguna", manipulatedUser)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -140,6 +136,8 @@ export class UserService {
 
   async updateUserService(req: Request): Promise<any> {
     try {
+      console.log(req.body);
+
       const userExist = await db.user.findOne({
         where: { id: req.params.id },
       });

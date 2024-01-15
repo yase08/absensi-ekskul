@@ -2,13 +2,14 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { BsKeyboard } from "react-icons/bs";
 import { MdColorLens } from "react-icons/md";
 import { CgProfile, CgLogOut } from "react-icons/cg";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import useAuth from "../../../hooks/useAuth";
+import { UserOutlined, EditOutlined } from "@ant-design/icons";
 import { jwtDecode } from "jwt-decode";
-import { Modal } from "antd";
+import { Modal, Button, Input, Form } from "antd";
 
 // eslint-disable-next-line react/prop-types
 const TopNav = ({
@@ -17,6 +18,8 @@ const TopNav = ({
   toggleChangeNavbar,
   toggleOpenChangeBg,
 }) => {
+  const [form] = Form.useForm();
+  const [isEditMode, setIsEditMode] = useState(false);
   const [profile, setProfile] = useState({});
   const [isOpen, setIsOpen] = useState(false);
   const [isButtonVisible, setIsButtonVisible] = useState(false);
@@ -26,8 +29,20 @@ const TopNav = ({
   const [backgroundColor, setBackgroundColor] = useState("bg-primary");
   const { setAuth, setPersist, auth, persist } = useAuth();
   const { id } = jwtDecode(auth.accessToken);
-  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const navigate = useNavigate()
+
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+  };
+
+  const handleEdittClick = () => {
+    // Pemanggilan fungsi click pada elemen input file
+    fileInputRef.current.click();
+  };
 
   const handleFetch = async () => {
     try {
@@ -36,6 +51,10 @@ const TopNav = ({
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleEditClick = () => {
+    setIsEditMode(!isEditMode);
   };
 
   const showModal = () => {
@@ -159,6 +178,27 @@ const TopNav = ({
     }
   };
 
+  const onFinish = async (values) => {
+    try {
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("mobileNumber", values.mobileNumber);
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      if (values.image) {
+        formData.append("image", values.image[0].originFileObj);
+      }
+      const response = await axiosPrivate.put(`/user/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      form.resetFields();
+    } catch (error) {
+      console.error("Error creating comic:", error);
+    }
+  };
+
   return (
     <div className="w-full">
       <nav
@@ -241,31 +281,134 @@ const TopNav = ({
               onOk={handleOk}
               onCancel={handleCancel}
             >
-              <div className="w-full flex flex-col justify-start gap-1">
-                <div className="self-center mb-4">
-                  <img
-                    className="rounded-full w-12 h-12 object-cover"
-                    src={`http://localhost:8000/images/${profile.image}`}
-                    alt={"Profile Picture"}
-                  />
+              <div className="w-full flex flex-col justify-start gap-2 text-base">
+                <div className="self-center mb-4 relative">
+                  {profile.image === null ? (
+                    <UserOutlined
+                      style={{
+                        fontSize: "50px",
+                        border: "1px solid black",
+                        borderRadius: "50%",
+                        padding: "12px 12px",
+                      }}
+                    />
+                  ) : (
+                    <img
+                      className="rounded-full w-12 h-12 object-cover"
+                      src={`http://localhost:8000/images/${profile.image}`}
+                      alt={"Profile Picture"}
+                    />
+                  )}
+                  {isEditMode ? (
+                    <>
+                      <input
+                        type="file"
+                        onChange={handleFileChange}
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                      />
+                      <EditOutlined
+                        className="absolute bottom-0 text-xl hover:text-blue-500 cursor-pointer"
+                        onClick={handleEdittClick}
+                      />
+                    </>
+                  ) : null}
                 </div>
-                <p>
-                  <span className="font-semibold">Nama:</span> {profile.name}
-                </p>
-                <p>
-                  <span className="font-semibold">Nomer Telpon:</span>{" "}
-                  {profile.mobileNumber}
-                </p>
-                <p>
-                  <span className="font-semibold">Email:</span> {profile.email}
-                </p>
-                <p>
-                  <span className="font-semibold">Role:</span> {profile.role}
-                </p>
-                <p>
-                  <span className="font-semibold">Ekstrakurikuler:</span>{" "}
-                  {profile.ekskul?.map((ekskul) => ekskul.name + " ")}
-                </p>
+                {isEditMode ? (
+                  <>
+                    <Form
+                      name="basic"
+                      labelCol={{
+                        span: 8,
+                      }}
+                      wrapperCol={{
+                        span: 16,
+                      }}
+                      style={{
+                        maxWidth: 600,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                      }}
+                      initialValues={{
+                        remember: true,
+                      }}
+                      onFinish={onFinish}
+                      autoComplete="off"
+                    >
+                      <Form.Item
+                        label="Name"
+                        name="name"
+                        initialValue={profile.name}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Masukan nama!",
+                          },
+                        ]}
+                      >
+                        <Input addonBefore="Nama" />
+                      </Form.Item>
+                      <Form.Item
+                        label="Nomer Telpon"
+                        name="mobileNumber"
+                        initialValue={profile.mobileNumber}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Masukan Nomer Telpon!",
+                          },
+                        ]}
+                      >
+                        <Input addonBefore="Nomer Telpon" />
+                      </Form.Item>
+                      <Form.Item
+                        label="Email"
+                        name="email"
+                        initialValue={profile.email}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Masukan email!",
+                          },
+                        ]}
+                      >
+                        <Input addonBefore="Email" />
+                      </Form.Item>
+                      <Form.Item
+                        label="Password"
+                        name="password"
+                      >
+                        <Input addonBefore="Password" type="password" />
+                      </Form.Item>
+                      <Button htmlType="submit">Submit</Button>
+                    </Form>
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      <span className="font-semibold">Nama: </span>
+                      {profile.name}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Nomer Telpon: </span>
+                      {profile.mobileNumber}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Email: </span>
+                      {profile.email}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Role: </span>
+                      {profile.role}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Ekstrakurikuler: </span>
+                      {profile.ekskul?.map((ekskul) => ekskul.name + " ")}
+                    </p>
+                  </>
+                )}
+                <Button onClick={handleEditClick}>Edit</Button>
               </div>
             </Modal>
           </div>

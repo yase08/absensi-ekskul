@@ -84,7 +84,7 @@ export class GalleryService {
         apiResponse(
           status.OK,
           "Berhasil mendapatkan semua galeri",
-          manipulatedGallery,
+          manipulatedGallery
         )
       );
     } catch (error: any) {
@@ -154,6 +154,44 @@ export class GalleryService {
 
       if (!galleries)
         throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan galeri",
+          manipulatedGallery
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getPopularGalleryService(req: Request): Promise<any> {
+    try {
+      const galleries = await db.gallery.findAll({
+        limit: 4,
+      });
+
+      if (!galleries || galleries.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
+
+      const manipulatedGallery = galleries.map((item) => {
+        return {
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          images: JSON.parse(item.images),
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+        };
+      });
 
       return Promise.resolve(
         apiResponse(

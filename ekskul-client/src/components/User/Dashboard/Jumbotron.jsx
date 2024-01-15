@@ -3,21 +3,24 @@ import wk2 from '../../../assets/Rectangle 39.png'
 
 const Jumbotron = () => {
   return (
-    <div className='bg-transparent w-full h-auto px-[165px] py-[165px] font-Nunito relative'>
-      <div className='bg-transparent w-full '>
-        <h1 className='text-[#004aad] text-[45px] leading-[normal] capitalize'>selamat datang di website</h1>
-        <p className="font-bold text-transparent text-[48px] leading-[normal]">
-           <span className="text-[#ffde59]">Eks</span>
-           <span className="text-[#ffbd59]">trakuri</span>
-           <span className="text-[#ff914d]">kuler</span>
-        </p>
-        <h1 className="font-bold text-[48px] leading-[normal] text-[#004aad]">WIKRAMA</h1>
-        <p className='capitalize my-2'>segala informasi tentang ekstrakurikuler di <span className='uppercase'>smk wikrama bogor</span> ada di sini</p>
-        <button className='bg-[#004AAD] p-[22px] text-white rounded-xl capitalize mt-5 text-[20px] font-bold'>get ekstrakurikuler</button>
+    <div id='home' className='w-full image-cerita relative flex flex-col bg-black justify-center gap-[5px] items-center h-[60dvh]'>
+      <h1 className="text-5xl font-bold text-white uppercase text-shadow-md">learn with eskul</h1>
+      <p className='max-w-[700px] text-center text-white'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat laborum ad ducimus odio magnam, quos sint? Totam voluptate iusto veritatis incidunt nisi quae dolores odit.</p>
+      <div className='mt-[15px] flex gap-[15px]'>
+        <button className='bg-blue-500 p-[7px] capitalize font-bold text-[15px] rounded-sm text-white'>learn more</button>
+        <button className='bg-white p-[7px] capitalize font-bold text-[15px] rounded-sm text-black'>contact us</button>
       </div>
-      <div className='w-[38%] absolute top-0 right-0'>
-        <img src={wk2}/>
-      </div>
+      {/* <div className='w-full h-auto p-[20px] bg-transparent flex items-center justify-center top-[350px] absolute'>
+        <div className='max-w-[500px] w-full h-full bg-white p-[10px] flex flex-col'>
+          <h1 className='capitalize font-bold '>see gallery</h1>
+          <div className='flex justify-between w-full'>
+            <div className='w-full'>
+              <p>title</p>
+              <input type="text" className='border border-blue-500 w-full' />
+            </div>
+          </div>
+        </div>
+      </div> */}
     </div>
   )
 }

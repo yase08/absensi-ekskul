@@ -32,6 +32,7 @@ class GalleryRoutes extends GalleryController {
       [authorization(), auth(), permission(["admin"])],
       this.getDetailGallery
     );
+    this.router.get("/popular", this.getPopularGallery);
     this.router.get("/:slug", this.getGallery);
     this.router.put(
       "/:id",

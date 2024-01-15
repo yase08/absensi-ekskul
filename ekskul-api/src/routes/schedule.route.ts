@@ -18,7 +18,12 @@ class ScheduleRoutes extends ScheduleController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin", "instructor"]), validator(DTOSchedule)],
+      [
+        authorization(),
+        auth(),
+        permission(["admin", "instructor"]),
+        validator(DTOSchedule),
+      ],
       this.createSchedule
     );
     this.router.put(

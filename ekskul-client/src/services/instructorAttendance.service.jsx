@@ -3,7 +3,11 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 export const getAllInstructorAttendance = async () => {
   try {
     const response = await axios.get(
+<<<<<<< HEAD:ekskul-client/src/services/rombel.service.ts
+      `${API}/${VERSION}/rombel?filter=${filter}&sort=${sort}&page[size]=${size}&page[number]=${number}`,
+=======
       `${API}/${VERSION}/instructor-attendance`,
+>>>>>>> c8887d90d85c53b76096291f72975cd45949f855:ekskul-client/src/services/instructorAttendance.service.jsx
       config
     );
     return response.data;
