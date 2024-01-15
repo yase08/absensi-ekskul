@@ -117,11 +117,7 @@ export class StudentService {
       });
 
       return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Berhasil mendapatkan siswa",
-          manipulatedStudent,
-        )
+        apiResponse(status.OK, "Berhasil mendapatkan siswa", manipulatedStudent)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -312,80 +308,81 @@ export class StudentService {
       );
     }
   }
+
   async exportAllStudentService(req: Request, res: Response): Promise<any> {
     try {
       const date = Date.now();
       const options = { timeZone: "Asia/Jakarta" };
       const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
-        const students = await db.student.findAll({
-          include: [
-            {
-              model: db.rombel,
-              as: "rombel",
-              attributes: ["name"],
-            },
-            {
-              model: db.rayon,
-              as: "rayon",
-              attributes: ["name"],
-            },
-            {
-              model: db.ekskul,
-              attributes: ["id", "name"],
-            },
-          ],
-          attributes: ["name", "nis", "gender"],
-        });
-        
+      const students = await db.student.findAll({
+        include: [
+          {
+            model: db.rombel,
+            as: "rombel",
+            attributes: ["name"],
+          },
+          {
+            model: db.rayon,
+            as: "rayon",
+            attributes: ["name"],
+          },
+          {
+            model: db.ekskul,
+            attributes: ["id", "name"],
+          },
+        ],
+        attributes: ["name", "nis", "gender"],
+      });
 
-        const modifiedStudents = students.map((student) => {
-          return {
-            no: students.indexOf(student) + 1,
-            student_name: student ? student.name : null,
-            student_nis: student ? student.nis : null,
-            student_gender: student
-              ? student.gender === "male"
-                ? "Laki-laki"
-                : "Perempuan"
-              : null,
-            student_rombel: student
-              ? student.rombel.name
-              : null,
-            student_rayon: student
-              ? student.rayon.name
-              : null,
-            student_ekskul: student.ekskuls
-            ? student.ekskuls.map((ekskul) => {
-                  ekskul.name
-              }): null,
-          };
-        });
+      const modifiedStudents = students.map((student, index) => {
+        return {
+          no: index + 1,
+          student_name: student ? student.name : null,
+          student_nis: student ? student.nis : null,
+          student_gender: student
+            ? student.gender === "male"
+              ? "Laki-laki"
+              : "Perempuan"
+            : null,
+          student_rombel: student ? student.rombel.name : null,
+          student_rayon: student ? student.rayon.name : null,
+          student_ekskul: student.ekskuls.length > 0
+            ? student.ekskuls.map((ekskul) => ekskul.name).join(', ')
+            : "-",
+        };
+      });
 
-        const columns = [
-          { header: "No", key: "no", width: 15 },
-          { header: "Nama", key: "student_name", width: 15 },
-          { header: "Nis", key: "student_nis", width: 15 },
-          { header: "JK", key: "student_gender", width: 15 },
-          { header: "Rombel", key: "student_rombel", width: 15 },
-          { header: "Rayon", key: "student_rayon", width: 15 },
-          { header: "Ekstrakurikuler", key: "ekskuls", width: 15 },
-        ];
-        const file = `data-siswa-${date}.xlsx`;
+      const columns = [
+        { header: "No", key: "no", width: 15 },
+        { header: "Nama", key: "student_name", width: 15 },
+        { header: "Nis", key: "student_nis", width: 15 },
+        { header: "JK", key: "student_gender", width: 15 },
+        { header: "Rombel", key: "student_rombel", width: 15 },
+        { header: "Rayon", key: "student_rayon", width: 15 },
+        { header: "Ekstrakurikuler", key: "student_ekskul", width: 15 },
+      ];
+      const file = `data-siswa-${date}.xlsx`;
 
-        const exportSuccess = await exportExcel(
-          columns,
-          modifiedStudents,
-          file,
-          res
-        );
+      const exportSuccess = await exportExcel(
+        file,
+        columns,
+        modifiedStudents,
+        "Siswa",
+        res
+      );
 
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
-        
-        if (!exportSuccess) {
-          throw apiResponse(status.FORBIDDEN, "Export failed");
-        }
-        return Promise.resolve(apiResponse(status.OK, "Export Success", exportExcel));
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader("Content-Disposition", `attachment; filename=${file}`);
+
+      if (!exportSuccess) {
+        throw apiResponse(status.FORBIDDEN, "Export failed");
+      }
+      return Promise.resolve(
+        apiResponse(status.OK, "Export Success", exportExcel)
+      );
       // } else {
       //   throw apiResponse(
       //     status.NOT_FOUND,
@@ -439,7 +436,7 @@ export class StudentService {
             },
           ],
           attributes: ["name", "nis", "gender"],
-        });        
+        });
 
         const modifiedStudents = students.map((student) => {
           return {
@@ -451,15 +448,11 @@ export class StudentService {
                 ? "Laki-laki"
                 : "Perempuan"
               : null,
-            student_rombel: student
-              ? student.rombel.name
-              : null,
-            student_rayon: student
-              ? student.rayon.name
-              : null,
-            student_ekskul: student.ekskul
-            ? student.ekskul.name : null,
-          };
+            student_rombel: student ? student.rombel.name : null,
+            student_rayon: student ? student.rayon.name : null,
+            student_ekskul: student.ekskuls.length > 0
+            ? student.ekskuls.map((ekskul) => ekskul.name).join(', ')
+            : "-"};
         });
 
         const columns = [
@@ -474,19 +467,25 @@ export class StudentService {
         const file = `data-siswa-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
+          file,
           columns,
           modifiedStudents,
-          file,
+          "Siswa",
           res
         );
 
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
-        
+        res.setHeader(
+          "Content-Type",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader("Content-Disposition", `attachment; filename=${file}`);
+
         if (!exportSuccess) {
           throw apiResponse(status.FORBIDDEN, "Export failed");
         }
-        return Promise.resolve(apiResponse(status.OK, "Export Success", exportSuccess));
+        return Promise.resolve(
+          apiResponse(status.OK, "Export Success", exportSuccess)
+        );
       } else {
         throw apiResponse(
           status.NOT_FOUND,

@@ -80,7 +80,15 @@ export class ActivityProgramService {
 
   async getAllActivityProgramService(req: Request): Promise<any> {
     try {
-      const activityProgram = await db.activityProgram.findAll();
+      const activityProgram = await db.activityProgram.findAll({
+        include: [
+          {
+            model: db.user,
+            as: "user",
+            attributes: ["id", "name"]
+          }
+        ]
+      });
 
       if (!activityProgram || activityProgram.length === 0)
         throw apiResponse(
@@ -88,11 +96,23 @@ export class ActivityProgramService {
           "Aktivitas program tidak ditemukan"
         );
 
+        const modefiedResponse = activityProgram.map((activity) => ({
+          id: activity.id,
+          user: activity.user ? {
+            id: activity.user.id,
+            name: activity.user.name,
+          } : null,
+          activity: activity.activity,
+          task: activity.task,
+          startDate: activity.startDate,
+          endDate: activity.endDate
+        }))
+
       return Promise.resolve(
         apiResponse(
           status.OK,
           "Berhasil mendapatkan aktivitas program",
-          activityProgram
+          modefiedResponse
         )
       );
     } catch (error: any) {
@@ -224,9 +244,10 @@ export class ActivityProgramService {
         const file = `data-absensi-instruktur-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
+          file,
           columns,
           modifiedAttendances,
-          file,
+          "Aktivitas Program",
           res
         );
 
@@ -295,9 +316,10 @@ export class ActivityProgramService {
         const file = `data-absensi-instruktur-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
+          file,
           columns,
           modifiedActivities,
-          file,
+          "Aktivitas Program",
           res
         );
 
