@@ -2,23 +2,6 @@ import axios from "axios";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import config, { axiosPrivate } from "../utils/config";
 import { API, VERSION } from "../utils/baseUrl";
-// const axiosPrivate = useAxiosPrivate();
-// const getTokenFromSessionStorage = sessionStorage.getItem("token") || null;
-
-
-export const getAllAttendance = async (ekskul_id) => {
-  try {
-    const response = await axiosPrivate.get(
-      `/attendance?ekskul_id=${ekskul_id}`,
-      config
-    );
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      throw error.response.data.message;
-    }
-  }
-};
 
 export const exportAttendance = async (ekskul_id) => {
   try {

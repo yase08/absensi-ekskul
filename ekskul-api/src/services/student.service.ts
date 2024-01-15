@@ -334,9 +334,9 @@ export class StudentService {
         attributes: ["name", "nis", "gender"],
       });
 
-      const modifiedStudents = students.map((student, index) => {
+      const modifiedStudents = students.map((student) => {
         return {
-          no: index + 1,
+          no: students.indexOf(student) + 1,
           student_name: student ? student.name : null,
           student_nis: student ? student.nis : null,
           student_gender: student
@@ -346,9 +346,11 @@ export class StudentService {
             : null,
           student_rombel: student ? student.rombel.name : null,
           student_rayon: student ? student.rayon.name : null,
-          student_ekskul: student.ekskuls.length > 0
-            ? student.ekskuls.map((ekskul) => ekskul.name).join(', ')
-            : "-",
+          student_ekskul: student.ekskuls
+            ? student.ekskuls.map((ekskul) => {
+                ekskul.name;
+              })
+            : null,
         };
       });
 

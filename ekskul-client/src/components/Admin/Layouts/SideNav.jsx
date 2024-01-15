@@ -1258,7 +1258,7 @@ const SideNav = ({
                     <div className="bg-black py-[4px] px-[5px] rounded-sm ">
                       <p className="font-semibold font-poppins text-sm z-50">
                         User
-                      </p>
+                      </p>  
                     </div>
                   </div>
                 )}

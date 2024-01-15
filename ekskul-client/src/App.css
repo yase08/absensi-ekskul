@@ -1,22 +1,22 @@
-* {
+*{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 .bg-aesthetic {
-  background-image: url("https://tse2.mm.bing.net/th?id=OIP.xbCiqkLPzjTe005_wUAc8QHaEK&pid=Api&P=0&h=180"); /* Replace 'path/to/aesthetic-bg.jpg' with the actual path to your image */
+  background-image: url('https://tse2.mm.bing.net/th?id=OIP.xbCiqkLPzjTe005_wUAc8QHaEK&pid=Api&P=0&h=180'); /* Replace 'path/to/aesthetic-bg.jpg' with the actual path to your image */
   background-size: cover;
   background-position: center;
 }
 
-.hidden-scroll::-webkit-scrollbar {
-  display: none;
+
+.hidden-scroll::-webkit-scrollbar{
+ display: none;
 }
 
 @keyframes border-rotate {
-  0%,
-  100% {
+  0%, 100% {
     transform: scaleX(0);
   }
   50% {
@@ -24,9 +24,9 @@
   }
 }
 
-.group-hover\:border-rotate:hover {
-  animation: border-rotate 3s ease-in-out infinite;
-}
+  .group-hover\:border-rotate:hover {
+    animation: border-rotate 3s ease-in-out infinite;
+  }
 
 .ant-btn-primary {
   background-color: #1890ff;
@@ -37,37 +37,33 @@
   background-color: #40a9ff;
 }
 
-/* Rombel.css */
-.loader {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-top: 4px solid white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  animation: spin 1s linear infinite;
-}
+  /* Rombel.css */
+  .loader {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* .custom-cursor {
-  cursor: url('./assets/react.svg'),auto;
-} */
+  /* .custom-cursor {
+    cursor: url('./assets/react.svg'),auto;
+  } */
 
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 
 /* Firefox */
-input[type="number"] {
+input[type=number] {
   -moz-appearance: textfield;
 }

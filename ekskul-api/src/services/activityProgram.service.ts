@@ -96,7 +96,7 @@ export class ActivityProgramService {
           "Aktivitas program tidak ditemukan"
         );
 
-        const modefiedResponse = activityProgram.map((activity) => ({
+        const modifiedProgram = activityProgram.map((activity) => ({
           id: activity.id,
           user: activity.user ? {
             id: activity.user.id,
@@ -112,7 +112,7 @@ export class ActivityProgramService {
         apiResponse(
           status.OK,
           "Berhasil mendapatkan aktivitas program",
-          modefiedResponse
+          modifiedProgram
         )
       );
     } catch (error: any) {
@@ -251,13 +251,18 @@ export class ActivityProgramService {
           res
         );
 
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
+        res.setHeader(
+          "Content-Type",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader("Content-Disposition", `attachment; filename=${file}`);
 
         if (!exportSuccess) {
           throw apiResponse(status.FORBIDDEN, "Export failed");
         }
-        return Promise.resolve(apiResponse(status.OK, "Export Success", exportSuccess));
+        return Promise.resolve(
+          apiResponse(status.OK, "Export Success", exportSuccess)
+        );
       } else {
         throw apiResponse(
           status.NOT_FOUND,
@@ -282,38 +287,37 @@ export class ActivityProgramService {
       const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
       const formattedDate = dateTimeFormat.format(date);
 
-        const activities = await db.activityProgram.findAll({
-          include: [
-            {
-              model: db.user,
-              as: "user",
-              attributes: ["name"],
-            },
-          ],
-          attributes: ["activity", "task", "startDate", "endDate"],
-        });
+      const activities = await db.activityProgram.findAll({
+        include: [
+          {
+            model: db.user,
+            as: "user",
+            attributes: ["name"],
+          },
+        ],
+        attributes: ["activity", "task", "startDate", "endDate"],
+      });
 
-        const modifiedActivities = activities.map((activity) => {
-          return {
-            no: activity.indexOf(activity) + 1,
-            activity: activity.activity ? activity.activity : null,
-            task: activity.task ? activity.task : null,
-            author: activity.user ? activity.user.name : null,
-            startDate: activity.startDate ? activity.startDate : null ,
-            endDate: activity.endDate ? activity.endDate : null ,
-          };
-        });
+      const modifiedActivities = activities.map((activity) => {
+        return {
+          no: activity.indexOf(activity) + 1,
+          activity: activity.activity ? activity.activity : null,
+          task: activity.task ? activity.task : null,
+          author: activity.user ? activity.user.name : null,
+          startDate: activity.startDate ? activity.startDate : null,
+          endDate: activity.endDate ? activity.endDate : null,
+        };
+      });
 
-        const columns = [
-          { header: "No", key: "no", width: 15 },
-          { header: "Aktifitas", key: "activity", width: 15 },
-          { header: "Tugas", key: "task", width: 15 },
-          { header: "Pembuat", key: "author", width: 15 },
-          { header: "Tanggal awal", key: "startDate", width: 15 },
-          { header: "Tanggal akhir", key: "endDate", width: 15 },
-
-        ];
-        const file = `data-absensi-instruktur-${date}.xlsx`;
+      const columns = [
+        { header: "No", key: "no", width: 15 },
+        { header: "Aktifitas", key: "activity", width: 15 },
+        { header: "Tugas", key: "task", width: 15 },
+        { header: "Pembuat", key: "author", width: 15 },
+        { header: "Tanggal awal", key: "startDate", width: 15 },
+        { header: "Tanggal akhir", key: "endDate", width: 15 },
+      ];
+      const file = `data-absensi-instruktur-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
           file,
@@ -323,13 +327,18 @@ export class ActivityProgramService {
           res
         );
 
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader("Content-Disposition", `attachment; filename=${file}`);
 
-        if (!exportSuccess) {
-          throw apiResponse(status.FORBIDDEN, "Export failed");
-        }
-        return Promise.resolve(apiResponse(status.OK, "Export Success", exportSuccess));
+      if (!exportSuccess) {
+        throw apiResponse(status.FORBIDDEN, "Export failed");
+      }
+      return Promise.resolve(
+        apiResponse(status.OK, "Export Success", exportSuccess)
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

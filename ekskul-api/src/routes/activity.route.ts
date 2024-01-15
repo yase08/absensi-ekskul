@@ -18,7 +18,12 @@ class ActivityRoutes extends ActivityController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin", "instructor"]), validator(DTOActivity)],
+      [
+        authorization(),
+        auth(),
+        permission(["admin", "instructor"]),
+        validator(DTOActivity),
+      ],
       this.createActivity
     );
     this.router.get(
@@ -26,9 +31,15 @@ class ActivityRoutes extends ActivityController {
       [authorization(), auth(), permission(["admin", "instructor"])],
       this.getAllActivity
     );
+    this.router.get("/", this.getAllActivity);
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin", "instructor"]), validator(DTOActivity)],
+      [
+        authorization(),
+        auth(),
+        permission(["admin", "instructor"]),
+        validator(DTOActivity),
+      ],
       this.updateActivity
     );
     this.router.delete(

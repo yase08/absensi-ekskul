@@ -34,14 +34,16 @@ export class ScheduleService {
       paramQuerySQL.include = {
         model: db.activity,
         include: [
-          { model: db.rombel, as: "rombel", attributes: ["name"] },
           { model: db.room, as: "room", attributes: ["name"] },
           { model: db.ekskul, as: "ekskul", attributes: ["name"] },
         ],
-        attributes: { exclude: ["rombel_id", "room_id", "ekskul_id"] },
+        attributes: { exclude: ["room_id", "ekskul_id", "grade"] },
       };
 
       const schedule = await db.schedule.findAll(paramQuerySQL);
+
+      if (!schedule || schedule.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Jadwal tidak ditemukan");
 
       const modifiedSchedules = schedule.map((schedule) => {
         return {
@@ -52,7 +54,7 @@ export class ScheduleService {
           activities: schedule.activities.map((activity) => {
             return {
               id: activity.id,
-              rombel: activity.rombel ? activity.rombel.name : null,
+              grade: activity.grade,
               room: activity.room ? activity.room.name : null,
               ekskul: activity.ekskul ? activity.ekskul.name : null,
               createdAt: activity.createdAt,
@@ -62,15 +64,8 @@ export class ScheduleService {
         };
       });
 
-      if (!schedule || schedule.length === 0)
-        throw apiResponse(status.NOT_FOUND, "Jadwal tidak ditemukan");
-
       return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Berhasil mendapatkan jadwal",
-          modifiedSchedules,
-        )
+        apiResponse(status.OK, "Berhasil mendapatkan jadwal", modifiedSchedules)
       );
     } catch (error: any) {
       return Promise.reject(
@@ -112,16 +107,19 @@ export class ScheduleService {
         include: {
           model: db.activity,
           include: [
-            { model: db.rombel, as: "rombel", attributes: ["id", "name"] },
-            { model: db.room, as: "room", attributes: ["id", "name"] },
-            { model: db.ekskul, as: "ekskul", attributes: ["id", "name"] },
+            {
+              model: db.ekskul,
+              as: "ekskul",
+              attributes: ["name", "category"],
+            },
+            { model: db.room, as: "room", attributes: ["name"] },
           ],
-          attributes: { exclude: ["rombel_id", "room_id", "ekskul_id"] },
+          attributes: ["grade", "startTime", "endTime"],
         },
       });
 
-      if (!schedules)
-        throw apiResponse(status.NOT_FOUND, "Schedule do not exist");
+      if (!schedules || schedules.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Jadwal tidak ditemukan");
 
       const modifiedSchedules = schedules.map((schedule) => {
         return {
@@ -132,30 +130,12 @@ export class ScheduleService {
           activities: schedule.activities.map((activity) => {
             return {
               id: activity.id,
-              rombel: activity.rombel
-                ? activity.rombel.map((rombel: any) => {
-                    return {
-                      id: rombel.id,
-                      name: rombel.name,
-                    };
-                  })
-                : null,
-              room: activity.room
-                ? activity.room.map((room: any) => {
-                    return {
-                      id: room.id,
-                      name: room.name,
-                    };
-                  })
-                : null,
-              ekskul: activity.ekskul
-                ? activity.ekskul.map((ekskul: any) => {
-                    return {
-                      id: ekskul.id,
-                      name: ekskul.name,
-                    };
-                  })
-                : null,
+              grade: activity.grade,
+              room: activity.room.name,
+              ekskul: activity.ekskul.name,
+              category: activity.ekskul.category,
+              startTime: activity.startTime,
+              endTime: activity.endTime,
               createdAt: activity.createdAt,
               updatedAt: activity.updatedAt,
             };

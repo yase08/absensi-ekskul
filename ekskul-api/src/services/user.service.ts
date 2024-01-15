@@ -92,7 +92,7 @@ export class UserService {
           },
         ],
       };
-  
+
       const user = await db.user.findAll(paramQuerySQL);
 
       if (!user || user.length === 0)
@@ -122,11 +122,7 @@ export class UserService {
         throw apiResponse(status.NOT_FOUND, "Pengguna tidak ditemukan");
 
       return Promise.resolve(
-        apiResponse(
-          status.OK,
-          "Berhasil mendapatkan pengguna",
-          manipulatedUser,
-        )
+        apiResponse(status.OK, "Berhasil mendapatkan pengguna", manipulatedUser)
       );
     } catch (error: any) {
       return Promise.reject(
