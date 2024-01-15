@@ -52,7 +52,6 @@ class StudentRoutes extends StudentController {
         authorization(),
         auth(),
         permission(["instructor", "admin"]),
-        validator(DTOStudent),
       ],
       this.updateStudent
     );
