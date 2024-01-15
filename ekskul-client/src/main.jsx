@@ -4,7 +4,6 @@ import "./index.css";
 import Helmet from "react-helmet";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import AppRouter from "./routes/Route.jsx";
-import { ProfileProvider } from "./context/ProfileContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <>
@@ -13,9 +12,7 @@ createRoot(document.getElementById("root")).render(
       <body className="h-full dark:bg-DarkBad bg-lightsun hidden-scroll custom-cursor" />
     </Helmet>
     <AuthProvider>
-      <ProfileProvider>
-        <AppRouter />
-      </ProfileProvider>
+      <AppRouter />
     </AuthProvider>
   </>
 );

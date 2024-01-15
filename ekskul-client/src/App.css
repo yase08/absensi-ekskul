@@ -1,22 +1,22 @@
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 .bg-aesthetic {
-  background-image: url('https://tse2.mm.bing.net/th?id=OIP.xbCiqkLPzjTe005_wUAc8QHaEK&pid=Api&P=0&h=180'); /* Replace 'path/to/aesthetic-bg.jpg' with the actual path to your image */
+  background-image: url("https://tse2.mm.bing.net/th?id=OIP.xbCiqkLPzjTe005_wUAc8QHaEK&pid=Api&P=0&h=180"); /* Replace 'path/to/aesthetic-bg.jpg' with the actual path to your image */
   background-size: cover;
   background-position: center;
 }
 
-
-.hidden-scroll::-webkit-scrollbar{
- display: none;
+.hidden-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes border-rotate {
-  0%, 100% {
+  0%,
+  100% {
     transform: scaleX(0);
   }
   50% {
@@ -28,7 +28,14 @@
   animation: border-rotate 3s ease-in-out infinite;
 }
 
+.ant-btn-primary {
+  background-color: #1890ff;
+  color: #fff;
+}
 
+.ant-btn-primary:hover {
+  background-color: #40a9ff;
+}
 
 /* Rombel.css */
 .loader {
@@ -41,8 +48,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* .custom-cursor {
@@ -57,6 +68,6 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }

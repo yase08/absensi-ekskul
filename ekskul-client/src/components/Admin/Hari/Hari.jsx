@@ -2,7 +2,6 @@ import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
-import { useProfile } from "../../../context/ProfileContext";
 import { Modal,  Input } from "antd";
 
 const HariComponent = () => {
@@ -16,7 +15,6 @@ const HariComponent = () => {
   const [error, setError] = useState();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -119,7 +117,6 @@ const HariComponent = () => {
   };
 
   useEffect(() => {
-    profile;
     handleGetEkskulRequest();
     handleGetRequest();
   }, []);

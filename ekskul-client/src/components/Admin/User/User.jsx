@@ -1,7 +1,6 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { useProfile } from "../../../context/ProfileContext";
 import { Modal, Select, Input, Upload, Button, Space } from "antd";
 import { LuUpload } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
@@ -29,7 +28,6 @@ const UserComponent = () => {
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { profile } = useProfile();
   const [onDataUpdate, setOnDataUpdate] = useState(false);
 
   const handleFileChange = ({ fileList }) => {
@@ -174,9 +172,8 @@ const UserComponent = () => {
   };
 
   useEffect(() => {
-    profile;
     handleGetEkskulRequest();
-    handleGetRequest()
+    handleGetRequest();
   }, []);
 
   return (

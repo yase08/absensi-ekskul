@@ -1,7 +1,6 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { useProfile } from "../../../context/ProfileContext";
 import { Modal, Select, Input, DatePicker } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { IoAddSharp } from "react-icons/io5";
@@ -21,7 +20,6 @@ const TugasComponent = () => {
   const [formOld, setFormOld] = useState();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -151,7 +149,6 @@ const TugasComponent = () => {
   };
 
   useEffect(() => {
-    profile;
     handleGetEkskulRequest();
     handleGetRequest()
   }, []);

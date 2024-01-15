@@ -2,7 +2,6 @@ import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { Modal, Select, Input, DatePicker } from "antd";
-import { useProfile } from "../../../../context/ProfileContext";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
@@ -16,7 +15,6 @@ const NilaiComponent = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState()
-  const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -103,7 +101,6 @@ const NilaiComponent = () => {
   };
 
   useEffect(() => {
-    profile;
     handleGetEkskulRequest();
   }, []);
 

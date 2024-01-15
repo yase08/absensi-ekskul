@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { RiFacebookFill } from "react-icons/ri";
 import { AiOutlineTwitter } from "react-icons/ai";
 import { BsInstagram, BsWhatsapp } from "react-icons/bs";
-import Profile from "../../../components/Admin/Profile/Profile";
+// import Profile from "../../../components/Admin/Profile/Profile";
 import ColorSettingForm from "../../../components/Admin/Layouts/HiddenColor/Navbar";
 import Tein from "../../../components/Admin/magic/Tein";
 
@@ -70,10 +70,10 @@ const Dashboard = () => {
             toggleOpenProfile={toggleOpenProfile}
           />
           <Jumbotron expanded={expanded} />
-          <Profile
+          {/* <Profile
             openProfile={openProfile}
             toggleOpenProfile={toggleOpenProfile}
-          />
+          /> */}
           {/* Sidebar */}
           <div className="mt-[80px] z-40 w-full px-10  bg-opacity-30 h-[100px] relative top-[50px] bg-transparent">
             <div className="bg-white rounded-md w-full h-full relative flex items-center px-5 justify-between overflow-hidden">

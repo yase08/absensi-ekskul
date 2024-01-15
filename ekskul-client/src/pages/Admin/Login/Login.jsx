@@ -7,7 +7,7 @@ import {
 import { useEffect, useState } from "react";
 import "./Login.css";
 import logo from "../../../assets/Logo-Absensi.png";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
@@ -39,8 +39,8 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setPersist((prev) => !prev);
+    setLoading(true);
     try {
       const response = await axiosWithAuth.post(
         `/auth/login`,
@@ -166,10 +166,9 @@ const Login = () => {
                 <span className="w-full h-[1px] bg-[#FFDE59]" />
               </div>
               <div className="w-full text-white flex justify-between">
-                <button className="capitalize">
-                  Not Have Account
-                </button>
+              <Link to={"/forgot-password"}>
                 <button className="capitalize">forgot password?</button>
+              </Link>
               </div>
               <button
                 className="w-full h-20 bg-[#FFDE59] text-white font-bold rounded-md polygon"
