@@ -10,8 +10,8 @@ import  { Swiper, SwiperSlide } from 'swiper/react';
 const Teacher = () => {
   return (
     <div className="p-[40px] image-cerita ">   
-       <p className='text-blue-500 text-[18px] uppercase font-semibold text-center'>top category</p>
-    <p className='text-[40px] font-bold uppercase text-center text-white'> kelas category</p>
+       <p className='text-blue-500 text-[18px] uppercase font-semibold text-center'>Ekstrakurikuler</p>
+    <p className='text-[40px] font-bold uppercase text-center text-white'>Penanggung Jawab</p>
       <Swiper
                spaceBetween={30}
                slidesPerView={3}

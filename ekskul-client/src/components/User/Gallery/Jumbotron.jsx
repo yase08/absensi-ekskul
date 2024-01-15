@@ -5,8 +5,8 @@ const Jumbotron = () => {
     <div className="bg-white dark:bg-gray-800 h-auto py-6 sm:py-8 lg:py-[28px]">
     <div className="mx-auto max-w-screen-2xl px-4 md:px-8 flex flex-col gap-[15px]">
       <div>
-    <p className='text-blue-500 text-[18px] uppercase font-semibold text-center'>top category</p>
-    <p className='text-[40px] font-bold uppercase text-center'> kelas category</p>
+    <p className='text-blue-500 text-[18px] uppercase font-semibold text-center'>Ekstrakurikuler</p>
+    <p className='text-[40px] font-bold uppercase text-center'>Gallery</p>
       </div>
     
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-[15px] xl:gap-[15px]">

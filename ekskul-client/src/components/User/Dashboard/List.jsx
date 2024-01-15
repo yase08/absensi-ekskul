@@ -7,9 +7,9 @@ const List = () => {
   return (
     <div className='w-full py-[10px] bg-transparent px-[15px] flex justify-center mt-[10px]'>
     <div className=' bg-transparent w-full gap-[5px] items-center flex justify-center flex-col'>
-      <p className='text-blue-500 text-[18px] uppercase font-semibold text-center'>top category</p>
+      <p className='text-blue-500 text-[18px] uppercase font-semibold text-center'>Ektrakurikuler</p>
       <div className='w-full max-w-[150px] h-[2px] bg-yellow-500'/>
-      <p className='text-[40px] font-bold uppercase'>kelas category</p>
+      <p className='text-[40px] font-bold uppercase'>Our Schedule</p>
       <div className='w-full h-full mt-[10px] bg-white flex gap-[10px] '>
         <div className='w-full h-auto bg-transparent p-[10px] flex-col gap-[10px] border border-transparent flex justify-between items-center'>
           <div className='grid grid-cols-7 w-full gap-[5px]'>
