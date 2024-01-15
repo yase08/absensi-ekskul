@@ -28,7 +28,6 @@ const UserComponent = () => {
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { profile } = useProfile();
   const [onDataUpdate, setOnDataUpdate] = useState(false);
 
   const handleFileChange = ({ fileList }) => {
@@ -173,9 +172,8 @@ const UserComponent = () => {
   };
 
   useEffect(() => {
-    profile;
     handleGetEkskulRequest();
-    handleGetRequest()
+    handleGetRequest();
   }, []);
 
   return (

@@ -15,7 +15,6 @@ const HariComponent = () => {
   const [error, setError] = useState();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -118,7 +117,6 @@ const HariComponent = () => {
   };
 
   useEffect(() => {
-    profile;
     handleGetEkskulRequest();
     handleGetRequest();
   }, []);

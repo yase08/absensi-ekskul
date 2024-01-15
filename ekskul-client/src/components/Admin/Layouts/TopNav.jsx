@@ -1,36 +1,53 @@
 import { GiHamburgerMenu } from "react-icons/gi";
-import { BiCodeAlt } from "react-icons/bi";
 import { BsKeyboard } from "react-icons/bs";
-import { MdKeyboardDoubleArrowRight, MdColorLens } from "react-icons/md";
-import { FiSettings, FiActivity } from "react-icons/fi";
+import { MdColorLens } from "react-icons/md";
 import { CgProfile, CgLogOut } from "react-icons/cg";
-import { AiOutlineMail, AiOutlineBell, AiOutlineClose } from "react-icons/ai";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import useAuth from "../../../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
+import { Modal } from "antd";
 
 // eslint-disable-next-line react/prop-types
 const TopNav = ({
   toggleExpansion,
-  toggleOpenProfile,
   expanded,
   toggleChangeNavbar,
   toggleOpenChangeBg,
 }) => {
+  const [profile, setProfile] = useState({});
   const [isOpen, setIsOpen] = useState(false);
-  const [isOpenNotification, setIsOpenNotification] = useState(false);
-  const [isOpenMassage, setIsOpenMassage] = useState(false);
   const [isButtonVisible, setIsButtonVisible] = useState(false);
   const [isButtonVisible1, setIsButtonVisible1] = useState(false);
   const [isButtonVisible2, setIsButtonVisible2] = useState(false);
   const axiosPrivate = useAxiosPrivate();
   const [backgroundColor, setBackgroundColor] = useState("bg-primary");
-  const { setAuth, setPersist, auth } = useAuth();
-  const {name} = jwtDecode(auth.accessToken)
+  const { setAuth, setPersist, auth, persist } = useAuth();
+  const { id } = jwtDecode(auth.accessToken);
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleFetch = async () => {
+    try {
+      const response = await axiosPrivate.get(`/auth/profile/${id}`);
+      setProfile(response.data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const savedColor = localStorage.getItem("backgroundColor");
@@ -43,7 +60,6 @@ const TopNav = ({
 
   const handleLogout = async (event) => {
     event.preventDefault();
-    setPersist((prev) => !prev);
     setAuth({});
 
     try {
@@ -55,7 +71,9 @@ const TopNav = ({
         title: "Sukses!",
         text: successMessage,
       });
-      navigate("/login");
+      setPersist(false);
+      localStorage.setItem("persist", JSON.stringify(false));
+      navigate("/login", { replace: true });
     } catch (error) {
       console.error("Error:", error);
 
@@ -84,20 +102,6 @@ const TopNav = ({
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
-    setIsOpenNotification(false);
-    setIsOpenMassage(false);
-  };
-
-  const toggleDropdownNotification = () => {
-    setIsOpenNotification(!isOpenNotification);
-    setIsOpen(false);
-    setIsOpenMassage(false);
-  };
-
-  const toggleDropdownMassage = () => {
-    setIsOpenNotification(false);
-    setIsOpen(false);
-    setIsOpenMassage(!isOpenMassage);
   };
 
   const truncateName = (name, maxLength = 10) => {
@@ -124,6 +128,10 @@ const TopNav = ({
     return () => {
       document.removeEventListener("keydown", handleOpenForm);
     };
+  }, []);
+
+  useEffect(() => {
+    handleFetch();
   }, []);
 
   const handleSecretKeywordInputChange = (event) => {
@@ -187,12 +195,6 @@ const TopNav = ({
               <MdColorLens className="text-white text-xl font-bold" />
             </button>
           )}
-          <button onClick={toggleDropdownMassage}>
-            <AiOutlineMail className="text-white text-xl font-bold" />
-          </button>
-          <button onClick={toggleDropdownNotification}>
-            <AiOutlineBell className="text-white text-xl font-bold" />
-          </button>
           <div className="relative inline-block text-left">
             <div>
               <button
@@ -202,7 +204,7 @@ const TopNav = ({
               >
                 <div className="w-[30px] h-[30px]">{/* <AdminPicture/> */}</div>
                 <p className="text-white text-sm capitalize">
-                  {truncateName(`Hi, ${name}`)}
+                  {truncateName(`Hi, ${profile.name}`)}
                 </p>
               </button>
             </div>
@@ -215,30 +217,13 @@ const TopNav = ({
                   aria-orientation="vertical"
                   aria-labelledby="options-menu"
                 >
-                  <p className="font-bold font-poppins opacity-70 text-sm tracking-widest text-center mt-3">
-                    LOGGED IN 5 MIN AGO
-                  </p>
                   <button
-                    onClick={toggleOpenProfile}
-                    className="flex items-center gap-2 hover:text-blue-500"
+                    onClick={showModal}
+                    className="flex items-center gap-2 hover:text-blue-500 pt-3"
                   >
                     <CgProfile />
                     <p>Profile</p>
                   </button>
-                  <a
-                    href="#"
-                    className="flex items-center gap-2 hover:text-blue-500"
-                  >
-                    <FiActivity />
-                    <p>Activity</p>
-                  </a>
-                  <a
-                    href="#"
-                    className="flex items-center gap-2 hover:text-blue-500"
-                  >
-                    <FiSettings />
-                    <p>Settings</p>
-                  </a>
                   {/* Logout */}
                   <button
                     onClick={handleLogout}
@@ -250,165 +235,41 @@ const TopNav = ({
                 </div>
               </div>
             )}
+            <Modal
+              title="Profile"
+              open={isModalOpen}
+              onOk={handleOk}
+              onCancel={handleCancel}
+            >
+              <div className="w-full flex flex-col justify-start gap-1">
+                <div className="self-center mb-4">
+                  <img
+                    className="rounded-full w-12 h-12 object-cover"
+                    src={`http://localhost:8000/images/${profile.image}`}
+                    alt={"Profile Picture"}
+                  />
+                </div>
+                <p>
+                  <span className="font-semibold">Nama:</span> {profile.name}
+                </p>
+                <p>
+                  <span className="font-semibold">Nomer Telpon:</span>{" "}
+                  {profile.mobileNumber}
+                </p>
+                <p>
+                  <span className="font-semibold">Email:</span> {profile.email}
+                </p>
+                <p>
+                  <span className="font-semibold">Role:</span> {profile.role}
+                </p>
+                <p>
+                  <span className="font-semibold">Ekstrakurikuler:</span>{" "}
+                  {profile.ekskul?.map((ekskul) => ekskul.name + " ")}
+                </p>
+              </div>
+            </Modal>
           </div>
         </div>
-        {isOpenMassage && (
-          <div className="z-50 md:origin-top-right max-md:fixed md:absolute max-md:right-0  md:right-[30px] max-md:top-0 md:top-[60px] md:mt-2 md:w-[350px] max-md:w-full  md:rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div
-              className=" flex flex-col"
-              role="menu"
-              aria-orientation="vertical"
-              aria-labelledby="options-menu"
-            >
-              <div className="w-full h-[58px] flex justify-between p-[15px] bg-transparent ">
-                <p className="text-sm opacity-70">Massage</p>
-                <div className="flex items-center">
-                  <a href="#" className="text-sm text-blue-500 max-md:hidden">
-                    Mark All As Read
-                  </a>
-                  <button onClick={toggleDropdownMassage} className="md:hidden">
-                    <AiOutlineClose className="text-xl" />
-                  </button>
-                </div>
-              </div>
-              <div className="px-[15px] h-[320px] overflow-y-scroll hidden-scroll">
-                <div className=" bg-transparent border-b flex justify-between items-center">
-                  <div className="flex gap-[15px] h-[76px] items-center">
-                    <ul className="bg-blue-500 w-[40px] h-[40px] rounded-full flex overflow-hidden justify-center items-center">
-                      <img
-                        src="https://demo.getstisla.com/assets/img/avatar/avatar-1.png"
-                        className="text-xl text-white "
-                      />
-                    </ul>
-                    <ul className="flex flex-col gap-1 my-5">
-                      <li>
-                        <p className="capitalize text-sm font-poppins opacity-70 font-semibold">
-                          Fadhli
-                        </p>
-                      </li>
-                      <li>
-                        <p className=" text-xs opacity-70">Hello Bro</p>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase">10 minute</p>
-                  </div>
-                </div>
-                <div className=" bg-transparent border-b flex justify-between items-center">
-                  <div className="flex gap-[15px] h-[76px] items-center">
-                    <ul className="bg-blue-500 w-[40px] h-[40px] rounded-full flex overflow-hidden justify-center items-center">
-                      <img
-                        src="https://demo.getstisla.com/assets/img/avatar/avatar-1.png"
-                        className="text-xl text-white "
-                      />
-                    </ul>
-                    <ul className="flex flex-col gap-1 my-5">
-                      <li>
-                        <p className="capitalize text-sm font-poppins opacity-70 font-semibold">
-                          Fadhli
-                        </p>
-                      </li>
-                      <li>
-                        <p className=" text-xs opacity-70">Hello Bro</p>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase">10 minute</p>
-                  </div>
-                </div>
-                <div className=" bg-transparent border-b flex justify-between items-center">
-                  <div className="flex gap-[15px] h-[76px] items-center">
-                    <ul className="bg-blue-500 w-[40px] h-[40px] rounded-full flex overflow-hidden justify-center items-center">
-                      <img
-                        src="https://demo.getstisla.com/assets/img/avatar/avatar-1.png"
-                        className="text-xl text-white "
-                      />
-                    </ul>
-                    <ul className="flex flex-col gap-1 my-5">
-                      <li>
-                        <p className="capitalize text-sm font-poppins opacity-70 font-semibold">
-                          Fadhli
-                        </p>
-                      </li>
-                      <li>
-                        <p className=" text-xs opacity-70">Hello Bro</p>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase">10 minute</p>
-                  </div>
-                </div>
-              </div>
-              <div className="w-full h-[59px] flex justify-center items-center">
-                <a
-                  href="#"
-                  className="text-blue-500 text-sm font-poppins flex items-center gap-1"
-                >
-                  View All{" "}
-                  <span>
-                    <MdKeyboardDoubleArrowRight className="text-lg" />
-                  </span>
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
-        {isOpenNotification && (
-          <div className="z-50 md:origin-top-right max-md:fixed md:absolute max-md:right-0  md:right-[30px] max-md:top-0 md:top-[60px] md:mt-2 md:w-[350px] max-md:w-full  md:rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div
-              className=" flex flex-col"
-              role="menu"
-              aria-orientation="vertical"
-              aria-labelledby="options-menu"
-            >
-              <div className="w-full h-[58px] flex justify-between p-[15px] bg-transparent ">
-                <p className="text-sm opacity-70">Notifications</p>
-                <div className="flex items-center">
-                  <a href="#" className="text-sm text-blue-500 max-md:hidden">
-                    Mark All As Read
-                  </a>
-                  <button
-                    onClick={toggleDropdownNotification}
-                    className="md:hidden"
-                  >
-                    <AiOutlineClose className="text-xl" />
-                  </button>
-                </div>
-              </div>
-              <div className="px-[15px] h-[320px] overflow-y-scroll hidden-scroll">
-                <div className="flex gap-[15px] w-full h-[76px] bg-transparent items-center">
-                  <ul className="bg-blue-500 w-[40px] h-[40px] rounded-full flex justify-center items-center">
-                    <BiCodeAlt className="text-xl text-white" />
-                  </ul>
-                  <ul className="flex flex-col gap-1">
-                    <li>
-                      <p className="capitalize text-sm font-poppins opacity-70">
-                        New Update Has Been Added
-                      </p>
-                    </li>
-                    <li>
-                      <p className="uppercase text-xs opacity-70">2 min ago</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="w-full h-[59px] flex justify-center items-center">
-                <a
-                  href="#"
-                  className="text-blue-500 text-sm font-poppins flex items-center gap-1"
-                >
-                  View All{" "}
-                  <span>
-                    <MdKeyboardDoubleArrowRight className="text-lg" />
-                  </span>
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
       </nav>
     </div>
   );

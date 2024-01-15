@@ -18,7 +18,7 @@ function ForgotPassword() {
   };
   return (
     <div className="flex min-h-screen text-xl items-center justify-center bg-primary">
-      <div className="w-full max-w-xl border-slate-700 py-5 px-5">
+      <div className="w-full max-w-xl border-2 rounded-md border-slate-500 py-5 px-5">
         <div className="w-4/5">
           <h1 className="text-3xl text-slate-200 font-bold mb-2 text-left">
             Find your account 🔍

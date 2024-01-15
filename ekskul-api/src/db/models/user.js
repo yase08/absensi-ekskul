@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       password: DataTypes.STRING,
       role: DataTypes.ENUM("admin", "instructor"),
       isActive: DataTypes.BOOLEAN,
-      refreshToken: DataTypes.STRING
+      refreshToken: DataTypes.TEXT
     },
     {
       sequelize,

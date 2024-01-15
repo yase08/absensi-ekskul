@@ -3,21 +3,24 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { Modal, Select, Input } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
-import fs from "fs"
+import fs from "fs";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { IoAddSharp } from "react-icons/io5";
 import { AiOutlineFileExcel } from "react-icons/ai";
+import useAuth from "../../../hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
 
 const SiswaComponent = () => {
   const [selectedEkskul, setSelectedEkskul] = useState(null);
-  const { profile } = useProfile();
+  const { auth } = useAuth();
+  const { ekskuls } = jwtDecode(auth.accessToken);
   const [open, setOpen] = useState(false);
   const axiosPrivate = useAxiosPrivate();
   const [rombel, setRombel] = useState([]);
   const [rayon, setRayon] = useState([]);
   const [ekskul, setEkskul] = useState([]);
-  const [error, setError] = useState()
-  const [data, setData] = useState([])
+  const [error, setError] = useState();
+  const [data, setData] = useState([]);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -35,17 +38,16 @@ const SiswaComponent = () => {
   });
   const [formOld, setFormOld] = useState();
   const [loading, setLoading] = useState(false);
-  const ekskul_id = localStorage.getItem("ekskul_id")
+  const ekskul_id = localStorage.getItem("ekskul_id");
 
   const handleSelectChange = (value) => {
     if (localStorage.getItem("ekskul_id") !== null) {
       localStorage.removeItem("ekskul_id");
-      localStorage.setItem("ekskul_id", value)
+      localStorage.setItem("ekskul_id", value);
     } else {
-      localStorage.setItem("ekskul_id", value)
+      localStorage.setItem("ekskul_id", value);
     }
-
-  }
+  };
 
   const handleGetRequest = async () => {
     try {
@@ -152,8 +154,8 @@ const SiswaComponent = () => {
 
   const handleCancel = () => {
     setOpen(false);
-    setFormOld({})
-    setFormData({})
+    setFormOld({});
+    setFormData({});
   };
 
   const handleOk = async (event) => {
@@ -174,7 +176,7 @@ const SiswaComponent = () => {
           title: "Berhasil!",
           text: successMessage,
         });
-        handleGetRequest()
+        handleGetRequest();
         setFormOld({});
       } else {
         const response = await axiosPrivate.post(`/student`, formData);
@@ -186,7 +188,7 @@ const SiswaComponent = () => {
           text: successMessage,
         });
         setFormData({});
-        handleGetRequest()
+        handleGetRequest();
       }
     } catch (error) {
       if (error.response) {
@@ -233,61 +235,68 @@ const SiswaComponent = () => {
 
   const handleExportExcel = async () => {
     try {
-      const response = await axiosPrivate.get(`/student/export?ekskul_id=${ekskul_id}`, {
-        responseType: 'blob', // Set the response type to 'blob'
-      });
-  
+      const response = await axiosPrivate.get(
+        `/student/export?ekskul_id=${ekskul_id}`,
+        {
+          responseType: "blob", // Set the response type to 'blob'
+        }
+      );
+
       if (response.data) {
-        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const blob = new Blob([response.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
         const outputFileName = `data-siswa-${Date.now()}.xlsx`;
-  
+
         const url = window.URL.createObjectURL(blob);
-  
-        const link = document.createElement('a');
+
+        const link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', outputFileName);
+        link.setAttribute("download", outputFileName);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } else {
-        console.error('Export failed: Empty response data');
+        console.error("Export failed: Empty response data");
       }
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
     }
   };
-  
+
   const handleAllExportExcel = async () => {
     try {
       const response = await axiosPrivate.get(`/student/export-all`, {
-        responseType: 'blob', // Set the response type to 'blob'
+        responseType: "blob", // Set the response type to 'blob'
       });
-  
+
       if (response.data) {
-        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const blob = new Blob([response.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
         const outputFileName = `data-siswa-${Date.now()}.xlsx`;
-  
+
         const url = window.URL.createObjectURL(blob);
-  
-        const link = document.createElement('a');
+
+        const link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', outputFileName);
+        link.setAttribute("download", outputFileName);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } else {
-        console.error('Export failed: Empty response data');
+        console.error("Export failed: Empty response data");
       }
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
     }
   };
-  
+
   useEffect(() => {
     handleGetRombelRequest();
     handleGetRayonRequest();
     handleGetEkskulRequest();
-    handleGetRequest()
+    handleGetRequest();
   }, []);
 
   return (
@@ -298,37 +307,51 @@ const SiswaComponent = () => {
             Siswa
           </h1>
           <div className="flex gap-3">
-          <Select
-            size="medium"
-            placeholder="Pilih kategori"
-            className=""
-            value={selectedEkskul}
-            onChange={(value) => {
-              setSelectedEkskul(value)
-              handleInputChange(value)
-            }}
-            options={profile.ekskul ? profile.ekskul.map((item) => ({
-              value: item.id,
-              label: item.name,
-            })) : []}
-          
-          />
-          <button onClick={handleExportExcel} className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500">
-            <RiFileExcel2Line size={20} />
-          </button>
-          <button onClick={handleAllExportExcel} className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500">
-            <AiOutlineFileExcel size={20} />
-          </button>
-          <button
-            onClick={showModal}
-            className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
-          >
-            <IoAddSharp size={20} />
-          </button>
+            <Select
+              size="medium"
+              placeholder="Pilih kategori"
+              className=""
+              value={selectedEkskul}
+              onChange={(value) => {
+                setSelectedEkskul(value);
+                handleInputChange(value);
+              }}
+              options={
+                ekskuls
+                  ? ekskuls.map((item) => ({
+                      value: item.id,
+                      label: item.name,
+                    }))
+                  : []
+              }
+            />
+            <button
+              onClick={handleExportExcel}
+              className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+            >
+              <RiFileExcel2Line size={20} />
+            </button>
+            <button
+              onClick={handleAllExportExcel}
+              className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+            >
+              <AiOutlineFileExcel size={20} />
+            </button>
+            <button
+              onClick={showModal}
+              className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+            >
+              <IoAddSharp size={20} />
+            </button>
           </div>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
+          <Table
+            setFormOld={setFormOld}
+            setOpen={setOpen}
+            data={data}
+            handleGetRequest={handleGetRequest}
+          />
         </div>
       </div>
       <Modal
@@ -381,7 +404,10 @@ const SiswaComponent = () => {
           <Input
             value={formOld ? formOld.mobileNumber : formData.mobileNumber}
             type="number"
-            rules={{ required: true, message: "Nomer Telpon Siswa Harus Diisi!" }}
+            rules={{
+              required: true,
+              message: "Nomer Telpon Siswa Harus Diisi!",
+            }}
             name="mobileNumber"
             size="large"
             placeholder="Masukan nomer telpon"
@@ -438,7 +464,10 @@ const SiswaComponent = () => {
             size="large"
             className="w-full"
             mode="multiple"
-            rules={{ required: true, message: "Ekstrakurikuler Siswa Harus Diisi!" }}
+            rules={{
+              required: true,
+              message: "Ekstrakurikuler Siswa Harus Diisi!",
+            }}
             placeholder="Pilih Ekstrakurikuler"
             value={formOld ? formOld.ekskuls : formData.ekskuls}
             onChange={(e) => handleInputChange(e, "ekskuls")}

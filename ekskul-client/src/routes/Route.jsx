@@ -7,7 +7,7 @@ import JadwalDashboard from "../pages/Admin/Jadwal/Jadwal";
 import RuanganDashboard from "../pages/Admin/Ruangan/Ruangan";
 import ProgramDashboard from "../pages/Admin/Program/Program";
 import SiswaDashboard from "../pages/Admin/Siswa/Siswa";
-import ProfileDashboard from "../pages/Admin/Profile/Profile";
+// import ProfileDashboard from "../pages/Admin/Profile/Profile";
 import GalleryDashboard from "../pages/Admin/Gallery/Gallery";
 import AbsensiDashboard from "../pages/Admin/Absensi/Absensi";
 import AbsensiPostDashboard from "../pages/Admin/Absensi/AbsensiPost";
@@ -120,11 +120,11 @@ const AppRouter = () => {
           <Route element={<RequireAuth allowedRoles={["admin"]} />}>
             <Route path="/admin/ruangan" element={<RuanganDashboard />} />
           </Route>
-          <Route
+          {/* <Route
             element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
           >
             <Route path="/admin/profile" element={<ProfileDashboard />} />
-          </Route>
+          </Route> */}
           <Route
             element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
           >

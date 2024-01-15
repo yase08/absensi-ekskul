@@ -15,8 +15,6 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
-  const { profile } = useProfile();
-
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();

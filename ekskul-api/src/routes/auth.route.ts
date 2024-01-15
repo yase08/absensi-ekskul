@@ -41,7 +41,7 @@ class AuthRoutes extends AuthController {
       this.updateProfile
     );
     this.router.get(
-      "/profile",
+      "/profile/:id",
       [authorization(), auth(), permission(["admin", "instructor"])],
       this.getProfile
     );

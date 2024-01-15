@@ -20,7 +20,6 @@ const TugasComponent = () => {
   const [formOld, setFormOld] = useState();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -150,7 +149,6 @@ const TugasComponent = () => {
   };
 
   useEffect(() => {
-    profile;
     handleGetEkskulRequest();
     handleGetRequest()
   }, []);

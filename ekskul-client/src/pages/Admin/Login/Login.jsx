@@ -7,7 +7,7 @@ import {
 import { useEffect, useState } from "react";
 import "./Login.css";
 import logo from "../../../assets/Logo-Absensi.png";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
@@ -39,9 +39,9 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setPersist((prev) => !prev);
     setLoading(true);
-    setPersist(true);
-    try { 
+    try {
       const response = await axiosWithAuth.post(
         `/auth/login`,
         { email, password },
@@ -52,7 +52,8 @@ const Login = () => {
       );
       if (response.data.statusCode === 200) {
         const accessToken = response.data.data.accessToken;
-        setAuth({ accessToken });
+        const role = response.data.data.role;
+        setAuth({ accessToken, role });
         navigate("/admin/dashboard", { replace: true });
       } else {
         console.error("Login failed:", response.data.message);
@@ -165,10 +166,9 @@ const Login = () => {
                 <span className="w-full h-[1px] bg-[#FFDE59]" />
               </div>
               <div className="w-full text-white flex justify-between">
-                <button className="capitalize">
-                  Not Have Account
-                </button>
+              <Link to={"/forgot-password"}>
                 <button className="capitalize">forgot password?</button>
+              </Link>
               </div>
               <button
                 className="w-full h-20 bg-[#FFDE59] text-white font-bold rounded-md polygon"

@@ -5,13 +5,16 @@ import { useEffect, useState } from "react";
 import { DatePicker, Modal, Select } from "antd/lib";
 import { IoAddSharp } from "react-icons/io5";
 import { RiFileExcel2Line } from "react-icons/ri";
-import fs from "fs"
+import fs from "fs";
+import useAuth from "../../../hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
 
 const InstrukturComponent = () => {
-  const { profile } = useProfile();
+  const { auth } = useAuth();
+  const { id, ekskuls } = jwtDecode(auth.accessToken);
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    instructor_id: profile?.id,
+    instructor_id: id,
     ekskul_id: "",
     category: "",
     date: "",
@@ -23,7 +26,7 @@ const InstrukturComponent = () => {
   const [loading, setLoading] = useState(false);
   const axiosPrivate = useAxiosPrivate();
 
-  const ekskulOption = profile?.ekskul?.map((item) => ({
+  const ekskulOption = ekskuls?.map((item) => ({
     label: item.name,
     value: item.id,
   }));
@@ -70,7 +73,6 @@ const InstrukturComponent = () => {
     }
   };
 
-
   const handleOk = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -87,7 +89,7 @@ const InstrukturComponent = () => {
         title: "Success!",
         text: successMessage,
       });
-      handleGetRequest()
+      handleGetRequest();
     } catch (error) {
       console.error("Error:", error);
 
@@ -121,37 +123,37 @@ const InstrukturComponent = () => {
   const handleExportExcel = async () => {
     try {
       const response = await axiosPrivate.get(`/instructor-attendance/export`, {
-        responseType: 'blob', // Set the response type to 'blob'
+        responseType: "blob", // Set the response type to 'blob'
       });
-        
+
       if (response.data) {
-        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const outputFileName = `data-absensi-instruktur-${Date.now()}.xlsx`
-  
+        const blob = new Blob([response.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        const outputFileName = `data-absensi-instruktur-${Date.now()}.xlsx`;
+
         // Create an object URL from the Blob
         const url = window.URL.createObjectURL(blob);
-  
+
         // Create an anchor element and trigger the download
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', outputFileName);
+        link.setAttribute("download", outputFileName);
         document.body.appendChild(link);
         link.click();
 
-        fs.writeFileSync(outputFileName, response.data)
+        fs.writeFileSync(outputFileName, response.data);
       } else {
-        console.error('Export failed: Empty response data');
+        console.error("Export failed: Empty response data");
       }
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
     }
   };
 
   useEffect(() => {
-    handleGetRequest()
-
-  },[])
-  
+    handleGetRequest();
+  }, []);
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -167,9 +169,12 @@ const InstrukturComponent = () => {
             >
               <IoAddSharp size={20} />
             </button>
-            <button onClick={handleExportExcel} className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500">
-          <RiFileExcel2Line size={20} />
-          </button>
+            <button
+              onClick={handleExportExcel}
+              className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+            >
+              <RiFileExcel2Line size={20} />
+            </button>
           </div>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
@@ -226,7 +231,7 @@ const InstrukturComponent = () => {
               Tanggal
             </label>
             <DatePicker
-            size="large"
+              size="large"
               name="date"
               value={selectedDate}
               onChange={(selectedDate, dateString) =>

@@ -15,7 +15,6 @@ const NilaiComponent = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState()
-  const { profile } = useProfile();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -102,7 +101,6 @@ const NilaiComponent = () => {
   };
 
   useEffect(() => {
-    profile;
     handleGetEkskulRequest();
   }, []);
 

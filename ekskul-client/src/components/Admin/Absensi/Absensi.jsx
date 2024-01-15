@@ -6,11 +6,14 @@ import fs from "fs";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { IoAddSharp } from "react-icons/io5";
 import { RiFileExcel2Line } from "react-icons/ri";
+import useAuth from "../../../hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
 
 const AbsensiComponent = () => {
   const [selectedEkskul, setSelectedEkskul] = useState(null);
   const axiosPrivate = useAxiosPrivate();
-  const { profile } = useProfile();
+  const { auth } = useAuth();
+  const { ekskuls } = jwtDecode(auth.accessToken);
   const ekskul_id = localStorage.getItem("ekskul_id");
   const handleInputChange = (value) => {
     if (localStorage.getItem("ekskul_id") !== null) {
@@ -80,8 +83,8 @@ const AbsensiComponent = () => {
                 handleInputChange(value);
               }}
               options={
-                profile.ekskul
-                  ? profile.ekskul.map((item) => ({
+                ekskuls
+                  ? ekskuls.map((item) => ({
                       value: item.id,
                       label: item.name,
                     }))
