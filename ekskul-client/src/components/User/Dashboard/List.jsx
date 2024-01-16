@@ -94,7 +94,8 @@ const List = () => {
                       <div className="bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] ">
                         <p className="font-Gabarito">{activity.room}</p>
                         <p className="font-Gabarito">
-                          {activity.startTime} - {activity.endTime}
+                          {activity.startTime.substring(0, 5)} -{" "}
+                          {activity.endTime.substring(0, 5)}
                         </p>
                       </div>
                     </div>
@@ -121,7 +122,8 @@ const List = () => {
                       <div className="bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] ">
                         <p className="font-Gabarito">{activity.room}</p>
                         <p className="font-Gabarito">
-                          {activity.startTime} - {activity.endTime}
+                          {activity.startTime.substring(0, 5)} -{" "}
+                          {activity.endTime.substring(0, 5)}
                         </p>
                       </div>
                     </div>
@@ -148,7 +150,8 @@ const List = () => {
                       <div className="bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] ">
                         <p className="font-Gabarito">{activity.room}</p>
                         <p className="font-Gabarito">
-                          {activity.startTime} - {activity.endTime}
+                          {activity.startTime.substring(0, 5)} -{" "}
+                          {activity.endTime.substring(0, 5)}
                         </p>
                       </div>
                     </div>
@@ -175,7 +178,8 @@ const List = () => {
                       <div className="bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] ">
                         <p className="font-Gabarito">{activity.room}</p>
                         <p className="font-Gabarito">
-                          {activity.startTime} - {activity.endTime}
+                          {activity.startTime.substring(0, 5)} -{" "}
+                          {activity.endTime.substring(0, 5)}
                         </p>
                       </div>
                     </div>
@@ -202,7 +206,8 @@ const List = () => {
                       <div className="bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] ">
                         <p className="font-Gabarito">{activity.room}</p>
                         <p className="font-Gabarito">
-                          {activity.startTime} - {activity.endTime}
+                          {activity.startTime.substring(0, 5)} -{" "}
+                          {activity.endTime.substring(0, 5)}
                         </p>
                       </div>
                     </div>
@@ -229,7 +234,8 @@ const List = () => {
                       <div className="bg-blue-500 w-full text-white text-[14px] flex justify-between py-[5px] px-[10px] ">
                         <p className="font-Gabarito">{activity.room}</p>
                         <p className="font-Gabarito">
-                          {activity.startTime} - {activity.endTime}
+                          {activity.startTime.substring(0, 5)} -{" "}
+                          {activity.endTime.substring(0, 5)}
                         </p>
                       </div>
                     </div>

@@ -51,23 +51,20 @@ export class GalleryController extends GalleryService {
     }
   };
 
-  getGallery = async (req: Request, res: Response): Promise<Response> => {
+  getGalleryDetail = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getGalleryService(req);
+      const serviceResponse: APIResponse = await this.getGalleryDetailService(
+        req
+      );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);
     }
   };
 
-  getPopularGallery = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
+  getGallery = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getPopularGalleryService(
-        req
-      );
+      const serviceResponse: APIResponse = await this.getGalleryService(req);
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);

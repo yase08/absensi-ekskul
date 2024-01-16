@@ -19,29 +19,29 @@ class GalleryRoutes extends GalleryController {
   routes(): Router {
     this.router.post(
       "/",
-      [authorization(), auth(), permission(["admin"]), upload.array("images")],
+      [authorization(), auth(), permission(["admin", "instructor"]), upload.array("images")],
       this.createGallery
     );
     this.router.get(
       "/",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin", "instructor"])],
       this.getAllGallery
     );
+    this.router.get("/single", this.getGallery);
     this.router.get(
       "/detail/:slug",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin", "instructor"])],
       this.getDetailGallery
     );
-    this.router.get("/popular", this.getPopularGallery);
-    this.router.get("/:slug", this.getGallery);
+    this.router.get("/detail/images/:slug", this.getGalleryDetail);
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"]), upload.array("images")],
+      [authorization(), auth(), permission(["admin", "instructor"]), upload.array("images")],
       this.updateGallery
     );
     this.router.delete(
       "/:id",
-      [authorization(), auth(), permission(["admin"])],
+      [authorization(), auth(), permission(["admin", "instructor"])],
       this.deleteGallery
     );
 

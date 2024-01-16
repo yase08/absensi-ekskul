@@ -31,7 +31,7 @@ const TableJadwal = ({ setFormOld, setOpen, data, handleGetRequest }) => {
       ...item,
       schedule_id: item.schedule.id,
       room_id: item.room.id,
-      ekskul_id: item.ekskul.id
+      ekskul_id: item.ekskul.id,
     });
     setOpen(true);
   };
@@ -156,7 +156,7 @@ const TableJadwal = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/schedule`, id);
+      const response = await axiosPrivate.delete(`/activity/${id}`);
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -277,7 +277,7 @@ const TableJadwal = ({ setFormOld, setOpen, data, handleGetRequest }) => {
       ),
     },
   ];
-  
+
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
       <div className="overflow-x-auto hidden-scroll w-full">

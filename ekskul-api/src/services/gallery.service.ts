@@ -122,7 +122,7 @@ export class GalleryService {
     }
   }
 
-  async getGalleryService(req: Request): Promise<any> {
+  async getGalleryDetailService(req: Request): Promise<any> {
     try {
       const galleries = await db.gallery.findAll({
         where: { slug: req.params.slug },
@@ -173,11 +173,9 @@ export class GalleryService {
     }
   }
 
-  async getPopularGalleryService(req: Request): Promise<any> {
+  async getGalleryService(req: Request): Promise<any> {
     try {
-      const galleries = await db.gallery.findAll({
-        limit: 4,
-      });
+      const galleries = await db.gallery.findAll();
 
       if (!galleries || galleries.length === 0)
         throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
@@ -254,8 +252,6 @@ export class GalleryService {
           fs.unlinkSync(imagePath);
         }
       }
-
-      console.log(galleryImages);
 
       const updateGallery = await db.gallery.update(
         {
