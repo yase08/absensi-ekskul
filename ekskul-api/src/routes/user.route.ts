@@ -35,7 +35,12 @@ class UserRoutes extends UserController {
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["admin"]), upload.single("images")],
+      [
+        authorization(),
+        auth(),
+        permission(["admin", "instructor"]),
+        upload.single("image"),
+      ],
       this.updateUser
     );
     this.router.delete(

@@ -143,15 +143,13 @@ export class UserService {
         where: { id: req.params.id },
       });
 
-      const ekskuls = await db.ekskul.findAll({
-        where: { id: req.body.ekskuls },
-      });
-
-      if (!userExist)
-        throw apiResponse(status.NOT_FOUND, "User tidak ditemukan");
+      if (req.body.password) {
+        const hashedPassword = await hashPassword(req.body.password);
+        req.body.password = hashedPassword;
+      }
 
       if (req.file) {
-        if (userExist.image) {
+        if (userExist.image && userExist.image !== "undefined") {
           fs.unlinkSync(
             path.join(__dirname, "..", "public", "images", userExist.image)
           );
@@ -160,10 +158,8 @@ export class UserService {
         req.body.image = req.file.filename;
       }
 
-      if (req.body.password) {
-        const hashedPassword = await hashPassword(req.body.password);
-        req.body.password = hashedPassword;
-      }
+      if (!userExist)
+        throw apiResponse(status.NOT_FOUND, "User tidak ditemukan");
 
       const updateUser = await db.user.update(req.body, {
         where: {
@@ -175,21 +171,27 @@ export class UserService {
       if (!updateUser)
         throw apiResponse(status.FORBIDDEN, "Gagal mengupdate pengguna");
 
-      // Hapus ekskul sebelumnya siswa pada transaksi ini
-      await db.userOnEkskul.destroy({
-        where: { user_id: userExist.id },
-        transaction,
-      });
+      if (req.body.ekskuls) {
+        const ekskuls = await db.ekskul.findAll({
+          where: { id: req.body.ekskuls },
+        });
 
-      await db.userOnEkskul.bulkCreate(
-        ekskuls.map((ekskul) => ({
-          user_id: userExist.id,
-          ekskul_id: ekskul.id,
-        })),
-        { transaction }
-      );
+        // Hapus ekskul sebelumnya siswa pada transaksi ini
+        await db.userOnEkskul.destroy({
+          where: { user_id: userExist.id },
+          transaction,
+        });
 
-      await transaction.commit();
+        await db.userOnEkskul.bulkCreate(
+          ekskuls.map((ekskul) => ({
+            user_id: userExist.id,
+            ekskul_id: ekskul.id,
+          })),
+          { transaction }
+        );
+
+        await transaction.commit();
+      }
 
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mengupdate pengguna")

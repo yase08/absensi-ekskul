@@ -4,6 +4,7 @@ import {
   AiOutlineEye,
   AiOutlineEyeInvisible,
 } from "react-icons/ai";
+import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
 import "./Login.css";
 import logo from "../../../assets/Logo-Absensi.png";
@@ -55,11 +56,29 @@ const Login = () => {
         const role = response.data.data.role;
         setAuth({ accessToken, role });
         navigate("/admin/dashboard", { replace: true });
-      } else {
-        console.error("Login failed:", response.data.message);
       }
     } catch (error) {
-      console.error("An error occurred:", error.message);
+      console.log(error.response);
+      if (error.response) {
+        const errorMessage = error.response.data.statusMessage;
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: errorMessage,
+        });
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "No response received from the server.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An unexpected error occurred.",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -166,9 +185,9 @@ const Login = () => {
                 <span className="w-full h-[1px] bg-[#FFDE59]" />
               </div>
               <div className="w-full text-white flex justify-between">
-              <Link to={"/forgot-password"}>
-                <button className="capitalize">forgot password?</button>
-              </Link>
+                <Link to={"/forgot-password"}>
+                  <button className="capitalize">forgot password?</button>
+                </Link>
               </div>
               <button
                 className="w-full h-20 bg-[#FFDE59] text-white font-bold rounded-md polygon"

@@ -2,14 +2,14 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { BsKeyboard } from "react-icons/bs";
 import { MdColorLens } from "react-icons/md";
 import { CgProfile, CgLogOut } from "react-icons/cg";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import useAuth from "../../../hooks/useAuth";
-import { UserOutlined, EditOutlined } from "@ant-design/icons";
+import { UserOutlined, UploadOutlined } from "@ant-design/icons";
 import { jwtDecode } from "jwt-decode";
-import { Modal, Button, Input, Form } from "antd";
+import { Modal, Button, Input, Form, Upload } from "antd";
 
 // eslint-disable-next-line react/prop-types
 const TopNav = ({
@@ -29,19 +29,12 @@ const TopNav = ({
   const [backgroundColor, setBackgroundColor] = useState("bg-primary");
   const { setAuth, setPersist, auth, persist } = useAuth();
   const { id } = jwtDecode(auth.accessToken);
+  const [fileList, setFileList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const fileInputRef = useRef(null);
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-  };
-
-  const handleEdittClick = () => {
-    // Pemanggilan fungsi click pada elemen input file
-    fileInputRef.current.click();
+  const handleFileChange = ({ fileList }) => {
+    setFileList(fileList);
   };
 
   const handleFetch = async () => {
@@ -184,9 +177,11 @@ const TopNav = ({
       formData.append("name", values.name);
       formData.append("mobileNumber", values.mobileNumber);
       formData.append("email", values.email);
-      formData.append("password", values.password);
+      if (values.password) {
+        formData.append("password", values.password);
+      }
       if (values.image) {
-        formData.append("image", values.image[0].originFileObj);
+        formData.append("image", fileList[0].originFileObj);
       }
       const response = await axiosPrivate.put(`/user/${id}`, formData, {
         headers: {
@@ -197,6 +192,13 @@ const TopNav = ({
     } catch (error) {
       console.error("Error creating comic:", error);
     }
+  };
+
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
   };
 
   return (
@@ -283,7 +285,7 @@ const TopNav = ({
             >
               <div className="w-full flex flex-col justify-start gap-2 text-base">
                 <div className="self-center mb-4 relative">
-                  {profile.image === null ? (
+                  {profile.image === null || "undefined" || undefined ? (
                     <UserOutlined
                       style={{
                         fontSize: "50px",
@@ -299,20 +301,6 @@ const TopNav = ({
                       alt={"Profile Picture"}
                     />
                   )}
-                  {isEditMode ? (
-                    <>
-                      <input
-                        type="file"
-                        onChange={handleFileChange}
-                        ref={fileInputRef}
-                        style={{ display: "none" }}
-                      />
-                      <EditOutlined
-                        className="absolute bottom-0 text-xl hover:text-blue-500 cursor-pointer"
-                        onClick={handleEdittClick}
-                      />
-                    </>
-                  ) : null}
                 </div>
                 {isEditMode ? (
                   <>
@@ -337,47 +325,42 @@ const TopNav = ({
                       autoComplete="off"
                     >
                       <Form.Item
-                        label="Name"
-                        name="name"
-                        initialValue={profile.name}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Masukan nama!",
-                          },
-                        ]}
+                        name="image"
+                        valuePropName="fileList"
+                        getValueFromEvent={normFile}
                       >
+                        <Upload
+                          name="image"
+                          onChange={handleFileChange}
+                          showUploadList={true}
+                          beforeUpload={() => false}
+                        >
+                          <Button icon={<UploadOutlined />}>
+                            Tekan untup upload
+                          </Button>
+                        </Upload>
+                      </Form.Item>
+                      <Form.Item name="name" initialValue={profile.name}>
                         <Input addonBefore="Nama" />
                       </Form.Item>
                       <Form.Item
-                        label="Nomer Telpon"
                         name="mobileNumber"
+                        type="number"
                         initialValue={profile.mobileNumber}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Masukan Nomer Telpon!",
-                          },
-                        ]}
                       >
                         <Input addonBefore="Nomer Telpon" />
                       </Form.Item>
-                      <Form.Item
-                        label="Email"
-                        name="email"
-                        initialValue={profile.email}
-                        rules={[
-                          {
-                            required: true,
-                            message: "Masukan email!",
-                          },
-                        ]}
-                      >
+                      <Form.Item name="email" initialValue={profile.email}>
                         <Input addonBefore="Email" />
                       </Form.Item>
                       <Form.Item
-                        label="Password"
                         name="password"
+                        rules={[
+                          {
+                            min: 8,
+                            message: "Minimal password 8 karakter",
+                          },
+                        ]}
                       >
                         <Input addonBefore="Password" type="password" />
                       </Form.Item>
