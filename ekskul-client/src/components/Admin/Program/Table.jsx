@@ -184,7 +184,13 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   };
 
   const handleEdit = async (item) => {
-    setFormOld(item)
+    setFormOld({
+      id: item.id,
+      activity: item.activity,
+      task: item.task,
+      startDate: item.startDate,
+      endDate: item.endDate,
+    })
     setOpen(true);
   };
 
@@ -235,11 +241,14 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     },
     {
       title: "Pembuat",
-      dataIndex: "author",
-      sorter: handleSort("author"),
+      dataIndex: "user",
+      sorter: handleSort("user"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("author"),
+      ...getColumnSearchProps("user"),
+      render(text) {
+        return text ? text.name : "-";
+      }
     },
     {
       title: "Aksi",

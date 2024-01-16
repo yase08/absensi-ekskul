@@ -65,7 +65,7 @@ class ActivityProgramRoutes extends ActivityProgramController {
       this.exportToExcel
     );
     this.router.get(
-      "/export",
+      "/export-all",
       [authorization(), auth(), permission(["admin", "instructor"])],
       this.exportAllToExcel
     );

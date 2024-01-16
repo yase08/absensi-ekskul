@@ -315,6 +315,7 @@ export class StudentService {
       );
     }
   }
+
   async exportAllStudentService(req: Request, res: Response): Promise<any> {
     try {
       const date = Date.now();
@@ -367,14 +368,15 @@ export class StudentService {
         { header: "JK", key: "student_gender", width: 15 },
         { header: "Rombel", key: "student_rombel", width: 15 },
         { header: "Rayon", key: "student_rayon", width: 15 },
-        { header: "Ekstrakurikuler", key: "ekskuls", width: 15 },
+        { header: "Ekstrakurikuler", key: "student_ekskul", width: 15 },
       ];
       const file = `data-siswa-${date}.xlsx`;
 
       const exportSuccess = await exportExcel(
+        file,
         columns,
         modifiedStudents,
-        file,
+        "Siswa",
         res
       );
 
@@ -457,8 +459,9 @@ export class StudentService {
               : null,
             student_rombel: student ? student.rombel.name : null,
             student_rayon: student ? student.rayon.name : null,
-            student_ekskul: student.ekskul ? student.ekskul.name : null,
-          };
+            student_ekskul: student.ekskuls.length > 0
+            ? student.ekskuls.map((ekskul) => ekskul.name).join(', ')
+            : "-"};
         });
 
         const columns = [
@@ -473,9 +476,10 @@ export class StudentService {
         const file = `data-siswa-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
+          file,
           columns,
           modifiedStudents,
-          file,
+          "Siswa",
           res
         );
 

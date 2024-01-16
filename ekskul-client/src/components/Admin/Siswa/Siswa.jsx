@@ -314,7 +314,7 @@ const SiswaComponent = () => {
               value={selectedEkskul}
               onChange={(value) => {
                 setSelectedEkskul(value);
-                handleInputChange(value);
+                handleSelectChange(value);
               }}
               options={
                 ekskuls

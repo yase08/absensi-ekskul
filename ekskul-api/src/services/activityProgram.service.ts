@@ -50,29 +50,8 @@ export class ActivityProgramService {
 
   async getAllActivityProgramByAuthorService(req: Request): Promise<any> {
     try {
-      const paramQuerySQL: any = {};
-
-      // paramQuerySQL.include = [
-      //   {
-      //     model: db.user,
-      //     as: "user",
-      //     attributes: ["id", "name"],
-      //   },
-      // ];
-
-      const activityProgram = await db.activityProgram.findAll(paramQuerySQL);
-
-      const modifiedProgram = activityProgram.map((activity) => {
-        return {
-          id: activity.id,
-          activity: activity.activity,
-          task: activity.task,
-          author: activity.author,
-          startDate: activity.startDate,
-          endDate: activity.endDate,
-          createdAt: activity.createdAt,
-          updatedAt: activity.updatedAt,
-        };
+      const activityProgram = await db.activityProgram.findAll({
+        where: { author: req.body.author_id },
       });
 
       if (!activityProgram || activityProgram.length === 0)
@@ -80,6 +59,54 @@ export class ActivityProgramService {
           status.NOT_FOUND,
           "Aktivitas program tidak ditemukan"
         );
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan aktivitas program berdasarkan author",
+          activityProgram
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getAllActivityProgramService(req: Request): Promise<any> {
+    try {
+      const activityProgram = await db.activityProgram.findAll({
+        include: [
+          {
+            model: db.user,
+            as: "user",
+            attributes: ["id", "name"]
+          }
+        ]
+      });
+
+      if (!activityProgram || activityProgram.length === 0)
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Aktivitas program tidak ditemukan"
+        );
+
+        const modifiedProgram = activityProgram.map((activity) => ({
+          id: activity.id,
+          user: activity.user ? {
+            id: activity.user.id,
+            name: activity.user.name,
+          } : null,
+          activity: activity.activity,
+          task: activity.task,
+          startDate: activity.startDate,
+          endDate: activity.endDate
+        }))
 
       return Promise.resolve(
         apiResponse(
@@ -217,9 +244,10 @@ export class ActivityProgramService {
         const file = `data-absensi-instruktur-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
+          file,
           columns,
           modifiedAttendances,
-          file,
+          "Aktivitas Program",
           res
         );
 
@@ -291,12 +319,13 @@ export class ActivityProgramService {
       ];
       const file = `data-absensi-instruktur-${date}.xlsx`;
 
-      const exportSuccess = await exportExcel(
-        columns,
-        modifiedActivities,
-        file,
-        res
-      );
+        const exportSuccess = await exportExcel(
+          file,
+          columns,
+          modifiedActivities,
+          "Aktivitas Program",
+          res
+        );
 
       res.setHeader(
         "Content-Type",

@@ -58,13 +58,20 @@ export class AssessmentService {
   async getAllAssessmentByTaskService(req: Request): Promise<any> {
     try {
       const task_id = req.query.task_id as string;
+
       const paramQuerySQL: any = {
         where: {
           task_id: task_id,
         },
-      }
+      };
 
-      paramQuerySQL.attributes = ["id", "grade", "createdAt", "updatedAt"];
+      paramQuerySQL.attributes = [
+        "id",
+        "grade",
+        "createdAt",
+        "updatedAt",
+        "date",
+      ];
 
       paramQuerySQL.include = [
         { model: db.student, as: "student", attributes: ["id", "name"] },
@@ -94,7 +101,7 @@ export class AssessmentService {
         apiResponse(
           status.OK,
           "Berhasil mendapatkan data penilaian",
-          manipulatedResponse,
+          manipulatedResponse
         )
       );
     } catch (error: any) {

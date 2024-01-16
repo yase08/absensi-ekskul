@@ -224,14 +224,38 @@ export class GalleryService {
       if (!galleryExist)
         throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
 
-      let files: Express.Multer.File[] = req.files as Express.Multer.File[];
-      let galleryImages: string[] = [...galleryExist.images];
+      const files: Express.Multer.File[] = req.files as Express.Multer.File[];
+      const galleryImages: string[] = Array.isArray(galleryExist.images)
+        ? [...galleryExist.images]
+        : [];
 
-      for (let i in files) {
-        const file = files[i];
+      // Add new images to the galleryImages array
+      for (const file of files) {
         const pathName = file.filename;
         galleryImages.push(pathName);
       }
+
+      // Remove deleted images from the galleryImages array and delete them from the server
+      const imagesToDelete = Array.isArray(galleryExist.images)
+        ? galleryExist.images.filter((image) => !galleryImages.includes(image))
+        : [];
+
+      for (const imageToDelete of imagesToDelete) {
+        const imagePath = path.join(
+          __dirname,
+          "..",
+          "public",
+          "images",
+          imageToDelete
+        );
+
+        // Check if the file exists before attempting to delete it
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+
+      console.log(galleryImages);
 
       const updateGallery = await db.gallery.update(
         {
@@ -287,7 +311,6 @@ export class GalleryService {
           "images",
           deleteImages[i]
         );
-        console.log(filePath);
 
         fs.unlinkSync(filePath);
       }

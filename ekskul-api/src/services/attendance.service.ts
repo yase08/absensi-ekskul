@@ -384,9 +384,10 @@ export class AttendanceService {
         const file = `data-kehadiran-${ekskul.name}-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
+          file,
           columns,
           modifiedAttendances,
-          file,
+          "Absensi",
           res
         );
 
