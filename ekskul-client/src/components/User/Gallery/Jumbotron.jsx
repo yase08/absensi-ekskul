@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { Link } from "react-router-dom";
 
 const Jumbotron = () => {
   const axiosPrivate = useAxiosPrivate();
@@ -71,7 +72,6 @@ const Jumbotron = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-[15px] xl:gap-[15px]">
-          {}
           <a
             href="#"
             className="group relative flex h-48 items-end overflow-hidden rounded-lg bg-gray-100 shadow-lg md:h-80"
@@ -90,9 +90,9 @@ const Jumbotron = () => {
             </span>
           </a>
         </div>
-        <button className=" bg-blue-500 w-full text-white p-[10px] rounded-md text-[18px] font-bold hover:bg-opacity-80">
+        <Link to={"/gallery"} className=" bg-blue-500 w-full text-white p-[10px] rounded-md text-[18px] font-bold hover:bg-opacity-80">
           See Full
-        </button>
+        </Link>
       </div>
     </div>
   );

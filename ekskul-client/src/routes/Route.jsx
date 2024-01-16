@@ -26,6 +26,7 @@ import RequireAuth from "../components/Admin/User/RequireAuth";
 import NotFound from "../pages/Admin/NotFound/NotFound";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import ResetToken from "../pages/ResetToken/ResetToken";
+import Gallery from "../pages/User/Gallery/Gallery";
 
 const AppRouter = () => {
   return (
@@ -33,6 +34,7 @@ const AppRouter = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/gallery" element={<Gallery />} />
         <Route path="/reset-token/:token" element={<ResetToken />} />
         <Route path="/*" element={<NotFound />} />
         <Route path="/" element={<Dashboard />} />
@@ -120,11 +122,6 @@ const AppRouter = () => {
           <Route element={<RequireAuth allowedRoles={["admin"]} />}>
             <Route path="/admin/ruangan" element={<RuanganDashboard />} />
           </Route>
-          {/* <Route
-            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
-          >
-            <Route path="/admin/profile" element={<ProfileDashboard />} />
-          </Route> */}
           <Route
             element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
           >

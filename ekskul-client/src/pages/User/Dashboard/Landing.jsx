@@ -22,12 +22,6 @@ const Dashboard = () => {
       <JumbotronAgain/>
       <Comment/>
       <Footer/>
-      {/* <TopNavbar/>
-      <Navbar/>
-      <div className="bg-transparent w-full mt-[100px] relative">
-       <Jumbotron/>
-       <Info/>
-      </div> */}
     </div>
     </>
   )
