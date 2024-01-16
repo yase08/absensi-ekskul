@@ -9,9 +9,9 @@ import  { Swiper, SwiperSlide } from 'swiper/react';
 
 const Teacher = () => {
   return (
-    <div className="p-[40px] image-cerita ">   
+    <div className="p-[40px]">   
        <p className='text-blue-500 text-[18px] uppercase font-semibold text-center'>Ekstrakurikuler</p>
-    <p className='text-[40px] font-bold uppercase text-center text-white'>Penanggung Jawab</p>
+    <p className='text-[40px] font-bold uppercase text-center text-white text-shadow-md'>Penanggung Jawab</p>
       <Swiper
                spaceBetween={30}
                slidesPerView={3}
@@ -59,7 +59,7 @@ const Teacher = () => {
     </div> */}
 
 
-        <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
+        <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-3xl shadow-shadow-500">
                         <div className="flex items-center">
                         <div className="">
                             <img
@@ -115,7 +115,7 @@ const Teacher = () => {
     </div> */}
 
 
-        <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
+        <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-3xl shadow-shadow-500 ">
                         <div className="flex items-center">
                         <div className="">
                             <img
@@ -171,7 +171,7 @@ const Teacher = () => {
     </div> */}
 
 
-        <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-3xl shadow-shadow-500 dark:!bg-navy-700 dark:shadow-none">
+        <div className="mt-3 flex w-full items-center justify-between rounded-2xl bg-white p-3 shadow-3xl shadow-shadow-500 ">
                         <div className="flex items-center">
                         <div className="">
                             <img
