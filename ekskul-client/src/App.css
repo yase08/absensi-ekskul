@@ -67,3 +67,21 @@
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+.image-cerita {
+  background-image: url("https://static.republika.co.id/uploads/images/inpicture_slide/sekolah-menengah-kejuruan-smk-wikrama-di-kota-bogor-jawa_211212100849-830.jpg");
+  background-attachment: fixed; /* Add parallax effect */
+  background-position: center; /* Center the background image */
+  background-repeat: no-repeat; /* Do not repeat the background image */
+  background-size: cover; /* Cover the entire container with the background image */
+  height: 100vh; /* Set the height of the container (adjust as needed) */
+  margin: 0; /* Remove any default margin */
+}
+
+.image-cerita-1 {
+  background-image: url("https://static.republika.co.id/uploads/images/inpicture_slide/sekolah-menengah-kejuruan-smk-wikrama-di-kota-bogor-jawa_211212100849-830.jpg"); /* Add parallax effect */
+  background-position: center; /* Center the background image */
+  background-repeat: no-repeat; /* Do not repeat the background image */
+  background-size: cover; /* Cover the entire container with the background image */
+
+}
