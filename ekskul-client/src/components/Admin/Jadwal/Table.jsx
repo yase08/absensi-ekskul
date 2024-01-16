@@ -156,7 +156,7 @@ const TableJadwal = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/schedule`, id);
+      const response = await axiosPrivate.delete(`/activity/${id}`,);
       const successMessage = response.statusMessage;
 
       Swal.fire({

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import Swal from "sweetalert2";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useAxiosPrivate from "../../../../../hooks/useAxiosPrivate";
 
 const TablePenilaianPost = ({ date }) => {
@@ -17,6 +17,7 @@ const TablePenilaianPost = ({ date }) => {
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
   const [formData, setformData] = useState([]);
+  const navigate = useNavigate();
 
   const ekskul = localStorage.getItem("ekskul_id");
   const task = useParams();
@@ -173,6 +174,7 @@ const TablePenilaianPost = ({ date }) => {
       const response = await axiosPrivate.post(`/assessment`, formData);
       const successMessage = response.data.statusMessage;
 
+      navigate(`/admin/penugasan/nilai/${task.id}`);
       Swal.fire({
         icon: "success",
         title: "Success!",

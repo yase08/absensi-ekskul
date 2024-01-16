@@ -3,6 +3,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button, Checkbox } from "antd";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
+import { useNavigate } from "react-router-dom";
 
 const TableAbsensiPost = ({ date }) => {
   const [searchText, setSearchText] = useState("");
@@ -16,6 +17,7 @@ const TableAbsensiPost = ({ date }) => {
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
   const [formData, setformData] = useState([]);
   const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
 
   const ekskul = localStorage.getItem("ekskul_id");
 
@@ -173,12 +175,12 @@ const TableAbsensiPost = ({ date }) => {
         formData
       );
       const successMessage = response.data.statusMessage;
-
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
         text: successMessage,
       });
+      navigate('/admin/absensi-siswa')
     } catch (error) {
       if (error) {
         const errorMessage = error.response.statusMessage;

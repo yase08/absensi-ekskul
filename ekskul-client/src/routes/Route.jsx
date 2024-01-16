@@ -120,11 +120,6 @@ const AppRouter = () => {
           <Route element={<RequireAuth allowedRoles={["admin"]} />}>
             <Route path="/admin/ruangan" element={<RuanganDashboard />} />
           </Route>
-          {/* <Route
-            element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
-          >
-            <Route path="/admin/profile" element={<ProfileDashboard />} />
-          </Route> */}
           <Route
             element={<RequireAuth allowedRoles={["admin", "instructor"]} />}
           >

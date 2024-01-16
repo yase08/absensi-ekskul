@@ -6,6 +6,7 @@ import { Table, Input, Space, Button, Tag } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { BiDetail } from "react-icons/bi";
 import { LuTrash } from "react-icons/lu";
+import { Link } from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
 const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
@@ -263,12 +264,12 @@ const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
             >
               <LuTrash size={20} />
             </a>
-            <a
+            <Link
               className="hover:text-green-500"
-              href={`/admin/penugasan/nilai/${record.id}`}
+              to={`/admin/penugasan/nilai/${record.id}`}
             >
               <BiDetail size={20} />
-            </a>
+            </Link>
           </Space>
         </>
       ),

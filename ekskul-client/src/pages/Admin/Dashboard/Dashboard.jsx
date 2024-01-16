@@ -50,7 +50,7 @@ const Dashboard = () => {
   };
   return (
     <>
-      <div className="flex relative">
+      <div className="flex relative bg-transparent h-screen w-full justify-between">
         <SideNav
           expanded={expanded}
           toggleExpansion={toggleExpansion}
@@ -58,7 +58,7 @@ const Dashboard = () => {
           toggleOpenHelpNav={toggleOpenHelpNav}
         />
         <div
-          className={`w-full transition-all overflow-hidden duration-[700ms]  ${
+          className={`w-full transition-all bg-transparent flex flex-col h-screen overflow-hidden duration-[700ms]  ${
             expanded ? "lg:ml-[65.5px]" : "lg:ml-[320px]"
           }`}
         >
@@ -75,7 +75,8 @@ const Dashboard = () => {
             toggleOpenProfile={toggleOpenProfile}
           /> */}
           {/* Sidebar */}
-          <div className="mt-[80px] z-40 w-full px-10  bg-opacity-30 h-[100px] relative top-[50px] bg-transparent">
+          <div className="flex w-full flex-col bg-transparent">
+          <div className="mt-[80px] z-40 w-full px-10  bg-opacity-30 h-[100px]  relative top-[50px] bg-transparent">
             <div className="bg-white rounded-md w-full h-full relative flex items-center px-5 justify-between overflow-hidden">
               <div className="flex gap-3 items-center">
                 <img
@@ -126,6 +127,7 @@ const Dashboard = () => {
             <button className="border border-white rounded-full p-1 text-sm w-[150px] h-[40px] translate-y-[5px]  hover:bg-white hover:text-blue-500 ">
               Redirect Landing
             </button>
+          </div>
           </div>
         </div>
         {openHelpNav && (

@@ -4,18 +4,13 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
-import { BiDetail } from "react-icons/bi";
-import { useParams } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 
-const TableNilai = ({ setFormOld, setOpen }) => {
-  const task_id = useParams();
+const TableNilai = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const axiosPrivate = useAxiosPrivate();
-  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
@@ -152,29 +147,6 @@ const TableNilai = ({ setFormOld, setOpen }) => {
     onShowSizeChange: handleChangePageSize,
   });
 
-  const handleGetRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(
-        `/assessment/detail?task_id=${task_id.id}`
-      );
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const taskData = response.data.data;
-          setData(taskData);
-        } else {
-          setError(new Error("Data is not an array"));
-        }
-      } else {
-        setError(new Error("Data retrieval failed"));
-      }
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDeleteRequest = async (id) => {
     setLoading(true);
 
@@ -273,10 +245,6 @@ const TableNilai = ({ setFormOld, setOpen }) => {
     },
   ];
 
-  useEffect(() => {
-    handleGetRequest();
-  }, []);
-
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">
       <div className="overflow-x-auto hidden-scroll w-full">
@@ -287,7 +255,7 @@ const TableNilai = ({ setFormOld, setOpen }) => {
             currentPage * pageSize
           )}
           pagination={getPaginationConfig()}
-          loading={loading}
+          loading={false}
           scroll={{ x: "max-content" }}
         />
       </div>

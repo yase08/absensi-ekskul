@@ -8,6 +8,7 @@ import { RiFileExcel2Line } from "react-icons/ri";
 import dayjs from "dayjs";
 import useAuth from "../../../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
+import { AiOutlineFileExcel } from "react-icons/ai";
 const { RangePicker } = DatePicker;
 
 const Program = () => {
@@ -97,7 +98,6 @@ const Program = () => {
         if (Array.isArray(response.data.data)) {
           const activityProgramData = response.data.data;
           setData(activityProgramData);
-          console.log(data);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -128,6 +128,7 @@ const Program = () => {
           text: successMessage,
         });
         setFormOld({});
+        setDate([]);
         handleGetRequest();
       } else {
         const response = await axiosPrivate.post(`/activity-program`, formData);
@@ -254,7 +255,7 @@ const Program = () => {
             Program
           </h1>
           <div className="flex gap-3">
-            <Select
+            {/* <Select
               size="medium"
               placeholder="Pilih kategori"
               className=""
@@ -271,18 +272,18 @@ const Program = () => {
                     }))
                   : []
               }
-            />
-            <button
+            /> */}
+            {/* <button
               onClick={handleExportExcel}
               className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
             >
               <RiFileExcel2Line size={20} />
-            </button>
+            </button> */}
             <button
               onClick={handleExportAllExcel}
               className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
             >
-              <RiFileExcel2Line size={20} />
+              <AiOutlineFileExcel size={20} />
             </button>
             <button
               onClick={showModal}

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { Modal, Select, Input, DatePicker } from "antd";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
 const NilaiComponent = () => {
@@ -12,6 +12,8 @@ const NilaiComponent = () => {
   const [open, setOpen] = useState(false);
   const [ekskul, setEkskul] = useState([]);
   const [formOld, setFormOld] = useState({});
+  const [error, setError] = useState(null);
+  const [data, setData] = useState([]);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState()
@@ -51,6 +53,29 @@ const NilaiComponent = () => {
     console.log(formOld);
   };
 
+  const handleGetRequest = async () => {
+    try {
+      const response = await axiosPrivate.get(
+        `/assessment/detail?task_id=${task.id}`
+      );
+
+      if (response && response.data.data) {
+        if (Array.isArray(response.data.data)) {
+          const taskData = response.data.data;
+          setData(taskData);
+        } else {
+          setError(new Error("Data is not an array"));
+        }
+      } else {
+        setError(new Error("Data retrieval failed"));
+      }
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOk = async (event) => {
     setLoading(true);
 
@@ -60,8 +85,9 @@ const NilaiComponent = () => {
           `/assessment/${formOld.id}`,
           formOld
         );
-        const successMessage = response.data.data;
 
+        handleGetRequest();
+        const successMessage = response.data.data;
         Swal.fire({
           icon: "success",
           title: "Success!",
@@ -102,6 +128,7 @@ const NilaiComponent = () => {
 
   useEffect(() => {
     handleGetEkskulRequest();
+    handleGetRequest();
   }, []);
 
   return (
@@ -111,19 +138,19 @@ const NilaiComponent = () => {
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
             Penilaian Siswa
           </h1>
-          <a
-            href={`/admin/penugasan/penilaian/${task.id}`}
+          <Link
+            to={`/admin/penugasan/penilaian/${task.id}`}
             className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
           >
             Penilaian
-          </a>
+          </Link>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} />
+          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
         </div>
       </div>
       <Modal
-        title={formOld && formOld.id ? "Edit Data" : "Tambah Data"}
+        title={"Edit Data"}
         open={open}
         onOk={handleOk}
         confirmLoading={confirmLoading}
@@ -134,7 +161,7 @@ const NilaiComponent = () => {
             Nilai
           </label>
           <Input
-            value={formOld ? formOld.grade : formData.grade}
+            value={formOld && formOld.grade ? formOld.grade : ""}
             type="text"
             name="name"
             size="large"
@@ -146,7 +173,7 @@ const NilaiComponent = () => {
           </label>
           <DatePicker
             name="date"
-            value={formOld && formOld.date ? dayjs(formData.date) : selectedDate}
+            value={formOld && formOld.date ? dayjs(formOld.date) : selectedDate}
             onChange={(selectedDate, dateString) => {
               setSelectedDate(selectedDate);
               handleInputChange(dateString, "date");

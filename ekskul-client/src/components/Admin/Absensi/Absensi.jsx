@@ -14,15 +14,18 @@ const AbsensiComponent = () => {
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
   const { ekskuls } = jwtDecode(auth.accessToken);
-  const ekskul_id = localStorage.getItem("ekskul_id");
-  const handleInputChange = (value) => {
-    if (localStorage.getItem("ekskul_id") !== null) {
-      localStorage.removeItem("ekskul_id");
-      localStorage.setItem("ekskul_id", value);
-    } else {
-      localStorage.setItem("ekskul_id", value);
-    }
-  };
+ // Get ekskul_id from sessionStorage
+const ekskul_id = sessionStorage.getItem("ekskul_id");
+
+// Function to handle input change and update sessionStorage
+const handleInputChange = (value) => {
+  if (sessionStorage.getItem("ekskul_id") !== null) {
+    sessionStorage.removeItem("ekskul_id");
+    sessionStorage.setItem("ekskul_id", value);
+  } else {
+    sessionStorage.setItem("ekskul_id", value);
+  }
+};
 
   const handleExportExcel = async () => {
     try {
@@ -59,7 +62,7 @@ const AbsensiComponent = () => {
   };
 
   useEffect(() => {
-    const storedEkskulId = localStorage.getItem("ekskul_id");
+    const storedEkskulId = sessionStorage.getItem("ekskul_id");
     if (storedEkskulId) {
       setSelectedEkskul(storedEkskulId);
     }

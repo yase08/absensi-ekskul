@@ -47,7 +47,7 @@ class ActivityRoutes extends ActivityController {
       [
         authorization(),
         auth(),
-        permission(["admin"]),
+        permission(["admin", "instructor"]),
         validator(DTOActivityById),
       ],
       this.deleteActivity

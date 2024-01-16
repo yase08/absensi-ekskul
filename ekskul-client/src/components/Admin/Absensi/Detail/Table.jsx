@@ -198,7 +198,6 @@ const TableAbsensi = () => {
         if (Array.isArray(response.data.data)) {
           const attendanceData = response.data.data;
           setData(attendanceData);
-          console.log(attendanceData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -223,6 +222,7 @@ const TableAbsensi = () => {
       );
       const successMessage = response.statusMessage;
       handleGetRequest()
+      setFormData({})
 
       Swal.fire({
         icon: "success",

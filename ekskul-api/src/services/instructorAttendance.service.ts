@@ -227,9 +227,10 @@ export class InstructorAttendanceService {
         const file = `data-absensi-instruktur-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
+          file,
           columns,
           modifiedAttendances,
-          file,
+          "Absensi Instruktur",
           res
         );
 
