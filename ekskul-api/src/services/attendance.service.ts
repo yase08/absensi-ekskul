@@ -13,7 +13,6 @@ import * as cron from "node-cron";
 import fs from "fs";
 import path from "path";
 
-
 const db = require("../db/models");
 
 function calculateAttendanceValueBasedOnCategory(category: string): number {
@@ -254,6 +253,7 @@ const countAttendancePerMonthService = async () => {
 export class AttendanceService {
   async createAttendanceService(req: Request): Promise<any> {
     try {
+      console.log(req.body);
       const ekskuls = (req.session as ISession).user.ekskul;
       const selectedEkskulId = req.query.ekskul_id as string;
 
@@ -391,17 +391,19 @@ export class AttendanceService {
           res
         );
 
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
-
-        const exportDir = path.join(__dirname, "../public/export/");
-        // const filePath = path.join(exportDir, file);
-        
+        res.setHeader(
+          "Content-Type",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader("Content-Disposition", `attachment; filename=${file}`);
 
         if (!exportSuccess) {
           throw apiResponse(status.FORBIDDEN, "Export failed");
         }
-        return Promise.resolve(apiResponse(status.OK, "Export Success", exportSuccess));
+
+        return Promise.resolve(
+          apiResponse(status.OK, "Export Success", exportSuccess)
+        );
       } else {
         throw apiResponse(
           status.NOT_FOUND,
@@ -430,7 +432,7 @@ export class AttendanceService {
         const paramQuerySQL: any = {
           where: { ekskul_id: selectedEkskulId },
         };
-      
+
         // Include associations (ekskul and student) in the query
         paramQuerySQL.include = [
           {

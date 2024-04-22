@@ -353,7 +353,7 @@ export class AuthService {
         },
         { where: { id: user.id } }
       );
-
+        
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mengubah password")
       );

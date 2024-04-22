@@ -232,11 +232,9 @@ const TopNav = ({
               <BsKeyboard className="text-white text-xl font-bold" />
             </button>
           )}
-          {isButtonVisible2 && (
             <button onClick={toggleOpenChangeBg}>
               <MdColorLens className="text-white text-xl font-bold" />
             </button>
-          )}
           <div className="relative inline-block text-left">
             <div>
               <button

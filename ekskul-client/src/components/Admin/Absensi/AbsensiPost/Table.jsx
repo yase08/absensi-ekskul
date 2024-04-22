@@ -3,8 +3,9 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button, Checkbox } from "antd";
 import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
+import { useNavigate } from "react-router-dom";
 
-const TableAbsensiPost = ({ date }) => {
+const TableAbsensiPost = ({ date, selectedDate }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
@@ -16,11 +17,13 @@ const TableAbsensiPost = ({ date }) => {
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
   const [formData, setformData] = useState([]);
   const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
 
-  const ekskul = localStorage.getItem("ekskul_id");
+  const ekskul = sessionStorage.getItem("ekskul_id");
 
   // Handler untuk checkbox
   const handleCheckboxChange = (studentId, category) => {
+    console.log(date)
     const newAttendance = {
       date: date,
       student_id: studentId,
@@ -30,7 +33,7 @@ const TableAbsensiPost = ({ date }) => {
       (attendance) => attendance.student_id !== studentId
     );
     setformData([...updatedformData, newAttendance]);
-    console.log(formData);
+    console.log(newAttendance);
   };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -168,17 +171,26 @@ const TableAbsensiPost = ({ date }) => {
     setLoading(true);
 
     try {
+      if (selectedDate == null) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "Pilih tanggal terlebih dahulu.",
+        });
+        return;
+      }
+
       const response = await axiosPrivate.post(
         `/attendance?ekskul_id=${ekskul}`,
         formData
       );
       const successMessage = response.data.statusMessage;
-
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
         text: successMessage,
       });
+      navigate("/admin/absensi-siswa");
     } catch (error) {
       if (error) {
         const errorMessage = error.response.statusMessage;

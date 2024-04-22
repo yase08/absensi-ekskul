@@ -8,6 +8,7 @@ import { RiFileExcel2Line } from "react-icons/ri";
 import dayjs from "dayjs";
 import useAuth from "../../../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
+import { AiOutlineFileExcel } from "react-icons/ai";
 const { RangePicker } = DatePicker;
 
 const Program = () => {
@@ -26,17 +27,7 @@ const Program = () => {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState([]);
   const { auth } = useAuth();
-  const { ekskuls } = jwtDecode(auth.accessToken);
-  const ekskul_id = localStorage.getItem("ekskul_id");
-  const [selectedEkskul, setSelectedEkskul] = useState(null);
-  const handleSelectChange = (value) => {
-    if (localStorage.getItem("ekskul_id") !== null) {
-      localStorage.removeItem("ekskul_id");
-      localStorage.setItem("ekskul_id", value);
-    } else {
-      localStorage.setItem("ekskul_id", value);
-    }
-  };
+
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -97,7 +88,6 @@ const Program = () => {
         if (Array.isArray(response.data.data)) {
           const activityProgramData = response.data.data;
           setData(activityProgramData);
-          console.log(data);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -128,6 +118,7 @@ const Program = () => {
           text: successMessage,
         });
         setFormOld({});
+        setDate([]);
         handleGetRequest();
       } else {
         const response = await axiosPrivate.post(`/activity-program`, formData);
@@ -199,40 +190,6 @@ const Program = () => {
     }
   };
 
-  const handleExportExcel = async () => {
-    try {
-      const response = await axiosPrivate.get(
-        `/activity-program/export?ekskul_id=${ekskul_id}`,
-        {
-          responseType: "blob", // Set the response type to 'blob'
-        }
-      );
-
-      if (response.data) {
-        const blob = new Blob([response.data], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-        const outputFileName = `data-aktivitas-${Date.now()}.xlsx`;
-
-        // Create an object URL from the Blob
-        const url = window.URL.createObjectURL(blob);
-
-        // Create an anchor element and trigger the download
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", outputFileName);
-        document.body.appendChild(link);
-        link.click();
-
-        fs.writeFileSync(outputFileName, response.data);
-      } else {
-        console.error("Export failed: Empty response data");
-      }
-    } catch (error) {
-      console.error("Export failed:", error);
-    }
-  };
-
   useEffect(() => {
     if (formOld && !date.length) {
       const dayjsStartDate = dayjs(formOld.startDate);
@@ -254,7 +211,7 @@ const Program = () => {
             Program
           </h1>
           <div className="flex gap-3">
-            <Select
+            {/* <Select
               size="medium"
               placeholder="Pilih kategori"
               className=""
@@ -271,18 +228,18 @@ const Program = () => {
                     }))
                   : []
               }
-            />
-            <button
+            /> */}
+            {/* <button
               onClick={handleExportExcel}
               className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
             >
               <RiFileExcel2Line size={20} />
-            </button>
+            </button> */}
             <button
               onClick={handleExportAllExcel}
               className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
             >
-              <RiFileExcel2Line size={20} />
+              <AiOutlineFileExcel size={20} />
             </button>
             <button
               onClick={showModal}

@@ -116,41 +116,6 @@ export class RombelService {
           "Rombel dengan id tersebut tidak ditemukan"
         );
 
-      const studentByRombelId = await db.student.findAll({
-        where: { rombel_id: rombelExist.id },
-        attributes: ["id", "name"],
-      });
-
-      const deleteStudentAssessment = await db.assessment.destroy({
-        where: {
-          student_id: {
-            [Op.in]: studentByRombelId.map((student: any) => student.id),
-          },
-        },
-      });
-
-      const deleteStudentAttendances = await db.attendance.destroy({
-        where: {
-          student_id: {
-            [Op.in]: studentByRombelId.map((student: any) => student.id),
-          },
-        },
-      });
-
-      const deleteStudentOnEkskul = await db.studentOnEkskul.destroy({
-        where: {
-          student_id: {
-            [Op.in]: studentByRombelId.map((student: any) => student.id),
-          },
-        },
-      });
-
-      const deleteStudent = await db.student.destroy({
-        where: {
-          rombel_id: rombelExist.id,
-        },
-      });
-
       const deleteRombel = await db.rombel.destroy({
         where: { id: rombelExist.id },
       });

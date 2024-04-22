@@ -157,7 +157,7 @@ const TableJadwal = ({ setFormOld, setOpen, data, handleGetRequest }) => {
 
     try {
       const response = await axiosPrivate.delete(`/activity/${id}`);
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",

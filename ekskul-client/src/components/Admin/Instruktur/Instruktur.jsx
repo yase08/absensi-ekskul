@@ -163,12 +163,14 @@ const InstrukturComponent = () => {
             Absensi Instruktur
           </h1>
           <div className="flex gap-3">
-            <button
-              onClick={showModal}
-              className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
-            >
-              <IoAddSharp size={20} />
-            </button>
+            {auth.role === "instructor" && (
+              <button
+                onClick={showModal}
+                className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+              >
+                <IoAddSharp size={20} />
+              </button>
+            )}
             <button
               onClick={handleExportExcel}
               className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"

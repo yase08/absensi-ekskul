@@ -14,13 +14,16 @@ const AbsensiComponent = () => {
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
   const { ekskuls } = jwtDecode(auth.accessToken);
-  const ekskul_id = localStorage.getItem("ekskul_id");
+  // Get ekskul_id from sessionStorage
+  const ekskul_id = sessionStorage.getItem("ekskul_id");
+
+  // Function to handle input change and update sessionStorage
   const handleInputChange = (value) => {
-    if (localStorage.getItem("ekskul_id") !== null) {
-      localStorage.removeItem("ekskul_id");
-      localStorage.setItem("ekskul_id", value);
+    if (sessionStorage.getItem("ekskul_id") !== null) {
+      sessionStorage.removeItem("ekskul_id");
+      sessionStorage.setItem("ekskul_id", value);
     } else {
-      localStorage.setItem("ekskul_id", value);
+      sessionStorage.setItem("ekskul_id", value);
     }
   };
 
@@ -59,7 +62,7 @@ const AbsensiComponent = () => {
   };
 
   useEffect(() => {
-    const storedEkskulId = localStorage.getItem("ekskul_id");
+    const storedEkskulId = sessionStorage.getItem("ekskul_id");
     if (storedEkskulId) {
       setSelectedEkskul(storedEkskulId);
     }
@@ -73,35 +76,40 @@ const AbsensiComponent = () => {
             Absensi Siswa
           </h1>
           <div className="flex gap-3">
-            <Select
-              size="medium"
-              placeholder="Pilih kategori"
-              className=""
-              value={selectedEkskul}
-              onChange={(value) => {
-                setSelectedEkskul(value);
-                handleInputChange(value);
-              }}
-              options={
-                ekskuls
-                  ? ekskuls.map((item) => ({
-                      value: item.id,
-                      label: item.name,
-                    }))
-                  : []
-              }
-            />
+            {auth.role === "instructor" && (
+              <>
+                <Select
+                  size="medium"
+                  placeholder="Pilih kategori"
+                  className=""
+                  value={selectedEkskul}
+                  onChange={(value) => {
+                    setSelectedEkskul(value);
+                    handleInputChange(value);
+                  }}
+                  options={
+                    ekskuls
+                      ? ekskuls.map((item) => ({
+                          value: item.id,
+                          label: item.name,
+                        }))
+                      : []
+                  }
+                />
+                {selectedEkskul && (
+                  <button className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500">
+                    <Link to="/admin/absensi-siswa/tambah">
+                      <IoAddSharp size={20} />
+                    </Link>
+                  </button>
+                )}
+              </>
+            )}
             <button
               onClick={handleExportExcel}
               className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
             >
               <RiFileExcel2Line size={20} />
-            </button>
-            <button className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500">
-              <Link to="/admin/absensi-siswa/tambah">
-                {" "}
-                <IoAddSharp size={20} />
-              </Link>
             </button>
           </div>
         </div>

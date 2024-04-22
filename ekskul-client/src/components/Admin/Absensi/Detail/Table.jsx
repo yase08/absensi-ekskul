@@ -16,8 +16,8 @@ const TableAbsensi = () => {
     id: "",
     category: "",
     date: "",
-    student_id:"",
-    ekskul_id:""
+    student_id: "",
+    ekskul_id: "",
   });
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -30,7 +30,7 @@ const TableAbsensi = () => {
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  const ekskul = localStorage.getItem("ekskul_id");
+  const ekskul = sessionStorage.getItem("ekskul_id");
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -198,7 +198,6 @@ const TableAbsensi = () => {
         if (Array.isArray(response.data.data)) {
           const attendanceData = response.data.data;
           setData(attendanceData);
-          console.log(attendanceData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -222,7 +221,8 @@ const TableAbsensi = () => {
         formData
       );
       const successMessage = response.statusMessage;
-      handleGetRequest()
+      handleGetRequest();
+      setFormData({});
 
       Swal.fire({
         icon: "success",
@@ -308,7 +308,7 @@ const TableAbsensi = () => {
                 student_id: record.student.id,
                 category: record.category,
                 date: record.date,
-                ekskul_id: record.ekskul.id
+                ekskul_id: record.ekskul.id,
               });
             }}
           >
@@ -361,7 +361,9 @@ const TableAbsensi = () => {
           </label>
           <DatePicker
             name="date"
-            value={formData && formData.date ? dayjs(formData.date) : selectedDate}
+            value={
+              formData && formData.date ? dayjs(formData.date) : selectedDate
+            }
             onChange={(selectedDate, dateString) => {
               setSelectedDate(selectedDate);
               handleInputChange(dateString, "date");

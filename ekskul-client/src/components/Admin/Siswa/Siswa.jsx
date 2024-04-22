@@ -38,16 +38,6 @@ const SiswaComponent = () => {
   });
   const [formOld, setFormOld] = useState();
   const [loading, setLoading] = useState(false);
-  const ekskul_id = localStorage.getItem("ekskul_id");
-
-  const handleSelectChange = (value) => {
-    if (localStorage.getItem("ekskul_id") !== null) {
-      localStorage.removeItem("ekskul_id");
-      localStorage.setItem("ekskul_id", value);
-    } else {
-      localStorage.setItem("ekskul_id", value);
-    }
-  };
 
   const handleGetRequest = async () => {
     try {
@@ -192,7 +182,7 @@ const SiswaComponent = () => {
       }
     } catch (error) {
       if (error.response) {
-        const errorMessage = error.response.data.statusMessage;
+        const errorMessage = error.response.data.data;
         Swal.fire({
           icon: "error",
           title: "Error!",
@@ -230,37 +220,6 @@ const SiswaComponent = () => {
         ...prevData,
         [inputName]: newValue,
       }));
-    }
-  };
-
-  const handleExportExcel = async () => {
-    try {
-      const response = await axiosPrivate.get(
-        `/student/export?ekskul_id=${ekskul_id}`,
-        {
-          responseType: "blob", // Set the response type to 'blob'
-        }
-      );
-
-      if (response.data) {
-        const blob = new Blob([response.data], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-        const outputFileName = `data-siswa-${Date.now()}.xlsx`;
-
-        const url = window.URL.createObjectURL(blob);
-
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", outputFileName);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        console.error("Export failed: Empty response data");
-      }
-    } catch (error) {
-      console.error("Export failed:", error);
     }
   };
 
@@ -307,30 +266,6 @@ const SiswaComponent = () => {
             Siswa
           </h1>
           <div className="flex gap-3">
-            <Select
-              size="medium"
-              placeholder="Pilih kategori"
-              className=""
-              value={selectedEkskul}
-              onChange={(value) => {
-                setSelectedEkskul(value);
-                handleSelectChange(value);
-              }}
-              options={
-                ekskuls
-                  ? ekskuls.map((item) => ({
-                      value: item.id,
-                      label: item.name,
-                    }))
-                  : []
-              }
-            />
-            <button
-              onClick={handleExportExcel}
-              className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
-            >
-              <RiFileExcel2Line size={20} />
-            </button>
             <button
               onClick={handleAllExportExcel}
               className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
@@ -361,118 +296,134 @@ const SiswaComponent = () => {
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
       >
-        <form action="" className="flex flex-col p-5 gap-2">
-          <label htmlFor="" className="text-lg">
-            Nama
-          </label>
-          <Input
-            value={formOld ? formOld.name : formData.name}
-            type="text"
-            name="name"
-            rules={{ required: true, message: "Nama Siswa Harus Diisi!" }}
-            size="large"
-            placeholder="Masukan nama"
-            onChange={(e) => handleInputChange(e, "name")}
-          />
-          <label htmlFor="" className="text-lg">
-            Nis
-          </label>
-          <Input
-            value={formOld ? formOld.nis : formData.nis}
-            type="number"
-            name="nis"
-            rules={{ required: true, message: "Nis Siswa Harus Diisi!" }}
-            size="large"
-            placeholder="Masukan nis"
-            onChange={(e) => handleInputChange(e, "nis")}
-          />
-          <label htmlFor="" className="text-lg">
-            Email
-          </label>
-          <Input
-            value={formOld ? formOld.email : formData.email}
-            type="email"
-            name="email"
-            rules={{ required: true, message: "Email Siswa Harus Diisi!" }}
-            size="large"
-            placeholder="Masukan email"
-            onChange={(e) => handleInputChange(e, "email")}
-          />
-          <label htmlFor="" className="text-lg">
-            Nomer Telpon
-          </label>
-          <Input
-            value={formOld ? formOld.mobileNumber : formData.mobileNumber}
-            type="number"
-            rules={{
-              required: true,
-              message: "Nomer Telpon Siswa Harus Diisi!",
-            }}
-            name="mobileNumber"
-            size="large"
-            placeholder="Masukan nomer telpon"
-            onChange={(e) => handleInputChange(e, "mobileNumber")}
-          />
-          <label htmlFor="" className="text-lg">
-            Jenis Kelamin
-          </label>
-          <Select
-            size="large"
-            className="w-full"
-            rules={{ required: true, message: "Jenis Kelamin Harus Diisi!" }}
-            placeholder="Pilih Jenis Kelamin"
-            value={formOld ? formOld.gender : formData.gender}
-            onChange={(e) => handleInputChange(e, "gender")}
-            options={[
-              {
-                value: "female",
-                label: "Perempuan",
-              },
-              {
-                value: "male",
-                label: "Laki Laki",
-              },
-            ]}
-          />
-          <label htmlFor="" className="text-lg">
-            Rombel
-          </label>
-          <Select
-            size="large"
-            className="w-full"
-            value={formOld ? formOld.rombel_id : formData.rombel}
-            onChange={(e) => handleInputChange(e, "rombel_id")}
-            options={rombelOption}
-            placeholder="Pilih Rombel"
-          />
-          <label htmlFor="" className="text-lg">
-            Rayon
-          </label>
-          <Select
-            size="large"
-            rules={{ required: true, message: "Rayon Siswa Harus Diisi!" }}
-            className="w-full"
-            value={formOld ? formOld.rayon_id : formData.rayon}
-            onChange={(e) => handleInputChange(e, "rayon_id")}
-            options={rayonOption}
-            placeholder="Pilih Rayon"
-          />
-          <label htmlFor="" className="text-lg">
-            Eksktrakurikuler
-          </label>
-          <Select
-            size="large"
-            className="w-full"
-            mode="multiple"
-            rules={{
-              required: true,
-              message: "Ekstrakurikuler Siswa Harus Diisi!",
-            }}
-            placeholder="Pilih Ekstrakurikuler"
-            value={formOld ? formOld.ekskuls : formData.ekskuls}
-            onChange={(e) => handleInputChange(e, "ekskuls")}
-            options={ekskulOption}
-          />
+        <form action="" className="grid grid-cols-2 p-5 gap-2">
+          <div>
+            <label htmlFor="" className="text-lg">
+              Nama
+            </label>
+            <Input
+              value={formOld ? formOld.name : formData.name}
+              type="text"
+              name="name"
+              rules={{ required: true, message: "Nama Siswa Harus Diisi!" }}
+              size="large"
+              placeholder="Masukan nama"
+              onChange={(e) => handleInputChange(e, "name")}
+            />
+          </div>
+          <div>
+            <label htmlFor="" className="text-lg">
+              Nis
+            </label>
+            <Input
+              value={formOld ? formOld.nis : formData.nis}
+              type="number"
+              name="nis"
+              rules={{ required: true, message: "Nis Siswa Harus Diisi!" }}
+              size="large"
+              placeholder="Masukan nis"
+              onChange={(e) => handleInputChange(e, "nis")}
+            />
+          </div>
+          <div>
+            <label htmlFor="" className="text-lg">
+              Email
+            </label>
+            <Input
+              value={formOld ? formOld.email : formData.email}
+              type="email"
+              name="email"
+              rules={{ required: true, message: "Email Siswa Harus Diisi!" }}
+              size="large"
+              placeholder="Masukan email"
+              onChange={(e) => handleInputChange(e, "email")}
+            />
+          </div>
+          <div>
+            <label htmlFor="" className="text-lg">
+              Nomer Telpon
+            </label>
+            <Input
+              value={formOld ? formOld.mobileNumber : formData.mobileNumber}
+              type="number"
+              rules={{
+                required: true,
+                message: "Nomer Telpon Siswa Harus Diisi!",
+              }}
+              name="mobileNumber"
+              size="large"
+              placeholder="Masukan nomer telpon"
+              onChange={(e) => handleInputChange(e, "mobileNumber")}
+            />
+          </div>
+          <div>
+            <label htmlFor="" className="text-lg">
+              Jenis Kelamin
+            </label>
+            <Select
+              size="large"
+              className="w-full"
+              rules={{ required: true, message: "Jenis Kelamin Harus Diisi!" }}
+              placeholder="Pilih Jenis Kelamin"
+              value={formOld ? formOld.gender : formData.gender}
+              onChange={(e) => handleInputChange(e, "gender")}
+              options={[
+                {
+                  value: "female",
+                  label: "Perempuan",
+                },
+                {
+                  value: "male",
+                  label: "Laki Laki",
+                },
+              ]}
+            />
+          </div>
+          <div>
+            <label htmlFor="" className="text-lg">
+              Rombel
+            </label>
+            <Select
+              size="large"
+              className="w-full"
+              value={formOld ? formOld.rombel_id : formData.rombel}
+              onChange={(e) => handleInputChange(e, "rombel_id")}
+              options={rombelOption}
+              placeholder="Pilih Rombel"
+            />
+          </div>
+          <div>
+            <label htmlFor="" className="text-lg">
+              Rayon
+            </label>
+            <Select
+              size="large"
+              rules={{ required: true, message: "Rayon Siswa Harus Diisi!" }}
+              className="w-full"
+              value={formOld ? formOld.rayon_id : formData.rayon}
+              onChange={(e) => handleInputChange(e, "rayon_id")}
+              options={rayonOption}
+              placeholder="Pilih Rayon"
+            />
+          </div>
+          <div>
+            <label htmlFor="" className="text-lg">
+              Eksktrakurikuler
+            </label>
+            <Select
+              size="large"
+              className="w-full"
+              mode="multiple"
+              rules={{
+                required: true,
+                message: "Ekstrakurikuler Siswa Harus Diisi!",
+              }}
+              placeholder="Pilih Ekstrakurikuler"
+              value={formOld ? formOld.ekskuls : formData.ekskuls}
+              onChange={(e) => handleInputChange(e, "ekskuls")}
+              options={ekskulOption}
+            />
+          </div>
         </form>
       </Modal>
     </div>

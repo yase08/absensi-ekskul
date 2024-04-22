@@ -25,6 +25,7 @@ module.exports = {
           model: "ekskuls",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       createdAt: {
         allowNull: false,

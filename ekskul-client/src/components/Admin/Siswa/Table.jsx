@@ -147,8 +147,8 @@ const TableSiswa = ({ setFormOld, setOpen, handleGetRequest, data }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/student`, id);
-      const successMessage = response.statusMessage;
+      const response = await axiosPrivate.delete(`/student/${id}`);
+      const successMessage = response.data.statusMessage;
       handleGetRequest();
 
       Swal.fire({

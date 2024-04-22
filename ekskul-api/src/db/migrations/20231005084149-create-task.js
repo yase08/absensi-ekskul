@@ -23,7 +23,8 @@ module.exports = {
         references: {
           model: 'ekskuls',
           key: 'id'
-        }
+        },
+        onDelete: "CASCADE",
       },
       author_id: {
         type: Sequelize.UUID,
@@ -31,7 +32,8 @@ module.exports = {
         references: {
           model: 'users',
           key: 'id'
-        }
+        },
+        onDelete: "CASCADE",
       },
       createdAt: {
         allowNull: false,

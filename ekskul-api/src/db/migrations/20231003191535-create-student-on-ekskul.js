@@ -17,6 +17,7 @@ module.exports = {
           model: "students",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       ekskul_id: {
         type: Sequelize.UUID,
@@ -25,6 +26,7 @@ module.exports = {
           model: "ekskuls",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       createdAt: {
         allowNull: false,

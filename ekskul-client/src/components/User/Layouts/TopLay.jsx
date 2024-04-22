@@ -74,14 +74,14 @@ const TopLay = () => {
                 home
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 to="/gallery"
                 className="hover:text-blue-500 transition duration-300 ease-in-out"
               >
                 gallery
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>

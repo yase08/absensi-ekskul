@@ -19,7 +19,7 @@ const Dashboard = () => {
       <Jumbotron/>
       <List/>
       <Teacher/>
-      <JumbotronAgain/>
+      {/* <JumbotronAgain/>= */}
       <Comment/>
       <Footer/>
     </div>

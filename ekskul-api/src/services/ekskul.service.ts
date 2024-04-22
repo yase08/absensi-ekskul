@@ -116,30 +116,6 @@ export class EkskulService {
           "Ekskul dengan id tersebut tidak ditemukan"
         );
 
-      const deleteEkskulGallery = await db.gallery.destroy({
-        where: {
-          ekskul_id: ekskulExist.id,
-        },
-      });
-
-      const deleteEkskulTask = await db.task.destroy({
-        where: {
-          ekskul_id: ekskulExist.id,
-        },
-      });
-
-      const deleteUserOnEkskul = await db.userOnEkskul.destroy({
-        where: {
-          ekskul_id: ekskulExist.id,
-        },
-      });
-
-      const deleteInstructorAttendance = await db.instructorAttendance.destroy({
-        where: {
-          ekskul_id: ekskulExist.id,
-        },
-      });
-
       const deleteEkskul = await db.ekskul.destroy({
         where: { id: ekskulExist.id },
       });

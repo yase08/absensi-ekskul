@@ -16,6 +16,7 @@ module.exports = {
           model: "tasks",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       student_id: {
         type: Sequelize.UUID,
@@ -24,6 +25,7 @@ module.exports = {
           model: "students",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       date: {
         type: Sequelize.DATE,

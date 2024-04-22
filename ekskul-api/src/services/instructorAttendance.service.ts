@@ -1,7 +1,6 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request, Response } from "express";
-import { Op } from "sequelize";
 import { ISession } from "../interfaces/user.interface";
 import { exportExcel } from "../libs/excel.lib";
 
@@ -52,9 +51,16 @@ export class InstructorAttendanceService {
   }
 
   async getAllInstructorAttendanceService(req: Request): Promise<any> {
-    const ekskulIds = (req.session as ISession).user.ekskul;
+    const userId = (req.session as ISession).user.id;
+    const role = (req.session as ISession).user.role;
     try {
       const paramQuerySQL: any = {};
+
+      if (role === "instructor") {
+        paramQuerySQL.where = {
+          instructor_id: userId,
+        };
+      }
 
       paramQuerySQL.include = [
         {
@@ -100,7 +106,7 @@ export class InstructorAttendanceService {
         apiResponse(
           status.OK,
           "Berhasil mendapatkan absensi instruktur",
-          manipulatedResponse,
+          manipulatedResponse
         )
       );
     } catch (error: any) {
@@ -188,58 +194,64 @@ export class InstructorAttendanceService {
       // });
 
       // if (ekskuls.includes(selectedEkskulId)) {
-        const attendances = await db.instructorAttendance.findAll({
-          // where: {
-          //   ekskul_id: selectedEkskulId,
-          // },
-          include: [
-            {
-              model: db.user,
-              as: "user",
-              attributes: ["name"],
-            },
-            {
-              model: db.ekskul,
-              as: "ekskul",
-              attributes: ["name"],
-            },
-          ],
-          attributes: ["category", "date"],
-        });
+      const attendances = await db.instructorAttendance.findAll({
+        // where: {
+        //   ekskul_id: selectedEkskulId,
+        // },
+        include: [
+          {
+            model: db.user,
+            as: "user",
+            attributes: ["name"],
+          },
+          {
+            model: db.ekskul,
+            as: "ekskul",
+            attributes: ["name"],
+          },
+        ],
+        attributes: ["category", "date"],
+      });
 
-        const modifiedAttendances = attendances.map((attendance) => {
-          return {
-            no: attendances.indexOf(attendance) + 1,
-            user_name: attendance.user ? attendance.user.name : null,
-            ekskul_name: attendance.ekskul ? attendance.ekskul.name : null,
-            category: attendance.category,
-            date: attendance.date,
-          };
-        });
+      const modifiedAttendances = attendances.map((attendance) => {
+        return {
+          no: attendances.indexOf(attendance) + 1,
+          user_name: attendance.user ? attendance.user.name : null,
+          ekskul_name: attendance.ekskul ? attendance.ekskul.name : null,
+          category: attendance.category,
+          date: attendance.date,
+        };
+      });
 
-        const columns = [
-          { header: "No", key: "no", width: 15 },
-          { header: "Nama", key: "user_name", width: 15 },
-          { header: "Ekstrakurikuler", key: "ekskul_name", width: 15 },
-          { header: "Keterangan", key: "category", width: 15 },
-          { header: "Tanggal", key: "date", width: 15 },
-        ];
-        const file = `data-absensi-instruktur-${date}.xlsx`;
+      const columns = [
+        { header: "No", key: "no", width: 15 },
+        { header: "Nama", key: "user_name", width: 15 },
+        { header: "Ekstrakurikuler", key: "ekskul_name", width: 15 },
+        { header: "Keterangan", key: "category", width: 15 },
+        { header: "Tanggal", key: "date", width: 15 },
+      ];
+      const file = `data-absensi-instruktur-${date}.xlsx`;
 
-        const exportSuccess = await exportExcel(
-          columns,
-          modifiedAttendances,
-          file,
-          res
-        );
+      const exportSuccess = await exportExcel(
+        file,
+        columns,
+        modifiedAttendances,
+        "Absensi Instruktur",
+        res
+      );
 
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader("Content-Disposition", `attachment; filename=${file}`);
 
-        if (!exportSuccess) {
-          throw apiResponse(status.FORBIDDEN, "Export failed");
-        }
-        return Promise.resolve(apiResponse(status.OK, "Export Success", exportSuccess));
+      if (!exportSuccess) {
+        throw apiResponse(status.FORBIDDEN, "Export failed");
+      }
+      return Promise.resolve(
+        apiResponse(status.OK, "Export Success", exportSuccess)
+      );
       // } else {
       //   throw apiResponse(
       //     status.NOT_FOUND,

@@ -9,7 +9,7 @@ import { BsCalendar3, BsRobot } from "react-icons/bs";
 import { FaBarsProgress } from "react-icons/fa6";
 import { PiStudentFill, PiDoorOpen } from "react-icons/pi";
 // import {MdGamepad, MdManageAccounts} from 'react-icons/md'
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { BsJoystick } from "react-icons/bs";
 import { IoDiamondSharp } from "react-icons/io5";
@@ -18,6 +18,7 @@ import { GrTask } from "react-icons/gr";
 import { FaRegUser } from "react-icons/fa";
 import { MdCoPresent, MdOutlineAssessment } from "react-icons/md";
 import Button from "../../../components/Admin/Layouts/Button";
+import useAuth from "../../../hooks/useAuth";
 // import ColorSettingForm from './ColorSettingForm'
 
 // eslint-disable-next-line react/prop-types
@@ -29,6 +30,7 @@ const SideNav = ({
 }) => {
   const location = useLocation();
   const currentPath = location.pathname;
+  const { auth } = useAuth();
 
   const [dataDropdownVisible, setDataDropdownVisible] = useState(false);
   const [hoverdataDropdownVisible, setHoverDataDropdownVisible] =
@@ -122,6 +124,7 @@ const SideNav = ({
       setInfoHome2Navbar(false);
     }
   };
+
   const [infoHome3Navbar, setInfoHome3Navbar] = useState(false);
 
   const handleNavbarHomeMouseEnter3 = () => {
@@ -200,6 +203,71 @@ const SideNav = ({
       setInfoHome8Navbar(false);
     }
   };
+  const [infoHome9Navbar, setInfoHome9Navbar] = useState(false);
+
+  const handleNavbarHomeMouseEnter9 = () => {
+    if (expanded) {
+      setInfoHome9Navbar(true);
+    }
+  };
+
+  const handleNavbarHomeMouseLeave9 = () => {
+    if (expanded) {
+      setInfoHome9Navbar(false);
+    }
+  };
+  const [infoHome10Navbar, setInfoHome10Navbar] = useState(false);
+
+  const handleNavbarHomeMouseEnter10 = () => {
+    if (expanded) {
+      setInfoHome10Navbar(true);
+    }
+  };
+
+  const handleNavbarHomeMouseLeave10 = () => {
+    if (expanded) {
+      setInfoHome10Navbar(false);
+    }
+  };
+  const [infoHome11Navbar, setInfoHome11Navbar] = useState(false);
+
+  const handleNavbarHomeMouseEnter11 = () => {
+    if (expanded) {
+      setInfoHome11Navbar(true);
+    }
+  };
+
+  const handleNavbarHomeMouseLeave11 = () => {
+    if (expanded) {
+      setInfoHome11Navbar(false);
+    }
+  };
+  const [infoHome12Navbar, setInfoHome12Navbar] = useState(false);
+
+  const handleNavbarHomeMouseEnter12 = () => {
+    if (expanded) {
+      setInfoHome12Navbar(true);
+    }
+  };
+
+  const handleNavbarHomeMouseLeave12 = () => {
+    if (expanded) {
+      setInfoHome12Navbar(false);
+    }
+  };
+  const [infoHome13Navbar, setInfoHome13Navbar] = useState(false);
+
+  const handleNavbarHomeMouseEnter13 = () => {
+    if (expanded) {
+      setInfoHome13Navbar(true);
+    }
+  };
+
+  const handleNavbarHomeMouseLeave13 = () => {
+    if (expanded) {
+      setInfoHome13Navbar(false);
+    }
+  };
 
   return (
     <div>
@@ -223,14 +291,14 @@ const SideNav = ({
         </div>
       )}
       <nav
-        className={`bg-white max-lg:border-r h-[100vh] z-50 transition-all duration-[700ms] fixed  ${
+        className={`bg-white max-lg:border-r h-[100vh] z-50 transition-all duration-[700ms] fixed   ${
           expanded
             ? "max-lg:w-[320px] lg:w-[65px] "
-            : "max-lg:w-0 overflow-y-scroll hidden-scroll lg:w-[320px]"
+            : "max-lg:w-0 overflow-y-scroll hidden-scroll  lg:w-[320px]"
         }`}
       >
         <Button toggleExpansion={toggleExpansion} expanded={expanded} />
-        <div className="max-lg:overflow-hidden">
+        <div className="max-lg:overflow-hidden ">
           <ul className="w-full bg-transparent flex justify-center items-center h-[72px]">
             <button
               onClick={toggleExpansion}
@@ -267,8 +335,8 @@ const SideNav = ({
                     : "w-full h-[55px] flex justify-center px-4"
                 }`}
               >
-                <a
-                  href="/admin/dashboard"
+                <Link
+                  to="/admin/dashboard"
                   onMouseEnter={handleNavbarHomeMouseEnter}
                   onMouseLeave={handleNavbarHomeMouseLeave}
                   className={`flex gap-x-[24.5px] items-center before:absolute  ${
@@ -294,17 +362,17 @@ const SideNav = ({
                     }`}
                   />
                   <p
-                    href=""
+                    to=""
                     className={`opacity-60 text-sm ${
                       expanded ? "lg:hidden" : ""
                     } transition-opacity`}
                   >
                     Home
                   </p>
-                </a>
+                </Link>
                 {infoHomeNavbar && (
                   <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] ${
+                    className={`absolute w-auto  h-full bg-transparent  text-white flex items-center left-[75px] ${
                       expanded ? "max-lg:hidden" : "hidden"
                     }`}
                   >
@@ -331,99 +399,105 @@ const SideNav = ({
             >
               Users
             </p>
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
+            {auth.role === "admin" && (
               <div
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
+                className={`flex flex-col gap-y-[13px] relative   ${
+                  expanded
+                    ? ""
+                    : "w-full h-[55px] mt-[15px] flex justify-center"
+                }`}
               >
-                <button
-                  onClick={toggleDataDropdown}
-                  className={`relative flex items-center justify-between   ${
-                    currentPath === "/admin/rayon" ||
-                    currentPath === "/admin/rayon/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[50px] "
-                  } ${
-                    currentPath === "/admin/rombel" ||
-                    currentPath === "/admin/rombel/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[50px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
+                <div
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                  className={`bg-transparent w-full ${
+                    expanded ? "lg:px-1" : ""
                   }`}
                 >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <SiGoogleclassroom
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Tingkatan
-                    </p>
-                  </div>
-                  <div className={`${expanded ? "lg:hidden" : ""}`}>
-                    <HiOutlineChevronDown className="text-md opacity-60" />
-                  </div>
-                </button>
-              </div>
-              <div
-                onMouseEnter={handleDropdownMouseEnterData}
-                onMouseLeave={handleDropdownMouseLeaveData}
-                className={`absolute top-0 bg-transparent left-[65px] pl-[10px] ${
-                  expanded ? "" : "hidden"
-                } ${hoverdataDropdownVisible ? "max-lg:hidden" : ""}`}
-              >
-                {hoverdataDropdownVisible && (
-                  <div className=" bg-white text-black w-[200px] rounded-md h-auto py-[20px]">
-                    <p className="opacity-60 text-sm  font-bold pb-5 border-b-[1px] border-black border-opacity-30 px-[20px]">
-                      Tingkatan
-                    </p>
-                    <a
-                      href="/admin/rombel"
-                      className={`py-[15px] flex gap-x-[24.5px] hover:text-primary items-center px-[20px] before:absolute `}
-                    >
+                  <button
+                    onClick={toggleDataDropdown}
+                    className={`relative flex items-center justify-between   ${
+                      currentPath === "/admin/rayon" ||
+                      currentPath === "/admin/rayon/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[50px] "
+                    } ${
+                      currentPath === "/admin/rombel" ||
+                      currentPath === "/admin/rombel/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[50px] "
+                    } ${
+                      expanded
+                        ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
+                        : "justify-between lg:px-9"
+                    }`}
+                  >
+                    <div className="flex gap-x-[24.5px] items-center ">
+                      <SiGoogleclassroom
+                        className={`opacity-100 ${
+                          expanded
+                            ? currentPath === "/data"
+                              ? "text-2xl opacity-100 text-white"
+                              : "text-2xl opacity-60 text-black"
+                            : "opacity-60"
+                        }`}
+                      />
                       <p
-                        href=""
-                        className={`opacity-60 text-sm transition-opacity`}
+                        className={`opacity-60 text-sm ${
+                          expanded ? "lg:hidden" : ""
+                        } transition-opacity`}
                       >
-                        Rombel{" "}
+                        Tingkatan
                       </p>
-                    </a>
-                    <a
-                      href="/admin/rayon"
-                      className={`flex gap-x-[24.5px] items-center hover:text-primary px-[20px] before:absolute py-[15px] `}
-                    >
-                      <p
-                        href=""
-                        className={`opacity-60 text-sm transition-opacity`}
+                    </div>
+                    <div className={`${expanded ? "lg:hidden" : ""}`}>
+                      <HiOutlineChevronDown className="text-md opacity-60" />
+                    </div>
+                  </button>
+                </div>
+                <div
+                  onMouseEnter={handleDropdownMouseEnterData}
+                  onMouseLeave={handleDropdownMouseLeaveData}
+                  className={`absolute top-0 bg-transparent left-[65px] pl-[10px] ${
+                    expanded ? "" : "hidden"
+                  } ${hoverdataDropdownVisible ? "max-lg:hidden" : ""}`}
+                >
+                  {hoverdataDropdownVisible && (
+                    <div className=" bg-white text-black w-[200px] rounded-md h-auto py-[20px]">
+                      <p className="opacity-60 text-sm  font-bold pb-5 border-b-[1px] border-black border-opacity-30 px-[20px]">
+                        Tingkatan
+                      </p>
+                      <Link
+                        to="/admin/rombel"
+                        className={`py-[15px] flex gap-x-[24.5px] hover:text-primary items-center px-[20px] before:absolute `}
                       >
-                        Rayon
-                      </p>
-                    </a>
-                  </div>
-                )}
+                        <p
+                          to=""
+                          className={`opacity-60 text-sm transition-opacity`}
+                        >
+                          Rombel{" "}
+                        </p>
+                      </Link>
+                      <Link
+                        to="/admin/rayon"
+                        className={`flex gap-x-[24.5px] items-center hover:text-primary px-[20px] before:absolute py-[15px] `}
+                      >
+                        <p
+                          to=""
+                          className={`opacity-60 text-sm transition-opacity`}
+                        >
+                          Rayon
+                        </p>
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
             <div
               className={`${expanded ? "lg:hidden" : ""} ${
                 hoverdataDropdownVisible ? "" : ""
@@ -436,8 +510,8 @@ const SideNav = ({
                   className={`text-black mx-[45px] bg-transparent border-l-[1px] border-opacity-60 border-black before:w-20 before:h-20 before:bg-black   `}
                 >
                   <div className={`flex flex-col bg-transparent `}>
-                    <a
-                      href="/admin/rombel"
+                    <Link
+                      to="/admin/rombel"
                       className={` py-[15px] flex gap-x-[24.5px] items-center before:absolute ${
                         expanded
                           ? "items-center justify-center max-lg:justify-start max-lg:pl-[35px] animate-fade-in-out"
@@ -446,16 +520,16 @@ const SideNav = ({
                     >
                       <IoDiamondSharp className={`opacity-60 `} />
                       <p
-                        href=""
+                        to=""
                         className={`opacity-60 text-sm ${
                           expanded ? "" : ""
                         } transition-opacity`}
                       >
                         Rombel
                       </p>
-                    </a>
-                    <a
-                      href="/admin/rayon"
+                    </Link>
+                    <Link
+                      to="/admin/rayon"
                       className={`flex gap-x-[24.5px] items-center before:absolute py-[15px] ${
                         expanded
                           ? "items-center justify-center max-lg:justify-start max-lg:pl-[35px] animate-fade-in-out"
@@ -464,84 +538,90 @@ const SideNav = ({
                     >
                       <BsJoystick className={`opacity-60`} />
                       <p
-                        href=""
+                        to=""
                         className={`opacity-60 text-sm ${
                           expanded ? "" : ""
                         } transition-opacity`}
                       >
                         Rayon
                       </p>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}
             </div>
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
+            {auth.role === "admin" && (
               <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
+                className={`flex flex-col gap-y-[13px] relative   ${
+                  expanded
+                    ? ""
+                    : "w-full h-[55px] mt-[15px] flex justify-center"
+                }`}
               >
-                <a
-                  href="/admin/ekstrakurikuler"
-                  onMouseEnter={handleNavbarHomeMouseEnter2}
-                  onMouseLeave={handleNavbarHomeMouseLeave2}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/ekstrakurikuler" ||
-                    currentPath === "/admin/ekstrakurikuler/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/ekstrakurikuler" ||
-                    currentPath === "/admin/ekstrakurikuler/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
+                <div
+                  className={`bg-transparent w-full ${
+                    expanded ? "lg:px-1" : ""
                   }`}
                 >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <GiBasketballBall
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Esktrakulikuler
-                    </p>
-                  </div>
-                </a>
-                {infoHome2Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
+                  <Link
+                    to="/admin/ekstrakurikuler"
+                    onMouseEnter={handleNavbarHomeMouseEnter3}
+                    onMouseLeave={handleNavbarHomeMouseLeave3}
+                    className={`relative flex items-center    ${
+                      currentPath === "/admin/ekstrakurikuler" ||
+                      currentPath === "/admin/ekstrakurikuler/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      currentPath === "/admin/ekstrakurikuler" ||
+                      currentPath === "/admin/ekstrakurikuler/"
+                        ? expanded
+                          ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
+                          : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      expanded
+                        ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
+                        : "justify-between lg:px-9"
                     }`}
                   >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
-                        Esktrakulikuler{" "}
+                    <div className="flex gap-x-[24.5px] items-center ">
+                      <GiBasketballBall
+                        className={`opacity-100 ${
+                          expanded
+                            ? currentPath === "/data"
+                              ? "text-2xl opacity-100 text-white"
+                              : "text-2xl opacity-60 text-black"
+                            : "opacity-60"
+                        }`}
+                      />
+                      <p
+                        className={`opacity-60 text-sm ${
+                          expanded ? "lg:hidden" : ""
+                        } transition-opacity`}
+                      >
+                        Esktrakulikuler
                       </p>
                     </div>
-                  </div>
-                )}
+                  </Link>
+                  {infoHome3Navbar && (
+                    <div
+                      className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
+                        expanded ? "max-lg:hidden" : "hidden"
+                      }`}
+                    >
+                      <div className="bg-black py-[4px] px-[5px] rounded-sm ">
+                        <p className="font-semibold font-poppins text-sm z-50">
+                          Esktrakulikuler{" "}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
             <div
               className={`flex flex-col gap-y-[13px] relative   ${
                 expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
@@ -550,10 +630,10 @@ const SideNav = ({
               <div
                 className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
               >
-                <a
-                  href="/admin/absensi-siswa"
-                  onMouseEnter={handleNavbarHomeMouseEnter2}
-                  onMouseLeave={handleNavbarHomeMouseLeave2}
+                <Link
+                  to="/admin/absensi-siswa"
+                  onMouseEnter={handleNavbarHomeMouseEnter4}
+                  onMouseLeave={handleNavbarHomeMouseLeave4}
                   className={`relative flex items-center    ${
                     currentPath === "/admin/absensi-siswa" ||
                     currentPath === "/admin/absensi-siswa/"
@@ -592,8 +672,8 @@ const SideNav = ({
                       Absensi Siswa
                     </p>
                   </div>
-                </a>
-                {infoHome2Navbar && (
+                </Link>
+                {infoHome4Navbar && (
                   <div
                     className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
                       expanded ? "max-lg:hidden" : "hidden"
@@ -608,461 +688,440 @@ const SideNav = ({
                 )}
               </div>
             </div>
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
+            {auth.role === "instructor" && (
               <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
+                className={`flex flex-col gap-y-[13px] relative   ${
+                  expanded
+                    ? ""
+                    : "w-full h-[55px] mt-[15px] flex justify-center"
+                }`}
               >
-                <a
-                  href="/admin/penugasan"
-                  onMouseEnter={handleNavbarHomeMouseEnter2}
-                  onMouseLeave={handleNavbarHomeMouseLeave2}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/penugasan" ||
-                    currentPath === "/admin/penugasan/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/penugasan" ||
-                    currentPath === "/admin/penugasan/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
+                <div
+                  className={`bg-transparent w-full ${
+                    expanded ? "lg:px-1" : ""
                   }`}
                 >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <GrTask
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Penugasan
-                    </p>
-                  </div>
-                </a>
-                {infoHome2Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
+                  <Link
+                    to="/admin/penugasan"
+                    onMouseEnter={handleNavbarHomeMouseEnter5}
+                    onMouseLeave={handleNavbarHomeMouseLeave5}
+                    className={`relative flex items-center    ${
+                      currentPath === "/admin/penugasan" ||
+                      currentPath === "/admin/penugasan/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] max-lg:before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      currentPath === "/admin/penugasan" ||
+                      currentPath === "/admin/penugasan/"
+                        ? expanded
+                          ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
+                          : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      expanded
+                        ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
+                        : "justify-between lg:px-9"
                     }`}
                   >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
-                        Penilaian{" "}
+                    <div className="flex gap-x-[24.5px] items-center ">
+                      <GrTask
+                        className={`opacity-100 ${
+                          expanded
+                            ? currentPath === "/data"
+                              ? "text-2xl opacity-100 text-white"
+                              : "text-2xl opacity-60 text-black"
+                            : "opacity-60"
+                        }`}
+                      />
+                      <p
+                        className={`opacity-60 text-sm ${
+                          expanded ? "lg:hidden" : ""
+                        } transition-opacity`}
+                      >
+                        Penugasan
                       </p>
                     </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            {/* <div className={`flex flex-col gap-y-[13px] relative   ${expanded?'':'w-full h-[55px] mt-[15px] flex justify-center'}`}>
-                <div                            
-                    onMouseEnter={handleMouseEnterManage}
-                    onMouseLeave={handleMouseLeaveManage}
-                    className={`bg-transparent w-full ${expanded ? 'px-1':''}`}>
-                <button
-                    onClick={toggleManagementDropdown}
-                    className={`relative flex items-center   ${currentPath === '/admin/manage/usermanagement' ? (expanded ? 'lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute' : ' before:w-[4px] before:h-5 before:bg-primary before:left-0 before:absolute ') : 'w-full h-[60px] '} ${currentPath === '/admin/manage/adminmanagement' ? (expanded ? 'w-full h-[50px] bg-primary rounded-md' : 'before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute ') : 'w-full h-[60px] '} ${expanded ? 'items-center lg:justify-center animate-fade-in-out' : 'justify-between lg:px-9'}`}
+                  </Link>
+                  {infoHome5Navbar && (
+                    <div
+                      className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
+                        expanded ? "max-lg:hidden" : "hidden"
+                      }`}
                     >
-                        <div className='flex gap-x-[24.5px] items-center '>
-                       <MdManageAccounts className={`opacity-100 ${expanded ? (currentPath === '/data' ? 'text-2xl opacity-100 text-white' : 'text-2xl opacity-60 text-black') : 'opacity-60'}`}/>
-                        <p  className={`opacity-60 text-sm ${expanded ? 'lg:hidden' : ''} transition-opacity`}>Manage</p>
-                        </div>
-                        <div className={`${expanded?'hidden':''}`}>
-                            <HiOutlineChevronDown className='text-md opacity-60'/>
-                        </div>
-                    </button>
+                      <div className="bg-black py-[4px] px-[5px] rounded-sm ">
+                        <p className="font-semibold font-poppins text-sm z-50">
+                          Penilaian{" "}
+                        </p>
+                      </div>
                     </div>
-                    <div 
-                        onMouseEnter={handleDropdownMouseEnter}
-                        onMouseLeave={handleDropdownMouseLeave}
-                        className={`absolute top-0 bg-transparent left-[65px] pl-[10px] ${expanded ? '':'hidden'}`}>
-                        {hovermanageDropdownVisible && (
-                            <div className=' bg-white text-black w-[200px] rounded-md h-auto py-[20px]'>
-                                <p className='opacity-60 text-sm  font-bold pb-5 border-b-[1px] border-black border-opacity-30 px-[20px]'>Manage</p>
-                                <a href='/admin/manage/usermanagement' className={`py-[15px] flex gap-x-[24.5px] hover:text-primary items-center px-[20px] before:absolute `}>
-                                    <p href="" className={`opacity-60 text-sm transition-opacity`}>Admin Management </p>
-                                </a>
-                                <a href='/admin/manage/adminmanagement' className={`flex gap-x-[24.5px] items-center hover:text-primary px-[20px] before:absolute py-[15px] `}>
-                                    <p href="" className={`opacity-60 text-sm transition-opacity`}>User Management</p>
-                                </a>
-                            </div>
-                            )}
-                   </div>
+                  )}
                 </div>
-                <div className={`${expanded ? 'lg:hidden':''} ${hoverdataDropdownVisible ? '':''} `}>
-                     {managementDropdownVisible && (
-                        <div
-                        onMouseEnter={handleDropdownMouseEnter}
-                        onMouseLeave={handleDropdownMouseLeave}
-                         className={`text-black mx-[45px] bg-transparent border-l-[1px] border-opacity-60 border-black before:w-20 before:h-20 before:bg-black   `}>
-                             <div className={`flex flex-col bg-transparent `}>
-                                <a href='/admin/game/top-up' className={` py-[15px] flex gap-x-[24.5px] items-center before:absolute ${expanded ? 'items-center justify-center animate-fade-in-out' : 'px-[30px]'}`}>
-                                    <IoDiamondSharp className={`opacity-60 `}/>
-                                    <p href="" className={`opacity-60 text-sm ${expanded ? 'hidden' : ''} transition-opacity`}>Top Up</p>
-                                </a>
-                                <a href='/admin/game/joki' className={`flex gap-x-[24.5px] items-center before:absolute py-[15px] ${expanded ? 'items-center justify-center animate-fade-in-out' : 'px-[30px]'}`}>
-                                    <BsJoystick className={`opacity-60`}/>
-                                    <p href="" className={`opacity-60 text-sm ${expanded ? 'hidden' : ''} transition-opacity`}>Joki</p>
-                                </a>
-                            </div>
-                        </div>
-                    )}
-                </div> */}
-
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
+              </div>
+            )}
+            {auth.role === "admin" && (
               <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
+                className={`flex flex-col gap-y-[13px] relative   ${
+                  expanded
+                    ? ""
+                    : "w-full h-[55px] mt-[15px] flex justify-center"
+                }`}
               >
-                <a
-                  href="/admin/jadwal"
-                  onMouseEnter={handleNavbarHomeMouseEnter3}
-                  onMouseLeave={handleNavbarHomeMouseLeave3}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/jadwal" ||
-                    currentPath === "/admin/jadwal/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/jadwal" ||
-                    currentPath === "/admin/jadwal/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
+                <div
+                  className={`bg-transparent w-full ${
+                    expanded ? "lg:px-1" : ""
                   }`}
                 >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <BsCalendar3
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Jadwal
-                    </p>
-                  </div>
-                </a>
-                {infoHome3Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
+                  <Link
+                    to="/admin/jadwal"
+                    onMouseEnter={handleNavbarHomeMouseEnter6}
+                    onMouseLeave={handleNavbarHomeMouseLeave6}
+                    className={`relative flex items-center    ${
+                      currentPath === "/admin/jadwal" ||
+                      currentPath === "/admin/jadwal/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      currentPath === "/admin/jadwal" ||
+                      currentPath === "/admin/jadwal/"
+                        ? expanded
+                          ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
+                          : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      expanded
+                        ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
+                        : "justify-between lg:px-9"
                     }`}
                   >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
-                        Jadwal{" "}
+                    <div className="flex gap-x-[24.5px] items-center ">
+                      <BsCalendar3
+                        className={`opacity-100 ${
+                          expanded
+                            ? currentPath === "/data"
+                              ? "text-2xl opacity-100 text-white"
+                              : "text-2xl opacity-60 text-black"
+                            : "opacity-60"
+                        }`}
+                      />
+                      <p
+                        className={`opacity-60 text-sm ${
+                          expanded ? "lg:hidden" : ""
+                        } transition-opacity`}
+                      >
+                        Jadwal
                       </p>
                     </div>
-                  </div>
-                )}
+                  </Link>
+                  {infoHome6Navbar && (
+                    <div
+                      className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
+                        expanded ? "max-lg:hidden" : "hidden"
+                      }`}
+                    >
+                      <div className="bg-black py-[4px] px-[5px] rounded-sm ">
+                        <p className="font-semibold font-poppins text-sm z-50">
+                          Jadwal{" "}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
+            )}
+            {auth.role === "admin" && (
               <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
+                className={`flex flex-col gap-y-[13px] relative   ${
+                  expanded
+                    ? ""
+                    : "w-full h-[55px] mt-[15px] flex justify-center"
+                }`}
               >
-                <a
-                  href="/admin/hari"
-                  onMouseEnter={handleNavbarHomeMouseEnter3}
-                  onMouseLeave={handleNavbarHomeMouseLeave3}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/hari" ||
-                    currentPath === "/admin/hari/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/hari" ||
-                    currentPath === "/admin/hari/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
+                <div
+                  className={`bg-transparent w-full ${
+                    expanded ? "lg:px-1" : ""
                   }`}
                 >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <WiDayCloudy
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Hari
-                    </p>
-                  </div>
-                </a>
-                {infoHome3Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
+                  <Link
+                    to="/admin/hari"
+                    onMouseEnter={handleNavbarHomeMouseEnter7}
+                    onMouseLeave={handleNavbarHomeMouseLeave7}
+                    className={`relative flex items-center    ${
+                      currentPath === "/admin/hari" ||
+                      currentPath === "/admin/hari/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      currentPath === "/admin/hari" ||
+                      currentPath === "/admin/hari/"
+                        ? expanded
+                          ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
+                          : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      expanded
+                        ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
+                        : "justify-between lg:px-9"
                     }`}
                   >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
-                        Hari{" "}
+                    <div className="flex gap-x-[24.5px] items-center ">
+                      <WiDayCloudy
+                        className={`opacity-100 ${
+                          expanded
+                            ? currentPath === "/data"
+                              ? "text-2xl opacity-100 text-white"
+                              : "text-2xl opacity-60 text-black"
+                            : "opacity-60"
+                        }`}
+                      />
+                      <p
+                        className={`opacity-60 text-sm ${
+                          expanded ? "lg:hidden" : ""
+                        } transition-opacity`}
+                      >
+                        Hari
                       </p>
                     </div>
-                  </div>
-                )}
+                  </Link>
+                  {infoHome7Navbar && (
+                    <div
+                      className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
+                        expanded ? "max-lg:hidden" : "hidden"
+                      }`}
+                    >
+                      <div className="bg-black py-[4px] px-[5px] rounded-sm ">
+                        <p className="font-semibold font-poppins text-sm z-50">
+                          Hari{" "}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
+            )}
+            {auth.role === "instructor" && (
               <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
+                className={`flex flex-col gap-y-[13px] relative   ${
+                  expanded
+                    ? ""
+                    : "w-full h-[55px] mt-[15px] flex justify-center"
+                }`}
               >
-                <a
-                  href="/admin/program"
-                  onMouseEnter={handleNavbarHomeMouseEnter4}
-                  onMouseLeave={handleNavbarHomeMouseLeave4}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/program" ||
-                    currentPath === "/admin/program/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/program" ||
-                    currentPath === "/admin/program/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
+                <div
+                  className={`bg-transparent w-full ${
+                    expanded ? "lg:px-1" : ""
                   }`}
                 >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <FaBarsProgress
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Program
-                    </p>
-                  </div>
-                </a>
-                {infoHome4Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
+                  <Link
+                    to="/admin/program"
+                    onMouseEnter={handleNavbarHomeMouseEnter8}
+                    onMouseLeave={handleNavbarHomeMouseLeave8}
+                    className={`relative flex items-center    ${
+                      currentPath === "/admin/program" ||
+                      currentPath === "/admin/program/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      currentPath === "/admin/program" ||
+                      currentPath === "/admin/program/"
+                        ? expanded
+                          ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
+                          : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      expanded
+                        ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
+                        : "justify-between lg:px-9"
                     }`}
                   >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
-                        Program{" "}
+                    <div className="flex gap-x-[24.5px] items-center ">
+                      <FaBarsProgress
+                        className={`opacity-100 ${
+                          expanded
+                            ? currentPath === "/data"
+                              ? "text-2xl opacity-100 text-white"
+                              : "text-2xl opacity-60 text-black"
+                            : "opacity-60"
+                        }`}
+                      />
+                      <p
+                        className={`opacity-60 text-sm ${
+                          expanded ? "lg:hidden" : ""
+                        } transition-opacity`}
+                      >
+                        Program
                       </p>
                     </div>
-                  </div>
-                )}
+                  </Link>
+                  {infoHome8Navbar && (
+                    <div
+                      className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
+                        expanded ? "max-lg:hidden" : "hidden"
+                      }`}
+                    >
+                      <div className="bg-black py-[4px] px-[5px] rounded-sm ">
+                        <p className="font-semibold font-poppins text-sm z-50">
+                          Program{" "}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
+            {auth.role === "admin" && (
               <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
+                className={`flex flex-col gap-y-[13px] relative   ${
+                  expanded
+                    ? ""
+                    : "w-full h-[55px] mt-[15px] flex justify-center"
+                }`}
               >
-                <a
-                  href="/admin/siswa"
-                  onMouseEnter={handleNavbarHomeMouseEnter5}
-                  onMouseLeave={handleNavbarHomeMouseLeave5}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/siswa" ||
-                    currentPath === "/admin/siswa/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/siswa" ||
-                    currentPath === "/admin/siswa/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
+                <div
+                  className={`bg-transparent w-full ${
+                    expanded ? "lg:px-1" : ""
                   }`}
                 >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <PiStudentFill
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Siswa
-                    </p>
-                  </div>
-                </a>
-                {infoHome5Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
+                  <Link
+                    to="/admin/siswa"
+                    onMouseEnter={handleNavbarHomeMouseEnter9}
+                    onMouseLeave={handleNavbarHomeMouseLeave9}
+                    className={`relative flex items-center    ${
+                      currentPath === "/admin/siswa" ||
+                      currentPath === "/admin/siswa/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      currentPath === "/admin/siswa" ||
+                      currentPath === "/admin/siswa/"
+                        ? expanded
+                          ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
+                          : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      expanded
+                        ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
+                        : "justify-between lg:px-9"
                     }`}
                   >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
-                        Siswa{" "}
+                    <div className="flex gap-x-[24.5px] items-center ">
+                      <PiStudentFill
+                        className={`opacity-100 ${
+                          expanded
+                            ? currentPath === "/data"
+                              ? "text-2xl opacity-100 text-white"
+                              : "text-2xl opacity-60 text-black"
+                            : "opacity-60"
+                        }`}
+                      />
+                      <p
+                        className={`opacity-60 text-sm ${
+                          expanded ? "lg:hidden" : ""
+                        } transition-opacity`}
+                      >
+                        Siswa
                       </p>
                     </div>
-                  </div>
-                )}
+                  </Link>
+                  {infoHome9Navbar && (
+                    <div
+                      className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
+                        expanded ? "max-lg:hidden" : "hidden"
+                      }`}
+                    >
+                      <div className="bg-black py-[4px] px-[5px] rounded-sm ">
+                        <p className="font-semibold font-poppins text-sm z-50">
+                          Siswa{" "}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
+            {auth.role === "admin" && (
               <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
+                className={`flex flex-col gap-y-[13px] relative   ${
+                  expanded
+                    ? ""
+                    : "w-full h-[55px] mt-[15px] flex justify-center"
+                }`}
               >
-                <a
-                  href="/admin/gallery"
-                  onMouseEnter={handleNavbarHomeMouseEnter6}
-                  onMouseLeave={handleNavbarHomeMouseLeave6}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/gallery" ||
-                    currentPath === "/admin/gallery/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/gallery" ||
-                    currentPath === "/admin/gallery/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
+                <div
+                  className={`bg-transparent w-full ${
+                    expanded ? "lg:px-1" : ""
                   }`}
                 >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <BiPhotoAlbum
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Galeri
-                    </p>
-                  </div>
-                </a>
-                {infoHome6Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
+                  <Link
+                    to="/admin/ruangan"
+                    onMouseEnter={handleNavbarHomeMouseEnter11}
+                    onMouseLeave={handleNavbarHomeMouseLeave11}
+                    className={`relative flex items-center    ${
+                      currentPath === "/admin/ruangan" ||
+                      currentPath === "/admin/ruangan/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      currentPath === "/admin/ruangan" ||
+                      currentPath === "/admin/ruangan/"
+                        ? expanded
+                          ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
+                          : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      expanded
+                        ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
+                        : "justify-between lg:px-9"
                     }`}
                   >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
-                        Gallery{" "}
+                    <div className="flex gap-x-[24.5px] items-center ">
+                      <PiDoorOpen
+                        className={`opacity-100 ${
+                          expanded
+                            ? currentPath === "/data"
+                              ? "text-2xl opacity-100 text-white"
+                              : "text-2xl opacity-60 text-black"
+                            : "opacity-60"
+                        }`}
+                      />
+                      <p
+                        className={`opacity-60 text-sm ${
+                          expanded ? "lg:hidden" : ""
+                        } transition-opacity`}
+                      >
+                        Ruangan
                       </p>
                     </div>
-                  </div>
-                )}
+                  </Link>
+                  {infoHome11Navbar && (
+                    <div
+                      className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
+                        expanded ? "max-lg:hidden" : "hidden"
+                      }`}
+                    >
+                      <div className="bg-black py-[4px] px-[5px] rounded-sm ">
+                        <p className="font-semibold font-poppins text-sm z-50">
+                          Ruangan{" "}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             <div
               className={`flex flex-col gap-y-[13px] relative   ${
@@ -1072,77 +1131,10 @@ const SideNav = ({
               <div
                 className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
               >
-                <a
-                  href="/admin/ruangan"
-                  onMouseEnter={handleNavbarHomeMouseEnter7}
-                  onMouseLeave={handleNavbarHomeMouseLeave7}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/ruangan" ||
-                    currentPath === "/admin/ruangan/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/ruangan" ||
-                    currentPath === "/admin/ruangan/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
-                  }`}
-                >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <PiDoorOpen
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Ruangan
-                    </p>
-                  </div>
-                </a>
-                {infoHome7Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
-                    }`}
-                  >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
-                        Ruangan{" "}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
-              <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
-              >
-                <a
-                  href="/admin/absensi-instruktur"
-                  onMouseEnter={handleNavbarHomeMouseEnter8}
-                  onMouseLeave={handleNavbarHomeMouseLeave8}
+                <Link
+                  to="/admin/absensi-instruktur"
+                  onMouseEnter={handleNavbarHomeMouseEnter12}
+                  onMouseLeave={handleNavbarHomeMouseLeave12}
                   className={`relative flex items-center    ${
                     currentPath === "/admin/absensi-instruktur" ||
                     currentPath === "/admin/absensi-instruktur/"
@@ -1181,8 +1173,8 @@ const SideNav = ({
                       Absensi Instruktur
                     </p>
                   </div>
-                </a>
-                {infoHome8Navbar && (
+                </Link>
+                {infoHome12Navbar && (
                   <div
                     className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
                       expanded ? "max-lg:hidden" : "hidden"
@@ -1197,73 +1189,78 @@ const SideNav = ({
                 )}
               </div>
             </div>
-
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
+            {auth.role === "admin" && (
               <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
+                className={`flex flex-col gap-y-[13px] relative   ${
+                  expanded
+                    ? ""
+                    : "w-full h-[55px] mt-[15px] flex justify-center"
+                }`}
               >
-                <a
-                  href="/admin/user"
-                  onMouseEnter={handleNavbarHomeMouseEnter8}
-                  onMouseLeave={handleNavbarHomeMouseLeave8}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/user" ||
-                    currentPath === "/admin/user/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/user" ||
-                    currentPath === "/admin/user/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
+                <div
+                  className={`bg-transparent w-full ${
+                    expanded ? "lg:px-1" : ""
                   }`}
                 >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <FaRegUser
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      User
-                    </p>
-                  </div>
-                </a>
-                {infoHome8Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
+                  <Link
+                    to="/admin/user"
+                    onMouseEnter={handleNavbarHomeMouseEnter13}
+                    onMouseLeave={handleNavbarHomeMouseLeave13}
+                    className={`relative flex items-center    ${
+                      currentPath === "/admin/user" ||
+                      currentPath === "/admin/user/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      currentPath === "/admin/user" ||
+                      currentPath === "/admin/user/"
+                        ? expanded
+                          ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
+                          : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      expanded
+                        ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
+                        : "justify-between lg:px-9"
                     }`}
                   >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
+                    <div className="flex gap-x-[24.5px] items-center ">
+                      <FaRegUser
+                        className={`opacity-100 ${
+                          expanded
+                            ? currentPath === "/data"
+                              ? "text-2xl opacity-100 text-white"
+                              : "text-2xl opacity-60 text-black"
+                            : "opacity-60"
+                        }`}
+                      />
+                      <p
+                        className={`opacity-60 text-sm ${
+                          expanded ? "lg:hidden" : ""
+                        } transition-opacity`}
+                      >
                         User
-                      </p>  
+                      </p>
                     </div>
-                  </div>
-                )}
+                  </Link>
+                  {infoHome13Navbar && (
+                    <div
+                      className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
+                        expanded ? "max-lg:hidden" : "hidden"
+                      }`}
+                    >
+                      <div className="bg-black py-[4px] px-[5px] rounded-sm ">
+                        <p className="font-semibold font-poppins text-sm z-50">
+                          User
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </ul>
         </div>
       </nav>

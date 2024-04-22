@@ -113,39 +113,6 @@ export class RayonService {
           "Rayon dengan id tersebut tidak ditemukan"
         );
 
-        const studentByRayonId = await db.student.findAll({
-          where: { rayon_id: rayonExist.id },
-          attributes: ["id", "name"],
-        });
-
-        const deleteStudentAssessment = await db.assessment.destroy({
-          where: {
-            student_id: {
-              [Op.in]: studentByRayonId.map((student: any) => student.id),
-            },
-          },
-        });
-  
-        const deleteStudentAttendances = await db.attendance.destroy({
-          where: {
-            student_id: {
-              [Op.in]: studentByRayonId.map((student: any) => student.id),
-            },
-          },
-        });
-  
-        const deleteStudentOnEkskul = await db.studentOnEkskul.destroy({
-          where: {
-            student_id: {
-              [Op.in]: studentByRayonId.map((student: any) => student.id),
-            },
-          },
-        });
-
-      const deleteStudent = await db.student.destroy({
-        where: { rayon_id: rayonExist.id },
-      });
-
       const deleteRayon = await db.rayon.destroy({
         where: { id: rayonExist.id },
       });

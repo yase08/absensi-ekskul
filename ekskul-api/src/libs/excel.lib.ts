@@ -106,12 +106,6 @@ export const exportExcel = async (
       },
     });
 
-    const titleRow = worksheet.addRow(['bilek']);
-    titleRow.font = { bold: true };
-    titleRow.alignment = { vertical: "middle", horizontal: "center" };
-    titleRow.height = 50;
-    worksheet.mergeCells(`A1:${String.fromCharCode(65 + columns.length - 1)}1`);
-
     const customHeaderRow = worksheet.addRow(
       columns.map((column) => column.header)
     );
@@ -154,4 +148,3 @@ export const exportExcel = async (
     }
   });
 };
-

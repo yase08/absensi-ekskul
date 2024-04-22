@@ -102,7 +102,7 @@ const Login = () => {
         >
           <div className=" w-full bg-transparent h-full flex items-center flex-col justify-center">
             <div
-              className={`flex items-center gap-3 text-white mb-5 absolute top-[20px] bg-transparent justify-center ${
+              className={`hidden items-center gap-3 text-white mb-5 absolute top-[20px] bg-transparent justify-center ${
                 changeMethod ? "hidden" : "left-[20px] "
               }`}
             >
@@ -200,7 +200,7 @@ const Login = () => {
         </div>
       </div>
       <div
-        className={`bg-transparent h-full text-white duration-[380ms] ${
+        className={`bg-transparent h-full text-white duration-[380ms] max-lg:hidden ${
           changeMethod ? "w-[800px] " : "w-[100%]  custom-background "
         }`}
       >

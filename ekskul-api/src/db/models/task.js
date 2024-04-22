@@ -9,11 +9,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.ekskul, {
-        foreignKey: "ekskul_id",
-      });
-      this.belongsTo(models.user, {
-        foreignKey: "author_id",
+      // this.belongsTo(models.ekskul, {
+      //   foreignKey: "ekskul_id",
+      // });
+      // this.belongsTo(models.user, {
+      //   foreignKey: "author_id",
+      // });
+      this.hasMany(models.assessment, {
+        foreignKey: "task_id",
+        as: "assessments",
+        onDelete: "CASCADE",
       });
     }
   }

@@ -35,7 +35,7 @@ const AbsensiPostComponent = () => {
           />
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table date={dateString} />
+          <Table date={dateString} selectedDate={selectedDate} />
         </div>
       </div>
     </div>

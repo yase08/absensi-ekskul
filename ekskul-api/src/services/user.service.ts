@@ -33,7 +33,7 @@ export class UserService {
 
       const ekskuls = await db.ekskul.findAll({
         where: { id: req.body.ekskuls },
-      });
+      }); 
 
       const createUser = await db.user.create({
         ...req.body,

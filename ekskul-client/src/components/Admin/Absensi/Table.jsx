@@ -17,7 +17,7 @@ const TableAbsensi = ({ selectedEkskul }) => {
   const axiosPrivate = useAxiosPrivate();
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
 
-  const ekskul = localStorage.getItem("ekskul_id");
+  const ekskul = sessionStorage.getItem("ekskul_id");
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();

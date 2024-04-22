@@ -353,11 +353,7 @@ export class StudentService {
             : null,
           student_rombel: student ? student.rombel.name : null,
           student_rayon: student ? student.rayon.name : null,
-          student_ekskul: student.ekskuls
-            ? student.ekskuls.map((ekskul) => {
-                ekskul.name;
-              })
-            : null,
+          student_ekskul: student.ekskuls.map((ekskul) => ekskul.name).join(', '),
         };
       });
 
@@ -365,7 +361,7 @@ export class StudentService {
         { header: "No", key: "no", width: 15 },
         { header: "Nama", key: "student_name", width: 15 },
         { header: "Nis", key: "student_nis", width: 15 },
-        { header: "JK", key: "student_gender", width: 15 },
+        { header: "Jenis Kelamin", key: "student_gender", width: 15 },
         { header: "Rombel", key: "student_rombel", width: 15 },
         { header: "Rayon", key: "student_rayon", width: 15 },
         { header: "Ekstrakurikuler", key: "student_ekskul", width: 15 },
@@ -389,118 +385,10 @@ export class StudentService {
       if (!exportSuccess) {
         throw apiResponse(status.FORBIDDEN, "Export failed");
       }
+
       return Promise.resolve(
-        apiResponse(status.OK, "Export Success", exportExcel)
+        apiResponse(status.OK, `Export Success`, exportExcel)
       );
-      // } else {
-      //   throw apiResponse(
-      //     status.NOT_FOUND,
-      //     "Ekskul does not exist for the given id"
-      //   );
-      // }
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-  }
-
-  async exportStudentService(req: Request, res: Response): Promise<any> {
-    try {
-      const date = Date.now();
-      const options = { timeZone: "Asia/Jakarta" };
-      const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
-      const formattedDate = dateTimeFormat.format(date);
-
-      const ekskuls = (req.session as ISession).user.ekskul;
-      const selectedEkskulId = req.query.ekskul_id as string;
-      const ekskul = await db.ekskul.findOne({
-        where: { id: selectedEkskulId },
-      });
-
-      if (ekskuls.includes(selectedEkskulId)) {
-        const students = await db.student.findAll({
-          include: [
-            {
-              model: db.rombel,
-              as: "rombel",
-              attributes: ["name"],
-            },
-            {
-              model: db.rayon,
-              as: "rayon",
-              attributes: ["name"],
-            },
-            {
-              model: db.ekskul,
-              through: "studentOnEkskuls",
-              where: {
-                id: selectedEkskulId,
-              },
-              attributes: ["name"],
-            },
-          ],
-          attributes: ["name", "nis", "gender"],
-        });
-
-        const modifiedStudents = students.map((student) => {
-          return {
-            no: students.indexOf(student) + 1,
-            student_name: student ? student.name : null,
-            student_nis: student ? student.nis : null,
-            student_gender: student
-              ? student.gender === "male"
-                ? "Laki-laki"
-                : "Perempuan"
-              : null,
-            student_rombel: student ? student.rombel.name : null,
-            student_rayon: student ? student.rayon.name : null,
-            student_ekskul: student.ekskuls.length > 0
-            ? student.ekskuls.map((ekskul) => ekskul.name).join(', ')
-            : "-"};
-        });
-
-        const columns = [
-          { header: "No", key: "no", width: 15 },
-          { header: "Nama", key: "student_name", width: 15 },
-          { header: "Nis", key: "student_nis", width: 15 },
-          { header: "JK", key: "student_gender", width: 15 },
-          { header: "Rombel", key: "student_rombel", width: 15 },
-          { header: "Rayon", key: "student_rayon", width: 15 },
-          { header: "Ekstrakurikuler", key: "student_ekskul", width: 15 },
-        ];
-        const file = `data-siswa-${date}.xlsx`;
-
-        const exportSuccess = await exportExcel(
-          file,
-          columns,
-          modifiedStudents,
-          "Siswa",
-          res
-        );
-
-        res.setHeader(
-          "Content-Type",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        );
-        res.setHeader("Content-Disposition", `attachment; filename=${file}`);
-
-        if (!exportSuccess) {
-          throw apiResponse(status.FORBIDDEN, "Export failed");
-        }
-        return Promise.resolve(
-          apiResponse(status.OK, "Export Success", exportSuccess)
-        );
-      } else {
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Ekskul does not exist for the given id"
-        );
-      }
     } catch (error: any) {
       return Promise.reject(
         apiResponse(

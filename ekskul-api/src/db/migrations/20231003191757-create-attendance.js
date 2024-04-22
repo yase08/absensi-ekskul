@@ -15,6 +15,7 @@ module.exports = {
           model: "ekskuls",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       student_id: {
         type: Sequelize.UUID,
@@ -22,6 +23,7 @@ module.exports = {
           model: "students",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       category: {
         type: Sequelize.ENUM("hadir", "sakit", "izin", "alpa"),

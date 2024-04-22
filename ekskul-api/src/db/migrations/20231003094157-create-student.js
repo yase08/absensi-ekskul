@@ -37,6 +37,7 @@ module.exports = {
           model: "rombels",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       rayon_id: {
         type: Sequelize.UUID,
@@ -44,6 +45,7 @@ module.exports = {
           model: "rayons",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       createdAt: {
         allowNull: false,

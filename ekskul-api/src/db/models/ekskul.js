@@ -11,10 +11,42 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.student, {
         through: "studentOnEkskuls",
         foreignKey: "ekskul_id",
+        onDelete: "CASCADE",
       });
       this.belongsToMany(models.user, {
         through: "userOnEkskuls",
         foreignKey: "ekskul_id",
+        onDelete: "CASCADE",
+      });
+      this.hasMany(models.activity, {
+        foreignKey: "ekskul_id",
+        as: "activities",
+        onDelete: "CASCADE",
+      });
+      this.hasMany(models.attendance, {
+        foreignKey: "ekskul_id",
+        as: "attendances",
+        onDelete: "CASCADE",
+      });
+      this.hasMany(models.task, {
+        foreignKey: "ekskul_id",
+        as: "tasks",
+        onDelete: "CASCADE",
+      });
+      this.hasMany(models.instructorAttendance, {
+        foreignKey: "ekskul_id",
+        as: "instructorAttendances",
+        onDelete: "CASCADE",
+      });
+      this.hasMany(models.gallery, {
+        foreignKey: "ekskul_id",
+        as: "galleries",
+        onDelete: "CASCADE",
+      });
+      this.hasMany(models.historyAttendance, {
+        foreignKey: "ekskul_id",
+        as: "historyAttendances",
+        onDelete: "CASCADE",
       });
     }
   }

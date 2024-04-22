@@ -6,7 +6,6 @@ import { authorization } from "../middlewares/authorization";
 import { validator } from "../middlewares/validator.middleware";
 import {
   DTOInstructorAttendance,
-  DTOInstructorAttendanceById,
 } from "../dto/instructorAttendance.dto";
 
 // class RouteUsers mengextends dari InstructorAttendanceController agar bisa memakai semua property dan method dari instructorAttendance controller
@@ -24,7 +23,7 @@ class InstructorAttendanceRoutes extends InstructorAttendanceController {
       [
         authorization(),
         auth(),
-        permission(["instructor", "admin"]),
+        permission(["instructor"]),
         validator(DTOInstructorAttendance),
       ],
       this.createInstructorAttendance

@@ -15,6 +15,7 @@ module.exports = {
           model: "schedules",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       grade: {
         type: Sequelize.ENUM("X", "XI", "XII"),
@@ -26,6 +27,7 @@ module.exports = {
           model: "rooms",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       ekskul_id: {
         type: Sequelize.UUID,
@@ -33,6 +35,7 @@ module.exports = {
           model: "ekskuls",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       startTime: {
         type: Sequelize.TIME,
