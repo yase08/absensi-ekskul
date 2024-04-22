@@ -29,7 +29,7 @@ const GalleryComponent = () => {
   const [formOld, setFormOld] = useState({});
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedDate, setSelectedDate] = useState()
+  const [selectedDate, setSelectedDate] = useState();
   const axiosPrivate = useAxiosPrivate();
 
   const handleFileChange = ({ fileList }) => {
@@ -115,14 +115,15 @@ const GalleryComponent = () => {
 
     try {
       const formDataWithFile = new FormData();
+      console.log(formData, formOld);
 
-      Object.entries(formData).forEach(([key, value]) => {
+      Object.entries(formOld).forEach(([key, value]) => {
         formDataWithFile.append(key, value);
       });
 
       if (fileList.length > 0) {
         fileList.forEach((file, index) => {
-          formDataWithFile.append("images", file.originFileObj); // Use "images" as the field name
+          formDataWithFile.append("images", file.originFileObj);
         });
       }
 
@@ -144,7 +145,7 @@ const GalleryComponent = () => {
       const successMessage = response.data.statusMessage;
 
       message.success(successMessage);
-      handleGetRequest()
+      handleGetRequest();
       setFormOld({});
     } catch (error) {
       console.error("Error:", error);
@@ -211,7 +212,7 @@ const GalleryComponent = () => {
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
       >
-        <form action="" className="flex flex-col p-5 gap-2">
+        <form className="flex flex-col p-5 gap-2">
           <label htmlFor="" className="text-lg">
             Nama
           </label>
@@ -219,8 +220,8 @@ const GalleryComponent = () => {
             placeholder={"Masukan Nama Galeri"}
             size="large"
             name="name"
-            onChange={(value) => handleInputChange(value, "name")}
-            value={formOld && formOld.name ? formOld.name : formData.name}
+            onChange={(e) => handleInputChange(e, "name")}
+            value={formOld ? formOld.name : formData.name}
           />
           <label htmlFor="" className="text-lg">
             Upload Gambar
@@ -240,8 +241,8 @@ const GalleryComponent = () => {
             className="w-full"
             size="large"
             placeholder="Pilih Ekstrakurikuler"
-            value={formOld && formOld.ekskul_id ? formOld.ekskul_id : formData.ekskul_id} 
-            onChange={(value) => handleInputChange(value, "ekskul_id")} 
+            onChange={(e) => handleInputChange(e, "ekskul_id")}
+            value={formOld ? formOld.ekskul_id : formData.ekskul_id}
             options={ekskulOption}
           />
           <label htmlFor="" className="text-lg">
@@ -255,7 +256,7 @@ const GalleryComponent = () => {
               setSelectedDate(selectedDate);
               handleInputChange(dateString, "date");
             }}
-            value={formOld && formOld.date ? dayjs(formOld.date) : selectedDate}
+            value={formOld ? dayjs(formOld.date) : selectedDate}
           />
         </form>
       </Modal>

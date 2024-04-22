@@ -221,6 +221,7 @@ const SiswaComponent = () => {
         [inputName]: newValue,
       }));
     }
+    console.log(formData)
   };
 
   const handleAllExportExcel = async () => {
