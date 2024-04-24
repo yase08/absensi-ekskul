@@ -196,8 +196,8 @@ export class AssessmentService {
             {
               model: db.student,
               as: "student",
-              attributes: ["name","nis","gender"],
-              include : [
+              attributes: ["name", "nis", "gender"],
+              include: [
                 {
                   model: db.rombel,
                   as: "rombel",
@@ -208,7 +208,7 @@ export class AssessmentService {
                   as: "rayon",
                   attributes: ["name"],
                 },
-              ]
+              ],
             },
             {
               model: db.task,
@@ -220,7 +220,7 @@ export class AssessmentService {
               as: "ekskul",
               attributes: ["name"],
             },
-            ],
+          ],
           attributes: ["grade", "date"],
         });
 
@@ -244,7 +244,6 @@ export class AssessmentService {
             task_name: assessment.task ? assessment.task.name : null,
             grade: assessment.grade ? assessment.grade : null,
             date: assessment.date ? assessment.date : null,
-
           };
         });
 
@@ -263,19 +262,25 @@ export class AssessmentService {
         const file = `data-penilaian-${ekskul.name}-${date}.xlsx`;
 
         const exportSuccess = await exportExcel(
+          file,
           columns,
           modifiedassessments,
-          file,
+          "Penilaian",
           res
         );
 
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', `attachment; filename=${file}`);
-        
+        res.setHeader(
+          "Content-Type",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader("Content-Disposition", `attachment; filename=${file}`);
+
         if (!exportSuccess) {
           throw apiResponse(status.FORBIDDEN, "Export failed");
         }
-        return Promise.resolve(apiResponse(status.OK, "Export Success", exportSuccess));
+        return Promise.resolve(
+          apiResponse(status.OK, "Export Success", exportSuccess)
+        );
       } else {
         throw apiResponse(
           status.NOT_FOUND,

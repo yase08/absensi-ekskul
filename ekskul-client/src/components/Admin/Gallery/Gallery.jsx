@@ -249,14 +249,14 @@ const GalleryComponent = () => {
             Tanggal
           </label>
           <DatePicker
-            placeholder={"Pilih Tanggal"}
             size="large"
+            format="DD-MM-YYYY"
+            placeholder="Masukan tanggal"
             name="date"
-            onChange={(selectedDate, dateString) => {
-              setSelectedDate(selectedDate);
-              handleInputChange(dateString, "date");
-            }}
-            value={formOld ? dayjs(formOld.date) : selectedDate}
+            value={
+              formOld && formOld.date ? dayjs(formOld.date) : formData.date
+            }
+            onChange={(e) => handleInputChange(e, "date")}
           />
         </form>
       </Modal>

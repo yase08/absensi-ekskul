@@ -221,7 +221,7 @@ const SiswaComponent = () => {
         [inputName]: newValue,
       }));
     }
-    console.log(formData)
+    console.log(formData);
   };
 
   const handleAllExportExcel = async () => {
@@ -423,6 +423,32 @@ const SiswaComponent = () => {
               value={formOld ? formOld.ekskuls : formData.ekskuls}
               onChange={(e) => handleInputChange(e, "ekskuls")}
               options={ekskulOption}
+            />
+          </div>
+          <div>
+            <label htmlFor="" className="text-lg">
+              Kelas
+            </label>
+            <Select
+              size="large"
+              className="w-full"
+              value={formOld ? formOld.grade : formData.grade}
+              onChange={(e) => handleInputChange(e, "grade")}
+              options={[
+                {
+                  label: "X",
+                  value: "X",
+                },
+                {
+                  label: "XI",
+                  value: "XI",
+                },
+                {
+                  label: "XII",
+                  value: "XII",
+                },
+              ]}
+              placeholder="Pilih Kelas"
             />
           </div>
         </form>

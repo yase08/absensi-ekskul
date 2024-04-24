@@ -28,9 +28,25 @@ export class AttendanceController extends AttendanceService {
     }
   };
 
+  exportToExcelByInstructor = async (
+    req: Request,
+    res: Response
+  ): Promise<any> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.exportAttendanceByInstructorService(req, res);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
   exportToExcel = async (req: Request, res: Response): Promise<any> => {
     try {
-      const serviceResponse: APIResponse = await this.exportAttendance(req, res);
+      const serviceResponse: APIResponse = await this.exportAttendanceService(
+        req,
+        res
+      );
       return res.status(serviceResponse.statusCode).json(serviceResponse);
     } catch (error: any) {
       return res.status(error.statusCode).json(error);

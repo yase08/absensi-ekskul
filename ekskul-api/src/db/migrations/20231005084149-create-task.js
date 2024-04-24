@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('tasks', {
+    await queryInterface.createTable("tasks", {
       id: {
         allowNull: false,
         primaryKey: true,
@@ -17,12 +17,16 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
       },
+      grade: {
+        type: Sequelize.ENUM("X", "XI", "XII"),
+        allowNull: false,
+      },
       ekskul_id: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'ekskuls',
-          key: 'id'
+          model: "ekskuls",
+          key: "id",
         },
         onDelete: "CASCADE",
       },
@@ -30,22 +34,22 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'users',
-          key: 'id'
+          model: "users",
+          key: "id",
         },
         onDelete: "CASCADE",
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('tasks');
-  }
+    await queryInterface.dropTable("tasks");
+  },
 };

@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import foto from "../../../assets/wk2.jpeg";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
 const List = () => {
   const day = new Date().getDay();
   const axiosPrivate = useAxiosPrivate();
   const [schedule, setSchedule] = useState([]);
-  const [senin, setSenin] = useState({});
 
   const handleFetch = async () => {
     try {
@@ -79,7 +77,7 @@ const List = () => {
                   .find((schedule) => schedule.day === "Senin")
                   ?.activities.map((activity, index) => (
                     <div
-                      className="h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative"
+                      className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
                       key={index}
                     >
                       <p className="absolute text-[14px] bg-yellow-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]">
@@ -107,7 +105,7 @@ const List = () => {
                   .find((schedule) => schedule.day === "Selasa")
                   ?.activities.map((activity, index) => (
                     <div
-                      className="h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative"
+                      className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
                       key={index}
                     >
                       <p className="absolute text-[14px] bg-yellow-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]">
@@ -135,7 +133,7 @@ const List = () => {
                   .find((schedule) => schedule.day === "Rabu")
                   ?.activities.map((activity, index) => (
                     <div
-                      className="h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative"
+                      className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
                       key={index}
                     >
                       <p className="absolute text-[14px] bg-yellow-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]">
@@ -163,7 +161,7 @@ const List = () => {
                   .find((schedule) => schedule.day === "Kamis")
                   ?.activities.map((activity, index) => (
                     <div
-                      className="h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative"
+                      className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
                       key={index}
                     >
                       <p className="absolute text-[14px] bg-yellow-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]">
@@ -191,7 +189,7 @@ const List = () => {
                   .find((schedule) => schedule.day === "Jumat")
                   ?.activities.map((activity, index) => (
                     <div
-                      className="h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative"
+                      className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
                       key={index}
                     >
                       <p className="absolute text-[14px] bg-yellow-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]">
@@ -219,7 +217,7 @@ const List = () => {
                   .find((schedule) => schedule.day === "Sabtu")
                   ?.activities.map((activity, index) => (
                     <div
-                      className="h-[210px] rounded-md overflow-hidden bg-black flex items-end justify-end  flex-col image-cerita-1 relative"
+                      className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
                       key={index}
                     >
                       <p className="absolute text-[14px] bg-yellow-500 rounded-md text-white top-[5px] left-[5px] w-[25px] flex items-center justify-center  h-[25px]">

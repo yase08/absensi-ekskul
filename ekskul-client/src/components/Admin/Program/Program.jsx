@@ -28,7 +28,6 @@ const Program = () => {
   const [date, setDate] = useState([]);
   const { auth } = useAuth();
 
-
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
     if (formOld) {
@@ -67,7 +66,6 @@ const Program = () => {
   const selectedDate = (date, dateString) => {
     setDate(date);
     handleInputChange(dateString, "date");
-    console.log(date);
   };
 
   const showModal = () => {
@@ -190,6 +188,40 @@ const Program = () => {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      const response = await axiosPrivate.get(
+        `/activity-program/export`,
+        {
+          responseType: "blob", // Set the response type to 'blob'
+        }
+      );
+
+      if (response.data) {
+        const blob = new Blob([response.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        const outputFileName = `data-aktivitas-${Date.now()}.xlsx`;
+
+        // Create an object URL from the Blob
+        const url = window.URL.createObjectURL(blob);
+
+        // Create an anchor element and trigger the download
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", outputFileName);
+        document.body.appendChild(link);
+        link.click();
+
+        fs.writeFileSync(outputFileName, response.data);
+      } else {
+        console.error("Export failed: Empty response data");
+      }
+    } catch (error) {
+      console.error("Export failed:", error);
+    }
+  };
+
   useEffect(() => {
     if (formOld && !date.length) {
       const dayjsStartDate = dayjs(formOld.startDate);
@@ -211,42 +243,30 @@ const Program = () => {
             Program
           </h1>
           <div className="flex gap-3">
-            {/* <Select
-              size="medium"
-              placeholder="Pilih kategori"
-              className=""
-              value={selectedEkskul}
-              onChange={(value) => {
-                setSelectedEkskul(value);
-                handleSelectChange(value);
-              }}
-              options={
-                ekskuls
-                  ? ekskuls.map((item) => ({
-                      value: item.id,
-                      label: item.name,
-                    }))
-                  : []
-              }
-            /> */}
-            {/* <button
-              onClick={handleExportExcel}
-              className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
-            >
-              <RiFileExcel2Line size={20} />
-            </button> */}
-            <button
-              onClick={handleExportAllExcel}
-              className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
-            >
-              <AiOutlineFileExcel size={20} />
-            </button>
-            <button
-              onClick={showModal}
-              className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
-            >
-              <IoAddSharp size={20} />
-            </button>
+            {auth.role === "instructor" && (
+              <button
+                onClick={showModal}
+                className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+              >
+                <IoAddSharp size={20} />
+              </button>
+            )}
+            {auth.role === "admin" && (
+              <button
+                onClick={handleExportAllExcel}
+                className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+              >
+                <AiOutlineFileExcel size={20} />
+              </button>
+            )}
+            {auth.role === "instructor" && (
+              <button
+                onClick={handleExportExcel}
+                className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+              >
+                <RiFileExcel2Line size={20} />
+              </button>
+            )}
           </div>
         </div>
         <div className="w-full bg-white mt-3 mb-5">

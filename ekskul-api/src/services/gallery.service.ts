@@ -124,7 +124,7 @@ export class GalleryService {
 
   async getGalleryDetailService(req: Request): Promise<any> {
     try {
-      const galleries = await db.gallery.findAll({
+      const gallery = await db.gallery.findOne({
         where: { slug: req.params.slug },
         include: [
           {
@@ -135,24 +135,22 @@ export class GalleryService {
         ],
       });
 
-      const manipulatedGallery = galleries.map((item) => {
-        return {
-          id: item.id,
-          name: item.name,
-          slug: item.slug,
-          ekskul: item.ekskul
-            ? {
-                id: item.ekskul.id,
-                name: item.ekskul.name,
-              }
-            : null,
-          images: JSON.parse(item.images),
-          createdAt: item.createdAt,
-          updatedAt: item.updatedAt,
-        };
-      });
+      const manipulatedGallery = {
+        id: gallery.id,
+        name: gallery.name,
+        slug: gallery.slug,
+        ekskul: gallery.ekskul
+          ? {
+              id: gallery.ekskul.id,
+              name: gallery.ekskul.name,
+            }
+          : null,
+        images: JSON.parse(gallery.images),
+        createdAt: gallery.createdAt,
+        updatedAt: gallery.updatedAt,
+      };
 
-      if (!galleries)
+      if (!gallery)
         throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
 
       return Promise.resolve(

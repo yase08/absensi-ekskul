@@ -80,15 +80,26 @@ export class ActivityProgramService {
 
   async getAllActivityProgramService(req: Request): Promise<any> {
     try {
-      const activityProgram = await db.activityProgram.findAll({
-        include: [
-          {
-            model: db.user,
-            as: "user",
-            attributes: ["id", "name"]
-          }
-        ]
-      });
+      const user = (req.session as ISession).user;
+      const paramQuerySQL: any = {};
+
+      paramQuerySQL.include = [
+        {
+          model: db.user,
+          as: "user",
+          attributes: ["id", "name"],
+        },
+      ];
+
+      if (user.role === "instructor") {
+        paramQuerySQL.where = {
+          author: user.id,
+        };
+      } else if (user.role === "admin") {
+        paramQuerySQL.where = {};
+      }
+
+      const activityProgram = await db.activityProgram.findAll(paramQuerySQL);
 
       if (!activityProgram || activityProgram.length === 0)
         throw apiResponse(
@@ -96,17 +107,19 @@ export class ActivityProgramService {
           "Aktivitas program tidak ditemukan"
         );
 
-        const modifiedProgram = activityProgram.map((activity) => ({
-          id: activity.id,
-          user: activity.user ? {
-            id: activity.user.id,
-            name: activity.user.name,
-          } : null,
-          activity: activity.activity,
-          task: activity.task,
-          startDate: activity.startDate,
-          endDate: activity.endDate
-        }))
+      const modifiedProgram = activityProgram.map((activity) => ({
+        id: activity.id,
+        user: activity.user
+          ? {
+              id: activity.user.id,
+              name: activity.user.name,
+            }
+          : null,
+        activity: activity.activity,
+        task: activity.task,
+        startDate: activity.startDate,
+        endDate: activity.endDate,
+      }));
 
       return Promise.resolve(
         apiResponse(
@@ -197,78 +210,63 @@ export class ActivityProgramService {
       const options = { timeZone: "Asia/Jakarta" };
       const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
       const formattedDate = dateTimeFormat.format(date);
+      const userId = (req.session as ISession).user.id;
 
-      const ekskuls = (req.session as ISession).user.ekskul;
-      const selectedEkskulId = req.query.ekskul_id as string;
-      const ekskul = await db.ekskul.findOne({
-        where: { id: selectedEkskulId },
+      const activities = await db.activityProgram.findAll({
+        where: {
+          author: userId,
+        },
+        include: [
+          {
+            model: db.user,
+            as: "user",
+            attributes: ["name"],
+          },
+        ],
+        attributes: ["activity", "task", "startDate", "endDate"],
       });
 
-      if (ekskuls.includes(selectedEkskulId)) {
-        const attendances = await db.instructorAttendance.findAll({
-          where: {
-            ekskul_id: selectedEkskulId,
-          },
-          include: [
-            {
-              model: db.user,
-              as: "user",
-              attributes: ["name"],
-            },
-            {
-              model: db.ekskul,
-              as: "ekskul",
-              attributes: ["name"],
-            },
-          ],
-          attributes: ["category", "date"],
-        });
+      const modifiedActivities = activities.map((activity) => {
+        return {
+          no: activities.indexOf(activity) + 1,
+          activity: activity.activity ? activity.activity : null,
+          task: activity.task ? activity.task : null,
+          author: activity.user ? activity.user.name : null,
+          startDate: activity.startDate ? activity.startDate : null,
+          endDate: activity.endDate ? activity.endDate : null,
+        };
+      });
 
-        const modifiedAttendances = attendances.map((attendance) => {
-          return {
-            no: attendances.indexOf(attendance) + 1,
-            user_name: attendance.user ? attendance.user.name : null,
-            ekskul_name: attendance.ekskul ? attendance.ekskul.name : null,
-            category: attendance.category,
-            date: attendance.date,
-          };
-        });
+      const columns = [
+        { header: "No", key: "no", width: 15 },
+        { header: "Aktivitas", key: "activity", width: 15 },
+        { header: "Tugas", key: "task", width: 15 },
+        { header: "Pembuat", key: "author", width: 15 },
+        { header: "Tanggal awal", key: "startDate", width: 15 },
+        { header: "Tanggal akhir", key: "endDate", width: 15 },
+      ];
+      const file = `data-absensi-instruktur-${formattedDate}.xlsx`;
 
-        const columns = [
-          { header: "No", key: "no", width: 15 },
-          { header: "Nama", key: "user_name", width: 15 },
-          { header: "Ekstrakurikuler", key: "ekskul_name", width: 15 },
-          { header: "Keterangan", key: "category", width: 15 },
-          { header: "Tanggal", key: "date", width: 15 },
-        ];
-        const file = `data-absensi-instruktur-${date}.xlsx`;
+      const exportSuccess = await exportExcel(
+        file,
+        columns,
+        modifiedActivities,
+        "Aktivitas Program",
+        res
+      );
 
-        const exportSuccess = await exportExcel(
-          file,
-          columns,
-          modifiedAttendances,
-          "Aktivitas Program",
-          res
-        );
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader("Content-Disposition", `attachment; filename=${file}`);
 
-        res.setHeader(
-          "Content-Type",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        );
-        res.setHeader("Content-Disposition", `attachment; filename=${file}`);
-
-        if (!exportSuccess) {
-          throw apiResponse(status.FORBIDDEN, "Export failed");
-        }
-        return Promise.resolve(
-          apiResponse(status.OK, "Export Success", exportSuccess)
-        );
-      } else {
-        throw apiResponse(
-          status.NOT_FOUND,
-          "Ekskul does not exist for the given id"
-        );
+      if (!exportSuccess) {
+        throw apiResponse(status.FORBIDDEN, "Export failed");
       }
+      return Promise.resolve(
+        apiResponse(status.OK, "Export Success", exportSuccess)
+      );
     } catch (error: any) {
       return Promise.reject(
         apiResponse(
@@ -300,7 +298,7 @@ export class ActivityProgramService {
 
       const modifiedActivities = activities.map((activity) => {
         return {
-          no: activity.indexOf(activity) + 1,
+          no: activities.indexOf(activity) + 1,
           activity: activity.activity ? activity.activity : null,
           task: activity.task ? activity.task : null,
           author: activity.user ? activity.user.name : null,
@@ -311,21 +309,21 @@ export class ActivityProgramService {
 
       const columns = [
         { header: "No", key: "no", width: 15 },
-        { header: "Aktifitas", key: "activity", width: 15 },
+        { header: "Aktivitas", key: "activity", width: 15 },
         { header: "Tugas", key: "task", width: 15 },
         { header: "Pembuat", key: "author", width: 15 },
         { header: "Tanggal awal", key: "startDate", width: 15 },
         { header: "Tanggal akhir", key: "endDate", width: 15 },
       ];
-      const file = `data-absensi-instruktur-${date}.xlsx`;
+      const file = `data-absensi-instruktur-${formattedDate}.xlsx`;
 
-        const exportSuccess = await exportExcel(
-          file,
-          columns,
-          modifiedActivities,
-          "Aktivitas Program",
-          res
-        );
+      const exportSuccess = await exportExcel(
+        file,
+        columns,
+        modifiedActivities,
+        "Aktivitas Program",
+        res
+      );
 
       res.setHeader(
         "Content-Type",

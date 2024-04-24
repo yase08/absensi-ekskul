@@ -82,7 +82,7 @@ const InstrukturComponent = () => {
         `/instructor-attendance`,
         formData
       );
-      const successMessage = response.data.data;
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",

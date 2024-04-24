@@ -7,9 +7,16 @@ import { BsPencil } from "react-icons/bs";
 import { BiDetail } from "react-icons/bi";
 import { LuTrash } from "react-icons/lu";
 import { Link } from "react-router-dom";
+import useAuth from "../../../hooks/useAuth";
 
 // eslint-disable-next-line react/prop-types
-const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
+const TableTugas = ({
+  setFormOld,
+  setOpen,
+  data,
+  handleGetRequest,
+  selectedEkskul,
+}) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -19,6 +26,7 @@ const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const { auth } = useAuth();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -252,24 +260,38 @@ const TableTugas = ({ setFormOld, setOpen, data, handleGetRequest }) => {
             size={"middle"}
             className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
           >
-            <a
-              className="hover:text-blue-500"
-              onClick={() => handleEdit(record)}
-            >
-              <BsPencil size={20} />
-            </a>
-            <a
-              className="hover:text-red-500"
-              onClick={() => handleDeleteRequest(record.id)}
-            >
-              <LuTrash size={20} />
-            </a>
-            <Link
-              className="hover:text-green-500"
-              to={`/admin/penugasan/nilai/${record.id}`}
-            >
-              <BiDetail size={20} />
-            </Link>
+            {auth.role === "instructor" && (
+              <>
+                <a
+                  className="hover:text-blue-500"
+                  onClick={() => handleEdit(record)}
+                >
+                  <BsPencil size={20} />
+                </a>
+                <a
+                  className="hover:text-red-500"
+                  onClick={() => handleDeleteRequest(record.id)}
+                >
+                  <LuTrash size={20} />
+                </a>
+              </>
+            )}
+            {selectedEkskul && (
+              <Link
+                className="hover:text-green-500"
+                to={`/admin/penugasan/nilai/${record.id}`}
+              >
+                <BiDetail size={20} />
+              </Link>
+            )}
+            {auth.role === "admin" && (
+              <Link
+                className="hover:text-green-500"
+                to={`/admin/penugasan/nilai/${record.id}`}
+              >
+                <BiDetail size={20} />
+              </Link>
+            )}
           </Space>
         </>
       ),

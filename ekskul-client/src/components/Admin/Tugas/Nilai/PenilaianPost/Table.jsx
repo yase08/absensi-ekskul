@@ -171,6 +171,14 @@ const TablePenilaianPost = ({ date }) => {
     setLoading(true);
 
     try {
+      if (!date) {
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "Pilih tanggal terlebih dahulu.",
+        });
+        return;
+      }
       const response = await axiosPrivate.post(`/assessment`, formData);
       const successMessage = response.data.statusMessage;
 

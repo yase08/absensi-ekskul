@@ -132,7 +132,6 @@ const TableSiswa = ({ setFormOld, setOpen, handleGetRequest, data }) => {
     setPageSize(size);
   };
 
-
   const getPaginationConfig = () => ({
     current: currentPage,
     pageSize: pageSize,
@@ -156,7 +155,6 @@ const TableSiswa = ({ setFormOld, setOpen, handleGetRequest, data }) => {
         title: "Success!",
         text: successMessage,
       });
-
     } catch (error) {
       console.error("Error:", error);
 
@@ -251,6 +249,14 @@ const TableSiswa = ({ setFormOld, setOpen, handleGetRequest, data }) => {
       render: (rayon) => (rayon ? rayon.name : "-"),
     },
     {
+      title: "Kelas",
+      dataIndex: "grade",
+      sorter: handleSort("grade"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("grade"),
+    },
+    {
       title: "Ekstrakurikuler",
       dataIndex: "ekskuls",
       width: "20%",
@@ -278,25 +284,28 @@ const TableSiswa = ({ setFormOld, setOpen, handleGetRequest, data }) => {
           size={"middle"}
           className="flex items-center gap-3 whitespace-no-wrap border-b border-gray-200"
         >
-          <a className="hover:text-blue-500" onClick={() => {
-            console.log(record);
-            if (record.ekskuls.length > 0) {
-              setFormOld({
-                ...record,
-                rombel_id: record.rombel.id,
-                rayon_id: record.rayon.id,
-                ekskuls: [record.ekskuls[0].id, record.ekskuls[1].id]
-              })
-            } else {
-              setFormOld({
-                ...record,
-                rombel_id: record.rombel.id,
-                rayon_id: record.rayon.id,
-                ekskuls: []
-              })
-            }
-            setOpen(true)
-             }}>
+          <a
+            className="hover:text-blue-500"
+            onClick={() => {
+              console.log(record);
+              if (record.ekskuls.length > 0) {
+                setFormOld({
+                  ...record,
+                  rombel_id: record.rombel.id,
+                  rayon_id: record.rayon.id,
+                  ekskuls: [record.ekskuls[0].id, record.ekskuls[1].id],
+                });
+              } else {
+                setFormOld({
+                  ...record,
+                  rombel_id: record.rombel.id,
+                  rayon_id: record.rayon.id,
+                  ekskuls: [],
+                });
+              }
+              setOpen(true);
+            }}
+          >
             <BsPencil size={20} />
           </a>
           <a

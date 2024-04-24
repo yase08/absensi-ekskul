@@ -45,19 +45,36 @@ export class TaskService {
   async getAllTaskService(req: Request): Promise<any> {
     try {
       const paramQuerySQL: any = {};
-
-      paramQuerySQL.include = [
-        {
-          model: db.ekskul,
-          as: "ekskul",
-          attributes: ["id", "name"],
-        },
-        {
-          model: db.user,
-          as: "user",
-          attributes: ["id", "name"],
-        },
-      ];
+      if ((req.session as ISession).user.role === "admin") {
+        paramQuerySQL.include = [
+          {
+            model: db.ekskul,
+            as: "ekskuls",
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.user,
+            as: "users",
+            attributes: ["id", "name"],
+          },
+        ];
+      } else if ((req.session as ISession).user.role === "instructor") {
+        paramQuerySQL.include = [
+          {
+            model: db.ekskul,
+            as: "ekskuls",
+            attributes: ["id", "name"],
+          },
+          {
+            model: db.user,
+            as: "users",
+            attributes: ["id", "name"],
+          },
+        ];
+        paramQuerySQL.where = {
+          author_id: (req.session as ISession).user.id,
+        };
+      }
 
       const task = await db.task.findAll(paramQuerySQL);
 
@@ -66,10 +83,10 @@ export class TaskService {
           id: task.id,
           name: task.name,
           ekskul: {
-            id: task.ekskul.id,
-            name: task.ekskul.name,
+            id: task?.ekskuls?.id,
+            name: task?.ekskuls?.name,
           },
-          user: task.user.name,
+          user: task.users?.name,
           date: task.date,
           createdAt: task.createdAt,
           updatedAt: task.updatedAt,

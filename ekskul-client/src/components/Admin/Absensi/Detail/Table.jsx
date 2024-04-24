@@ -30,7 +30,7 @@ const TableAbsensi = () => {
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  const ekskul = sessionStorage.getItem("ekskul_id");
+  const ekskul = sessionStorage.getItem("ekskul_id") || "";
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();

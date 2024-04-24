@@ -37,7 +37,7 @@ export class ScheduleService {
           { model: db.room, as: "room", attributes: ["name"] },
           { model: db.ekskul, as: "ekskul", attributes: ["name"] },
         ],
-        attributes: { exclude: ["room_id", "ekskul_id", "grade"] },
+        attributes: { exclude: ["ekskul_id", "grade"] },
       };
 
       const schedule = await db.schedule.findAll(paramQuerySQL);

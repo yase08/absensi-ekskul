@@ -1,7 +1,7 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request, Response } from "express";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 import { exportExcel } from "../libs/excel.lib";
 import { ISession } from "../interfaces/user.interface";
@@ -61,7 +61,7 @@ export class StudentService {
   async getAllStudentService(req: Request): Promise<any> {
     try {
       const paramQuerySQL: any = {
-        attributes: ["id", "name", "nis", "email", "mobileNumber", "gender"],
+        attributes: ["id", "name", "nis", "email", "mobileNumber", "gender", "grade"],
         include: [
           {
             model: db.rombel,
@@ -93,6 +93,7 @@ export class StudentService {
           email: student.email,
           mobileNumber: student.mobileNumber,
           gender: student.gender,
+          grade: student.grade,
           rombel: student.rombel
             ? {
                 id: student.rombel.id,
@@ -133,6 +134,9 @@ export class StudentService {
     try {
       const ekskul_id = req.query.ekskul_id as string;
       const task_id = req.query.task_id as string;
+      const task = await db.task.findOne({
+        where: { id: task_id },
+      });
 
       const assessmentSubquery = `(SELECT student_id FROM assessments WHERE task_id = '${task_id}')`;
 
@@ -149,6 +153,7 @@ export class StudentService {
           id: {
             [db.Sequelize.Op.notIn]: db.Sequelize.literal(assessmentSubquery),
           },
+          grade: task.grade,
         },
       };
 
@@ -213,6 +218,56 @@ export class StudentService {
         apiResponse(
           status.OK,
           "Berhasil mendapatkan siswa berdasarkan ekskul",
+          manipulatedStudent
+        )
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getStudentByEkskulAndGradeService(req: Request): Promise<any> {
+    try {
+      const ekskul_id = req.query.ekskul_id as string;
+      const grade = req.query.grade as string;
+
+      const paramQuerySQL: any = {
+        where: {
+          grade: grade,
+        },
+        attributes: ["id", "name"],
+        include: [
+          {
+            model: db.ekskul,
+            attributes: [],
+            where: { id: ekskul_id },
+          },
+        ],
+      };
+
+      const student = await db.student.findAll(paramQuerySQL);
+
+      if (!student || student.length === 0) {
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+      }
+
+      const manipulatedStudent = student.map((student: any) => {
+        return {
+          id: student.id,
+          name: student.name,
+        };
+      });
+
+      return Promise.resolve(
+        apiResponse(
+          status.OK,
+          "Berhasil mendapatkan siswa berdasarkan ekskul dan kelas",
           manipulatedStudent
         )
       );
@@ -353,7 +408,9 @@ export class StudentService {
             : null,
           student_rombel: student ? student.rombel.name : null,
           student_rayon: student ? student.rayon.name : null,
-          student_ekskul: student.ekskuls.map((ekskul) => ekskul.name).join(', '),
+          student_ekskul: student.ekskuls
+            .map((ekskul) => ekskul.name)
+            .join(", "),
         };
       });
 

@@ -49,6 +49,19 @@ export class StudentController extends StudentService {
     }
   };
 
+  getStudentByEkskulAndGrade = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.getStudentByEkskulAndGradeService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
   updateStudent = async (req: Request, res: Response): Promise<Response> => {
     try {
       const serviceResponse: APIResponse = await this.updateStudentService(req);
@@ -66,7 +79,7 @@ export class StudentController extends StudentService {
       return res.status(error.statusCode).json(error);
     }
   };
-  
+
   exportAllStudent = async (req: Request, res: Response): Promise<any> => {
     try {
       const serviceResponse: APIResponse = await this.exportAllStudentService(

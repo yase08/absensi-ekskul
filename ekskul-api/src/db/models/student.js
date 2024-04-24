@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("male", "female"),
         allowNull: false,
       },
+      grade: {
+        type: DataTypes.ENUM("X", "XI", "XII"),
+        allowNull: false,
+      },
       rombel_id: {
         type: DataTypes.UUID,
         allowNull: false,

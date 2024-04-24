@@ -5,8 +5,10 @@ import { Modal, Select, Input, DatePicker } from "antd";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import { Link, useParams } from "react-router-dom";
 import dayjs from "dayjs";
+import useAuth from "../../../../hooks/useAuth";
 
 const NilaiComponent = () => {
+  const { auth } = useAuth();
   const task = useParams();
   const axiosPrivate = useAxiosPrivate();
   const [open, setOpen] = useState(false);
@@ -16,14 +18,14 @@ const NilaiComponent = () => {
   const [data, setData] = useState([]);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedDate, setSelectedDate] = useState()
+  const [selectedDate, setSelectedDate] = useState();
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-      setFormOld((prevData) => ({
-        ...prevData,
-        [inputName]: newValue,
-      }));
+    setFormOld((prevData) => ({
+      ...prevData,
+      [inputName]: newValue,
+    }));
   };
 
   const handleGetEkskulRequest = async () => {
@@ -138,15 +140,22 @@ const NilaiComponent = () => {
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
             Penilaian Siswa
           </h1>
-          <Link
-            to={`/admin/penugasan/penilaian/${task.id}`}
-            className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
-          >
-            Penilaian
-          </Link>
+          {auth.role === "instructor" && (
+            <Link
+              to={`/admin/penugasan/penilaian/${task.id}`}
+              className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+            >
+              Penilaian
+            </Link>
+          )}
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
+          <Table
+            setFormOld={setFormOld}
+            setOpen={setOpen}
+            data={data}
+            handleGetRequest={handleGetRequest}
+          />
         </div>
       </div>
       <Modal

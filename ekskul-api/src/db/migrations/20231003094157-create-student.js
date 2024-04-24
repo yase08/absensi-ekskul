@@ -31,6 +31,10 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true,
       },
+      grade: {
+        type: Sequelize.ENUM("X", "XI", "XII"),
+        allowNull: false,
+      },
       rombel_id: {
         type: Sequelize.UUID,
         references: {

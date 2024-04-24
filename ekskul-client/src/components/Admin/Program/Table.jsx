@@ -5,6 +5,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Table, Input, Space, Button } from "antd";
 import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
+import useAuth from "../../../hooks/useAuth";
 
 const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const [searchText, setSearchText] = useState("");
@@ -15,6 +16,7 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const searchInput = useRef(null);
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const { auth } = useAuth();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -142,7 +144,6 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     onShowSizeChange: handleChangePageSize,
   });
 
-
   const handleDeleteRequest = async (id) => {
     setLoading(true);
 
@@ -190,7 +191,7 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
       task: item.task,
       startDate: item.startDate,
       endDate: item.endDate,
-    })
+    });
     setOpen(true);
   };
 
@@ -246,11 +247,14 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("user"),
-      render(text) {
+      render: (text) => {
         return text ? text.name : "-";
-      }
+      },
     },
-    {
+  ];
+
+  if (auth.role === "instructor") {
+    columns.push({
       title: "Aksi",
       dataIndex: "action",
       width: "20%",
@@ -270,8 +274,8 @@ const TableProgram = ({ setFormOld, setOpen, data, handleGetRequest }) => {
           </a>
         </Space>
       ),
-    },
-  ];
+    });
+  }
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

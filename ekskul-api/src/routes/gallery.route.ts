@@ -28,12 +28,12 @@ class GalleryRoutes extends GalleryController {
       this.getAllGallery
     );
     this.router.get("/single", this.getGallery);
+    this.router.get("/detail/images/:slug", this.getGalleryDetail);
     this.router.get(
       "/detail/:slug",
       [authorization(), auth(), permission(["admin", "instructor"])],
       this.getDetailGallery
     );
-    this.router.get("/detail/images/:slug", this.getGalleryDetail);
     this.router.put(
       "/:id",
       [authorization(), auth(), permission(["admin", "instructor"]), upload.array("images")],

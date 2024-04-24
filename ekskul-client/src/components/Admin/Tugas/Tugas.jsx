@@ -5,6 +5,9 @@ import { Modal, Select, Input, DatePicker } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { IoAddSharp } from "react-icons/io5";
 import dayjs from "dayjs";
+import { jwtDecode } from "jwt-decode";
+import useAuth from "../../../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const TugasComponent = () => {
   const [open, setOpen] = useState(false);
@@ -13,13 +16,17 @@ const TugasComponent = () => {
   const [formData, setFormData] = useState({
     name: "",
     ekskul_id: "",
-    date: ""
+    date: "",
+    grade: "",
   });
+  const { auth } = useAuth();
   const [data, setData] = useState([]);
-  const [error, setError] =  useState()
+  const [error, setError] = useState();
   const [formOld, setFormOld] = useState();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { ekskuls } = jwtDecode(auth.accessToken);
+  const [selectedEkskul, setSelectedEkskul] = useState(null);
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
@@ -36,27 +43,7 @@ const TugasComponent = () => {
     }
   };
 
-  const handleGetEkskulRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/ekskul`);
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const ekskulData = response.data.data;
-          setEkskul(ekskulData);
-        } else {
-          console.log("Data is not an array");
-        }
-      } else {
-        console.log("Data retrieval failed");
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const ekskulOption = ekskul.map((item) => ({
+  const ekskulOption = ekskuls.map((item) => ({
     label: item.name,
     value: item.id,
   }));
@@ -92,6 +79,15 @@ const TugasComponent = () => {
     }
   };
 
+  const handleSessionChange = (value) => {
+    if (sessionStorage.getItem("ekskul_id") !== null) {
+      sessionStorage.removeItem("ekskul_id");
+      sessionStorage.setItem("ekskul_id", value);
+    } else {
+      sessionStorage.setItem("ekskul_id", value);
+    }
+  };
+
   const handleOk = async (event) => {
     setLoading(true);
 
@@ -107,7 +103,7 @@ const TugasComponent = () => {
         });
         event.preventDefault();
         setFormOld({});
-        handleGetRequest()
+        handleGetRequest();
       } else {
         const response = await axiosPrivate.post(`/task`, formData);
         const successMessage = response.data.statusMessage;
@@ -118,7 +114,7 @@ const TugasComponent = () => {
           text: successMessage,
         });
         event.preventDefault();
-        handleGetRequest()
+        handleGetRequest();
       }
     } catch (error) {
       if (error.response) {
@@ -149,8 +145,24 @@ const TugasComponent = () => {
   };
 
   useEffect(() => {
-    handleGetEkskulRequest();
-    handleGetRequest()
+    handleGetRequest();
+  }, []);
+
+  useEffect(() => {
+    if (formOld) {
+      const ekskul = ekskuls.find((item) => item.id === formOld.ekskul_id);
+      setFormOld((prevData) => ({
+        ...prevData,
+        ekskul: ekskul ? { id: ekskul.id, name: ekskul.name } : null,
+      }));
+    }
+  }, [formOld, ekskuls]);
+
+  useEffect(() => {
+    const storedEkskulId = sessionStorage.getItem("ekskul_id");
+    if (storedEkskulId) {
+      setSelectedEkskul(storedEkskulId);
+    }
   }, []);
 
   return (
@@ -160,15 +172,45 @@ const TugasComponent = () => {
           <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
             Tugas Siswa
           </h1>
-          <button
-            onClick={showModal}
-            className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
-          >
-            <IoAddSharp size={20} />
-          </button>
+          <div className="flex gap-2">
+            {auth.role === "instructor" && (
+              <>
+                <Select
+                  size="medium"
+                  placeholder="Pilih kategori"
+                  className=""
+                  value={selectedEkskul}
+                  onChange={(value) => {
+                    setSelectedEkskul(value);
+                    handleSessionChange(value);
+                  }}
+                  options={
+                    ekskuls
+                      ? ekskuls.map((item) => ({
+                          value: item.id,
+                          label: item.name,
+                        }))
+                      : []
+                  }
+                />
+                <button
+                  onClick={showModal}
+                  className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+                >
+                  <IoAddSharp size={20} />
+                </button>
+              </>
+            )}
+          </div>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
+          <Table
+            setFormOld={setFormOld}
+            setOpen={setOpen}
+            data={data}
+            selectedEkskul={selectedEkskul}
+            handleGetRequest={handleGetRequest}
+          />
         </div>
       </div>
       <Modal
@@ -197,7 +239,9 @@ const TugasComponent = () => {
             size="large"
             placeholder="Pilih Ekstrakurikuler"
             className="w-full"
-            value={formOld && formOld.ekskul ? formOld.ekskul_id : formData.ekskul}
+            value={
+              formOld && formOld.ekskul ? formOld.ekskul_id : formData.ekskul
+            }
             onChange={(e) => handleInputChange(e, "ekskul_id")}
             options={ekskulOption}
           />
@@ -209,9 +253,37 @@ const TugasComponent = () => {
             format="DD-MM-YYYY"
             placeholder="Masukan tanggal"
             name="date"
-            value={formOld && formOld.date ? dayjs(formOld.date) : formData.date}
+            value={
+              formOld && formOld.date ? dayjs(formOld.date) : formData.date
+            }
             onChange={(e) => handleInputChange(e, "date")}
           />
+          <div>
+            <label htmlFor="" className="text-lg">
+              Kelas
+            </label>
+            <Select
+              size="large"
+              className="w-full"
+              value={formOld ? formOld.grade : formData.grade}
+              onChange={(e) => handleInputChange(e, "grade")}
+              options={[
+                {
+                  label: "X",
+                  value: "X",
+                },
+                {
+                  label: "XI",
+                  value: "XI",
+                },
+                {
+                  label: "XII",
+                  value: "XII",
+                },
+              ]}
+              placeholder="Pilih Kelas"
+            />
+          </div>
         </form>
       </Modal>
     </div>

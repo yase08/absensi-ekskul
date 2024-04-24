@@ -27,6 +27,7 @@ import NotFound from "../pages/Admin/NotFound/NotFound";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import ResetToken from "../pages/ResetToken/ResetToken";
 import Gallery from "../pages/User/Gallery/Gallery";
+import DetailGalleryUser from "../pages/User/Gallery/Detail";
 
 const AppRouter = () => {
   return (
@@ -35,6 +36,7 @@ const AppRouter = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/gallery/:slug" element={<DetailGalleryUser />} />
         <Route path="/reset-token/:token" element={<ResetToken />} />
         <Route path="/*" element={<NotFound />} />
         <Route path="/" element={<Dashboard />} />

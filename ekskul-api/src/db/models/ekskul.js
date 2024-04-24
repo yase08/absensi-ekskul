@@ -28,11 +28,6 @@ module.exports = (sequelize, DataTypes) => {
         as: "attendances",
         onDelete: "CASCADE",
       });
-      this.hasMany(models.task, {
-        foreignKey: "ekskul_id",
-        as: "tasks",
-        onDelete: "CASCADE",
-      });
       this.hasMany(models.instructorAttendance, {
         foreignKey: "ekskul_id",
         as: "instructorAttendances",

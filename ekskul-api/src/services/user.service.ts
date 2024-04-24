@@ -33,7 +33,7 @@ export class UserService {
 
       const ekskuls = await db.ekskul.findAll({
         where: { id: req.body.ekskuls },
-      }); 
+      });
 
       const createUser = await db.user.create({
         ...req.body,
@@ -107,6 +107,62 @@ export class UserService {
           image: user.image,
           role: user.role,
           isActive: user.isActive,
+          ekskuls: user.ekskuls
+            ? user.ekskuls.map((ekskul) => {
+                return {
+                  id: ekskul.id,
+                  name: ekskul.name,
+                };
+              })
+            : null,
+        };
+      });
+
+      if (!user || user.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Pengguna tidak ditemukan");
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil mendapatkan pengguna", manipulatedUser)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getAllInstructorService(req: Request): Promise<any> {
+    try {
+      const paramQuerySQL: any = {
+        where: {
+          role: "instructor",
+        },
+        attributes: ["id", "name", "email", "mobileNumber", "image"],
+        include: [
+          {
+            model: db.ekskul,
+            attributes: ["id", "name"],
+            as: "ekskuls",
+          },
+        ],
+      };
+
+      const user = await db.user.findAll(paramQuerySQL);
+
+      if (!user || user.length === 0)
+        throw apiResponse(status.NOT_FOUND, "Siswa tidak ditemukan");
+
+      const manipulatedUser = user.map((user: any) => {
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          mobileNumber: user.mobileNumber,
+          image: user.image,
           ekskuls: user.ekskuls
             ? user.ekskuls.map((ekskul) => {
                 return {

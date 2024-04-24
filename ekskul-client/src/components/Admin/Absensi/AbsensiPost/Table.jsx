@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
 import { useNavigate } from "react-router-dom";
 
-const TableAbsensiPost = ({ date, selectedDate }) => {
+const TableAbsensiPost = ({ date }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
@@ -20,10 +20,10 @@ const TableAbsensiPost = ({ date, selectedDate }) => {
   const navigate = useNavigate();
 
   const ekskul = sessionStorage.getItem("ekskul_id");
+  const grade = sessionStorage.getItem("grade");
 
   // Handler untuk checkbox
   const handleCheckboxChange = (studentId, category) => {
-    console.log(date)
     const newAttendance = {
       date: date,
       student_id: studentId,
@@ -146,14 +146,13 @@ const TableAbsensiPost = ({ date, selectedDate }) => {
   const handleGetStudentRequest = async () => {
     try {
       const response = await axiosPrivate.get(
-        `/student/ekskul?ekskul_id=${ekskul}`
+        `/student/grade?ekskul_id=${ekskul}&grade=${grade}`
       );
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
           const studentData = response.data.data;
           setData(studentData);
-          console.log(studentData);
         } else {
           setError(new Error("Data is not an array"));
         }
@@ -171,7 +170,7 @@ const TableAbsensiPost = ({ date, selectedDate }) => {
     setLoading(true);
 
     try {
-      if (selectedDate == null) {
+      if (!date) {
         Swal.fire({
           icon: "error",
           title: "Error!",

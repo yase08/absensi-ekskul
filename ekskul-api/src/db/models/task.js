@@ -8,16 +8,19 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
-      // this.belongsTo(models.ekskul, {
-      //   foreignKey: "ekskul_id",
-      // });
-      // this.belongsTo(models.user, {
-      //   foreignKey: "author_id",
-      // });
       this.hasMany(models.assessment, {
         foreignKey: "task_id",
         as: "assessments",
+        onDelete: "CASCADE",
+      });
+      this.belongsTo(models.ekskul, {
+        foreignKey: "ekskul_id",
+        as: "ekskuls",
+        onDelete: "CASCADE",
+      });
+      this.belongsTo(models.user, {
+        foreignKey: "author_id",
+        as: "users",
         onDelete: "CASCADE",
       });
     }
@@ -36,6 +39,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       date: {
         type: DataTypes.DATE,
+        allowNull: false,
+      },
+      grade: {
+        type: DataTypes.ENUM("X", "XI", "XII"),
         allowNull: false,
       },
       ekskul_id: {

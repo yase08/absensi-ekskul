@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user_id",
         as: "ekskuls",
       });
+      this.hasMany(models.task, {
+        foreignKey: "author_id",
+        as: "tasks",
+        onDelete: "CASCADE",
+      });
     }
   }
   user.init(
@@ -30,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       password: DataTypes.STRING,
       role: DataTypes.ENUM("admin", "instructor"),
       isActive: DataTypes.BOOLEAN,
-      refreshToken: DataTypes.TEXT
+      refreshToken: DataTypes.TEXT,
     },
     {
       sequelize,

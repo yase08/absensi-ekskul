@@ -59,7 +59,16 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error.response);
-      if (error.response) {
+      if (error.response.data.errors) {
+        const errorMessage = error.response.data.errors.map((error) => {
+          return error.statusMessage;
+        });
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: errorMessage,
+        });
+      } else if (error.response.data) {
         const errorMessage = error.response.data.statusMessage;
         Swal.fire({
           icon: "error",

@@ -129,6 +129,7 @@ const Dashboard = () => {
             </button>
           </div>
           </div>
+          <div className="h-full"></div>
         </div>
         {openHelpNav && (
           <Tein

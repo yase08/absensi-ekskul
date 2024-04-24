@@ -59,7 +59,7 @@ const Ruangan = () => {
 
     try {
       const response = await axiosPrivate.post(`/room`, formData);
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
 
       handleGetRequest()
       Swal.fire({
@@ -149,15 +149,12 @@ const Ruangan = () => {
     <div className="w-full h-full bg-transparent p-[20px]">
       <div className="w-full flex flex-col gap-2">
         <h1 className="text-black text-2xl font-bold font-poppins capitalize opacity-60">
-          Tingkatan
+          Ruangan
         </h1>
         <div className="bg-white rounded-md w-full h-auto flex">
           <div className="w-full p-[20px] flex">
             <form className="flex-col gap-3 flex w-full">
               <div className="flex flex-col gap-2">
-                <span className="text-black text-opacity-60 uppercase font-semibold max-md:text-sm">
-                  Ruangan
-                </span>
                 <input
                   placeholder="Masukan nama ruangan"
                   type="text"

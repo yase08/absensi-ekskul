@@ -1,16 +1,17 @@
-import { DatePicker } from "antd/lib";
+import { DatePicker } from "antd";
 import Table from "./Table";
 import { useState } from "react";
-// import { createAttendance } from "../../../../services/attendance.service";
 
 const PenilaianPostComponent = () => {
-  const [selectedDate, setSelectedDate] = useState("")
-  const [dateStirng, setDateString] = useState("")
+  const [selectedDate, setSelectedDate] = useState("");
+  const [dateString, setDateString] = useState("");
 
-  const handleChange = (selectedDate, dateStirng) => {
-      setSelectedDate(selectedDate)
-      setDateString(dateStirng)
-  }
+  const handleDateChange = (date, dateString) => {
+    setSelectedDate(date);
+    setDateString(dateString);
+  };
+  var oldDate = dateString.split("-");
+  var date = new Date(oldDate[2], oldDate[1] - 1, oldDate[0]).getTime();
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -20,13 +21,16 @@ const PenilaianPostComponent = () => {
             Penilaian
           </h1>
           <DatePicker
-          name="date"
-          value={selectedDate}
-          onChange={(selectedDate, dateString) => handleChange(selectedDate, dateString)}
+            size="large"
+            format="DD-MM-YYYY"
+            placeholder="Masukan tanggal"
+            name="date"
+            value={selectedDate}
+            onChange={handleDateChange}
           />
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table date={dateStirng}/>
+          <Table date={date} selectedDate={selectedDate} />
         </div>
       </div>
     </div>

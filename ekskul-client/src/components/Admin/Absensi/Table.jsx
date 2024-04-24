@@ -4,8 +4,9 @@ import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { Table, Input, Space, Button } from "antd";
 import { Link } from "react-router-dom";
 import { BiDetail } from "react-icons/bi";
+import useAuth from "../../../hooks/useAuth";
 
-const TableAbsensi = ({ selectedEkskul }) => {
+const TableAbsensi = ({ selectedEkskul, selectedGrade }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
@@ -16,8 +17,10 @@ const TableAbsensi = ({ selectedEkskul }) => {
   const pageSizeOptions = [10, 20, 50];
   const axiosPrivate = useAxiosPrivate();
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
+  const { auth } = useAuth();
 
-  const ekskul = sessionStorage.getItem("ekskul_id");
+  const ekskul = sessionStorage.getItem("ekskul_id") || "";
+  const grade = sessionStorage.getItem("grade") || "";
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -148,7 +151,7 @@ const TableAbsensi = ({ selectedEkskul }) => {
   const handleGetRequest = async () => {
     try {
       const response = await axiosPrivate.get(
-        `/attendance?ekskul_id=${ekskul}`
+        `/attendance?ekskul_id=${ekskul}&grade=${grade}`
       );
 
       if (response && response.data.data) {
@@ -199,7 +202,10 @@ const TableAbsensi = ({ selectedEkskul }) => {
       ...getColumnSearchProps("percentage"),
       render: (percentage) => (percentage ? `${percentage}%` : "-"),
     },
-    {
+  ];
+
+  if (auth.role === "instructor") {
+    columns.push({
       title: "Aksi",
       dataIndex: "action",
       width: "20%",
@@ -211,14 +217,14 @@ const TableAbsensi = ({ selectedEkskul }) => {
           >
             <BiDetail size={20} />
           </Link>
-      </Space>
+        </Space>
       ),
-    },
-  ];
+    });
+  }
 
   useEffect(() => {
-      handleGetRequest();
-  }, [selectedEkskul]);
+    handleGetRequest();
+  }, [selectedEkskul, selectedGrade]);
 
   return (
     <div className="bg-transparent p-7 max-md:px-5 h-auto w-full">

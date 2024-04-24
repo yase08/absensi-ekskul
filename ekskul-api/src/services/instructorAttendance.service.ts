@@ -186,32 +186,33 @@ export class InstructorAttendanceService {
       const options = { timeZone: "Asia/Jakarta" };
       const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
       const formattedDate = dateTimeFormat.format(date);
+      const { user } = req.session as ISession;
+      const paramQuerySQL: any = {};
 
-      // const ekskuls = (req.session as ISession).user.ekskul;
-      // const selectedEkskulId = req.query.ekskul_id as string;
-      // const ekskul = await db.ekskul.findOne({
-      //   where: { id: selectedEkskulId },
-      // });
+      paramQuerySQL.include = [
+        {
+          model: db.user,
+          as: "user",
+          attributes: ["name"],
+        },
+        {
+          model: db.ekskul,
+          as: "ekskul",
+          attributes: ["name"],
+        },
+      ];
 
-      // if (ekskuls.includes(selectedEkskulId)) {
-      const attendances = await db.instructorAttendance.findAll({
-        // where: {
-        //   ekskul_id: selectedEkskulId,
-        // },
-        include: [
-          {
-            model: db.user,
-            as: "user",
-            attributes: ["name"],
-          },
-          {
-            model: db.ekskul,
-            as: "ekskul",
-            attributes: ["name"],
-          },
-        ],
-        attributes: ["category", "date"],
-      });
+      paramQuerySQL.attributes = ["category", "date"];
+
+      if (user.role === "instructor") {
+        paramQuerySQL.where = {
+          instructor_id: user.id,
+        };
+      } else if (user.role === "admin") {
+        paramQuerySQL.where = {};
+      }
+
+      const attendances = await db.instructorAttendance.findAll(paramQuerySQL);
 
       const modifiedAttendances = attendances.map((attendance) => {
         return {
@@ -230,7 +231,7 @@ export class InstructorAttendanceService {
         { header: "Keterangan", key: "category", width: 15 },
         { header: "Tanggal", key: "date", width: 15 },
       ];
-      const file = `data-absensi-instruktur-${date}.xlsx`;
+      const file = `data-absensi-instruktur-${formattedDate}.xlsx`;
 
       const exportSuccess = await exportExcel(
         file,
