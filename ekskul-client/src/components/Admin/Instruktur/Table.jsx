@@ -11,7 +11,8 @@ const TableInstruktur = ({ data, handleGetRequest }) => {
   const pageSizeOptions = [10, 20, 50];
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
 
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {[]
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    [];
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
@@ -130,7 +131,7 @@ const TableInstruktur = ({ data, handleGetRequest }) => {
   const getPaginationConfig = () => ({
     current: currentPage,
     pageSize: pageSize,
-    total: data.length,
+    total: data?.length,
     pageSizeOptions: pageSizeOptions,
     showSizeChanger: true,
     onChange: handleChangePage,
@@ -141,7 +142,7 @@ const TableInstruktur = ({ data, handleGetRequest }) => {
     {
       title: "No",
       dataIndex: "no",
-      render: (text, record, index) => index + 1,
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
       width: "10%",
     },
     {

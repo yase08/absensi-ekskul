@@ -31,7 +31,7 @@ const TableGallery = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const handleEdit = async (item) => {
     setFormOld({
       ...item,
-      ekskul_id : item.ekskul.id,
+      ekskul_id: item.ekskul.id,
     });
     setOpen(true);
   };
@@ -145,7 +145,7 @@ const TableGallery = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const getPaginationConfig = () => ({
     current: currentPage,
     pageSize: pageSize,
-    total: data.length,
+    total: data?.length,
     pageSizeOptions: pageSizeOptions,
     showSizeChanger: true,
     onChange: handleChangePage,
@@ -196,7 +196,7 @@ const TableGallery = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     {
       title: "No",
       dataIndex: "no",
-      render: (text, record, index) => index + 1,
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
       width: "10%",
     },
     {
@@ -207,17 +207,17 @@ const TableGallery = ({ setFormOld, setOpen, data, handleGetRequest }) => {
       width: "20%",
       ...getColumnSearchProps("name"),
     },
-    // {
-    //   title: "Tanggal",
-    //   dataIndex: "date",
-    //   sorter: handleSort("date"),
-    //   sortDirections: ["descend", "ascend"],
-    //   width: "20%",
-    //   ...getColumnSearchProps("date"),
-    //   render: (text) => {
-    //     return new Intl.DateTimeFormat("en-US").format(new Date(text));
-    //   },
-    // },
+    {
+      title: "Tanggal",
+      dataIndex: "date",
+      sorter: handleSort("date"),
+      sortDirections: ["descend", "ascend"],
+      width: "20%",
+      ...getColumnSearchProps("date"),
+      render: (text) => {
+        return new Intl.DateTimeFormat("en-US").format(new Date(text));
+      },
+    },
     {
       title: "Ekstrakurikuler",
       dataIndex: "ekskul",
@@ -225,7 +225,7 @@ const TableGallery = ({ setFormOld, setOpen, data, handleGetRequest }) => {
       sortDirections: ["descend", "ascend"],
       width: "20%",
       ...getColumnSearchProps("ekskul"),
-      render: (ekskul) => (ekskul ? ekskul.name : "-")
+      render: (ekskul) => (ekskul ? ekskul.name : "-"),
     },
     {
       title: "Aksi",

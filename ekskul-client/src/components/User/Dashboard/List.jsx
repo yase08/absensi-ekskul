@@ -27,7 +27,7 @@ const List = () => {
         <div className="w-full max-w-[150px] h-[2px] bg-yellow-500" />
         <div className="w-full h-full mt-[10px] bg-white flex gap-[10px] ">
           <div className="w-full h-auto bg-transparent p-[10px] flex-col gap-[10px] border border-transparent flex justify-between items-center">
-            <div className="grid grid-cols-6 w-full gap-[5px]">
+            <div className="grid-cols-6 max-lg:grid-cols-5 max-md:grid-cols-4 max-sm:grid-cols-3 grid w-full gap-[5px]">
               <p
                 className={`text-center rounded-[5px] py-[10px] ${
                   day === 1 ? "text-white bg-yellow-500" : "text-black"
@@ -71,7 +71,7 @@ const List = () => {
                 Sab
               </p>
             </div>
-            <div className="grid grid-cols-6 w-full gap-[5px]">
+            <div className="grid grid-cols-6 max-lg:grid-cols-5 max-md:grid-cols-4 max-sm:grid-cols-3 w-full gap-[5px]">
               <div className="h-auto gap-[5px] bg-transparent flex flex-col">
                 {schedule
                   .find((schedule) => schedule.day === "Senin")

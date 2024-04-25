@@ -276,7 +276,9 @@ export class UserService {
         throw apiResponse(status.NOT_FOUND, "Pengguna tidak ditemukan");
 
       if (userExist.image) {
-        fs.unlinkSync(`../public/images/${userExist.image}`);
+        fs.unlinkSync(
+          path.join(__dirname, "..", "public", "images", userExist.image)
+        );
         await db.userOnEkskul.destroy({
           where: {
             user_id: userExist.id,

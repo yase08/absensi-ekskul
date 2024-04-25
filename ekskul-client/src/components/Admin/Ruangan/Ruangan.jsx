@@ -52,7 +52,6 @@ const Ruangan = () => {
     }
   };
 
-
   const handlePostRequest = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -61,7 +60,7 @@ const Ruangan = () => {
       const response = await axiosPrivate.post(`/room`, formData);
       const successMessage = response.data.statusMessage;
 
-      handleGetRequest()
+      handleGetRequest();
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -104,7 +103,7 @@ const Ruangan = () => {
       const response = await axiosPrivate.put(`/room/${formOld.id}`, formOld);
       const successMessage = response.data.statusMessage;
 
-      handleGetRequest()
+      handleGetRequest();
 
       Swal.fire({
         icon: "success",
@@ -142,8 +141,8 @@ const Ruangan = () => {
   };
 
   useEffect(() => {
-    handleGetRequest()
-  }, [])
+    handleGetRequest();
+  }, []);
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -176,7 +175,11 @@ const Ruangan = () => {
           </div>
         </div>
         <div className="w-full bg-white mt-5 mb-5">
-          <TableEskul setFormOld={setFormOld} data={data} handleGetRequest={handleGetRequest} />
+          <TableEskul
+            setFormOld={setFormOld}
+            data={data}
+            handleGetRequest={handleGetRequest}
+          />
         </div>
       </div>
     </div>

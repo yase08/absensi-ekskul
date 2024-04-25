@@ -293,7 +293,7 @@ const SideNav = ({
       <nav
         className={`bg-white max-lg:border-r h-[100vh] z-50 transition-all duration-[700ms] fixed   ${
           expanded
-            ? "max-lg:w-[320px] lg:w-[65px] "
+            ? "max-lg:w-[320px] lg:w-[65px]"
             : "max-lg:w-0 overflow-y-scroll hidden-scroll  lg:w-[320px]"
         }`}
       >

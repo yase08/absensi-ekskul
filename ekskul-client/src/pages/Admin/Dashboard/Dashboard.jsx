@@ -50,7 +50,7 @@ const Dashboard = () => {
   };
   return (
     <>
-      <div className="flex relative bg-transparent h-screen w-full justify-between">
+      <div className="flex relative bg-transparent h-screen w-full justify-start">
         <SideNav
           expanded={expanded}
           toggleExpansion={toggleExpansion}
@@ -58,10 +58,11 @@ const Dashboard = () => {
           toggleOpenHelpNav={toggleOpenHelpNav}
         />
         <div
-          className={`w-full transition-all bg-transparent flex flex-col h-screen overflow-hidden duration-[700ms]  ${
+          className={`w-full transition-all flex h-screen flex-col overflow-hidden duration-[700ms] justify-between ${
             expanded ? "lg:ml-[65.5px]" : "lg:ml-[320px]"
           }`}
         >
+          <div className="">
           <TopNav
             toggleOpenChangeBg={toggleOpenChangeBg}
             toggleExpansion={toggleExpansion}
@@ -70,13 +71,14 @@ const Dashboard = () => {
             toggleOpenProfile={toggleOpenProfile}
           />
           <Jumbotron expanded={expanded} />
+          </div>
           {/* <Profile
             openProfile={openProfile}
             toggleOpenProfile={toggleOpenProfile}
           /> */}
           {/* Sidebar */}
-          <div className="flex w-full flex-col bg-transparent">
-          <div className="mt-[80px] z-40 w-full px-10  bg-opacity-30 h-[100px]  relative top-[50px] bg-transparent">
+          <div className="flex w-full bg-transparent flex-col justify-end ">
+          <div className="z-40 w-full px-10  bg-opacity-30 h-[100px]  relative top-[50px] bg-transparent">
             <div className="bg-white rounded-md w-full h-full relative flex items-center px-5 justify-between overflow-hidden">
               <div className="flex gap-3 items-center">
                 <img
@@ -129,7 +131,6 @@ const Dashboard = () => {
             </button>
           </div>
           </div>
-          <div className="h-full"></div>
         </div>
         {openHelpNav && (
           <Tein

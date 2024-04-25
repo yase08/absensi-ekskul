@@ -136,7 +136,7 @@ const TableEkskul = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const getPaginationConfig = () => ({
     current: currentPage,
     pageSize: pageSize,
-    total: filteredData.length,
+    total: data?.length,
     pageSizeOptions: pageSizeOptions,
     showSizeChanger: true,
     onChange: handleChangePage,
@@ -206,7 +206,7 @@ const TableEkskul = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     {
       title: "No",
       dataIndex: "no",
-      render: (text, record, index) => index + 1,
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
       width: "10%",
     },
     {

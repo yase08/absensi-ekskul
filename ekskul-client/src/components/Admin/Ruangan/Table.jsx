@@ -146,7 +146,7 @@ const TableRuangan = ({ setFormOld, data, handleGetRequest }) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/room`, id);
+      const response = await axiosPrivate.delete(`/room/${id}`);
       const successMessage = response.data.statusMessage;
 
       Swal.fire({
@@ -188,7 +188,7 @@ const TableRuangan = ({ setFormOld, data, handleGetRequest }) => {
     {
       title: "No",
       dataIndex: "no",
-      render: (text, record, index) => index + 1,
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
       width: "10%",
     },
     {

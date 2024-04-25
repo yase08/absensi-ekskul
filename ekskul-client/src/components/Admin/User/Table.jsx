@@ -6,7 +6,13 @@ import { BsPencil } from "react-icons/bs";
 import { LuTrash } from "react-icons/lu";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-const TableUser = ({ setFormOld, setOpen, onDataUpdate, data, handleGetRequest }) => {
+const TableUser = ({
+  setFormOld,
+  setOpen,
+  onDataUpdate,
+  data,
+  handleGetRequest,
+}) => {
   const [searchText, setSearchText] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -140,7 +146,7 @@ const TableUser = ({ setFormOld, setOpen, onDataUpdate, data, handleGetRequest }
   const getPaginationConfig = () => ({
     current: currentPage,
     pageSize: pageSize,
-    total: data.length,
+    total: data?.length,
     pageSizeOptions: pageSizeOptions,
     showSizeChanger: true,
     onChange: handleChangePage,
@@ -193,7 +199,7 @@ const TableUser = ({ setFormOld, setOpen, onDataUpdate, data, handleGetRequest }
     {
       title: "No",
       dataIndex: "no",
-      render: (text, record, index) => index + 1,
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
       width: "10%",
     },
     {
@@ -323,7 +329,7 @@ const TableUser = ({ setFormOld, setOpen, onDataUpdate, data, handleGetRequest }
             currentPage * pageSize
           )}
           pagination={getPaginationConfig()}
-          loading={false  }
+          loading={false}
           scroll={{ x: "max-content" }}
         />
       </div>

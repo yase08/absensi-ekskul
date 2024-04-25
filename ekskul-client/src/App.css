@@ -98,3 +98,7 @@ input[type="number"] {
   background-repeat: no-repeat; /* Do not repeat the background image */
   background-size: cover; /* Cover the entire container with the background image */
 }
+
+.hidden-scroll::-webkit-scrollbar {
+  display: none;
+}
