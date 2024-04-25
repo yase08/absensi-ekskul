@@ -11,7 +11,6 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.ekskul, {
         through: "userOnEkskuls",
         foreignKey: "user_id",
-        as: "ekskuls",
       });
       this.hasMany(models.task, {
         foreignKey: "author_id",

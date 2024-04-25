@@ -151,7 +151,7 @@ const UserComponent = () => {
           },
         });
 
-        const successMessage = response.statusMessage;
+        const successMessage = response.data.statusMessage;
         setOnDataUpdate((prev) => !prev);
 
         Swal.fire({
@@ -285,9 +285,13 @@ const UserComponent = () => {
             Eksktrakurikuler
           </label>
           <Select
+            size="large"
             className="w-full"
             mode="multiple"
-            size="large"
+            rules={{
+              required: true,
+              message: "Ekstrakurikuler User Harus Diisi!",
+            }}
             placeholder="Pilih Ekstrakurikuler"
             value={formOld ? formOld.ekskuls : formData.ekskuls}
             onChange={(e) => handleInputChange(e, "ekskuls")}

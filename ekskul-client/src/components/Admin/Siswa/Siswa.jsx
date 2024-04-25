@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import { Modal, Select, Input } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import fs from "fs";
-import { RiFileExcel2Line } from "react-icons/ri";
 import { IoAddSharp } from "react-icons/io5";
 import { AiOutlineFileExcel } from "react-icons/ai";
 import useAuth from "../../../hooks/useAuth";
@@ -154,7 +153,6 @@ const SiswaComponent = () => {
 
     try {
       if (formOld && formOld.id) {
-        console.log(formOld);
         const response = await axiosPrivate.put(
           `/student/${formOld.id}`,
           formOld
@@ -221,7 +219,6 @@ const SiswaComponent = () => {
         [inputName]: newValue,
       }));
     }
-    console.log(formData);
   };
 
   const handleAllExportExcel = async () => {

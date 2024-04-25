@@ -180,7 +180,7 @@ const DetailGallery = ({ setFormOld, setOpen }) => {
 
     try {
       const response = await axiosPrivate.delete(`/gallery/${id}`);
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",

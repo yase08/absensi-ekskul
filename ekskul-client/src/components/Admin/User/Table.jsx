@@ -152,7 +152,7 @@ const TableUser = ({ setFormOld, setOpen, onDataUpdate, data, handleGetRequest }
 
     try {
       const response = await axiosPrivate.delete(`/user/${id}`);
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",

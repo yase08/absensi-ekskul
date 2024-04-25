@@ -287,7 +287,6 @@ const TableSiswa = ({ setFormOld, setOpen, handleGetRequest, data }) => {
           <a
             className="hover:text-blue-500"
             onClick={() => {
-              console.log(record);
               if (record.ekskuls.length > 0) {
                 setFormOld({
                   ...record,

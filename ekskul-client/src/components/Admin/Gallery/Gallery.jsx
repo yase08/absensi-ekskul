@@ -115,7 +115,6 @@ const GalleryComponent = () => {
 
     try {
       const formDataWithFile = new FormData();
-      console.log(formData, formOld);
 
       Object.entries(formOld).forEach(([key, value]) => {
         formDataWithFile.append(key, value);

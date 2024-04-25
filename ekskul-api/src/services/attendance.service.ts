@@ -557,6 +557,10 @@ export class AttendanceService {
         paramQuerySQL.where = {};
       } else if (user.role === "instructor") {
         if (selectedEkskulId) {
+          if (selectedGrade) {
+            // Check if grade is provided
+            paramQuerySQL.include[1].where.grade = selectedGrade; // Apply grade filter
+          }
           if (ekskuls.includes(selectedEkskulId)) {
             paramQuerySQL.where = { ekskul_id: selectedEkskulId };
           } else {
@@ -566,11 +570,6 @@ export class AttendanceService {
             );
           }
         }
-      }
-
-      if (selectedGrade) {
-        // Check if grade is provided
-        paramQuerySQL.include[1].where.grade = selectedGrade; // Apply grade filter
       }
 
       // Fetch attendance data based on the query parameters

@@ -15,6 +15,7 @@ const AbsensiComponent = () => {
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
   const { ekskuls } = jwtDecode(auth.accessToken);
+  console.log()
   // Get ekskul_id from sessionStorage
   const ekskul_id = sessionStorage.getItem("ekskul_id");
 

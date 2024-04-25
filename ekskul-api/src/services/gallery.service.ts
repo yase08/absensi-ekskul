@@ -25,11 +25,19 @@ export class GalleryService {
         const fileName = file.filename;
         galleryImages.push(fileName);
       }
+      const date = req.body.date;
+      const newDate = new Date(date);
+      const timestamp = newDate.getTime();
+
+      console.log(timestamp)
 
       const createGallery = await db.gallery.create({
         ...req.body,
+        date: timestamp,
         images: galleryImages,
       });
+
+      console.log(createGallery)
 
       if (!createGallery)
         throw apiResponse(status.FORBIDDEN, "Gagal membuat galeri");

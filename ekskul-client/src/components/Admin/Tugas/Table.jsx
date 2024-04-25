@@ -274,15 +274,15 @@ const TableTugas = ({
                 >
                   <LuTrash size={20} />
                 </a>
+                {selectedEkskul && (
+                  <Link
+                    className="hover:text-green-500"
+                    to={`/admin/penugasan/nilai/${record.id}`}
+                  >
+                    <BiDetail size={20} />
+                  </Link>
+                )}
               </>
-            )}
-            {selectedEkskul && (
-              <Link
-                className="hover:text-green-500"
-                to={`/admin/penugasan/nilai/${record.id}`}
-              >
-                <BiDetail size={20} />
-              </Link>
             )}
             {auth.role === "admin" && (
               <Link

@@ -16,7 +16,6 @@ const EkstrakurikulerComponent = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState();
   const [formOld, setFormOld] = useState("");
-  const [editFormData, setEditFormData] = useState(null);
 
   const showModal = () => {
     setOpen(true);
@@ -29,7 +28,7 @@ const EkstrakurikulerComponent = () => {
 
   const handleGetRequest = async () => {
     try {
-      const response = await axiosPrivate.get(`/ekskul`);
+      const response = await axiosPrivate.get("/ekskul");
 
       if (response.status === 200 && response.data.data) {
         if (Array.isArray(response.data.data)) {
@@ -48,16 +47,15 @@ const EkstrakurikulerComponent = () => {
     }
   };
 
-
   const handleOk = async (event) => {
     event.preventDefault();
     setConfirmLoading(true);
 
     try {
-      if (editFormData && editFormData.id) {
+      if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
-          `/ekskul/${editFormData.id}`,
-          editFormData
+          `/ekskul/${formOld.id}`,
+          formOld
         );
         const successMessage = response.data.statusMessage;
 
@@ -66,14 +64,15 @@ const EkstrakurikulerComponent = () => {
           title: "Success!",
           text: successMessage,
         });
-        handleGetRequest()
-        setEditFormData(null);
+        handleGetRequest();
+        setFormOld(null);
+        setOpen(false);
       } else {
-        const response = await axiosPrivate.post(`/ekskul`, formData);
+        const response = await axiosPrivate.post("/ekskul", formData);
         const successMessage = response.data.statusMessage;
         setOpen(false);
 
-        handleGetRequest()
+        handleGetRequest();
         Swal.fire({
           icon: "success",
           title: "Success!",
@@ -102,7 +101,6 @@ const EkstrakurikulerComponent = () => {
         });
       }
     } finally {
-      setLoading(false);
       setConfirmLoading(false);
       setOpen(false);
     }
@@ -110,8 +108,8 @@ const EkstrakurikulerComponent = () => {
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-    if (editFormData) {
-      setEditFormData((prevData) => ({
+    if (formOld) {
+      setFormOld((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
@@ -124,9 +122,8 @@ const EkstrakurikulerComponent = () => {
   };
 
   useEffect(() => {
-    handleGetRequest()
-  }
-  , []);
+    handleGetRequest();
+  }, []);
 
   return (
     <div className="w-full h-full bg-transparent p-[20px]">
@@ -143,14 +140,19 @@ const EkstrakurikulerComponent = () => {
           </button>
         </div>
         <div className="w-full bg-white mt-3 mb-5">
-          <Table setFormOld={setFormOld} setOpen={setOpen} data={data} handleGetRequest={handleGetRequest} />
+          <Table
+            setFormOld={setFormOld}
+            setOpen={setOpen}
+            data={data}
+            handleGetRequest={handleGetRequest}
+          />
         </div>
       </div>
       <Modal
         title={formOld && formOld.id ? "Edit Data" : "Tambah Data"}
         open={open}
         onOk={handleOk}
-        confirmLoading={confirmLoading}
+        confirmLoading={false}
         onCancel={handleCancel}
       >
         <form action="" className="flex flex-col p-5 gap-2">

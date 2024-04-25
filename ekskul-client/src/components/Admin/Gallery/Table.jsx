@@ -207,17 +207,17 @@ const TableGallery = ({ setFormOld, setOpen, data, handleGetRequest }) => {
       width: "20%",
       ...getColumnSearchProps("name"),
     },
-    {
-      title: "Tanggal",
-      dataIndex: "date",
-      sorter: handleSort("date"),
-      sortDirections: ["descend", "ascend"],
-      width: "20%",
-      ...getColumnSearchProps("date"),
-      render: (text) => {
-        return new Intl.DateTimeFormat("en-US").format(new Date(text));
-      },
-    },
+    // {
+    //   title: "Tanggal",
+    //   dataIndex: "date",
+    //   sorter: handleSort("date"),
+    //   sortDirections: ["descend", "ascend"],
+    //   width: "20%",
+    //   ...getColumnSearchProps("date"),
+    //   render: (text) => {
+    //     return new Intl.DateTimeFormat("en-US").format(new Date(text));
+    //   },
+    // },
     {
       title: "Ekstrakurikuler",
       dataIndex: "ekskul",

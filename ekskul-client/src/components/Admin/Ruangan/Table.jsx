@@ -147,7 +147,7 @@ const TableRuangan = ({ setFormOld, data, handleGetRequest }) => {
 
     try {
       const response = await axiosPrivate.delete(`/room`, id);
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
 
       Swal.fire({
         icon: "success",

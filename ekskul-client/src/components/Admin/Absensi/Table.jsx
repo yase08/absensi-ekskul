@@ -19,8 +19,16 @@ const TableAbsensi = ({ selectedEkskul, selectedGrade }) => {
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
   const { auth } = useAuth();
 
-  const ekskul = sessionStorage.getItem("ekskul_id") || "";
-  const grade = sessionStorage.getItem("grade") || "";
+  var ekskul;
+  var grade;
+
+  if (auth.role === "admin") {
+    ekskul = sessionStorage.getItem("ekskul_id") || "";
+    grade = sessionStorage.getItem("grade") || "";
+  } else if (auth.role === "instructor") {
+    ekskul = sessionStorage.getItem("ekskul_id") || null;
+    grade = sessionStorage.getItem("grade") || null;
+  }
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();

@@ -31,8 +31,11 @@ export class UserService {
 
       const hashedPassword = await hashPassword(req.body.password);
 
+      const ekskulsArray = req.body.ekskuls.split(",");
+      console.log(ekskulsArray);
+
       const ekskuls = await db.ekskul.findAll({
-        where: { id: req.body.ekskuls },
+        where: { id: ekskulsArray },
       });
 
       const createUser = await db.user.create({
@@ -44,11 +47,11 @@ export class UserService {
       Promise.all(
         ekskuls.map(async (ekskul) => {
           try {
-            const createUserOnEkskuls = await db.userOnEkskul.create({
+            const createUserEkskuls = await db.userOnEkskul.create({
               user_id: createUser.id,
               ekskul_id: ekskul.id,
             });
-            return createUserOnEkskuls;
+            return createUserEkskuls;
           } catch (error) {
             console.error(error);
           }

@@ -22,7 +22,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       name: DataTypes.STRING,
-      date: DataTypes.STRING,
+      date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
       images: DataTypes.JSON,
       slug: DataTypes.STRING,
       ekskul_id: {

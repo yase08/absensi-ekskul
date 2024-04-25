@@ -220,7 +220,7 @@ const TableAbsensi = () => {
         `/attendance/${formData.id}`,
         formData
       );
-      const successMessage = response.statusMessage;
+      const successMessage = response.data.statusMessage;
       handleGetRequest();
       setFormData({});
 

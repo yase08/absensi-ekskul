@@ -900,7 +900,7 @@ const SideNav = ({
                 </div>
               </div>
             )}
-            {auth.role === "admin" && (
+            {/* {auth.role === "admin" && (
               <div
                 className={`flex flex-col gap-y-[13px] relative   ${
                   expanded
@@ -971,7 +971,7 @@ const SideNav = ({
                   )}
                 </div>
               </div>
-            )}
+            )} */}
             <div
               className={`flex flex-col gap-y-[13px] relative   ${
                 expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
