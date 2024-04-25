@@ -298,9 +298,9 @@ export class ActivityProgramService {
         attributes: ["activity", "task", "startDate", "endDate"],
       });
 
-      const modifiedActivities = activities.map((activity) => {
+      const modifiedActivities = activities.map((activity, index) => {
         return {
-          no: activity.indexOf(activity) + 1,
+          no: index + 1,
           activity: activity.activity ? activity.activity : null,
           task: activity.task ? activity.task : null,
           author: activity.user ? activity.user.name : null,

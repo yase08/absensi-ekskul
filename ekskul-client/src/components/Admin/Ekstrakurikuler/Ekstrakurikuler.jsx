@@ -16,7 +16,6 @@ const EkstrakurikulerComponent = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState();
   const [formOld, setFormOld] = useState("");
-  const [editFormData, setEditFormData] = useState(null);
 
   const showModal = () => {
     setOpen(true);
@@ -54,10 +53,10 @@ const EkstrakurikulerComponent = () => {
     setConfirmLoading(true);
 
     try {
-      if (editFormData && editFormData.id) {
+      if (formOld && formOld.id) {
         const response = await axiosPrivate.put(
-          `/ekskul/${editFormData.id}`,
-          editFormData
+          `/ekskul/${formOld.id}`,
+          formOld
         );
         const successMessage = response.data.statusMessage;
 
@@ -67,7 +66,8 @@ const EkstrakurikulerComponent = () => {
           text: successMessage,
         });
         handleGetRequest()
-        setEditFormData(null);
+        setFormOld(null);
+        setOpen(false)
       } else {
         const response = await axiosPrivate.post(`/ekskul`, formData);
         const successMessage = response.data.statusMessage;
@@ -102,7 +102,6 @@ const EkstrakurikulerComponent = () => {
         });
       }
     } finally {
-      setLoading(false);
       setConfirmLoading(false);
       setOpen(false);
     }
@@ -110,8 +109,8 @@ const EkstrakurikulerComponent = () => {
 
   const handleInputChange = (e, inputName) => {
     const newValue = e.target ? e.target.value : e;
-    if (editFormData) {
-      setEditFormData((prevData) => ({
+    if (formOld) {
+      setFormOld((prevData) => ({
         ...prevData,
         [inputName]: newValue,
       }));
@@ -150,7 +149,7 @@ const EkstrakurikulerComponent = () => {
         title={formOld && formOld.id ? "Edit Data" : "Tambah Data"}
         open={open}
         onOk={handleOk}
-        confirmLoading={confirmLoading}
+        confirmLoading={false}
         onCancel={handleCancel}
       >
         <form action="" className="flex flex-col p-5 gap-2">

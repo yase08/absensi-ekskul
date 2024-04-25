@@ -125,7 +125,6 @@ const SideNav = ({
     }
   };
 
-  console.log("role", auth.role);
   const [infoHome3Navbar, setInfoHome3Navbar] = useState(false);
 
   const handleNavbarHomeMouseEnter3 = () => {
