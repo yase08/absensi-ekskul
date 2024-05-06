@@ -91,7 +91,7 @@ export class AuthService {
       return Promise.resolve(
         apiResponse(status.OK, "Login berhasil", {
           accessToken: token,
-          role: user.role
+          role: user.role,
         })
       );
     } catch (error: any) {
@@ -158,7 +158,7 @@ export class AuthService {
 
       return apiResponse(status.OK, "Refresh token", {
         accessToken: accessToken,
-        role: user.role
+        role: user.role,
       });
     } catch (error: any) {
       return apiResponse(
@@ -220,7 +220,9 @@ export class AuthService {
         where: { role: "instructor" },
       });
       const studentCount = await db.student.count();
-      const activeUserCount = await db.user.count();
+      const activeUserCount = await db.user.count({
+        where: { isActive: true },
+      });
 
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mendapatkan data", {
@@ -353,7 +355,7 @@ export class AuthService {
         },
         { where: { id: user.id } }
       );
-        
+
       return Promise.resolve(
         apiResponse(status.OK, "Berhasil mengubah password")
       );

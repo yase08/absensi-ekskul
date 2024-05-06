@@ -18,9 +18,6 @@ const Nextinfo = () => {
                 <p className="font-poppins text-3xl opacity-80 ml-3 mt-2 max-2xl:text-xl ">
                   212
                 </p>
-                <p className="font-poppins text-sm mt-2 opacity-60 max-2xl:text-xs">
-                  Increased By 90%
-                </p>
               </div>
               <span className="mr-10">
                 <SiPhpmyadmin className="text-5xl font-bold opacity-80 max-2xl:text-4xl" />
@@ -33,9 +30,6 @@ const Nextinfo = () => {
                 </p>
                 <p className="font-poppins text-3xl opacity-80 ml-3 mt-2 max-2xl:text-xl">
                   212
-                </p>
-                <p className="font-poppins text-sm mt-2 opacity-60 max-2xl:text-xs">
-                  Increased By 90%
                 </p>
               </div>
               <span className="mr-10">
@@ -50,9 +44,6 @@ const Nextinfo = () => {
                 <p className="font-poppins text-3xl opacity-80 ml-3 mt-2 max-2xl:text-xl">
                   21
                 </p>
-                <p className="font-poppins text-sm mt-2 opacity-60 max-2xl:text-xs">
-                  Increased By 90%
-                </p>
               </div>
               <span className="mr-10">
                 <BsClockHistory className="text-[43px] font-bold opacity-80 max-2xl:text-4xl" />
@@ -65,9 +56,6 @@ const Nextinfo = () => {
                 </p>
                 <p className="font-poppins text-3xl opacity-80 ml-3 mt-2 max-2xl:text-xl">
                 121
-                </p>
-                <p className="font-poppins text-sm mt-2 opacity-60 max-2xl:text-xs">
-                  Increased By 90%
                 </p>
               </div>
               <span className="mr-10">

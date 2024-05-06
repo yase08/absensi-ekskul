@@ -32,7 +32,6 @@ export class UserService {
       const hashedPassword = await hashPassword(req.body.password);
 
       const ekskulsArray = req.body.ekskuls.split(",");
-      console.log(ekskulsArray);
 
       const ekskuls = await db.ekskul.findAll({
         where: { id: ekskulsArray },

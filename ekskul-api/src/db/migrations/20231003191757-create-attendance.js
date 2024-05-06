@@ -33,6 +33,10 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
       },
+      semester: {
+        type: Sequelize.ENUM("odd", "even"),
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

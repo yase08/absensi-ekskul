@@ -29,15 +29,11 @@ export class GalleryService {
       const newDate = new Date(date);
       const timestamp = newDate.getTime();
 
-      console.log(timestamp)
-
       const createGallery = await db.gallery.create({
         ...req.body,
         date: timestamp,
         images: galleryImages,
       });
-
-      console.log(createGallery)
 
       if (!createGallery)
         throw apiResponse(status.FORBIDDEN, "Gagal membuat galeri");
@@ -110,7 +106,7 @@ export class GalleryService {
     try {
       const gallery = await db.gallery.findAll({
         where: { slug: req.params.slug },
-        attributes: ["images"],
+        attributes: ["images", "id"],
       });
 
       if (!gallery || gallery.length === 0)
@@ -330,6 +326,70 @@ export class GalleryService {
           error.statusCode || status.INTERNAL_SERVER_ERROR,
           error.statusMessage,
           error.message
+        )
+      );
+    }
+  }
+
+  async deleteImageOnGalleryService(req: Request): Promise<any> {
+    try {
+      const galleryId = req.params.id;
+      const imageName = req.body.imageName;
+
+      const galleryExist = await db.gallery.findOne({
+        where: { id: galleryId },
+      });
+
+      if (!galleryExist) {
+        throw apiResponse(status.NOT_FOUND, "Galeri tidak ditemukan");
+      }
+
+      let deleteImages: string[] = [];
+
+      if (typeof galleryExist.images === "string") {
+        deleteImages = JSON.parse(galleryExist.images);
+      } else if (Array.isArray(galleryExist.images)) {
+        deleteImages = galleryExist.images;
+      }
+
+      const imageIndex = deleteImages.indexOf(imageName);
+
+      if (imageIndex === -1) {
+        throw apiResponse(
+          status.NOT_FOUND,
+          "Gambar tidak ditemukan dalam galeri"
+        );
+      }
+
+      const filePath = path.join(
+        __dirname,
+        "..",
+        "public",
+        "images",
+        imageName
+      );
+      fs.unlinkSync(filePath);
+
+      deleteImages.splice(imageIndex, 1);
+
+      await db.gallery.update(
+        {
+          images: deleteImages,
+        },
+        {
+          where: { id: galleryId },
+        }
+      );
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Berhasil menghapus gambar dari galeri")
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message || "Gagal menghapus gambar dari galeri"
         )
       );
     }

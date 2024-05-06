@@ -85,9 +85,7 @@ const TableEskul = () => {
     try {
       const response = await getAllEkskul({ filter, sort, size, number });
   
-      if (response && response.data) {
-        console.log('API Response:', response.data);
-  
+      if (response && response.data) {  
         if (Array.isArray(response.data.ekskulFilter)) {
           const ekskulData = response.data.ekskulFilter;
           const ekskuls = response.data.ekskuls;

@@ -58,14 +58,9 @@ const GalleryComponent = () => {
         if (Array.isArray(response.data.data)) {
           const ekskulData = response.data.data;
           setEkskul(ekskulData);
-        } else {
-          console.log("Data is not an array");
         }
-      } else {
-        console.log("Data retrieval failed");
       }
     } catch (error) {
-      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -90,8 +85,6 @@ const GalleryComponent = () => {
   const handleGetRequest = async () => {
     try {
       const response = await axiosPrivate.get(`/gallery`);
-      console.log(response);
-
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
           const galleryData = response.data.data;

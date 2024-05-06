@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  
+
   attendance.init(
     {
       id: {
@@ -39,6 +39,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       date: {
         type: DataTypes.DATE,
+        allowNull: false,
+      },
+      semester: {
+        type: DataTypes.ENUM("odd", "even"),
         allowNull: false,
       },
     },

@@ -41,7 +41,6 @@ const AktivitasComponent = () => {
 
     try {
       const response = await  axiosPrivate.post('/activity-program', formData);
-      console.log(formData);
       const successMessage = response.statusMessage;
 
       Swal.fire({
@@ -50,7 +49,6 @@ const AktivitasComponent = () => {
         text: successMessage,
       });
       setOpen(!isOpen)
-      console.log('Response:', response.data);
     } catch (error) {
       console.error('Error:', error);
 
@@ -82,7 +80,6 @@ const AktivitasComponent = () => {
   const handleUpdateRequest  = async (event) => {
     event.preventDefault();
     setLoading(true);
-    console.log(formOld);
 
     try {
       const response = await axiosPrivate.put(`/activity-program/${formOld.id}`, formOld);
@@ -95,7 +92,6 @@ const AktivitasComponent = () => {
       });
       setFormOld('')
       setOpen(!isOpen)
-      console.log('Response:', response.data);
     } catch (error) {
       console.error('Error:', error);
 

@@ -5,6 +5,7 @@ import { permission } from "../middlewares/permission";
 import { authorization } from "../middlewares/authorization";
 import { validator } from "../middlewares/validator.middleware";
 import { DTOStudent, DTOStudentById } from "../dto/student.dto";
+import { uploadExcel } from "../libs/multer.lib";
 
 // class RouteUsers mengextends dari StudentController agar bisa memakai semua property dan method dari student controller
 class StudentRoutes extends StudentController {
@@ -18,13 +19,18 @@ class StudentRoutes extends StudentController {
   routes(): Router {
     this.router.post(
       "/",
+      [authorization(), auth(), permission(["admin"]), validator(DTOStudent)],
+      this.createStudent
+    );
+    this.router.post(
+      "/import",
       [
         authorization(),
         auth(),
-        permission(["admin", "instructor"]),
-        validator(DTOStudent),
+        permission(["admin"]),
+        uploadExcel.single("file"),
       ],
-      this.createStudent
+      this.importStudent
     );
     this.router.get(
       "/",
@@ -53,7 +59,7 @@ class StudentRoutes extends StudentController {
     );
     this.router.put(
       "/:id",
-      [authorization(), auth(), permission(["instructor", "admin"])],
+      [authorization(), auth(), permission(["admin"])],
       this.updateStudent
     );
     this.router.delete(
@@ -61,7 +67,7 @@ class StudentRoutes extends StudentController {
       [
         authorization(),
         auth(),
-        permission(["instructor", "admin"]),
+        permission(["admin"]),
         validator(DTOStudentById),
       ],
       this.deleteStudent

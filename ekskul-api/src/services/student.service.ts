@@ -1,10 +1,10 @@
 import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request, Response } from "express";
-import { Op, where } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 import { exportExcel } from "../libs/excel.lib";
-import { ISession } from "../interfaces/user.interface";
+import xlsx from "xlsx";
+import { Op } from "sequelize";
 
 // Berfungsi untuk menghandle logic dari controler
 const db = require("../db/models/index.js");
@@ -26,7 +26,9 @@ export class StudentService {
         where: { id: req.body.ekskuls },
       });
 
-      const createStudent = await db.student.create(req.body);
+      const createStudent = await db.student.create({
+        ...req.body,
+      });
 
       Promise.all(
         ekskuls.map(async (ekskul) => {
@@ -61,7 +63,15 @@ export class StudentService {
   async getAllStudentService(req: Request): Promise<any> {
     try {
       const paramQuerySQL: any = {
-        attributes: ["id", "name", "nis", "email", "mobileNumber", "gender", "grade"],
+        attributes: [
+          "id",
+          "name",
+          "nis",
+          "email",
+          "mobileNumber",
+          "gender",
+          "grade",
+        ],
         include: [
           {
             model: db.rombel,
@@ -373,7 +383,6 @@ export class StudentService {
 
   async exportAllStudentService(req: Request, res: Response): Promise<any> {
     try {
-      const date = Date.now();
       const options = { timeZone: "Asia/Jakarta" };
       const dateTimeFormat = new Intl.DateTimeFormat("en-US", options);
       const students = await db.student.findAll({
@@ -393,7 +402,7 @@ export class StudentService {
             attributes: ["id", "name"],
           },
         ],
-        attributes: ["name", "nis", "gender"],
+        attributes: ["name", "nis", "email", "mobileNumber", "gender", "grade"],
       });
 
       const modifiedStudents = students.map((student) => {
@@ -401,11 +410,14 @@ export class StudentService {
           no: students.indexOf(student) + 1,
           student_name: student ? student.name : null,
           student_nis: student ? student.nis : null,
+          student_email: student ? student.email : null,
+          student_mobileNumber: student ? student.mobileNumber : null,
           student_gender: student
             ? student.gender === "male"
               ? "Laki-laki"
               : "Perempuan"
             : null,
+          student_grade: student ? student.grade : null,
           student_rombel: student ? student.rombel.name : null,
           student_rayon: student ? student.rayon.name : null,
           student_ekskul: student.ekskuls
@@ -418,12 +430,15 @@ export class StudentService {
         { header: "No", key: "no", width: 15 },
         { header: "Nama", key: "student_name", width: 15 },
         { header: "Nis", key: "student_nis", width: 15 },
+        { header: "Email", key: "student_email", width: 15 },
+        { header: "Nomor Telepon", key: "student_mobileNumber", width: 15 },
         { header: "Jenis Kelamin", key: "student_gender", width: 15 },
+        { header: "Kelas", key: "student_grade", width: 15 },
         { header: "Rombel", key: "student_rombel", width: 15 },
         { header: "Rayon", key: "student_rayon", width: 15 },
         { header: "Ekstrakurikuler", key: "student_ekskul", width: 15 },
       ];
-      const file = `data-siswa-${date}.xlsx`;
+      const file = `data-siswa-${dateTimeFormat}.xlsx`;
 
       const exportSuccess = await exportExcel(
         file,
@@ -453,6 +468,81 @@ export class StudentService {
           error.statusMessage,
           error.message
         )
+      );
+    }
+  }
+
+  async importStudentService(req: Request, res: Response): Promise<any> {
+    try {
+      const workbook = xlsx.readFile(req.file.path);
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows: any = xlsx.utils.sheet_to_json(worksheet, { raw: true });
+
+      for (const row of rows) {
+        const existingStudent = await db.student.findOne({
+          where: {
+            [Op.or]: [
+              { nis: row.Nis },
+              { email: row.Email },
+              { mobileNumber: row["Nomor Telepon"] },
+            ],
+          },
+        });
+
+        if (existingStudent) {
+          continue;
+        }
+
+        const data = {
+          id: uuidv4(),
+          name: row.Nama,
+          nis: row.Nis,
+          email: row.Email,
+          mobileNumber: row["Nomor Telepon"],
+          gender: row["Jenis Kelamin"] === "Laki-laki" ? "male" : "female",
+          grade: row.Kelas,
+        };
+
+        const rayon = await db.rayon.findOne({ where: { name: row.Rayon } });
+        const rombel = await db.rombel.findOne({ where: { name: row.Rombel } });
+        const arrayEkskul = row.Ekstrakurikuler.split(",").map((item) =>
+          item.trim()
+        );
+        const ekskul = await db.ekskul.findAll({
+          where: {
+            name: {
+              [Op.in]: arrayEkskul,
+            },
+          },
+        });
+
+        const createStudent = await db.student.create({
+          ...data,
+          rayon_id: rayon ? rayon.id : null,
+          rombel_id: rombel ? rombel.id : null,
+        });
+
+        const createStudentEkskul = await Promise.all(
+          ekskul.map(async (ekskul) => {
+            try {
+              const createStudentEkskul = await db.studentOnEkskul.create({
+                student_id: createStudent.id,
+                ekskul_id: ekskul.id,
+              });
+              return createStudentEkskul;
+            } catch (error) {
+              console.error(error);
+            }
+          })
+        );
+      }
+
+      return apiResponse(status.OK, `Import Success`, exportExcel);
+    } catch (error: any) {
+      return apiResponse(
+        error.statusCode || status.INTERNAL_SERVER_ERROR,
+        error.statusMessage,
+        error.message
       );
     }
   }

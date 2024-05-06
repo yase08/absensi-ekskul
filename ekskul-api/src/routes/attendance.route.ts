@@ -32,14 +32,24 @@ class AttendanceRoutes extends AttendanceController {
       this.getAllAttendance
     );
     this.router.get(
+      "/charts/monthly",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getMonthlyAttendance
+    );
+    this.router.get(
+      "/charts/daily",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getDailyAttendance
+    );
+    this.router.get(
+      "/charts/semester",
+      [authorization(), auth(), permission(["instructor", "admin"])],
+      this.getSemesterlyAttendance
+    );
+    this.router.get(
       "/detail",
       [authorization(), auth(), permission(["instructor", "admin"])],
       this.getDetailAttendance
-    );
-    this.router.get(
-      "/charts/weekly",
-      [authorization(), auth(), permission(["admin"])],
-      this.getWeeklyAttendanceChart
     );
     this.router.get(
       "/export",

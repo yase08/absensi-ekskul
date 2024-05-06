@@ -2,18 +2,20 @@ import { StatusCodes as status } from "http-status-codes";
 import { apiResponse } from "../helpers/apiResponse.helper";
 import { Request, Response } from "express";
 import { exportExcel } from "../libs/excel.lib";
-import {
-  formatDate,
-  getWeekNumberAndYear,
-  getMonthAndYear,
-} from "../libs/date.lib";
 import { ISession } from "../interfaces/user.interface";
 import { Op } from "sequelize";
-import * as cron from "node-cron";
-import fs from "fs";
-import path from "path";
 
 const db = require("../db/models");
+
+async function checkSemester(): Promise<string> {
+  const currentMonth = new Date().getMonth();
+
+  if (currentMonth >= 6 && currentMonth <= 11) {
+    return "odd";
+  } else {
+    return "even";
+  }
+}
 
 function calculateAttendanceValueBasedOnCategory(category: string): number {
   const result = category === "hadir" ? 1 : 0;
@@ -229,32 +231,15 @@ const countAttendancePerMonthService = async () => {
   }
 };
 
-// cron.schedule("* * * * *", () => {
-//   countAttendancePerWeekService();
-// });
-
-// cron.schedule("0 0 1 * *", () => {
-//   countAttendancePerMonthService();
-// });
-
-// cron.schedule("* * * * *", async () => {
-//   try {
-//     await countAttendancePerWeekService();
-//     console.log("Attendance per week count completed successfully.");
-//   } catch (error) {
-//     console.error("Error in cron job:", error);
-//   }
-// });
-
-// cron.schedule("* * * * *", () => {
-//   countAttendancePerMonthService();
-// });
-
 export class AttendanceService {
   async createAttendanceService(req: Request): Promise<any> {
     try {
       const ekskuls = (req.session as ISession).user.ekskul;
       const selectedEkskulId = req.query.ekskul_id as string;
+      const semester = await checkSemester();
+      const date = req.body.date;
+      const newDate = new Date(date);
+      const timestamp = newDate.getTime();
 
       if (ekskuls.includes(selectedEkskulId)) {
         const createAttendancePromises = [];
@@ -266,11 +251,13 @@ export class AttendanceService {
           });
 
           if (studentOnEkskul) {
-            const createAttendance = db.attendance.create({
+            const createAttendancePromise = db.attendance.create({
               ...attendance,
+              date: timestamp,
+              semester: semester,
               ekskul_id: selectedEkskulId,
             });
-            createAttendancePromises.push(createAttendance);
+            createAttendancePromises.push(createAttendancePromise);
           } else {
             throw apiResponse(
               status.FORBIDDEN,
@@ -746,99 +733,6 @@ export class AttendanceService {
     }
   }
 
-  async getChartAttendanceService(req: Request): Promise<any> {
-    try {
-      const weeklyAttendance = {};
-      const monthlyAttendance = {};
-      const dailyAttendance = {};
-      // const ekskuls = (req.session as ISession).user.ekskul;
-      const selectedType = req.query.type;
-
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const page: any = req.query.page;
-
-      // if (ekskuls.includes(Number(selectedEkskulId))) {
-      const paramQuerySQL: any = {
-        where: { category: selectedType },
-      };
-      let limit: number;
-      let offset: number;
-
-      if (sort) {
-        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-        const fieldName = sort.replace(/^-/, "");
-        paramQuerySQL.order = [[fieldName, sortOrder]];
-      }
-
-      if (page && page.size && page.number) {
-        limit = parseInt(page.size, 10);
-        offset = (parseInt(page.number, 10) - 1) * limit;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      } else {
-        limit = 10;
-        offset = 0;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      }
-
-      const attendanceFilter = await db.attendance.findAll(paramQuerySQL);
-
-      if (!attendanceFilter || attendanceFilter.length === 0) {
-        return Promise.resolve(
-          apiResponse(
-            status.NOT_FOUND,
-            "No attendances found with the specified filter"
-          )
-        );
-      }
-
-      attendanceFilter.forEach((attendance) => {
-        const formattedDate = formatDate(attendance.date);
-
-        if (!dailyAttendance[formattedDate]) {
-          dailyAttendance[formattedDate] = [];
-        }
-        dailyAttendance[formattedDate].push(attendance);
-
-        const { weekNumber, year } = getWeekNumberAndYear(attendance.date);
-
-        const weekKey = `${year}-W${weekNumber}`;
-        if (!weeklyAttendance[weekKey]) {
-          weeklyAttendance[weekKey] = [];
-        }
-        weeklyAttendance[weekKey].push(attendance);
-
-        const { month, formattedYear } = getMonthAndYear(attendance.date);
-
-        const monthKey = `${formattedYear}-${month}`;
-        if (!monthlyAttendance[monthKey]) {
-          monthlyAttendance[monthKey] = [];
-        }
-        monthlyAttendance[monthKey].push(attendance);
-      });
-
-      return Promise.resolve(
-        apiResponse(status.OK, "Fetched all attendances success", {
-          weeklyAttendance,
-          monthlyAttendance,
-          dailyAttendance,
-          // attendances,
-        })
-      );
-    } catch (error: any) {
-      return Promise.reject(
-        apiResponse(
-          error.statusCode || status.INTERNAL_SERVER_ERROR,
-          error.statusMessage,
-          error.message
-        )
-      );
-    }
-    ``;
-  }
-
   async updateAttendanceService(req: Request): Promise<any> {
     try {
       const attendanceExist = await db.attendance.findOne({
@@ -874,52 +768,131 @@ export class AttendanceService {
     }
   }
 
-  async getHistoryWeeklyAttendanceService(req: Request): Promise<any> {
+  async getDailyAttendanceService(req: Request): Promise<any> {
     try {
-      const weeklyAttendanceData = await db.historyAttendance.findAll({
+      const twelveMonthsAgo = new Date();
+      twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+      const attendanceDate = await db.attendance.findAll({
         where: {
-          type: "week",
-        },
-        attributes: ["totalAttendance", "type", "name", "year"],
-        include: [
-          {
-            model: db.ekskul,
-            as: "ekskul",
-            attributes: ["name"],
+          date: {
+            [Op.gte]: twelveMonthsAgo,
           },
+        },
+        attributes: [
+          "date",
+          [db.sequelize.fn("COUNT", db.sequelize.col("id")), "count"],
+        ],
+        group: ["date"],
+      });
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Get daily attendance success", attendanceDate)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getMonthlyAttendanceService(req: Request): Promise<any> {
+    try {
+      const twelveMonthsAgo = new Date();
+      twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+      console.log(twelveMonthsAgo);
+
+      const attendanceData = await db.attendance.findAll({
+        where: {
+          date: {
+            [Op.gte]: twelveMonthsAgo,
+          },
+        },
+        attributes: [
+          [db.sequelize.fn("MONTH", db.sequelize.col("date")), "month"],
+          [db.sequelize.fn("COUNT", db.sequelize.col("id")), "count"],
+        ],
+        group: [db.sequelize.fn("MONTH", db.sequelize.col("date"))],
+      });
+
+      const formattedData = attendanceData.map((data) => ({
+        month: data.get("month"),
+        count: data.get("count"),
+      }));
+
+      return Promise.resolve(
+        apiResponse(status.OK, "Get monthly attendance success", formattedData)
+      );
+    } catch (error: any) {
+      return Promise.reject(
+        apiResponse(
+          error.statusCode || status.INTERNAL_SERVER_ERROR,
+          error.statusMessage,
+          error.message
+        )
+      );
+    }
+  }
+
+  async getSemesterlyAttendanceService(req: Request): Promise<any> {
+    try {
+      const semestersAgo = 2;
+      const currentDate = new Date();
+      const semesterStart = new Date(currentDate);
+      semesterStart.setMonth(semesterStart.getMonth() - 6 * semestersAgo);
+      const semesterEnd = new Date(currentDate);
+      semesterEnd.setMonth(semesterEnd.getMonth() - 6 * (semestersAgo - 1));
+
+      const attendanceData = await db.attendance.findAll({
+        where: {
+          date: {
+            [Op.gte]: semesterStart,
+            [Op.lt]: semesterEnd,
+          },
+        },
+        attributes: [
+          [db.sequelize.fn("YEAR", db.sequelize.col("date")), "year"],
+          [db.sequelize.fn("QUARTER", db.sequelize.col("date")), "quarter"],
+          [db.sequelize.fn("COUNT", db.sequelize.col("id")), "count"],
+        ],
+        group: [
+          db.sequelize.fn("YEAR", db.sequelize.col("date")),
+          db.sequelize.fn("QUARTER", db.sequelize.col("date")),
         ],
       });
 
-      const formattedData = {};
+      console.log(`attendanceData: ${JSON.stringify(attendanceData)}`);
 
-      weeklyAttendanceData.forEach((attendance) => {
-        const weekName = `week ${attendance.name}`;
-        if (!formattedData[weekName]) {
-          formattedData[weekName] = [];
-        }
+      if (attendanceData.length === 0) {
+        return Promise.resolve(
+          apiResponse(
+            status.OK,
+            "No attendance data found for the specified semester",
+            []
+          )
+        );
+      }
 
-        formattedData[weekName].push({
-          ekskulName: attendance.ekskul.name,
-          year: attendance.year,
-          totalAttendance: attendance.totalAttendance,
-        });
-      });
+      const formattedData = attendanceData.map((data) => ({
+        semester: `Semester ${data.get("quarter")} ${data.get("year")}`,
+        count: data.get("count"),
+      }));
 
-      const sortedWeeks = Object.keys(formattedData).sort();
-
-      const sortedFormattedData = {};
-      sortedWeeks.forEach((week) => {
-        sortedFormattedData[week] = formattedData[week];
-      });
+      console.log(`formattedData: ${JSON.stringify(formattedData)}`);
 
       return Promise.resolve(
         apiResponse(
           status.OK,
-          "Fetched weekly attendance success",
-          sortedFormattedData
+          "Get semesterly attendance success",
+          formattedData
         )
       );
     } catch (error: any) {
+      console.error(`Error: ${error}`);
       return Promise.reject(
         apiResponse(
           error.statusCode || status.INTERNAL_SERVER_ERROR,

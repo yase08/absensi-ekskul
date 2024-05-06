@@ -2,7 +2,7 @@ import Swal from "sweetalert2";
 import Table from "./Table";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { useEffect, useState } from "react";
-import { DatePicker, Modal, Select } from "antd/lib";
+import { Modal, Select } from "antd/lib";
 import { IoAddSharp } from "react-icons/io5";
 import { RiFileExcel2Line } from "react-icons/ri";
 import fs from "fs";
@@ -10,6 +10,10 @@ import useAuth from "../../../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
 
 const InstrukturComponent = () => {
+  const date = new Date();
+  const options = {
+    timeZone: "Asia/Jakarta",
+  };
   const { auth } = useAuth();
   const { id, ekskuls } = jwtDecode(auth.accessToken);
   const [open, setOpen] = useState(false);
@@ -17,11 +21,10 @@ const InstrukturComponent = () => {
     instructor_id: id,
     ekskul_id: "",
     category: "",
-    date: "",
+    date: date.toLocaleDateString("id-ID", options),
   });
   const [data, setData] = useState([]);
   const [error, setError] = useState();
-  const [selectedDate, setSelectedDate] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const axiosPrivate = useAxiosPrivate();
@@ -37,11 +40,6 @@ const InstrukturComponent = () => {
       ...prevData,
       [inputName]: newValue,
     }));
-  };
-
-  const handleDate = (dateStirng, selectedDate) => {
-    setSelectedDate(selectedDate);
-    handleInputChange(dateStirng, "date");
   };
 
   const showModal = () => {
@@ -228,17 +226,6 @@ const InstrukturComponent = () => {
                   label: "Alfa",
                 },
               ]}
-            />
-            <label htmlFor="" className="text-lg">
-              Tanggal
-            </label>
-            <DatePicker
-              size="large"
-              name="date"
-              value={selectedDate}
-              onChange={(selectedDate, dateString) =>
-                handleDate(dateString, selectedDate)
-              }
             />
           </form>
         </Modal>

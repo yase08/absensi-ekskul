@@ -1,26 +1,26 @@
 import Table from "./Table";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { Modal, Select, Input } from "antd";
+import { Modal, Select, Input, Button, Upload } from "antd";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
-import fs from "fs";
 import { IoAddSharp } from "react-icons/io5";
 import { AiOutlineFileExcel } from "react-icons/ai";
 import useAuth from "../../../hooks/useAuth";
-import { jwtDecode } from "jwt-decode";
+import { LuUpload } from "react-icons/lu";
+import { FaFileImport } from "react-icons/fa";
 
 const SiswaComponent = () => {
-  const [selectedEkskul, setSelectedEkskul] = useState(null);
   const { auth } = useAuth();
-  const { ekskuls } = jwtDecode(auth.accessToken);
   const [open, setOpen] = useState(false);
+  const [openImport, setOpenImport] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [confirmLoadingImport, setConfirmLoadingImport] = useState(false);
   const axiosPrivate = useAxiosPrivate();
   const [rombel, setRombel] = useState([]);
   const [rayon, setRayon] = useState([]);
   const [ekskul, setEkskul] = useState([]);
   const [error, setError] = useState();
   const [data, setData] = useState([]);
-  const [confirmLoading, setConfirmLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     nis: "",
@@ -28,6 +28,7 @@ const SiswaComponent = () => {
     mobileNumber: "",
     gender: "",
     rombel_id: "",
+    grade: "",
     rayon_id: "",
     ekskuls: [
       {
@@ -37,6 +38,7 @@ const SiswaComponent = () => {
   });
   const [formOld, setFormOld] = useState();
   const [loading, setLoading] = useState(false);
+  const [fileList, setFileList] = useState([]);
 
   const handleGetRequest = async () => {
     try {
@@ -137,6 +139,14 @@ const SiswaComponent = () => {
     value: item.id,
   }));
 
+  const showModalImport = () => {
+    setOpenImport(true);
+  };
+
+  const handleCancelImport = () => {
+    setOpenImport(false);
+  };
+
   const showModal = () => {
     setOpen(true);
   };
@@ -224,7 +234,7 @@ const SiswaComponent = () => {
   const handleAllExportExcel = async () => {
     try {
       const response = await axiosPrivate.get(`/student/export-all`, {
-        responseType: "blob", // Set the response type to 'blob'
+        responseType: "blob",
       });
 
       if (response.data) {
@@ -249,6 +259,49 @@ const SiswaComponent = () => {
     }
   };
 
+  const handleImportExcel = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+
+    try {
+      const formDataWithFile = new FormData();
+      formDataWithFile.append("file", fileList[0].originFileObj);
+
+      const axiosConfig = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
+      const apiEndpoint = "/student/import";
+      const response = await axiosPrivate.post(
+        apiEndpoint,
+        formDataWithFile,
+        axiosConfig
+      );
+
+      const successMessage = response.data.statusMessage;
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: successMessage,
+      });
+
+      event.preventDefault();
+      handleGetRequest();
+      setFormOld({});
+    } catch (error) {
+    } finally {
+      setLoading(false);
+      setConfirmLoading(false);
+      setOpen(false);
+    }
+  };
+
+  const handleFileChange = ({ fileList }) => {
+    setFileList(fileList);
+  };
+
   useEffect(() => {
     handleGetRombelRequest();
     handleGetRayonRequest();
@@ -267,12 +320,23 @@ const SiswaComponent = () => {
             <button
               onClick={handleAllExportExcel}
               className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+              title="Export All Data to Excel"
             >
               <AiOutlineFileExcel size={20} />
             </button>
+            {auth.role === "admin" && (
+              <button
+                onClick={showModalImport}
+                className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+                title="Import Data from Excel"
+              >
+                <FaFileImport size={20} />
+              </button>
+            )}
             <button
               onClick={showModal}
               className="bg-blue-500 p-2 text-white rounded-md hover:bg-yellow-500"
+              title="Add New Item"
             >
               <IoAddSharp size={20} />
             </button>
@@ -447,6 +511,25 @@ const SiswaComponent = () => {
               ]}
               placeholder="Pilih Kelas"
             />
+          </div>
+        </form>
+      </Modal>
+      <Modal
+        title="Masukkan file Excel yang akan diimpor"
+        onOk={handleImportExcel}
+        confirmLoading={confirmLoadingImport}
+        onCancel={handleCancelImport}
+        open={openImport}
+      >
+        <form action="" className="flex w-full items-center justify-center">
+          <div className="flex flex-col">
+            <Upload
+              onChange={handleFileChange}
+              showUploadList={true}
+              beforeUpload={() => false}
+            >
+              <Button icon={<LuUpload />}>Tekan Untuk Upload</Button>
+            </Upload>
           </div>
         </form>
       </Modal>

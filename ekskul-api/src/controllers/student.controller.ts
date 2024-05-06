@@ -91,4 +91,16 @@ export class StudentController extends StudentService {
       return res.status(error.statusCode).json(error);
     }
   };
+
+  importStudent = async (req: Request, res: Response): Promise<any> => {
+    try {
+      const serviceResponse: APIResponse = await this.importStudentService(
+        req,
+        res
+      );
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
 }

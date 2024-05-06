@@ -27,8 +27,6 @@ export class TaskService {
         ...req.body,
       });
 
-      console.log(createTask)
-
       if (!createTask)
         throw apiResponse(status.FORBIDDEN, "Gagal membuat tugas");
 

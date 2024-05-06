@@ -33,7 +33,6 @@ const TableAbsensiPost = ({ date }) => {
       (attendance) => attendance.student_id !== studentId
     );
     setformData([...updatedformData, newAttendance]);
-    console.log(newAttendance);
   };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {

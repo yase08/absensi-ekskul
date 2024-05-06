@@ -15,19 +15,6 @@ export class AttendanceController extends AttendanceService {
     }
   };
 
-  getWeeklyAttendanceChart = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
-    try {
-      const serviceResponse: APIResponse =
-        await this.getHistoryWeeklyAttendanceService(req);
-      return res.status(serviceResponse.statusCode).json(serviceResponse);
-    } catch (error: any) {
-      return res.status(error.statusCode).json(error);
-    }
-  };
-
   exportToExcelByInstructor = async (
     req: Request,
     res: Response
@@ -76,12 +63,38 @@ export class AttendanceController extends AttendanceService {
     }
   };
 
-  getChartAttendance = async (
+  getMonthlyAttendance = async (
     req: Request,
     res: Response
   ): Promise<Response> => {
     try {
-      const serviceResponse: APIResponse = await this.getChartAttendanceService(
+      const serviceResponse: APIResponse =
+        await this.getMonthlyAttendanceService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  getSemesterlyAttendance = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse =
+        await this.getSemesterlyAttendanceService(req);
+      return res.status(serviceResponse.statusCode).json(serviceResponse);
+    } catch (error: any) {
+      return res.status(error.statusCode).json(error);
+    }
+  };
+
+  getDailyAttendance = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const serviceResponse: APIResponse = await this.getDailyAttendanceService(
         req
       );
       return res.status(serviceResponse.statusCode).json(serviceResponse);

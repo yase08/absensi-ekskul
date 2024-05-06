@@ -52,11 +52,7 @@ const HariComponent = () => {
         if (Array.isArray(response.data.data)) {
           const ekskulData = response.data.data;
           setEkskul(ekskulData);
-        } else {
-          console.log("Data is not an array");
         }
-      } else {
-        console.log("Data retrieval failed");
       }
     } catch (error) {
       console.log(error);

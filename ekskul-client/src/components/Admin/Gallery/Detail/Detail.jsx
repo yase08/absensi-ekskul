@@ -1,162 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
-import { SearchOutlined } from "@ant-design/icons";
-import { Table, Input, Space, Button, Tag } from "antd";
-import { BsPencil } from "react-icons/bs";
-import { LuTrash } from "react-icons/lu";
-import { BiDetail } from "react-icons/bi";
-import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
+import { FaRegTrashAlt } from "react-icons/fa";
 
 const DetailGallery = ({ setFormOld, setOpen }) => {
   const { slug } = useParams();
-  const [searchText, setSearchText] = useState("");
-  const [searchedColumn, setSearchedColumn] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const searchInput = useRef(null);
-  const pageSizeOptions = [10, 20, 50];
-  const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
   const axiosPrivate = useAxiosPrivate();
-
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-  };
-  const handleReset = (clearFilters) => {
-    clearFilters();
-    setSearchText("");
-  };
-
-  const handleEdit = async (item) => {
-    setFormOld(item);
-    setOpen(true);
-  };
-
-  const handleSort = (dataIndex) => (a, b) => {
-    const valueA = a[dataIndex].toLowerCase();
-    const valueB = b[dataIndex].toLowerCase();
-
-    return valueA.localeCompare(valueB);
-  };
-
-  const getColumnSearchProps = (dataIndex) => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters,
-      close,
-    }) => (
-      <div
-        style={{
-          padding: 8,
-        }}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{
-            marginBottom: 8,
-            display: "block",
-          }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{
-              width: 90,
-            }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
-            style={{
-              width: 90,
-            }}
-          >
-            Reset
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              confirm({
-                closeDropdown: false,
-              });
-              setSearchText(selectedKeys[0]);
-              setSearchedColumn(dataIndex);
-            }}
-          >
-            Filter
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => {
-              close();
-            }}
-          >
-            close
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered) => (
-      <SearchOutlined
-        style={{
-          color: filtered ? "#1677ff" : undefined,
-        }}
-      />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownOpenChange: (visible) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
-    },
-    render: (text) => (searchedColumn === dataIndex ? <div>{text}</div> : text),
-  });
-
-  const handleChangePage = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleChangePageSize = (current, size) => {
-    setCurrentPage(1);
-    setPageSize(size);
-  };
-
-  const getPaginationConfig = () => ({
-    current: currentPage,
-    pageSize: pageSize,
-    total: data.length,
-    pageSizeOptions: pageSizeOptions,
-    showSizeChanger: true,
-    onChange: handleChangePage,
-    onShowSizeChange: handleChangePageSize,
-  });
 
   const handleGetRequest = async () => {
     try {
       const response = await axiosPrivate.get(`/gallery/detail/${slug}`);
-      console.log(response);
 
       if (response && response.data.data) {
         if (Array.isArray(response.data.data)) {
@@ -175,11 +32,13 @@ const DetailGallery = ({ setFormOld, setOpen }) => {
     }
   };
 
-  const handleDeleteRequest = async (id) => {
+  const handleDeleteRequest = async (id, imageName) => {
     setLoading(true);
 
     try {
-      const response = await axiosPrivate.delete(`/gallery/${id}`);
+      const response = await axiosPrivate.delete(`/gallery/image/${id}`, {
+        data: { imageName: imageName },
+      });
       const successMessage = response.data.statusMessage;
 
       Swal.fire({
@@ -239,12 +98,20 @@ const DetailGallery = ({ setFormOld, setOpen }) => {
               key={index}
             >
               {imageArray.map((imageName, imageIndex) => (
-                <img
-                  key={imageIndex}
-                  className="rounded-lg aspect-video"
-                  src={`http://localhost:8000/images/${imageName}`}
-                  alt={imageName}
-                />
+                <div className="flex flex-col px-5 py-3 rounded-lg">
+                  <img
+                    key={imageIndex}
+                    className="w-full"
+                    src={`http://localhost:8000/images/${imageName}`}
+                    alt={imageName}
+                  />
+                  <button
+                    className="w-full flex justify-center items-center bg-red-600 hover:bg-red-500 py-3"
+                    onClick={() => handleDeleteRequest(item.id, imageName)}
+                  >
+                    <FaRegTrashAlt className="text-xl" />
+                  </button>
+                </div>
               ))}
             </div>
           );
