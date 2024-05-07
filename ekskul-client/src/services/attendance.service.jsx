@@ -5,12 +5,11 @@ import { API, VERSION } from "../utils/baseUrl";
 
 export const exportAttendance = async (ekskul_id) => {
   try {
-    // const headers = {'Content-Type': 'blob',
-    //     Authorization: getTokenFromSessionStorage
-    //     ? `Bearer ${getTokenFromSessionStorage}`
-    //     : "",
-    //     Accept: "application/json"};
-    const configHeader = {method: 'GET', url: URL, responseType: 'arraybuffer'};
+    const configHeader = {
+      method: "GET",
+      url: URL,
+      responseType: "arraybuffer",
+    };
 
     const response = await axiosPrivate.get(
       `/attendance/export?ekskul_id=${ekskul_id}`,

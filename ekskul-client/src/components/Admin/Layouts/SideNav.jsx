@@ -1185,72 +1185,78 @@ const SideNav = ({
               </div>
             )}
 
-            <div
-              className={`flex flex-col gap-y-[13px] relative   ${
-                expanded ? "" : "w-full h-[55px] mt-[15px] flex justify-center"
-              }`}
-            >
+            {auth.role === "admin" && (
               <div
-                className={`bg-transparent w-full ${expanded ? "lg:px-1" : ""}`}
+                className={`flex flex-col gap-y-[13px] relative   ${
+                  expanded
+                    ? ""
+                    : "w-full h-[55px] mt-[15px] flex justify-center"
+                }`}
               >
-                <Link
-                  to="/admin/absensi-instruktur"
-                  onMouseEnter={handleNavbarHomeMouseEnter12}
-                  onMouseLeave={handleNavbarHomeMouseLeave12}
-                  className={`relative flex items-center    ${
-                    currentPath === "/admin/absensi-instruktur" ||
-                    currentPath === "/admin/absensi-instruktur/"
-                      ? expanded
-                        ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
-                        : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    currentPath === "/admin/absensi-instruktur" ||
-                    currentPath === "/admin/absensi-instruktur/"
-                      ? expanded
-                        ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
-                        : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
-                      : "w-full h-[60px] "
-                  } ${
-                    expanded
-                      ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
-                      : "justify-between lg:px-9"
+                <div
+                  className={`bg-transparent w-full ${
+                    expanded ? "lg:px-1" : ""
                   }`}
                 >
-                  <div className="flex gap-x-[24.5px] items-center ">
-                    <GiTeacher
-                      className={`opacity-100 ${
-                        expanded
-                          ? currentPath === "/data"
-                            ? "text-2xl opacity-100 text-white"
-                            : "text-2xl opacity-60 text-black"
-                          : "opacity-60"
-                      }`}
-                    />
-                    <p
-                      className={`opacity-60 text-sm ${
-                        expanded ? "lg:hidden" : ""
-                      } transition-opacity`}
-                    >
-                      Absensi Instruktur
-                    </p>
-                  </div>
-                </Link>
-                {infoHome12Navbar && (
-                  <div
-                    className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
-                      expanded ? "max-lg:hidden" : "hidden"
+                  <Link
+                    to="/admin/absensi-instruktur"
+                    onMouseEnter={handleNavbarHomeMouseEnter12}
+                    onMouseLeave={handleNavbarHomeMouseLeave12}
+                    className={`relative flex items-center    ${
+                      currentPath === "/admin/absensi-instruktur" ||
+                      currentPath === "/admin/absensi-instruktur/"
+                        ? expanded
+                          ? "lg:w-full lg:h-[50px] lg:bg-primary lg:rounded-md before:w-[4px] before:h-5 max-lg:px-9 before:bg-primary before:left-0 before:absolute"
+                          : " before:w-[4px] before:h-5  before:bg-primary before:left-0 before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      currentPath === "/admin/absensi-instruktur" ||
+                      currentPath === "/admin/absensi-instruktur/"
+                        ? expanded
+                          ? "w-full h-[50px] lg:bg-primary max-lg:bg-transparent rounded-md"
+                          : "before:w-[4px] before:h-5 before:bg-primary before:left-[0] before:absolute "
+                        : "w-full h-[60px] "
+                    } ${
+                      expanded
+                        ? "items-center lg:justify-center animate-fade-in-out max-lg:px-8"
+                        : "justify-between lg:px-9"
                     }`}
                   >
-                    <div className="bg-black py-[4px] px-[5px] rounded-sm ">
-                      <p className="font-semibold font-poppins text-sm z-50">
-                        Instruktur{" "}
+                    <div className="flex gap-x-[24.5px] items-center ">
+                      <GiTeacher
+                        className={`opacity-100 ${
+                          expanded
+                            ? currentPath === "/data"
+                              ? "text-2xl opacity-100 text-white"
+                              : "text-2xl opacity-60 text-black"
+                            : "opacity-60"
+                        }`}
+                      />
+                      <p
+                        className={`opacity-60 text-sm ${
+                          expanded ? "lg:hidden" : ""
+                        } transition-opacity`}
+                      >
+                        Absensi Instruktur
                       </p>
                     </div>
-                  </div>
-                )}
+                  </Link>
+                  {infoHome12Navbar && (
+                    <div
+                      className={`absolute w-auto h-full bg-transparent  text-white flex items-center left-[75px] top-0 ${
+                        expanded ? "max-lg:hidden" : "hidden"
+                      }`}
+                    >
+                      <div className="bg-black py-[4px] px-[5px] rounded-sm ">
+                        <p className="font-semibold font-poppins text-sm z-50">
+                          Instruktur{" "}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
             {auth.role === "admin" && (
               <div
                 className={`flex flex-col gap-y-[13px] relative   ${

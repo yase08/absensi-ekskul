@@ -59,187 +59,16 @@ function calculateTotalAttendance(attendance: any[]): Record<string, number> {
   return totalAttendanceByStudent;
 }
 
-const countAttendancePerWeekService = async () => {
-  try {
-    let currentWeekNumber = 1;
-    const ekskuls = await db.ekskul.findAll({
-      attributes: ["id"],
-    });
-
-    const totalAttendance = await Promise.all(
-      ekskuls.map(async (ekskul) => {
-        try {
-          const attendance = await db.attendance.count({
-            where: {
-              ekskul_id: ekskul.id,
-            },
-          });
-          return attendance;
-        } catch (error) {
-          console.error(
-            `Error counting attendance for ekskul ${ekskul.id}:`,
-            error
-          );
-          return 0;
-        }
-      })
-    );
-
-    if (!totalAttendance) {
-      throw apiResponse(status.NOT_FOUND, "No attendance found");
-    }
-
-    let createOrUpdateHistoryAttendance = [];
-
-    for (const ekskul of ekskuls) {
-      const historyAttendanceExist = await db.historyAttendance.findAll({
-        where: {
-          ekskul_id: ekskul.id,
-        },
-      });
-
-      if (historyAttendanceExist.length > 0) {
-        const updatedRecords = await Promise.all(
-          totalAttendance.map(async (ekskulCount, index) => {
-            try {
-              const existingRecord = historyAttendanceExist.find(
-                (record) => record.ekskul_id === ekskul.id
-              );
-
-              const updatedRecord = await db.historyAttendance.update(
-                {
-                  totalAttendance: ekskulCount,
-                  weekNumber: existingRecord.weekNumber + 1,
-                },
-                {
-                  where: {
-                    ekskul_id: ekskul.id,
-                  },
-                }
-              );
-
-              return updatedRecord;
-            } catch (error) {
-              console.error(
-                `Error updating history attendance for ekskul ${ekskul.id}:`,
-                error
-              );
-              return null;
-            }
-          })
-        );
-
-        createOrUpdateHistoryAttendance.push(...updatedRecords);
-      } else {
-        const createdRecords = await Promise.all(
-          totalAttendance.map(async (ekskulCount, index) => {
-            try {
-              const historyAttendance = await db.historyAttendance.create({
-                ekskul_id: ekskul.id,
-                totalAttendance: ekskulCount,
-                year: new Date().getFullYear(),
-                weekNumber: currentWeekNumber,
-              });
-
-              return historyAttendance;
-            } catch (error) {
-              console.error(
-                `Error creating history attendance for ekskul ${ekskul.id}:`,
-                error
-              );
-              return null;
-            }
-          })
-        );
-
-        createOrUpdateHistoryAttendance.push(...createdRecords);
-      }
-    }
-
-    currentWeekNumber++;
-
-    return createOrUpdateHistoryAttendance;
-  } catch (error: any) {
-    console.error("Unhandled promise rejection:", error);
-    return Promise.reject(
-      apiResponse(
-        error.statusCode || status.INTERNAL_SERVER_ERROR,
-        error.statusMessage,
-        error.message
-      )
-    );
-  }
-};
-
-const countAttendancePerMonthService = async () => {
-  try {
-    const ekskuls = await db.ekskul.findAll({
-      attributes: ["id"],
-    });
-
-    const totalAttendance = await Promise.all(
-      ekskuls.map(async (ekskul) => {
-        try {
-          const attendance = await db.attendance.count({
-            where: {
-              ekskul_id: ekskul.id,
-            },
-          });
-          return attendance;
-        } catch (error) {
-          console.error(
-            `Error counting attendance for ekskul ${ekskul.id}:`,
-            error
-          );
-          return 0;
-        }
-      })
-    );
-
-    if (!totalAttendance)
-      throw apiResponse(status.NOT_FOUND, "No attendance found");
-
-    const createHistoryAttendance = await Promise.all(
-      totalAttendance.map(async (ekskulCount, index) => {
-        try {
-          const historyAttendance = await db.historyAttendance.create({
-            ekskul_id: ekskuls[index].id,
-            totalAttendance: ekskulCount,
-            type: "month",
-            year: new Date().getFullYear(),
-          });
-          return historyAttendance;
-        } catch (error) {
-          console.error(
-            `Error creating history attendance for ekskul ${ekskuls[index].id}:`,
-            error
-          );
-          return null;
-        }
-      })
-    );
-
-    return createHistoryAttendance;
-  } catch (error: any) {
-    return Promise.reject(
-      apiResponse(
-        error.statusCode || status.INTERNAL_SERVER_ERROR,
-        error.statusMessage,
-        error.message
-      )
-    );
-  }
-};
-
 export class AttendanceService {
   async createAttendanceService(req: Request): Promise<any> {
     try {
       const ekskuls = (req.session as ISession).user.ekskul;
       const selectedEkskulId = req.query.ekskul_id as string;
+      const instructorId = (req.session as ISession).user.id;
       const semester = await checkSemester();
-      const date = req.body.date;
-      const newDate = new Date(date);
-      const timestamp = newDate.getTime();
+      const date = new Date().toLocaleDateString("id-ID", {
+        timeZone: "Asia/Jakarta",
+      });
 
       if (ekskuls.includes(selectedEkskulId)) {
         const createAttendancePromises = [];
@@ -253,7 +82,7 @@ export class AttendanceService {
           if (studentOnEkskul) {
             const createAttendancePromise = db.attendance.create({
               ...attendance,
-              date: timestamp,
+              date: date,
               semester: semester,
               ekskul_id: selectedEkskulId,
             });
@@ -270,6 +99,29 @@ export class AttendanceService {
 
         if (!createdAttendances.length) {
           throw apiResponse(status.FORBIDDEN, "Gagal menambahkan kehadiran");
+        }
+
+        if (ekskuls.includes(selectedEkskulId)) {
+          const userOnEkskul = await db.userOnEkskul.findOne({
+            where: { user_id: instructorId, ekskul_id: selectedEkskulId },
+          });
+
+          if (userOnEkskul) {
+            const createInstructorAttendance =
+              await db.instructorAttendance.create({
+                category: "hadir",
+                instructor_id: instructorId,
+                ekskul_id: selectedEkskulId,
+                date: date,
+              });
+
+            if (!createInstructorAttendance) {
+              throw apiResponse(
+                status.FORBIDDEN,
+                "Gagal menambahkan kehadiran instruktur"
+              );
+            }
+          }
         }
 
         return Promise.resolve(

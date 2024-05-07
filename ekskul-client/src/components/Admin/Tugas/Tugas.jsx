@@ -16,7 +16,7 @@ const TugasComponent = () => {
   const [formData, setFormData] = useState({
     name: "",
     ekskul_id: "",
-    date: "",
+    date: new Date().toLocaleDateString({ timeZone: "Asia/Jakarta" }),
     grade: "",
   });
   const { auth } = useAuth();
@@ -244,19 +244,6 @@ const TugasComponent = () => {
             }
             onChange={(e) => handleInputChange(e, "ekskul_id")}
             options={ekskulOption}
-          />
-          <label htmlFor="" className="text-lg">
-            Tanggal
-          </label>
-          <DatePicker
-            size="large"
-            format="DD-MM-YYYY"
-            placeholder="Masukan tanggal"
-            name="date"
-            value={
-              formOld && formOld.date ? dayjs(formOld.date) : formData.date
-            }
-            onChange={(e) => handleInputChange(e, "date")}
           />
           <div>
             <label htmlFor="" className="text-lg">
