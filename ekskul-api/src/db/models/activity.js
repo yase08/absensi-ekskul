@@ -8,9 +8,6 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.schedule, {
-        foreignKey: "schedule_id",
-      });
       this.belongsTo(models.room, {
         foreignKey: "room_id",
       });
@@ -27,12 +24,20 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
       },
-      schedule_id: {
-        type: DataTypes.UUID,
-        allowNull: false,
-      },
       grade: {
         type: DataTypes.ENUM("X", "XI", "XII"),
+        allowNull: false,
+      },
+      day: {
+        type: DataTypes.ENUM(
+          "SENIN",
+          "SELASA",
+          "RABU",
+          "KAMIS",
+          "JUMAT",
+          "SABTU",
+          "MINGGU"
+        ),
         allowNull: false,
       },
       room_id: {

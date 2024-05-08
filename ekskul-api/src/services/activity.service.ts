@@ -30,47 +30,12 @@ export class ActivityService {
 
   async getAllActivityService(req: Request): Promise<any> {
     try {
-      const sort: string =
-        typeof req.query.sort === "string" ? req.query.sort : "";
-      const filter: string =
-        typeof req.query.filter === "string" ? req.query.filter : "";
-      const page: any = req.query.page;
-
       const paramQuerySQL: any = {};
-      let limit: number;
-      let offset: number;
-
-      const totalRows = await db.activity.count();
 
       paramQuerySQL.include = [
         { model: db.room, as: "room", attributes: ["id", "name"] },
         { model: db.ekskul, as: "ekskul", attributes: ["id", "name"] },
-        { model: db.schedule, as: "schedule", attributes: ["id", "day"] },
       ];
-
-      if (sort) {
-        const sortOrder = sort.startsWith("-") ? "DESC" : "ASC";
-        const fieldName = sort.replace(/^-/, "");
-        paramQuerySQL.order = [[fieldName, sortOrder]];
-      }
-
-      if (page && page.size && page.number) {
-        limit = parseInt(page.size);
-        offset = (parseInt(page.number) - 1) * limit;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      } else {
-        limit = 10;
-        offset = 0;
-        paramQuerySQL.limit = limit;
-        paramQuerySQL.offset = offset;
-      }
-
-      if (filter) {
-        paramQuerySQL.where = {
-          schedule_id: parseInt(filter),
-        };
-      }
 
       const activity = await db.activity.findAll(paramQuerySQL);
 
@@ -84,6 +49,7 @@ export class ActivityService {
           startTime: activity.startTime,
           endTime: activity.endTime,
           grade: activity.grade,
+          day: activity.day,
           room: activity.room
             ? {
                 id: activity.room.id,
@@ -96,12 +62,6 @@ export class ActivityService {
                 name: activity.ekskul.name,
               }
             : null,
-          schedule: activity.schedule
-            ? {
-                id: activity.schedule.id,
-                day: activity.schedule.day,
-              }
-            : null,
           createdAt: activity.createdAt,
           updatedAt: activity.updatedAt,
         };
@@ -111,9 +71,7 @@ export class ActivityService {
         apiResponse(
           status.OK,
           "Berhasil mendapatkan semua aktivitas",
-          manipulatedActivity,
-          totalRows
-        )
+          manipulatedActivity        )
       );
     } catch (error: any) {
       return Promise.reject(

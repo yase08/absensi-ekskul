@@ -10,14 +10,13 @@ const Jadwal = () => {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     ekskul_id: "",
-    schedule_id: "",
+    day: "",
     room_id: "",
     grade: "",
     startTime: "",
     endTime: "",
   });
   const axiosPrivate = useAxiosPrivate();
-  const [hari, setHari] = useState([]);
   const [data, setData] = useState([]);
   const [error, setError] = useState();
   const [ekskul, setEkskul] = useState([]);
@@ -110,27 +109,6 @@ const Jadwal = () => {
     }
   };
 
-  const handleGetHariRequest = async () => {
-    try {
-      const response = await axiosPrivate.get(`/schedule/day`);
-
-      if (response && response.data.data) {
-        if (Array.isArray(response.data.data)) {
-          const hariData = response.data.data;
-          setHari(hariData);
-        } else {
-          console.log("Data is not an array");
-        }
-      } else {
-        console.log("Data retrieval failed");
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleGetEkskulRequest = async () => {
     try {
       const response = await axiosPrivate.get(`/ekskul`);
@@ -151,9 +129,11 @@ const Jadwal = () => {
     }
   };
 
+  const hari = ["SENIN", "SELASA", "RABU", "KAMIS", "JUMAT", "SABTU", "MINGGU"];
+
   const hariOption = hari.map((item) => ({
-    label: item.day,
-    value: item.id,
+    label: item,
+    value: item,
   }));
 
   const ekskulOption = ekskul.map((item) => ({
@@ -246,7 +226,6 @@ const Jadwal = () => {
   
   useEffect(() => {
     handleGetEkskulRequest();
-    handleGetHariRequest();
     handleGetRoomRequest();
     handleGetRequest();
   }, []);
@@ -285,8 +264,8 @@ const Jadwal = () => {
           <Select
             size="large"
             className="w-full"
-            value={formOld ? formOld.schedule_id : formData.schedule}
-            onChange={(e) => handleInputChange(e, "schedule_id")}
+            value={formOld ? formOld.day : formData.day}
+            onChange={(e) => handleInputChange(e, "day")}
             options={hariOption}
             placeholder="Pilih Hari"
           />

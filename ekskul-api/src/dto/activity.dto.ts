@@ -14,10 +14,6 @@ export class DTOActivity {
   @IsNotEmpty({ message: "Kelas tidak boleh kosong" })
   grade: string;
 
-  @IsNotEmpty({ message: "Jadwal tidak boleh kosong" })
-  @IsUUID()
-  schedule_id: string;
-
   @IsNotEmpty({ message: "Waktu mulai tidak boleh kosong" })
   @IsString({ message: "Waktu mulai tidak sesuai dengan format jam" })
   startTime: string;

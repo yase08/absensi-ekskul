@@ -16,31 +16,6 @@ class ScheduleRoutes extends ScheduleController {
   }
 
   routes(): Router {
-    this.router.post(
-      "/",
-      [
-        authorization(),
-        auth(),
-        permission(["admin", "instructor"]),
-        validator(DTOSchedule),
-      ],
-      this.createSchedule
-    );
-    this.router.put(
-      "/:id",
-      [authorization(), auth(), permission(["admin"]), validator(DTOSchedule)],
-      this.updateSchedule
-    );
-    this.router.get(
-      "/",
-      [authorization(), auth(), permission(["admin"])],
-      this.getAllSchedule
-    );
-    this.router.get(
-      "/day",
-      [authorization(), auth(), permission(["admin", "instructor"])],
-      this.getAllDay
-    );
     this.router.get("/ekskul", this.getSchedule);
 
     return this.router;

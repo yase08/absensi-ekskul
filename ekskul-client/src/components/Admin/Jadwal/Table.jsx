@@ -29,7 +29,6 @@ const TableJadwal = ({ setFormOld, setOpen, data, handleGetRequest }) => {
   const handleEdit = async (item) => {
     setFormOld({
       ...item,
-      schedule_id: item.schedule.id,
       room_id: item.room.id,
       ekskul_id: item.ekskul.id,
     });
@@ -203,12 +202,12 @@ const TableJadwal = ({ setFormOld, setOpen, data, handleGetRequest }) => {
     },
     {
       title: "Hari",
-      dataIndex: "schedule",
-      sorter: handleSort("schedule"),
+      dataIndex: "day",
+      sorter: handleSort("day"),
       sortDirections: ["descend", "ascend"],
       width: "20%",
-      ...getColumnSearchProps("schedule"),
-      render: (schedule) => (schedule.day ? schedule.day : "-"),
+      ...getColumnSearchProps("day"),
+      render: (day) => (day ? day : "-"),
     },
     {
       title: "Ekstrakurikuler",

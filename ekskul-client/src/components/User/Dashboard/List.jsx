@@ -74,7 +74,7 @@ const List = () => {
             <div className="grid grid-cols-6 max-lg:grid-cols-5 max-md:grid-cols-4 max-sm:grid-cols-3 w-full gap-[5px]">
               <div className="h-auto gap-[5px] bg-transparent flex flex-col">
                 {schedule
-                  .find((schedule) => schedule.day === "Senin")
+                  .find((schedule) => schedule.day === "SENIN")
                   ?.activities.map((activity, index) => (
                     <div
                       className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
@@ -102,7 +102,7 @@ const List = () => {
 
               <div className="h-auto gap-[5px] bg-transparent flex flex-col">
                 {schedule
-                  .find((schedule) => schedule.day === "Selasa")
+                  .find((schedule) => schedule.day === "SELASA")
                   ?.activities.map((activity, index) => (
                     <div
                       className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
@@ -130,7 +130,7 @@ const List = () => {
 
               <div className="h-auto gap-[5px] bg-transparent flex flex-col">
                 {schedule
-                  .find((schedule) => schedule.day === "Rabu")
+                  .find((schedule) => schedule.day === "RABU")
                   ?.activities.map((activity, index) => (
                     <div
                       className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
@@ -158,7 +158,7 @@ const List = () => {
 
               <div className="h-auto gap-[5px] bg-transparent flex flex-col">
                 {schedule
-                  .find((schedule) => schedule.day === "Kamis")
+                  .find((schedule) => schedule.day === "KAMIS")
                   ?.activities.map((activity, index) => (
                     <div
                       className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
@@ -186,7 +186,7 @@ const List = () => {
 
               <div className="h-auto gap-[5px] bg-transparent flex flex-col">
                 {schedule
-                  .find((schedule) => schedule.day === "Jumat")
+                  .find((schedule) => schedule.day === "JUMAT")
                   ?.activities.map((activity, index) => (
                     <div
                       className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"
@@ -214,7 +214,7 @@ const List = () => {
 
               <div className="h-auto gap-[5px] bg-transparent flex flex-col">
                 {schedule
-                  .find((schedule) => schedule.day === "Sabtu")
+                  .find((schedule) => schedule.day === "SABTU")
                   ?.activities.map((activity, index) => (
                     <div
                       className="h-[150px] rounded-md overflow-hidden bg-blue-300 flex items-end justify-end  flex-col relative"

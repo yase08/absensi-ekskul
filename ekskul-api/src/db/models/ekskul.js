@@ -38,11 +38,6 @@ module.exports = (sequelize, DataTypes) => {
         as: "galleries",
         onDelete: "CASCADE",
       });
-      this.hasMany(models.historyAttendance, {
-        foreignKey: "ekskul_id",
-        as: "historyAttendances",
-        onDelete: "CASCADE",
-      });
     }
   }
   ekskul.init(
